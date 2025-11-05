@@ -14,6 +14,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@code0-tech/pictor": "^0.0.0-mvp.rc.1",
     "next": "16.0.1",
     "react": "19.2.0",
     "react-dom": "19.2.0"
