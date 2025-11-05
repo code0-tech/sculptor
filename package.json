@@ -1,0 +1,29 @@
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "predev": "node edition.mjs",
+    "dev": "next dev",
+    "dev:ce": "cross-env EDITION=ce npm run dev",
+    "dev:ee": "cross-env EDITION=ee npm run dev",
+    "dev:cloud": "cross-env EDITION=cloud npm run dev",
+    "prebuild": "node edition.mjs",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "next": "16.0.1",
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.0.1",
+    "typescript": "^5"
+  }
+}
