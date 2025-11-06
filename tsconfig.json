@@ -26,8 +26,12 @@
       "@/*": [
         "./src/*"
       ],
-      "@edition/*": ["src/packages/ce/src/*"],
-      "@core/*": ["src/packages/core/src/*"]
+      "@edition/*": [
+        "src/packages/ce/src/*"
+      ],
+      "@core/*": [
+        "src/packages/core/src/*"
+      ]
     }
   },
   "baseUrl": ".",
