@@ -4,13 +4,22 @@ import path from "node:path";
 
 const root = process.cwd();
 const edition = process.env.EDITION ?? "ce";
-const current = path.join(root, "src/packages/ce");
 const target = path.join(root, `src/packages/${edition}`);
 
-if (!fs.existsSync(target)) {
+const editionImports = {
+    cloud: ["src/packages/cloud/src/*", "src/packages/ee/src/*", "src/packages/ce/src/*"],
+    ee: ["src/packages/ee/src/*", "src/packages/ce/src/*"],
+    ce: ["src/packages/ce/src/*"],
+}
+
+if (!fs.existsSync(target) || !editionImports[edition]) {
     console.error(`[set-edition] Edition not found: ${target}`);
     process.exit(1);
 }
-try { fs.rmSync(current, { recursive: true, force: true }); } catch {}
-fs.symlinkSync(target, current, "junction");
+
+const tsconfig = path.join(root, 'tsconfig.json');
+const tsconf = JSON.parse(fs.readFileSync(tsconfig));
+tsconf.compilerOptions.paths['@edition/*'] = editionImports[edition];
+fs.writeFileSync(tsconfig, JSON.stringify(tsconf, null, 2));
+
 console.log(`[set-edition] current -> ${edition}`);
