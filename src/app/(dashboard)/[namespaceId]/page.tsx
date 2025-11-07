@@ -1,5 +1,3 @@
-import {Test} from "../../../packages/ce/src/Test";
-
-export default function Home() {
-    return <Test/>
+export default function NamespacePage() {
+    return <>Namespace page (view all projects)</>
 }

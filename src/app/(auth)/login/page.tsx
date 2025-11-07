@@ -1,3 +1,5 @@
-export default function Home() {
-    return <>Login</>
+import React from "react";
+
+export default function LoginPage() {
+    return <>Login page</>
 }

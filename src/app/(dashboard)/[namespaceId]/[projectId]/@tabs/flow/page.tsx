@@ -1,3 +1,3 @@
 export default function ProjectPage() {
-    return <>Project page</>
+    return <>Flows page</>
 }

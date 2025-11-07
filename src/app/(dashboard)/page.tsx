@@ -1,3 +1,3 @@
-export default function Home() {
-  return <>Application view</>
+export default function ApplicationPage() {
+  return <>Application page</>
 }
