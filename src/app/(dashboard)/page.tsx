@@ -1,3 +1,5 @@
 export default function ApplicationPage() {
-  return <>Application page</>
+  return <>
+    Application page
+  </>
 }

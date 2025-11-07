@@ -1,0 +1,13 @@
+mutation emailVerification($token: String!) {
+    usersEmailVerification(input: {
+        token: $token
+    }) {
+        errors {
+            ...on ActiveModelError { attribute type }
+            ...on MessageError { message }
+        }
+        user {
+            ...UserId
+        }
+    }
+}

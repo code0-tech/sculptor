@@ -1,0 +1,22 @@
+mutation login($email: String!, $password: String!, $username: String) {
+    usersLogin(input: {
+        email: $email
+        password: $password
+        username: $username
+    }) {
+        errors {
+            ...on ActiveModelError { attribute type }
+            ...on MessageError { message }
+        }
+        userSession {
+            updatedAt
+            token
+            active
+            createdAt
+            id
+            user {
+                ...User
+            }
+        }
+    }
+}

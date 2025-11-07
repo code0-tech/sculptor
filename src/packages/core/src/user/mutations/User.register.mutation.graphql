@@ -1,0 +1,23 @@
+mutation register($email: String!, $password: String!, $passwordRepeat: String!, $username: String!) {
+    usersRegister(input: {
+        email: $email
+        password: $password
+        passwordRepeat: $passwordRepeat
+        username: $username
+    }) {
+        errors {
+            ...on ActiveModelError { attribute type }
+            ...on MessageError { message }
+        }
+        userSession {
+            updatedAt
+            token
+            active
+            createdAt
+            id
+            user {
+                ...User
+            }
+        }
+    }
+}
