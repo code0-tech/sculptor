@@ -14,18 +14,19 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@code0-tech/pictor": "^0.0.0-mvp.4",
+    "@apollo/client": "^4.0.9",
+    "@code0-tech/pictor": "^0.0.0-mvp.5",
+    "graphql": "^16.12.0",
+    "graphql-tag": "^2.12.6",
     "next": "16.0.1",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "react-relay": "^20.1.1",
-    "relay-runtime": "^20.1.1"
+    "rxjs": "^7.8.2"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/react-relay": "^18.2.1",
     "eslint": "^9",
     "eslint-config-next": "16.0.1",
     "typescript": "^5"

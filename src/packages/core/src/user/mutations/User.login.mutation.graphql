@@ -1,3 +1,4 @@
+#import '../queries/User.basic.fragment.graphql'
 mutation login($email: String!, $password: String!, $username: String) {
     usersLogin(input: {
         email: $email
@@ -7,6 +8,7 @@ mutation login($email: String!, $password: String!, $username: String) {
         errors {
             ...on ActiveModelError { attribute type }
             ...on MessageError { message }
+            ...on ErrorCode { errorCode }
         }
         userSession {
             updatedAt
