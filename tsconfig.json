@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
-    "types": ["./graphql-imports"],
+    "types": [
+      "./graphql-imports"
+    ],
     "target": "ES2017",
     "lib": [
       "dom",
