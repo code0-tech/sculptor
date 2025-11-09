@@ -1,5 +1,6 @@
 import {DUserReactiveService, DUserView, ReactiveArrayStore} from "@code0-tech/pictor";
 import {
+    Query,
     User,
     UsersEmailVerificationInput,
     UsersEmailVerificationPayload,
@@ -30,7 +31,7 @@ import {
 } from "@code0-tech/sagittarius-graphql-types";
 import {GraphqlClient} from "@core/util/graphql-client";
 import loginMutation from "../user/mutations/User.login.mutation.graphql";
-import logoutMutation from "../user/mutations/User.login.mutation.graphql";
+import userQuery from "../user/queries/User.query.graphql";
 
 export class UserService extends DUserReactiveService {
 
@@ -42,6 +43,20 @@ export class UserService extends DUserReactiveService {
     }
 
     values(): DUserView[] {
+        this.client.query<Query>({
+            query: userQuery
+        }).then(result => {
+            const data = result.data
+            if (!data) return
+
+            if (data && data.currentUser) this.add(new DUserView(data.currentUser))
+            if (data.users && data.users.nodes) {
+                for (const user of data.users.nodes) {
+                    if (user) this.add(new DUserView(user))
+                }
+            }
+        })
+
         return super.values();
     }
 
@@ -75,7 +90,7 @@ export class UserService extends DUserReactiveService {
     }
 
     async usersLogin(payload: UsersLoginInput): Promise<UsersLoginPayload | undefined> {
-        const result = await this.client.mutate<UsersLoginPayload, UsersLoginInput>({
+        const result = await this.client.mutate<{ usersLogin: UsersLoginPayload }, UsersLoginInput>({
             mutation: loginMutation,
             variables: {
                 ...payload
@@ -83,15 +98,15 @@ export class UserService extends DUserReactiveService {
         })
 
         //store user session
-        if (result.data && result.data.userSession) {
-            this.createUserSession(result.data.userSession)
+        if (result.data && result.data.usersLogin && result.data.usersLogin.userSession) {
+            this.createUserSession(result.data.usersLogin.userSession)
         }
 
-        if (result.data && result.data.userSession?.user) {
-            this.add(new DUserView(result.data.userSession.user))
+        if (result.data && result.data.usersLogin && result.data.usersLogin.userSession?.user) {
+            this.add(new DUserView(result.data.usersLogin.userSession.user))
         }
 
-        return result.data ?? undefined
+        return result.data?.usersLogin ?? undefined
     }
 
     usersLogout(payload: UsersLogoutInput): Promise<UsersLogoutPayload | undefined> {
