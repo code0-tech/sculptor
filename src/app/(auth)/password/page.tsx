@@ -1,5 +1,6 @@
 import React from "react";
+import {UserForgotPasswordPage} from "@edition/user/UserForgotPasswordPage";
 
-export default function PasswordResetPage() {
-    return <>Password reset page</>
+export default function Page() {
+    return <UserForgotPasswordPage/>
 }
