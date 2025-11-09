@@ -9,6 +9,7 @@ import Link from "next/link";
 export const UserLoginPage: React.FC = () => {
 
     const userService = useService(UserService)
+
     const [inputs, validate] = useForm({
         initialValues: {
             emailOrUsername: null,
