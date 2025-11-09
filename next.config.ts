@@ -4,6 +4,7 @@ import path from "node:path";
 const EDITION = process.env.EDITION ?? "ce";
 
 const nextConfig: NextConfig = {
+    reactStrictMode: true,
     turbopack: {
         resolveAlias: {
             "@edition": path.resolve(__dirname, `src/packages/${EDITION}/src`),
