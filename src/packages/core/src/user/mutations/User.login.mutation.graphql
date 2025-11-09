@@ -1,4 +1,4 @@
-#import '../queries/User.basic.fragment.graphql'
+#import '../fragments/User.basic.fragment.graphql'
 mutation login($email: String!, $password: String!, $username: String) {
     usersLogin(input: {
         email: $email
@@ -17,7 +17,7 @@ mutation login($email: String!, $password: String!, $username: String) {
             createdAt
             id
             user {
-                ...User
+                ...UserBasic
             }
         }
     }
