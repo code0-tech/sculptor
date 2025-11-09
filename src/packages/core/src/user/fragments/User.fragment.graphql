@@ -1,5 +1,5 @@
-#import "../identity/fragments/Identity.fragment.graphql"
-#import "../session/fragments/Session.fragment.graphql"
+#import "../../identity/fragments/Identity.fragment.graphql"
+#import "../../session/fragments/Session.fragment.graphql"
 fragment User on User {
     admin
     avatarPath
