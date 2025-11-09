@@ -1,6 +1,5 @@
 "use client";
 
-import {DFullScreen} from "@code0-tech/pictor";
 import {ApolloClient, ApolloLink, HttpLink, InMemoryCache} from "@apollo/client";
 import {ApolloProvider} from "@apollo/client/react";
 import {UserSession} from "@code0-tech/sagittarius-graphql-types";
@@ -37,9 +36,7 @@ export default function RootLayout({children}: Readonly<{ children: React.ReactN
         return <html>
         <body>
         <ApolloProvider client={client}>
-            <DFullScreen>
-                {children}
-            </DFullScreen>
+            {children}
         </ApolloProvider>
         </body>
         </html>
