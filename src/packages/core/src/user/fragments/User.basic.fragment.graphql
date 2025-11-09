@@ -1,4 +1,4 @@
-fragment User on User {
+fragment UserBasic on User {
     admin
     avatarPath
     createdAt
