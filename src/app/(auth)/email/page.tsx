@@ -1,5 +1,6 @@
 import React from "react";
+import {UserEmailVerificationPage} from "@edition/user/UserEmailVerificationPage";
 
-export default function EmailVerificationPage() {
-    return <>Email verification page</>
+export default function Page() {
+    return <UserEmailVerificationPage/>
 }
