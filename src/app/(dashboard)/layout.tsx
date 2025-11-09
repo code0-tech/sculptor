@@ -17,14 +17,14 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, modal, b
     const client = useApolloClient()
     const [store, service] = useReactiveArrayService<DUserView, UserService>((store) => new UserService(new GraphqlClient(client), store))
 
-    return React.useMemo(() => <Container>
+    return <Container>
         <ContextStoreProvider services={[[store, service]]}>
             {modal}
             <DLayout topContent={bar}>
                 {children}
             </DLayout>
         </ContextStoreProvider>
-    </Container>, [client, children, modal, bar])
+    </Container>
 }
 
-export default ApplicationLayout
+export default React.memo(ApplicationLayout)

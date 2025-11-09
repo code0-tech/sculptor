@@ -9,7 +9,7 @@ import {
     MenuSeparator,
     Text,
     TextInput,
-    useService
+    useService, useStore
 } from "@code0-tech/pictor";
 import DUserMenu from "@code0-tech/pictor/dist/components/d-user/DUserMenu";
 import {UserService} from "@core/user/User.service";
@@ -58,4 +58,4 @@ const Page = memo(() => {
     </Flex>
 })
 
-export default Page
+export default React.memo(Page)

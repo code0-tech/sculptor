@@ -2,8 +2,9 @@
 
 import {Button, Flex, Text} from "@code0-tech/pictor";
 import {IconBuilding, IconChevronDown, IconPlus} from "@tabler/icons-react";
+import React from "react";
 
-export default function ApplicationPage() {
+const Page = () => {
 
   return <Flex style={{flexDirection: "column", gap: "1.3rem"}}>
     <Flex justify={"space-between"} align={"center"}>
@@ -23,3 +24,5 @@ export default function ApplicationPage() {
     </Flex>
   </Flex>
 }
+
+export default React.memo(Page);

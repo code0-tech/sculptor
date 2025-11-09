@@ -43,6 +43,7 @@ export class UserService extends DUserReactiveService {
     }
 
     values(): DUserView[] {
+        if (super.values().length > 0) return super.values();
         this.client.query<Query>({
             query: userQuery
         }).then(result => {
