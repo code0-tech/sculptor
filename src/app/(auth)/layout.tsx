@@ -15,7 +15,7 @@ export default function AuthLayout({children}: Readonly<{ children: React.ReactN
     return (
         <html>
         <body style={{
-            backgroundImage: "url(./CodeZero_Rainbow.png)",
+            backgroundImage: "url(/CodeZero_Rainbow.png)",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "center bottom"
         }}>
