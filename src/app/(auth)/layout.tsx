@@ -1,6 +1,6 @@
 "use client"
 
-import {ContextStoreProvider, DUserView, Text, useReactiveArrayService} from "@code0-tech/pictor";
+import {Col, Container, ContextStoreProvider, DUserView, Flex, Text, useReactiveArrayService} from "@code0-tech/pictor";
 import {UserService} from "@core/user/User.service";
 import {useApolloClient} from "@apollo/client/react";
 import {GraphqlClient} from "@core/util/graphql-client";
@@ -20,7 +20,13 @@ export default function AuthLayout({children}: Readonly<{ children: React.ReactN
             backgroundPosition: "center bottom"
         }}>
         <ContextStoreProvider services={[[store, service]]}>
-            {children}
+            <Container h={"100%"} w={"100%"}>
+                <Flex h={"100%"} w={"100%"} align={"center"} justify={"center"}>
+                    <Col xs={4}>
+                        {children}
+                    </Col>
+                </Flex>
+            </Container>
         </ContextStoreProvider>
         <div style={{
             position: "fixed",
