@@ -6,7 +6,6 @@ import {ApolloProvider} from "@apollo/client/react";
 import {UserSession} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
 import "./global.scss"
-import Image from "next/image";
 
 
 export default function RootLayout({children}: Readonly<{ children: React.ReactNode }>) {
@@ -17,7 +16,7 @@ export default function RootLayout({children}: Readonly<{ children: React.ReactN
         if (token) {
             operation.setContext({
                 headers: {
-                    authorization: token
+                    authorization: `Session ${token}`
                 }
             })
         }
@@ -29,13 +28,13 @@ export default function RootLayout({children}: Readonly<{ children: React.ReactN
         if (userSession && userSession.token) setToken(userSession.token)
     }, [])
 
-    const client = new ApolloClient({
+    const client = React.useMemo(() => new ApolloClient({
         cache: new InMemoryCache(),
         link: ApolloLink.from([authMiddleware, new HttpLink({uri: "/graphql"})]),
-    });
+    }), [authMiddleware]);
 
-    return (
-        <html>
+    return React.useMemo(() => {
+        return <html>
         <body>
         <ApolloProvider client={client}>
             <DFullScreen>
@@ -44,5 +43,5 @@ export default function RootLayout({children}: Readonly<{ children: React.ReactN
         </ApolloProvider>
         </body>
         </html>
-    );
+    }, [client, children])
 }
