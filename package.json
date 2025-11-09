@@ -15,13 +15,14 @@
   },
   "dependencies": {
     "@apollo/client": "^4.0.9",
-    "@code0-tech/pictor": "^0.0.0-mvp.5",
+    "@code0-tech/pictor": "^0.0.0-mvp.6",
     "graphql": "^16.12.0",
     "graphql-tag": "^2.12.6",
     "next": "16.0.1",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "rxjs": "^7.8.2"
+    "rxjs": "^7.8.2",
+    "sass": "^1.93.3"
   },
   "devDependencies": {
     "@types/node": "^20",
