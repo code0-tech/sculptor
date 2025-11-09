@@ -91,7 +91,7 @@ export class GraphqlClient {
                 t.pageInfo = {
                     ...t.pageInfo,
                     ...s.pageInfo,
-                    endCursor: s.pageInfo.endCursor ?? t.pageInfo?.endCursor,
+                    endCursor: s.pageInfo.endCursor
                 };
             }
             if (typeof t.count === "number" && typeof s.count === "number") {
@@ -104,7 +104,7 @@ export class GraphqlClient {
             // Nächste Connection mit restlichen Seiten finden
             const next = uniqSpecs.find(s => {
                 const c = getAt(aggregated, s.path);
-                return !!c?.pageInfo?.hasNextPage && !!c?.pageInfo?.endCursor;
+                return !!c?.pageInfo?.hasNextPage;
             });
             if (!next) break;
 
