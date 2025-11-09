@@ -1,5 +1,6 @@
 import React from "react";
+import {UserRegistrationPage} from "@edition/user/UserRegistrationPage";
 
-export default function RegistrationPage() {
-    return <>Registration page</>
+export default function Page() {
+    return <UserRegistrationPage/>
 }
