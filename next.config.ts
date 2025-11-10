@@ -5,6 +5,7 @@ const EDITION = process.env.EDITION ?? "ce";
 
 const nextConfig: NextConfig = {
     reactStrictMode: true,
+    reactCompiler: true,
     turbopack: {
         resolveAlias: {
             "@edition": path.resolve(__dirname, `src/packages/${EDITION}/src`),
