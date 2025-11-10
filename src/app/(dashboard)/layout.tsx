@@ -28,7 +28,7 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
                 {tab}
             </>
         }>
-            <Container>
+            <Container py={1.3}>
                 {children}
             </Container>
         </DLayout>
