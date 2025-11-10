@@ -4,6 +4,10 @@ import path from "node:path";
 const EDITION = process.env.EDITION ?? "ce";
 
 const nextConfig: NextConfig = {
+    env: {
+        NEXT_PUBLIC_edition: EDITION,
+        NEXT_PUBLIC_pictorVersion: "11"
+    },
     reactStrictMode: true,
     reactCompiler: true,
     turbopack: {
