@@ -9,7 +9,7 @@ import {
     MenuSeparator,
     Text,
     TextInput,
-    useService, useStore
+    useService
 } from "@code0-tech/pictor";
 import DUserMenu from "@code0-tech/pictor/dist/components/d-user/DUserMenu";
 import {UserService} from "@core/user/User.service";
@@ -30,8 +30,13 @@ const Page = () => {
 
     return <Flex style={{gap: "0.7rem", flexDirection: "column"}} py={1.3} w={"100%"}>
         <Flex align={"center"} justify={"space-between"}>
-            <Image src={"/CodeZero_Banner_Transparent.png"} alt={"CodeZero Banner"} width={160} height={0}
-                   style={{width: '160px', height: 'auto'}}/>
+            <Flex align={"center"} style={{gap: "1.3rem"}}>
+                <Image src={"/CodeZero_App_Background_Colorful.png"} alt={"CodeZero Banner"} width={160} height={0}
+                       style={{width: '42px', height: 'auto'}}/>
+                <Breadcrumb>
+                    <Text>Application</Text>
+                </Breadcrumb>
+            </Flex>
             <Flex align={"center"} style={{gap: "0.7rem"}}>
                 <TextInput disabled left={<IconSearch size={16}/>} right={<Badge>⌘K</Badge>} rightType={"icon"}
                            placeholder={"Search..."}/>
@@ -52,9 +57,6 @@ const Page = () => {
                 </DUserMenu>
             </Flex>
         </Flex>
-        <Breadcrumb>
-            <Text>Application</Text>
-        </Breadcrumb>
     </Flex>
 }
 
