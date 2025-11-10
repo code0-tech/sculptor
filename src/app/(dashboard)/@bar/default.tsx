@@ -3,7 +3,7 @@
 import {
     Badge,
     Breadcrumb,
-    Button,
+    Button, Container,
     Flex,
     MenuItem,
     MenuSeparator,
@@ -28,36 +28,38 @@ const Page = () => {
         return null
     }
 
-    return <Flex style={{gap: "0.7rem", flexDirection: "column"}} py={1.3} w={"100%"}>
-        <Flex align={"center"} justify={"space-between"}>
-            <Flex align={"center"} style={{gap: "1.3rem"}}>
-                <Image src={"/CodeZero_App_Background_Colorful.png"} alt={"CodeZero Banner"} width={160} height={0}
-                       style={{width: '42px', height: 'auto'}}/>
-                <Breadcrumb>
-                    <Text>Application</Text>
-                </Breadcrumb>
-            </Flex>
-            <Flex align={"center"} style={{gap: "0.7rem"}}>
-                <TextInput disabled left={<IconSearch size={16}/>} right={<Badge>⌘K</Badge>} rightType={"icon"}
-                           placeholder={"Search..."}/>
-                <Button>
-                    <IconInbox size={16}/>
-                </Button>
-                <DUserMenu userId={currentSession.user?.id!!}>
-                    <MenuItem>
-                        <IconBuilding size={16}/>Organizations
-                    </MenuItem>
-                    <MenuItem>
-                        <IconSettings size={16}/>Settings
-                    </MenuItem>
-                    <MenuSeparator/>
-                    <MenuItem>
-                        <IconLogout size={16}/>Logout
-                    </MenuItem>
-                </DUserMenu>
+    return <Container>
+        <Flex style={{gap: "0.7rem", flexDirection: "column"}} py={0.7} w={"100%"}>
+            <Flex align={"center"} justify={"space-between"}>
+                <Flex align={"center"} style={{gap: "1.3rem"}}>
+                    <Image src={"/CodeZero_App_Background_Colorful.png"} alt={"CodeZero Banner"} width={160} height={0}
+                           style={{width: '42px', height: 'auto'}}/>
+                    <Breadcrumb>
+                        <Text>Application</Text>
+                    </Breadcrumb>
+                </Flex>
+                <Flex align={"center"} style={{gap: "0.7rem"}}>
+                    <TextInput disabled left={<IconSearch size={16}/>} right={<Badge>⌘K</Badge>} rightType={"icon"}
+                               placeholder={"Search..."}/>
+                    <Button>
+                        <IconInbox size={16}/>
+                    </Button>
+                    <DUserMenu userId={currentSession.user?.id!!}>
+                        <MenuItem>
+                            <IconBuilding size={16}/>Organizations
+                        </MenuItem>
+                        <MenuItem>
+                            <IconSettings size={16}/>Settings
+                        </MenuItem>
+                        <MenuSeparator/>
+                        <MenuItem>
+                            <IconLogout size={16}/>Logout
+                        </MenuItem>
+                    </DUserMenu>
+                </Flex>
             </Flex>
         </Flex>
-    </Flex>
+    </Container>
 }
 
 export default Page
