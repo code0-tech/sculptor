@@ -18,7 +18,7 @@ import {IconBuilding, IconInbox, IconLogout, IconSearch, IconSettings} from "@ta
 import React, {memo} from "react";
 import Image from "next/image";
 
-const Page = memo(() => {
+const Page = () => {
 
     const userService = useService(UserService)
     const router = useRouter()
@@ -56,6 +56,6 @@ const Page = memo(() => {
             <Text>Application</Text>
         </Breadcrumb>
     </Flex>
-})
+}
 
-export default React.memo(Page)
+export default Page
