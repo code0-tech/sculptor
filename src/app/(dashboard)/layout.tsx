@@ -21,14 +21,12 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
         <DLayout topContent={
             <>
                 <div style={{background: "rgba(255,2552,255,.1)", borderBottom: "1px solid rgba(255,2552,255,.1)"}}>
-                    <Container>
-                        {bar}
-                    </Container>
+                    {bar}
+                    {tab}
                 </div>
-                {tab}
             </>
         }>
-            <Container py={1.3}>
+            <Container>
                 {children}
             </Container>
         </DLayout>
