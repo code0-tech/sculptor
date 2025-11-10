@@ -10,21 +10,31 @@ interface ApplicationLayoutProps {
     children: React.ReactElement
     modal: React.ReactElement
     bar: React.ReactElement
+    tab: React.ReactElement
 }
 
-const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, modal, bar}) => {
+const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, modal, bar, tab}) => {
 
     const client = useApolloClient()
     const [store, service] = useReactiveArrayService<DUserView, UserService>((store) => new UserService(new GraphqlClient(client), store))
 
-    return <Container>
-        <ContextStoreProvider services={[[store, service]]}>
-            {modal}
-            <DLayout topContent={bar}>
-                {children}
-            </DLayout>
-        </ContextStoreProvider>
-    </Container>
+    return <ContextStoreProvider services={[[store, service]]}>
+        {modal}
+        <DLayout topContent={<div
+            style={{background: "rgba(255,2552,255,.1)", borderBottom: "1px solid rgba(255,2552,255,.1)"}}>
+            <Container>{bar}</Container></div>}>
+            <>
+                <div style={{background: "rgba(255,2552,255,.1)", borderBottom: "1px solid rgba(255,2552,255,.1)"}}>
+                    <Container>
+                        {tab}
+                    </Container>
+                </div>
+                <Container py={1.3}>
+                    {children}
+                </Container>
+            </>
+        </DLayout>
+    </ContextStoreProvider>
 }
 
 export default React.memo(ApplicationLayout)

@@ -52,7 +52,9 @@ export const UserRegistrationPage: React.FC = () => {
             Build high-class workflows, endpoints and software without coding
         </Text>
         <Flex style={{gap: "1.3rem"}}>
+            {/**@ts-ignore**/}
             <EmailInput wrapperComponent={{style: {flex: 1}}} placeholder={"Email"} {...inputs.getInputProps("email")}/>
+            {/**@ts-ignore**/}
             <TextInput wrapperComponent={{style: {flex: 1}}} placeholder={"Username"}
                        w={"100%"} {...inputs.getInputProps("username")}/>
         </Flex>
