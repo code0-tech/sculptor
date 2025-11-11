@@ -31,6 +31,7 @@ import {
 } from "@code0-tech/sagittarius-graphql-types";
 import {GraphqlClient} from "@core/util/graphql-client";
 import loginMutation from "../user/mutations/User.login.mutation.graphql";
+import logoutMutation from "../user/mutations/User.logout.mutation.graphql";
 import userQuery from "../user/queries/User.query.graphql";
 
 export class UserService extends DUserReactiveService {
@@ -63,6 +64,16 @@ export class UserService extends DUserReactiveService {
 
     getById(id: User["id"]): DUserView | undefined {
         return super.getById(id);
+    }
+
+    deleteById(id: User["id"]): void {
+        const index = this.values().findIndex(user => user.id === id)
+        this.delete(index)
+    }
+
+    hasById(id: User["id"]): boolean {
+        const user = this.getById(id);
+        return user !== undefined;
     }
 
     /** @alpha **/
@@ -98,15 +109,26 @@ export class UserService extends DUserReactiveService {
             }
         })
 
-        if (result.data && result.data.usersLogin && result.data.usersLogin.userSession?.user) {
+        if (result.data && result.data.usersLogin && result.data.usersLogin.userSession?.user && !this.hasById(result.data.usersLogin.userSession?.user.id)) {
             this.add(new DUserView(result.data.usersLogin.userSession.user))
         }
 
         return result.data?.usersLogin ?? undefined
     }
 
-    usersLogout(payload: UsersLogoutInput): Promise<UsersLogoutPayload | undefined> {
-        return Promise.resolve(undefined);
+    async usersLogout(payload: UsersLogoutInput): Promise<UsersLogoutPayload | undefined> {
+        const result = await this.client.mutate<{ usersLogout: UsersLogoutPayload }, UsersLogoutInput>({
+            mutation: logoutMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        if (result.data && result.data.usersLogout.userSession && result.data.usersLogout.userSession.user) {
+            this.deleteById(result.data.usersLogout.userSession.user.id)
+        }
+
+        return result.data?.usersLogout ?? undefined
     }
 
     /** @alpha **/
