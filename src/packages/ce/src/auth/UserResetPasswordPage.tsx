@@ -41,7 +41,7 @@ export const UserResetPasswordPage: React.FC = () => {
                     newPassword: (values.password as unknown as string),
                     newPasswordConfirmation: (values.repeatPassword as unknown as string),
                 }).then(payload => {
-                    if (!payload?.errors) {
+                    if ((payload?.errors?.length ?? 0) <= 0) {
                         router.push("/login?passwordReset=true")
                     }
                 })

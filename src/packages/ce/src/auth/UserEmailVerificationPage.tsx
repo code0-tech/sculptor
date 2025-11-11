@@ -29,7 +29,7 @@ export const UserEmailVerificationPage: React.FC = () => {
                 await userService.usersEmailVerification({
                     token: (values.code as unknown as string),
                 }).then(payload => {
-                    if (!payload?.errors) {
+                    if ((payload?.errors?.length ?? 0) <= 0) {
                         router.push("/?emailVerified=true")
                         router.refresh()
                     }
