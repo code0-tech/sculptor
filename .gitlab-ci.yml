@@ -1,0 +1,30 @@
+stages:
+  - lint
+  - build
+
+.node:
+  image: node:24.8.0
+  before_script:
+    - npm ci
+
+lint:
+  extends:
+    - .node
+  stage: lint
+  script:
+    - npm run lint
+
+build:
+  extends:
+    - .node
+  stage: build
+  parallel:
+    matrix:
+      - EDITION:
+          - ce
+          - ee
+          - cloud
+  script:
+    - '[[ $EDITION == "ce" ]] && rm -rf src/packages/{ee,cloud}'
+    - '[[ $EDITION == "ee" ]] && rm -rf src/packages/cloud'
+    - npm run build
