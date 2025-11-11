@@ -30,7 +30,7 @@
         "./src/*"
       ],
       "@edition/*": [
-        "src/packages/ce/src/*"
+        "./src/packages/ce/src/*"
       ],
       "@core/*": [
         "./src/packages/core/src/*"

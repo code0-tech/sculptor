@@ -3,12 +3,10 @@ import Link from "next/link";
 
 interface NamespaceLayoutProps {
     children: React.ReactNode
-    modal: React.ReactNode
 }
 
-const NamespaceLayout: React.FC<NamespaceLayoutProps> = ({children, modal}) => {
+const NamespaceLayout: React.FC<NamespaceLayoutProps> = ({children}) => {
     return <div>
-        {modal}
         {children}
     </div>
 }

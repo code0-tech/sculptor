@@ -3,14 +3,12 @@ import Link from "next/link";
 
 interface ProjectLayoutProps {
     children: React.ReactNode
-    modal: React.ReactNode
     tabs: React.ReactNode
 }
 
-const ProjectLayout: React.FC<ProjectLayoutProps> = ({children, modal, tabs}) => {
+const ProjectLayout: React.FC<ProjectLayoutProps> = ({children, tabs}) => {
     return <div>
         {tabs}
-        {modal}
         {children}
     </div>
 }
