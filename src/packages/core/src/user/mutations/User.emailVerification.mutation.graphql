@@ -1,3 +1,4 @@
+#import '../fragments/User.basic.fragment.graphql'
 mutation emailVerification($token: String!) {
     usersEmailVerification(input: {
         token: $token
@@ -5,9 +6,10 @@ mutation emailVerification($token: String!) {
         errors {
             ...on ActiveModelError { attribute type }
             ...on MessageError { message }
+            ...on ErrorCode { errorCode }
         }
         user {
-            ...UserId
+            ...UserBasic
         }
     }
 }

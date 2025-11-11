@@ -5,6 +5,7 @@ mutation logout($userSessionId: UserSessionID!) {
         errors {
             ...on ActiveModelError { attribute type }
             ...on MessageError { message }
+            ...on ErrorCode { errorCode }
         }
         userSession {
             id

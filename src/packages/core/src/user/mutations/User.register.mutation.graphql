@@ -9,6 +9,7 @@ mutation register($email: String!, $password: String!, $passwordRepeat: String!,
         errors {
             ...on ActiveModelError { attribute type }
             ...on MessageError { message }
+            ...on ErrorCode { errorCode }
         }
         userSession {
             updatedAt
