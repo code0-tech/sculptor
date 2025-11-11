@@ -9,24 +9,37 @@ import {
     MenuSeparator,
     Text,
     TextInput,
-    useService
+    useUserSession
 } from "@code0-tech/pictor";
 import DUserMenu from "@code0-tech/pictor/dist/components/d-user/DUserMenu";
-import {UserService} from "@core/user/User.service";
-import {useRouter} from "next/navigation";
 import {IconBuilding, IconInbox, IconLogout, IconSearch, IconSettings} from "@tabler/icons-react";
 import React from "react";
 import Image from "next/image";
 
 const Page = () => {
 
-    const userService = useService(UserService)
-    const router = useRouter()
-    const currentSession = userService.getUserSession()
+    const currentSession = useUserSession()
 
-    if (!currentSession?.token) {
-        return null
-    }
+
+    const userMenu = React.useMemo(() => {
+
+        if (!currentSession?.token) {
+            return null
+        }
+
+        return <DUserMenu userId={currentSession.user?.id!!}>
+            <MenuItem>
+                <IconBuilding size={16}/>Organizations
+            </MenuItem>
+            <MenuItem>
+                <IconSettings size={16}/>Settings
+            </MenuItem>
+            <MenuSeparator/>
+            <MenuItem>
+                <IconLogout size={16}/>Logout
+            </MenuItem>
+        </DUserMenu>
+    }, [currentSession])
 
     return <Container>
         <Flex style={{gap: "0.7rem", flexDirection: "column"}} py={0.7} w={"100%"}>
@@ -44,18 +57,7 @@ const Page = () => {
                     <Button>
                         <IconInbox size={16}/>
                     </Button>
-                    <DUserMenu userId={currentSession.user?.id!!}>
-                        <MenuItem>
-                            <IconBuilding size={16}/>Organizations
-                        </MenuItem>
-                        <MenuItem>
-                            <IconSettings size={16}/>Settings
-                        </MenuItem>
-                        <MenuSeparator/>
-                        <MenuItem>
-                            <IconLogout size={16}/>Logout
-                        </MenuItem>
-                    </DUserMenu>
+                    {userMenu}
                 </Flex>
             </Flex>
         </Flex>
