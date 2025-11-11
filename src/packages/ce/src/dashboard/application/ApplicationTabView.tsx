@@ -2,7 +2,7 @@
 
 import React from "react";
 import {Tab, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
-import {Badge, Button, Container, useService, useStore} from "@code0-tech/pictor";
+import {Badge, Button, Container, useService, useStore, useUserSession} from "@code0-tech/pictor";
 import {IconBuilding, IconFolder, IconHome, IconServer, IconSettings, IconUser} from "@tabler/icons-react";
 import {usePathname} from "next/navigation";
 import Link from "next/link";
@@ -13,8 +13,8 @@ export const ApplicationTabView: React.FC = () => {
     const pathname = usePathname()
     const userService = useService(UserService)
     const userStore = useStore(UserService)
-    const currentSession = userService.getUserSession()
-    const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [userService, userStore])
+    const currentSession = useUserSession()
+    const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [userStore, currentSession])
     const defaultValue = pathname.includes("organizations") ? "organizations"
         : pathname.includes("users") ? "users"
             : pathname.includes("settings") ? "settings"
