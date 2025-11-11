@@ -3,7 +3,7 @@
 import React from "react";
 import {Tab, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {Badge, Button, Container, useService, useStore} from "@code0-tech/pictor";
-import {IconBuilding, IconHome, IconServer, IconSettings, IconUser} from "@tabler/icons-react";
+import {IconBuilding, IconFolder, IconHome, IconServer, IconSettings, IconUser} from "@tabler/icons-react";
 import {usePathname} from "next/navigation";
 import Link from "next/link";
 import {UserService} from "@core/user/User.service";
@@ -61,6 +61,15 @@ export const ApplicationTabView: React.FC = () => {
                         <Button variant={"none"}>
                             <IconHome size={16}/>
                             Overview
+                        </Button>
+                    </Link>
+                </TabTrigger>
+                <TabTrigger value={"projects"}>
+                    <Link href={"/projects"}>
+                        <Button variant={"none"}>
+                            <IconFolder size={16}/>
+                            Personal projects
+                            <Badge>2</Badge>
                         </Button>
                     </Link>
                 </TabTrigger>
