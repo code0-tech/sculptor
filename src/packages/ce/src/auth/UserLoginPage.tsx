@@ -1,23 +1,36 @@
 "use client";
 
 import React from "react";
-import {Button, PasswordInput, Text, TextInput, useForm, useService} from "@code0-tech/pictor";
+import {
+    Button,
+    EmailInput,
+    emailValidation,
+    PasswordInput,
+    setUserSession,
+    Text,
+    useForm,
+    useService
+} from "@code0-tech/pictor";
 import {UserService} from "@core/user/User.service";
 import Image from "next/image";
 import Link from "next/link";
+import {useRouter} from "next/navigation";
 
 export const UserLoginPage: React.FC = () => {
 
     const userService = useService(UserService)
+    const router = useRouter()
+    const [loading, startTransition] = React.useTransition()
 
     const [inputs, validate] = useForm({
         initialValues: {
-            emailOrUsername: null,
+            email: null,
             password: null
         },
         validate: {
-            emailOrUsername: (value) => {
+            email: (value) => {
                 if (!value) return "Email is required"
+                if (!emailValidation(value)) return "Please provide a valid email"
                 return null
             },
             password: (value) => {
@@ -26,7 +39,18 @@ export const UserLoginPage: React.FC = () => {
             }
         },
         onSubmit: (values) => {
-            console.log(values)
+            if (!values.password || !values.email) return
+            startTransition(async () => {
+                await userService.usersLogin({
+                    password: (values.password as unknown as string),
+                    email: (values.email as unknown as string),
+                }).then(payload => {
+                    if (payload?.userSession) {
+                        setUserSession(payload.userSession)
+                        router.push("/")
+                    }
+                })
+            })
         }
     })
 
@@ -41,7 +65,7 @@ export const UserLoginPage: React.FC = () => {
         <Text mb={1.3} size={"md"} hierarchy={"tertiary"} display={"block"}>
             Build high-class workflows, endpoints and software without coding
         </Text>
-        <TextInput placeholder={"Email or username"} {...inputs.getInputProps("emailOrUsername")}/>
+        <EmailInput placeholder={"Email"} {...inputs.getInputProps("email")}/>
         <div style={{marginBottom: "1.3rem"}}/>
         <PasswordInput placeholder={"Password"} {...inputs.getInputProps("password")}/>
         <div style={{marginBottom: "1.3rem"}}/>
