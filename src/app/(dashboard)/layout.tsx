@@ -15,9 +15,9 @@ import {GraphqlClient} from "@core/util/graphql-client";
 import {useRouter} from "next/navigation";
 
 interface ApplicationLayoutProps {
-    children: React.ReactElement
-    bar: React.ReactElement
-    tab: React.ReactElement
+    children: React.ReactNode
+    bar: React.ReactNode
+    tab: React.ReactNode
 }
 
 const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab}) => {
@@ -45,4 +45,4 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
     </ContextStoreProvider>
 }
 
-export default React.memo(ApplicationLayout)
+export default ApplicationLayout
