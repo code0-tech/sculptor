@@ -1,13 +1,17 @@
 "use client";
 
 import React from "react";
-import {Button, Text, TextInput, useForm, useService} from "@code0-tech/pictor";
+import {Button, setUserSession, Text, TextInput, useForm, useService} from "@code0-tech/pictor";
 import {UserService} from "@core/user/User.service";
 import Link from "next/link";
 import Image from "next/image";
+import {useRouter} from "next/navigation";
 
 export const UserEmailVerificationPage: React.FC = () => {
+
     const userService = useService(UserService)
+    const [loading, startTransition] = React.useTransition()
+    const router = useRouter()
 
     const [inputs, validate] = useForm({
         initialValues: {
@@ -20,7 +24,17 @@ export const UserEmailVerificationPage: React.FC = () => {
             }
         },
         onSubmit: (values) => {
-            console.log(values)
+            if (!values.code) return
+            startTransition(async () => {
+                await userService.usersEmailVerification({
+                    token: (values.code as unknown as string),
+                }).then(payload => {
+                    if (payload?.user) {
+                        router.push("/")
+                        router.refresh()
+                    }
+                })
+            })
         }
     })
 

@@ -34,6 +34,9 @@ import {GraphqlClient} from "@core/util/graphql-client";
 import loginMutation from "../user/mutations/User.login.mutation.graphql";
 import logoutMutation from "../user/mutations/User.logout.mutation.graphql";
 import registerMutation from "../user/mutations/User.register.mutation.graphql";
+import emailVerificationMutation from "../user/mutations/User.emailVerification.mutation.graphql";
+import passwordResetMutation from "../user/mutations/User.passwordReset.mutation.graphql"
+import passwordResetRequestMutation from "../user/mutations/User.passwordResetRequest.mutation.graphql"
 import userQuery from "../user/queries/User.query.graphql";
 
 export class UserService extends DUserReactiveService {
@@ -78,9 +81,20 @@ export class UserService extends DUserReactiveService {
         return user !== undefined;
     }
 
-    /** @alpha **/
-    usersEmailVerification(payload: UsersEmailVerificationInput): Promise<UsersEmailVerificationPayload | undefined> {
-        return Promise.resolve(undefined);
+    async usersEmailVerification(payload: UsersEmailVerificationInput): Promise<UsersEmailVerificationPayload | undefined> {
+        const result = await this.client.mutate<Mutation, UsersEmailVerificationInput>({
+            mutation: emailVerificationMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        if (result.data && result.data.usersEmailVerification && result.data.usersEmailVerification.user && this.hasById(result.data.usersEmailVerification.user.id)) {
+            //const existingUser = this.getById(result.data.usersEmailVerification.user.id)
+            //TODO: existingUser?.emailVerifiedAt = result.data.usersEmailVerification.user.emailVerifiedAt
+        }
+
+        return result.data?.usersEmailVerification ?? undefined
     }
 
     /** @alpha **/
@@ -148,12 +162,26 @@ export class UserService extends DUserReactiveService {
         return Promise.resolve(undefined);
     }
 
-    usersPasswordReset(payload: UsersPasswordResetInput): Promise<UsersPasswordResetPayload | undefined> {
-        return Promise.resolve(undefined);
+    async usersPasswordReset(payload: UsersPasswordResetInput): Promise<UsersPasswordResetPayload | undefined> {
+        const result = await this.client.mutate<Mutation, UsersPasswordResetInput>({
+            mutation: passwordResetMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        return result.data?.usersPasswordReset ?? undefined
     }
 
-    usersPasswordResetRequest(payload: UsersPasswordResetRequestInput): Promise<UsersPasswordResetRequestPayload | undefined> {
-        return Promise.resolve(undefined);
+    async usersPasswordResetRequest(payload: UsersPasswordResetRequestInput): Promise<UsersPasswordResetRequestPayload | undefined> {
+        const result = await this.client.mutate<Mutation, UsersPasswordResetRequestInput>({
+            mutation: passwordResetRequestMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        return result.data?.usersPasswordResetRequest ?? undefined
     }
 
     async usersRegister(payload: UsersRegisterInput): Promise<UsersRegisterPayload | undefined> {
