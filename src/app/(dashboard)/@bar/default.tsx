@@ -8,23 +8,39 @@ import {
     MenuItem,
     MenuSeparator,
     Text,
-    TextInput,
+    TextInput, useService,
     useUserSession
 } from "@code0-tech/pictor";
 import DUserMenu from "@code0-tech/pictor/dist/components/d-user/DUserMenu";
 import {IconBuilding, IconInbox, IconLogout, IconSearch, IconSettings} from "@tabler/icons-react";
 import React from "react";
 import Image from "next/image";
+import {UserService} from "@core/user/User.service";
+import {useRouter} from "next/navigation";
 
 const Page = () => {
 
     const currentSession = useUserSession()
+    const userService = useService(UserService)
+    const router = useRouter()
+    const [loading, startTransition] = React.useTransition()
 
 
     const userMenu = React.useMemo(() => {
 
         if (!currentSession?.token) {
             return null
+        }
+
+        const userLogout = () => {
+            startTransition(async () => {
+                await userService.usersLogout({
+                    userSessionId: currentSession.id!!
+                }).then(payload => {
+                    window.localStorage.removeItem("ide_code-zero_session")
+                    router.push("/login")
+                })
+            })
         }
 
         return <DUserMenu userId={currentSession.user?.id!!}>
@@ -35,7 +51,7 @@ const Page = () => {
                 <IconSettings size={16}/>Settings
             </MenuItem>
             <MenuSeparator/>
-            <MenuItem>
+            <MenuItem onSelect={userLogout}>
                 <IconLogout size={16}/>Logout
             </MenuItem>
         </DUserMenu>
