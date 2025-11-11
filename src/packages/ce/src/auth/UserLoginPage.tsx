@@ -48,6 +48,7 @@ export const UserLoginPage: React.FC = () => {
                     if (payload?.userSession) {
                         setUserSession(payload.userSession)
                         router.push("/")
+                        router.refresh()
                     }
                 })
             })
