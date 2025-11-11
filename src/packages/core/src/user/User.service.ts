@@ -98,11 +98,6 @@ export class UserService extends DUserReactiveService {
             }
         })
 
-        //store user session
-        if (result.data && result.data.usersLogin && result.data.usersLogin.userSession) {
-            this.createUserSession(result.data.usersLogin.userSession)
-        }
-
         if (result.data && result.data.usersLogin && result.data.usersLogin.userSession?.user) {
             this.add(new DUserView(result.data.usersLogin.userSession.user))
         }
