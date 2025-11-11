@@ -4,12 +4,12 @@ import path from "node:path";
 
 const root = process.cwd();
 const edition = process.env.EDITION ?? "ce";
-const target = path.join(root, `src/packages/${edition}`);
+const target = path.join(root, `./src/packages/${edition}`);
 
 const editionImports = {
-    cloud: ["src/packages/cloud/src/*", "src/packages/ee/src/*", "src/packages/ce/src/*"],
-    ee: ["src/packages/ee/src/*", "src/packages/ce/src/*"],
-    ce: ["src/packages/ce/src/*"],
+    cloud: ["./src/packages/cloud/src/*", "./src/packages/ee/src/*", "./src/packages/ce/src/*"],
+    ee: ["./src/packages/ee/src/*", "./src/packages/ce/src/*"],
+    ce: ["./src/packages/ce/src/*"],
 }
 
 if (!fs.existsSync(target) || !editionImports[edition]) {
