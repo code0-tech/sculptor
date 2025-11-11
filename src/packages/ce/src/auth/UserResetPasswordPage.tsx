@@ -5,9 +5,13 @@ import {Button, PasswordInput, Text, TextInput, useForm, useService} from "@code
 import {UserService} from "@core/user/User.service";
 import Link from "next/link";
 import Image from "next/image";
+import {useRouter} from "next/navigation";
 
 export const UserResetPasswordPage: React.FC = () => {
+
     const userService = useService(UserService)
+    const [loading, startTransition] = React.useTransition()
+    const router = useRouter()
 
     const [inputs, validate] = useForm({
         initialValues: {
@@ -30,7 +34,18 @@ export const UserResetPasswordPage: React.FC = () => {
             }
         },
         onSubmit: (values) => {
-            console.log(values)
+            if (!values.code || !values.password || !values.repeatPassword) return
+            startTransition(async () => {
+                await userService.usersPasswordReset({
+                    resetToken: (values.code as unknown as string),
+                    newPassword: (values.password as unknown as string),
+                    newPasswordConfirmation: (values.repeatPassword as unknown as string),
+                }).then(payload => {
+                    if (!payload?.errors) {
+                        router.push("/login?passwordReset=true")
+                    }
+                })
+            })
         }
     })
 

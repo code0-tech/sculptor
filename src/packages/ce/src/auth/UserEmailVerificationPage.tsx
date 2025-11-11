@@ -29,8 +29,8 @@ export const UserEmailVerificationPage: React.FC = () => {
                 await userService.usersEmailVerification({
                     token: (values.code as unknown as string),
                 }).then(payload => {
-                    if (payload?.user) {
-                        router.push("/")
+                    if (!payload?.errors) {
+                        router.push("/?emailVerified=true")
                         router.refresh()
                     }
                 })

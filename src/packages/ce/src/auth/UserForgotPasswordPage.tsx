@@ -1,13 +1,17 @@
 "use client";
 
 import React from "react";
-import {Button, EmailInput, Text, useForm, useService} from "@code0-tech/pictor";
+import {Button, EmailInput, emailValidation, Text, useForm, useService} from "@code0-tech/pictor";
 import {UserService} from "@core/user/User.service";
 import Link from "next/link";
 import Image from "next/image";
+import {useRouter} from "next/navigation";
 
 export const UserForgotPasswordPage: React.FC = () => {
+
     const userService = useService(UserService)
+    const [loading, startTransition] = React.useTransition()
+    const router = useRouter()
 
     const [inputs, validate] = useForm({
         initialValues: {
@@ -16,11 +20,21 @@ export const UserForgotPasswordPage: React.FC = () => {
         validate: {
             email: (value) => {
                 if (!value) return "Email is required"
+                if (!emailValidation(value)) return "Please provide a valid email"
                 return null
             }
         },
         onSubmit: (values) => {
-            console.log(values)
+            if (!values.email) return
+            startTransition(async () => {
+                await userService.usersPasswordResetRequest({
+                    email: (values.email as unknown as string),
+                }).then(payload => {
+                    if (!payload?.errors) {
+                        router.push("/password/reset?passwordReset=true")
+                    }
+                })
+            })
         }
     })
 
