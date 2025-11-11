@@ -2,30 +2,26 @@
 
 import {ApolloClient, ApolloLink, HttpLink, InMemoryCache} from "@apollo/client";
 import {ApolloProvider} from "@apollo/client/react";
-import {UserSession} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
 import "./global.scss"
+import {setContext} from "@apollo/client/link/context";
 
 
 export default function RootLayout({children}: Readonly<{ children: React.ReactNode }>) {
 
-    const [token, setToken] = React.useState<string | null>(null);
-
-    const authMiddleware = React.useMemo(() => new ApolloLink((operation, forward) => {
-        if (token) {
-            operation.setContext({
-                headers: {
-                    authorization: `Session ${token}`
-                }
-            })
-        }
-        return forward(operation);
-    }), [token]);
-
-    React.useEffect(() => {
-        const userSession = JSON.parse(localStorage.getItem("ide_code-zero_session")!!) as UserSession
-        if (userSession && userSession.token) setToken(userSession.token)
-    }, [])
+    const authMiddleware = setContext((_, { headers }) => {
+        let token: string | undefined;
+        try {
+            const raw = localStorage.getItem("ide_code-zero_session");
+            token = raw ? JSON.parse(raw)?.token : undefined;
+        } catch {}
+        return {
+            headers: {
+                ...headers,
+                ...(token ? { authorization: `Session ${token}` } : {}),
+            },
+        };
+    });
 
     const client = React.useMemo(() => new ApolloClient({
         cache: new InMemoryCache(),
