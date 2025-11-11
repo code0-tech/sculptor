@@ -1,14 +1,27 @@
 "use client";
 
 import React from "react";
-import {Button, EmailInput, Flex, PasswordInput, Text, TextInput, useForm, useService} from "@code0-tech/pictor";
+import {
+    Button,
+    EmailInput, emailValidation,
+    Flex,
+    PasswordInput,
+    setUserSession,
+    Text,
+    TextInput,
+    useForm,
+    useService
+} from "@code0-tech/pictor";
 import Image from "next/image";
 import Link from "next/link";
 import {UserService} from "@core/user/User.service";
+import {useRouter} from "next/navigation";
 
 export const UserRegistrationPage: React.FC = () => {
 
     const userService = useService(UserService)
+    const router = useRouter()
+    const [loading, startTransition] = React.useTransition()
 
     const [inputs, validate] = useForm({
         initialValues: {
@@ -20,6 +33,7 @@ export const UserRegistrationPage: React.FC = () => {
         validate: {
             email: (value) => {
                 if (!value) return "Email is required"
+                if (!emailValidation(value)) return "Please provide a valid email"
                 return null
             },
             username: (value) => {
@@ -36,7 +50,21 @@ export const UserRegistrationPage: React.FC = () => {
             }
         },
         onSubmit: (values) => {
-            console.log(values)
+            if (!values.email || !values.username || !values.password || !values.repeatPassword) return
+            startTransition(async () => {
+                await userService.usersRegister({
+                    passwordRepeat: (values.repeatPassword as unknown as string),
+                    password: (values.password as unknown as string),
+                    email: (values.email as unknown as string),
+                    username: (values.username as unknown as string),
+                }).then(payload => {
+                    if (payload?.userSession) {
+                        setUserSession(payload.userSession)
+                        router.push("/")
+                        router.refresh()
+                    }
+                })
+            })
         }
     })
 

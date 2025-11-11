@@ -1,5 +1,6 @@
 import {DUserReactiveService, DUserView, ReactiveArrayStore} from "@code0-tech/pictor";
 import {
+    Mutation,
     Query,
     User,
     UsersEmailVerificationInput,
@@ -32,6 +33,7 @@ import {
 import {GraphqlClient} from "@core/util/graphql-client";
 import loginMutation from "../user/mutations/User.login.mutation.graphql";
 import logoutMutation from "../user/mutations/User.logout.mutation.graphql";
+import registerMutation from "../user/mutations/User.register.mutation.graphql";
 import userQuery from "../user/queries/User.query.graphql";
 
 export class UserService extends DUserReactiveService {
@@ -102,7 +104,7 @@ export class UserService extends DUserReactiveService {
     }
 
     async usersLogin(payload: UsersLoginInput): Promise<UsersLoginPayload | undefined> {
-        const result = await this.client.mutate<{ usersLogin: UsersLoginPayload }, UsersLoginInput>({
+        const result = await this.client.mutate<Mutation, UsersLoginInput>({
             mutation: loginMutation,
             variables: {
                 ...payload
@@ -117,14 +119,14 @@ export class UserService extends DUserReactiveService {
     }
 
     async usersLogout(payload: UsersLogoutInput): Promise<UsersLogoutPayload | undefined> {
-        const result = await this.client.mutate<{ usersLogout: UsersLogoutPayload }, UsersLogoutInput>({
+        const result = await this.client.mutate<Mutation, UsersLogoutInput>({
             mutation: logoutMutation,
             variables: {
                 ...payload
             }
         })
 
-        if (result.data && result.data.usersLogout.userSession && result.data.usersLogout.userSession.user) {
+        if (result.data && result.data.usersLogout && result.data.usersLogout.userSession && result.data.usersLogout.userSession.user) {
             this.deleteById(result.data.usersLogout.userSession.user.id)
         }
 
@@ -154,8 +156,20 @@ export class UserService extends DUserReactiveService {
         return Promise.resolve(undefined);
     }
 
-    usersRegister(payload: UsersRegisterInput): Promise<UsersRegisterPayload | undefined> {
-        return Promise.resolve(undefined);
+    async usersRegister(payload: UsersRegisterInput): Promise<UsersRegisterPayload | undefined> {
+
+        const result = await this.client.mutate<Mutation, UsersRegisterInput>({
+            mutation: registerMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        if (result.data && result.data.usersRegister && result.data.usersRegister.userSession?.user && !this.hasById(result.data.usersRegister.userSession?.user.id)) {
+            this.add(new DUserView(result.data.usersRegister.userSession.user))
+        }
+
+        return result.data?.usersRegister ?? undefined
     }
 
 }

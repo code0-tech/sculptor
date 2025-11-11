@@ -1,3 +1,4 @@
+#import '../fragments/User.basic.fragment.graphql'
 mutation register($email: String!, $password: String!, $passwordRepeat: String!, $username: String!) {
     usersRegister(input: {
         email: $email
