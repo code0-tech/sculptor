@@ -52,7 +52,7 @@ export default function RootLayout({children}: Readonly<{ children: React.ReactN
 
         if (error instanceof CombinedProtocolErrors) {
         }
-        
+
         if (error instanceof ServerError) {
             const status = error.statusCode;
             if (status === 401) {
@@ -142,7 +142,7 @@ export default function RootLayout({children}: Readonly<{ children: React.ReactN
     return React.useMemo(() => {
         return <html>
         <body>
-        <Toaster/>
+        <Toaster position={"bottom-center"}/>
 
         <ApolloProvider client={client}>
             {children}
