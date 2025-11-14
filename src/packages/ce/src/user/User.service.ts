@@ -56,14 +56,13 @@ export class UserService extends DUserReactiveService {
             const data = result.data
             if (!data) return
 
-            if (data && data.currentUser) this.add(new DUserView(data.currentUser))
+            if (data && data.currentUser) this.set(0, new DUserView(data.currentUser))
             if (data.users && data.users.nodes) {
-                for (const user of data.users.nodes) {
-                    if (user) this.add(new DUserView(user))
-                }
+                data.users.nodes.forEach((user, index) => {
+                    if (user && !(user.id === data.currentUser?.id)) this.set(index, new DUserView(user))
+                })
             }
         })
-
         return super.values();
     }
 
@@ -77,7 +76,7 @@ export class UserService extends DUserReactiveService {
     }
 
     hasById(id: User["id"]): boolean {
-        const user = this.getById(id);
+        const user = super.values().find(u => u.id === id);
         return user !== undefined;
     }
 
