@@ -11,14 +11,14 @@ import {
     ServerParseError
 } from "@apollo/client";
 import {ApolloProvider} from "@apollo/client/react";
-import React from "react";
+import React, {Suspense} from "react";
 import "./global.scss"
 import {setContext} from "@apollo/client/link/context";
 import {ErrorLink} from "@apollo/client/link/error";
 import {useRouter} from "next/navigation";
 import {Toaster} from "sonner";
 import {Error} from "@code0-tech/sagittarius-graphql-types";
-import {Text, toast} from "@code0-tech/pictor";
+import {toast} from "@code0-tech/pictor";
 import {Inter} from 'next/font/google'
 
 /**
@@ -201,10 +201,12 @@ export default function RootLayout({children}: Readonly<{ children: React.ReactN
     return React.useMemo(() => {
         return <html>
         <body className={inter.className}>
-        <ApolloProvider client={client}>
-            <Toaster position={"top-right"}/>
-            {children}
-        </ApolloProvider>
+        <Suspense>
+            <ApolloProvider client={client}>
+                <Toaster position={"top-right"}/>
+                {children}
+            </ApolloProvider>
+        </Suspense>
         </body>
         </html>
     }, [client, children])
