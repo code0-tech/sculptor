@@ -10,7 +10,7 @@ import {
     useReactiveArrayService,
     useUserSession
 } from "@code0-tech/pictor";
-import {UserService} from "@core/user/User.service";
+import {UserService} from "@edition/user/User.service";
 import {GraphqlClient} from "@core/util/graphql-client";
 import {useRouter} from "next/navigation";
 

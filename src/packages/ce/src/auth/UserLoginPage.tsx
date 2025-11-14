@@ -13,7 +13,7 @@ import {
     useForm,
     useService
 } from "@code0-tech/pictor";
-import {UserService} from "@core/user/User.service";
+import {UserService} from "@edition/user/User.service";
 import Image from "next/image";
 import Link from "next/link";
 import {useRouter, useSearchParams} from "next/navigation";

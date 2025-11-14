@@ -14,7 +14,7 @@ import {
 } from "@code0-tech/pictor";
 import Image from "next/image";
 import Link from "next/link";
-import {UserService} from "@core/user/User.service";
+import {UserService} from "@edition/user/User.service";
 import {useRouter} from "next/navigation";
 
 export const UserRegistrationPage: React.FC = () => {

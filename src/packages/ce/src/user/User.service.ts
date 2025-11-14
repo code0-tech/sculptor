@@ -31,13 +31,13 @@ import {
     UsersRegisterPayload
 } from "@code0-tech/sagittarius-graphql-types";
 import {GraphqlClient} from "@core/util/graphql-client";
-import loginMutation from "../user/mutations/User.login.mutation.graphql";
-import logoutMutation from "../user/mutations/User.logout.mutation.graphql";
-import registerMutation from "../user/mutations/User.register.mutation.graphql";
-import emailVerificationMutation from "../user/mutations/User.emailVerification.mutation.graphql";
-import passwordResetMutation from "../user/mutations/User.passwordReset.mutation.graphql"
-import passwordResetRequestMutation from "../user/mutations/User.passwordResetRequest.mutation.graphql"
-import userQuery from "../user/queries/User.query.graphql";
+import loginMutation from "./mutations/User.login.mutation.graphql";
+import logoutMutation from "./mutations/User.logout.mutation.graphql";
+import registerMutation from "./mutations/User.register.mutation.graphql";
+import emailVerificationMutation from "./mutations/User.emailVerification.mutation.graphql";
+import passwordResetMutation from "./mutations/User.passwordReset.mutation.graphql"
+import passwordResetRequestMutation from "./mutations/User.passwordResetRequest.mutation.graphql"
+import userQuery from "./queries/User.query.graphql";
 
 export class UserService extends DUserReactiveService {
 

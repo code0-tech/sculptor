@@ -2,7 +2,7 @@
 
 import React from "react";
 import {Button, setUserSession, Text, TextInput, useForm, useService} from "@code0-tech/pictor";
-import {UserService} from "@core/user/User.service";
+import {UserService} from "@edition/user/User.service";
 import Link from "next/link";
 import Image from "next/image";
 import {useRouter} from "next/navigation";

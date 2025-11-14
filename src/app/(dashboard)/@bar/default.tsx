@@ -15,7 +15,7 @@ import DUserMenu from "@code0-tech/pictor/dist/components/d-user/DUserMenu";
 import {IconBuilding, IconInbox, IconLogout, IconSearch, IconSettings} from "@tabler/icons-react";
 import React from "react";
 import Image from "next/image";
-import {UserService} from "@core/user/User.service";
+import {UserService} from "@edition/user/User.service";
 import {useRouter} from "next/navigation";
 
 const Page = () => {

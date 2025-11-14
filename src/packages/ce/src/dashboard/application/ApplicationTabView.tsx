@@ -6,7 +6,7 @@ import {Badge, Button, Container, useService, useStore, useUserSession} from "@c
 import {IconBuilding, IconFolder, IconHome, IconServer, IconSettings, IconUser} from "@tabler/icons-react";
 import {usePathname} from "next/navigation";
 import Link from "next/link";
-import {UserService} from "@core/user/User.service";
+import {UserService} from "@edition/user/User.service";
 
 export const ApplicationTabView: React.FC = () => {
 
