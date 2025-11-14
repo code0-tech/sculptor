@@ -1,0 +1,18 @@
+#import '../fragments/User.fragment.graphql'
+#import '../fragments/User.basic.fragment.graphql'
+
+query User($firstUser: Int, $afterUser: String, $firstIdentity: Int, $afterIdentity: String, $firstSession: Int, $afterSession: String) {
+    currentUser {
+        ...User
+    }
+    users (first: $firstUser, after: $afterUser) {
+        count
+        nodes {
+            ...UserBasic
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+    }
+}

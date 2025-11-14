@@ -1,0 +1,14 @@
+mutation logout($userSessionId: UserSessionID!) {
+    usersLogout(input: {
+        userSessionId: $userSessionId
+    }) {
+        errors {
+            ...on ActiveModelError { attribute type }
+            ...on MessageError { message }
+            ...on ErrorCode { errorCode }
+        }
+        userSession {
+            id
+        }
+    }
+}

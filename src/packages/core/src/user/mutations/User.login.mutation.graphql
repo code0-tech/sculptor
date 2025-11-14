@@ -1,0 +1,24 @@
+#import '../fragments/User.basic.fragment.graphql'
+mutation login($email: String!, $password: String!, $username: String) {
+    usersLogin(input: {
+        email: $email
+        password: $password
+        username: $username
+    }) {
+        errors {
+            ...on ActiveModelError { attribute type }
+            ...on MessageError { message }
+            ...on ErrorCode { errorCode }
+        }
+        userSession {
+            updatedAt
+            token
+            active
+            createdAt
+            id
+            user {
+                ...UserBasic
+            }
+        }
+    }
+}

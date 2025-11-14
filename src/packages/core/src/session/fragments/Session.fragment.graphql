@@ -1,0 +1,8 @@
+fragment Session on UserSession {
+    updatedAt
+    createdAt
+    id
+    token
+    active
+    __typename
+}

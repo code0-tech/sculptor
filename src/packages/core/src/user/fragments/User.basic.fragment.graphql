@@ -1,0 +1,15 @@
+fragment UserBasic on User {
+    admin
+    avatarPath
+    createdAt
+    email
+    emailVerifiedAt
+    firstname
+    id
+    lastname
+    namespace {
+        id
+    }
+    updatedAt
+    username
+}

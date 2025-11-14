@@ -42,3 +42,5 @@ next-env.d.ts
 
 # intellij
 .idea/
+
+schema.graphql

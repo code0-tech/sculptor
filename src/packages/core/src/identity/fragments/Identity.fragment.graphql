@@ -1,0 +1,8 @@
+fragment Identity on UserIdentity {
+    id
+    createdAt
+    updatedAt
+    identifier
+    providerId
+    __typename
+}
