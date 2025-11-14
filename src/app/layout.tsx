@@ -201,7 +201,7 @@ export default function RootLayout({children}: Readonly<{ children: React.ReactN
     return React.useMemo(() => {
         return <html>
         <body className={inter.className}>
-        <Suspense>
+        <Suspense fallback={"loading..."}>
             <ApolloProvider client={client}>
                 <Toaster position={"top-right"}/>
                 {children}
