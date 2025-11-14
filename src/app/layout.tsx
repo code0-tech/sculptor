@@ -81,8 +81,7 @@ const ErrorCodeDescription: Record<string, string> = {
 const toastHandler = (error: Error) => {
     if (error.__typename === "ErrorCode") {
         toast({
-            title: "Error",
-            children: <Text hierarchy={"tertiary"}>{ErrorCodeDescription[(error.errorCode as string)]}</Text>,
+            title: ErrorCodeDescription[(error.errorCode as string)],
             color: "error",
             dismissible: true,
         })
