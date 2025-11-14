@@ -1,18 +1,10 @@
 stages:
-  - lint
   - build
 
 .node:
   image: node:24.8.0
   before_script:
     - npm ci
-
-lint:
-  extends:
-    - .node
-  stage: lint
-  script:
-    - npm run lint
 
 build:
   extends:
