@@ -2,11 +2,13 @@
 
 import React from "react";
 import {
+    Alert,
     Button,
     EmailInput,
     emailValidation,
     PasswordInput,
     setUserSession,
+    Spacing,
     Text,
     useForm,
     useService
@@ -14,10 +16,11 @@ import {
 import {UserService} from "@core/user/User.service";
 import Image from "next/image";
 import Link from "next/link";
-import {useRouter} from "next/navigation";
+import {useRouter, useSearchParams} from "next/navigation";
 
 export const UserLoginPage: React.FC = () => {
 
+    const query = useSearchParams() //can be passwordReset
     const userService = useService(UserService)
     const router = useRouter()
     const [loading, startTransition] = React.useTransition()
@@ -39,7 +42,7 @@ export const UserLoginPage: React.FC = () => {
             }
         },
         onSubmit: (values) => {
-            if (!values.password || !values.email) return
+            if (!values.password || !values.email || !emailValidation(values.email)) return
             startTransition(async () => {
                 await userService.usersLogin({
                     password: (values.password as unknown as string),
@@ -66,6 +69,12 @@ export const UserLoginPage: React.FC = () => {
         <Text mb={1.3} size={"md"} hierarchy={"tertiary"} display={"block"}>
             Build high-class workflows, endpoints and software without coding
         </Text>
+        {query.has("passwordReset") ? (
+            <>
+                <Alert color={"success"}>Your password was successfully reset.</Alert>
+                <Spacing spacing={"xl"}/>
+            </>
+        ) : null}
         <EmailInput placeholder={"Email"} {...inputs.getInputProps("email")}/>
         <div style={{marginBottom: "1.3rem"}}/>
         <PasswordInput placeholder={"Password"} {...inputs.getInputProps("password")}/>
