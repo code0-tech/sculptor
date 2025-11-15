@@ -28,7 +28,7 @@ export const ApplicationTabView: React.FC = () => {
                         <Button variant={"none"}>
                             <IconUser size={16}/>
                             Users
-                            <Badge>19</Badge>
+                            <Badge>{userService.values().length}</Badge>
                         </Button>
                     </Link>
                 </TabTrigger>
