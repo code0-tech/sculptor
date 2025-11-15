@@ -23,7 +23,6 @@ export const ApplicationUsersPage: React.FC = () => {
 
     const userService = useService(UserService)
     const userStore = useStore(UserService)
-
     const users = React.useMemo(() => userService.values(), [userStore])
     const usersList = React.useMemo(() => {
         return users.map((user) => {
@@ -80,14 +79,12 @@ const UserCardSection: React.FC<{ user: DUserView }> = (props) => {
                 ) : null}
                 {!isCurrentUser ? (
                     <Flex style={{gap: "0.7rem"}} align={"center"}>
-                        <Button color={"error"}>Block</Button>
                         {
                             remove ? (
                                 <Flex align={"center"} style={{gap: "0.35rem"}}>
                                     <Button color={"error"} onClick={() => {
                                         startTransition(async () => {
                                             userService.deleteById(user.id)
-                                            userService.update()
                                         })
                                     }}>
                                         Confirm remove
