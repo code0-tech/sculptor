@@ -66,10 +66,6 @@ export class UserService extends DUserReactiveService {
         return super.values();
     }
 
-    getById(id: User["id"]): DUserView | undefined {
-        return super.getById(id);
-    }
-
     deleteById(id: User["id"]): void {
         const index = this.values().findIndex(user => user.id === id)
         this.delete(index)
