@@ -1,0 +1,14 @@
+mutation createOrganization ($name: String!) {
+    organizationsCreate(input: {
+        name: $name
+    }) {
+        errors {
+            ...on ActiveModelError { attribute type }
+            ...on MessageError { message }
+            ...on ErrorCode { errorCode }
+        }
+        organization {
+            ...Organization
+        }
+    }
+}
