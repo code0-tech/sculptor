@@ -1,3 +1,4 @@
+#import '../fragments/Organization.fragment.graphql'
 mutation createOrganization ($name: String!) {
     organizationsCreate(input: {
         name: $name

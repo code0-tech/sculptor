@@ -1,3 +1,4 @@
+#import '../fragments/Organization.fragment.graphql'
 query Organization ($firstOrganization: Int, $afterOrganization: String) {
     organizations (first: $firstOrganization, after: $afterOrganization) {
         count
