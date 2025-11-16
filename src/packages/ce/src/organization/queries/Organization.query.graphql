@@ -1,0 +1,12 @@
+query Organization ($firstOrganization: Int, $afterOrganization: String) {
+    organizations (first: $firstOrganization, after: $afterOrganization) {
+        count
+        nodes {
+            ...Organization
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+    }
+}
