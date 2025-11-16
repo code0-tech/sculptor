@@ -1,3 +1,4 @@
 fragment UserId on User {
+    __typename
     id
 }

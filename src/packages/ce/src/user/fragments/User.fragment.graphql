@@ -1,6 +1,7 @@
 #import "../identity/fragments/Identity.fragment.graphql"
 #import "../session/fragments/Session.fragment.graphql"
 fragment User on User {
+    __typename
     admin
     avatarPath
     createdAt

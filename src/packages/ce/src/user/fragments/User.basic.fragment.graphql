@@ -1,4 +1,5 @@
 fragment UserBasic on User {
+    __typename
     admin
     avatarPath
     createdAt
