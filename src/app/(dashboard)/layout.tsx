@@ -58,7 +58,7 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
     if (currentSession === null) router.push("/login")
 
     return <ContextStoreProvider services={[user, organization, member, namespace]}>
-        <DLayout topContent={
+        <DLayout style={{zIndex: 0}} topContent={
             <>
                 <div style={{background: "rgba(255,2552,255,.1)", borderBottom: "1px solid rgba(255,2552,255,.1)"}}>
                     {bar}
