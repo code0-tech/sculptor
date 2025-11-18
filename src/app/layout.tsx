@@ -200,7 +200,7 @@ export default function RootLayout({children}: Readonly<{ children: React.ReactN
     }), [authMiddleware])
 
     return React.useMemo(() => {
-        return <html>
+        return <html suppressHydrationWarning>
         <body className={inter.className}>
         <Suspense fallback={"loading..."}>
             <ApolloProvider client={client}>
