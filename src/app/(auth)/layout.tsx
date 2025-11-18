@@ -1,14 +1,6 @@
 "use client"
 
-import {
-    Col,
-    Container,
-    ContextStoreProvider,
-    DFullScreen,
-    DUserView,
-    Flex,
-    Text
-} from "@code0-tech/pictor";
+import {Col, Container, ContextStoreProvider, DFullScreen, DUserView, Flex, Text} from "@code0-tech/pictor";
 import {UserService} from "@edition/user/User.service";
 import {useApolloClient} from "@apollo/client/react";
 import {GraphqlClient} from "@core/util/graphql-client";
@@ -19,10 +11,7 @@ import {usePersistentReactiveArrayService} from "@/hooks/usePersistentReactiveAr
 export default function AuthLayout({children}: Readonly<{ children: React.ReactNode }>) {
 
     const client = useApolloClient()
-    const [store, service] = usePersistentReactiveArrayService<DUserView, UserService>(
-        "auth-users",
-        (store) => new UserService(new GraphqlClient(client), store)
-    )
+    const [store, service] = usePersistentReactiveArrayService<DUserView, UserService>("auth-users", (store) => new UserService(new GraphqlClient(client), store))
 
     return (
         <DFullScreen>

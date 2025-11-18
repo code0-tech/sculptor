@@ -5,8 +5,12 @@ import {useApolloClient} from "@apollo/client/react";
 import {
     Container,
     ContextStoreProvider,
-    DLayout, DNamespaceMemberView, DNamespaceView, DOrganizationView,
-    DUserView, ReactiveArrayStore,
+    DLayout,
+    DNamespaceMemberView,
+    DNamespaceView,
+    DOrganizationView,
+    DUserView,
+    ReactiveArrayStore,
     useUserSession
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/User.service";
