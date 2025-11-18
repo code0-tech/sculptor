@@ -7,8 +7,7 @@ import {
     HttpLink,
     InMemoryCache,
     Observable,
-    ServerError,
-    ServerParseError
+    ServerError
 } from "@apollo/client";
 import {ApolloProvider} from "@apollo/client/react";
 import React, {Suspense} from "react";
@@ -33,12 +32,12 @@ const inter = Inter({
  * Override console error and warn in development to log to console.log
  */
 if (process.env.NODE_ENV === "development" && typeof window !== "undefined") {
-    const originalError = console.error.bind(console);
-    const originalWarn = console.warn.bind(console);
-
     console.error = (...args: unknown[]) => {
         console.log(args)
     }
+
+    console.error.bind(console);
+    console.warn.bind(console);
 }
 
 /**
@@ -105,22 +104,23 @@ export default function RootLayout({children}: Readonly<{ children: React.ReactN
      * Apollo Error Link to handle GraphQL and network errors
      */
     const errorLink = new ErrorLink(({error, result, operation, forward}) => {
-
-        if (error instanceof CombinedGraphQLErrors) error.errors.forEach((error: Error) => {
-            toastHandler(error)
-        })
+        if (error instanceof CombinedGraphQLErrors) {
+            error.errors.forEach((error: Error) => {
+                toastHandler(error)
+            })
+            return
+        }
 
         if (error instanceof ServerError) {
             const status = error.statusCode;
             if (status === 401) {
                 localStorage.removeItem("ide_code-zero_session")
                 router.push("/login")
+                return
             }
         }
 
-        if (error instanceof ServerParseError) {
-            toastHandler(error)
-        }
+        toastHandler(error)
     })
 
     /**
@@ -173,6 +173,7 @@ export default function RootLayout({children}: Readonly<{ children: React.ReactN
                     findErrors(result).map((error) => toastHandler(error))
                     observer.next(result);
                 },
+                error: (err) => observer.error(err),
                 complete: () => observer.complete()
             })
             return () => sub.unsubscribe()
