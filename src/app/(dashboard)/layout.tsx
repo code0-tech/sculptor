@@ -7,7 +7,6 @@ import {
     ContextStoreProvider,
     DLayout, DNamespaceMemberView, DNamespaceView, DOrganizationView,
     DUserView, ReactiveArrayStore,
-    useReactiveArrayService,
     useUserSession
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/User.service";
@@ -16,6 +15,7 @@ import {useRouter} from "next/navigation";
 import {OrganizationService} from "@edition/organization/Organization.service";
 import {MemberService} from "@edition/member/Member.service";
 import {NamespaceService} from "@edition/namespace/Namespace.service";
+import {usePersistentReactiveArrayService} from "@/hooks/usePersistentReactiveArrayService";
 
 interface ApplicationLayoutProps {
     children: React.ReactNode
@@ -31,29 +31,10 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
 
     const graphqlClient = React.useMemo(() => new GraphqlClient(client), [client])
 
-    const createUserService = React.useCallback(
-        (store: ReactiveArrayStore<DUserView>) => new UserService(graphqlClient, store),
-        [graphqlClient]
-    )
-    const user = useReactiveArrayService<DUserView, UserService>(createUserService)
-
-    const createOrganizationService = React.useCallback(
-        (store: ReactiveArrayStore<DOrganizationView>) => new OrganizationService(graphqlClient, store),
-        [graphqlClient]
-    )
-    const organization = useReactiveArrayService<DOrganizationView, OrganizationService>(createOrganizationService)
-
-    const createMemberService = React.useCallback(
-        (store: ReactiveArrayStore<DNamespaceMemberView>) => new MemberService(graphqlClient, store),
-        [graphqlClient]
-    )
-    const member = useReactiveArrayService<DNamespaceMemberView, MemberService>(createMemberService)
-
-    const createNamespaceService = React.useCallback(
-        (store: ReactiveArrayStore<DNamespaceView>) => new NamespaceService(graphqlClient, store),
-        [graphqlClient]
-    )
-    const namespace = useReactiveArrayService<DNamespaceView, NamespaceService>(createNamespaceService)
+    const user = usePersistentReactiveArrayService<DUserView, UserService>("dashboard-users", (store: ReactiveArrayStore<DUserView>) => new UserService(graphqlClient, store))
+    const organization = usePersistentReactiveArrayService<DOrganizationView, OrganizationService>("dashboard-organizations", (store: ReactiveArrayStore<DOrganizationView>) => new OrganizationService(graphqlClient, store))
+    const member = usePersistentReactiveArrayService<DNamespaceMemberView, MemberService>("dashboard-members", (store: ReactiveArrayStore<DNamespaceMemberView>) => new MemberService(graphqlClient, store))
+    const namespace = usePersistentReactiveArrayService<DNamespaceView, NamespaceService>("dashboard-namespaces", (store: ReactiveArrayStore<DNamespaceView>) => new NamespaceService(graphqlClient, store))
 
     if (currentSession === null) router.push("/login")
 
