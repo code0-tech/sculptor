@@ -3,9 +3,12 @@ mutation logout($userSessionId: UserSessionID!) {
         userSessionId: $userSessionId
     }) {
         errors {
-            ...on ActiveModelError { attribute type }
-            ...on MessageError { message }
-            ...on ErrorCode { errorCode }
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
         }
         userSession {
             id

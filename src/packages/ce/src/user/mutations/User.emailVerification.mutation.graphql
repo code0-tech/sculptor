@@ -4,9 +4,12 @@ mutation emailVerification($token: String!) {
         token: $token
     }) {
         errors {
-            ...on ActiveModelError { attribute type }
-            ...on MessageError { message }
-            ...on ErrorCode { errorCode }
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
         }
         user {
             ...UserBasic

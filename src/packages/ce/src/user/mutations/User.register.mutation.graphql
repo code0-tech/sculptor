@@ -7,9 +7,12 @@ mutation register($email: String!, $password: String!, $passwordRepeat: String!,
         username: $username
     }) {
         errors {
-            ...on ActiveModelError { attribute type }
-            ...on MessageError { message }
-            ...on ErrorCode { errorCode }
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
         }
         userSession {
             updatedAt

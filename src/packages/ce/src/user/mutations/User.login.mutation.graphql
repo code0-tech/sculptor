@@ -6,9 +6,12 @@ mutation login($email: String!, $password: String!, $username: String) {
         username: $username
     }) {
         errors {
-            ...on ActiveModelError { attribute type }
-            ...on MessageError { message }
-            ...on ErrorCode { errorCode }
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
         }
         userSession {
             updatedAt
