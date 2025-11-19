@@ -1,0 +1,24 @@
+query Runtimes (
+    $firstRuntime: Int!,
+    $afterRuntime: String,
+
+    $firstDataType: Int!,
+    $afterDataType: String,
+
+    $firstFlowType: Int!,
+    $afterFlowType: String,
+
+    $firstProject: Int!,
+    $afterProject: String
+) {
+    globalRuntimes (first: $firstRuntime, after: $afterRuntime) {
+        count
+        nodes {
+            ...Runtime
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+    }
+}
