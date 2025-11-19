@@ -1,0 +1,53 @@
+fragment Runtime on Runtime {
+    __typename
+    id
+    name
+    description
+    namespace {
+        __typename
+        id
+    }
+    createdAt
+    updatedAt
+    status
+    token
+    dataTypes (first: $firstDataType, after: $afterDataType) {
+        count
+        nodes {
+            __typename
+            id
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+    }
+    flowTypes (first: $firstFlowType, after: $afterFlowType) {
+        count
+        nodes {
+            __typename
+            id
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+    }
+    projects (first: $firstProject, after: $afterProject) {
+        count
+        nodes {
+            __typename
+            id
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+    }
+    userAbilities {
+        deleteRuntime
+        rotateRuntimeToken
+        updateRuntime
+        __typename
+    }
+}
