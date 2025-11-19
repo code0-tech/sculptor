@@ -1,0 +1,29 @@
+query NamespaceRuntimes (
+
+    $namespaceId: NamespaceID!,
+
+    $firstRuntime: Int!,
+    $afterRuntime: String,
+
+    $firstDataType: Int!,
+    $afterDataType: String,
+
+    $firstFlowType: Int!,
+    $afterFlowType: String,
+
+    $firstProject: Int!,
+    $afterProject: String
+) {
+    namespace(id: $namespaceId) {
+        runtimes (first: $firstRuntime, after: $afterRuntime) {
+            count
+            nodes {
+                ...Runtime
+            }
+            pageInfo {
+                endCursor
+                hasNextPage
+            }
+        }
+    }
+}
