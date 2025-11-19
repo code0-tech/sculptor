@@ -1,0 +1,4 @@
+fragment RuntimeId on Runtime {
+    __typename
+    id
+}
