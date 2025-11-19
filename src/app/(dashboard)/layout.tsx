@@ -35,10 +35,10 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
 
     const graphqlClient = React.useMemo(() => new GraphqlClient(client), [client])
 
-    const user = usePersistentReactiveArrayService<DUserView, UserService>("dashboard::users", (store: ReactiveArrayStore<DUserView>) => new UserService(graphqlClient, store))
-    const organization = usePersistentReactiveArrayService<DOrganizationView, OrganizationService>("dashboard::organizations", (store: ReactiveArrayStore<DOrganizationView>) => new OrganizationService(graphqlClient, store))
-    const member = usePersistentReactiveArrayService<DNamespaceMemberView, MemberService>("dashboard::members", (store: ReactiveArrayStore<DNamespaceMemberView>) => new MemberService(graphqlClient, store))
-    const namespace = usePersistentReactiveArrayService<DNamespaceView, NamespaceService>("dashboard::namespaces", (store: ReactiveArrayStore<DNamespaceView>) => new NamespaceService(graphqlClient, store))
+    const user = usePersistentReactiveArrayService<DUserView, UserService>(`dashboard::users::${currentSession?.id}`, (store: ReactiveArrayStore<DUserView>) => new UserService(graphqlClient, store))
+    const organization = usePersistentReactiveArrayService<DOrganizationView, OrganizationService>(`dashboard::organizations::${currentSession?.id}`, (store: ReactiveArrayStore<DOrganizationView>) => new OrganizationService(graphqlClient, store))
+    const member = usePersistentReactiveArrayService<DNamespaceMemberView, MemberService>(`dashboard::members::${currentSession?.id}`, (store: ReactiveArrayStore<DNamespaceMemberView>) => new MemberService(graphqlClient, store))
+    const namespace = usePersistentReactiveArrayService<DNamespaceView, NamespaceService>(`dashboard::namespaces::${currentSession?.id}`, (store: ReactiveArrayStore<DNamespaceView>) => new NamespaceService(graphqlClient, store))
 
     if (currentSession === null) router.push("/login")
 
