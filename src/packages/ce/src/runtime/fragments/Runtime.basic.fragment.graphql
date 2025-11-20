@@ -1,0 +1,20 @@
+fragment RuntimeBasic on Runtime {
+    __typename
+    id
+    name
+    description
+    namespace {
+        __typename
+        id
+    }
+    createdAt
+    updatedAt
+    status
+    token
+    userAbilities {
+        deleteRuntime
+        rotateRuntimeToken
+        updateRuntime
+        __typename
+    }
+}
