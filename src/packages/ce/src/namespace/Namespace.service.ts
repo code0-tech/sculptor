@@ -1,4 +1,4 @@
-import {DNamespaceReactiveService, DNamespaceView, DRuntimeView, ReactiveArrayStore} from "@code0-tech/pictor";
+import {DNamespaceReactiveService, DNamespaceView, ReactiveArrayStore} from "@code0-tech/pictor";
 import {GraphqlClient} from "@core/util/graphql-client";
 import {Namespace, Query} from "@code0-tech/sagittarius-graphql-types";
 import namespaceQuery from "./queries/Namespace.query.graphql";
