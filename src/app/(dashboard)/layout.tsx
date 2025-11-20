@@ -8,7 +8,7 @@ import {
     DLayout,
     DNamespaceMemberView,
     DNamespaceView,
-    DOrganizationView,
+    DOrganizationView, DRuntimeView,
     DUserView,
     ReactiveArrayStore,
     useUserSession
@@ -20,6 +20,7 @@ import {OrganizationService} from "@edition/organization/Organization.service";
 import {MemberService} from "@edition/member/Member.service";
 import {NamespaceService} from "@edition/namespace/Namespace.service";
 import {usePersistentReactiveArrayService} from "@/hooks/usePersistentReactiveArrayService";
+import {RuntimeService} from "@edition/runtime/Runtime.service";
 
 interface ApplicationLayoutProps {
     children: React.ReactNode
@@ -39,10 +40,11 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
     const organization = usePersistentReactiveArrayService<DOrganizationView, OrganizationService>(`dashboard::organizations::${currentSession?.id}`, (store: ReactiveArrayStore<DOrganizationView>) => new OrganizationService(graphqlClient, store))
     const member = usePersistentReactiveArrayService<DNamespaceMemberView, MemberService>(`dashboard::members::${currentSession?.id}`, (store: ReactiveArrayStore<DNamespaceMemberView>) => new MemberService(graphqlClient, store))
     const namespace = usePersistentReactiveArrayService<DNamespaceView, NamespaceService>(`dashboard::namespaces::${currentSession?.id}`, (store: ReactiveArrayStore<DNamespaceView>) => new NamespaceService(graphqlClient, store))
+    const runtime = usePersistentReactiveArrayService<DRuntimeView, RuntimeService>(`dashboard::global_runtimes::${currentSession?.id}`, (store: ReactiveArrayStore<DRuntimeView>) => new RuntimeService(graphqlClient, store))
 
     if (currentSession === null) router.push("/login")
 
-    return <ContextStoreProvider services={[user, organization, member, namespace]}>
+    return <ContextStoreProvider services={[user, organization, member, namespace, runtime]}>
         <DLayout style={{zIndex: 0}} topContent={
             <>
                 <div style={{background: "rgba(255,2552,255,.1)", borderBottom: "1px solid rgba(255,2552,255,.1)"}}>
