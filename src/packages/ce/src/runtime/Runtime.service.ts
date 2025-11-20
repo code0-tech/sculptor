@@ -1,5 +1,6 @@
 import {DOrganizationView, DRuntimeReactiveService, DRuntimeView, ReactiveArrayStore} from "@code0-tech/pictor";
 import {
+    Mutation, Organization, OrganizationsCreateInput,
     Query,
     Runtime,
     RuntimesCreateInput,
@@ -10,6 +11,7 @@ import {
 import {GraphqlClient} from "@core/util/graphql-client";
 import globalRuntimesQuery from "./queries/Runtime.global.query.graphql"
 import namespaceRuntimesQuery from "./queries/Runtime.namespace.query.graphql"
+import createRuntimeMutation from "./mutations/Runtime.create.mutation.graphql"
 
 export class RuntimeService extends DRuntimeReactiveService {
 
@@ -20,6 +22,11 @@ export class RuntimeService extends DRuntimeReactiveService {
         super(store);
         this.client = client
         this.namespaceId = namespaceId ?? undefined
+    }
+
+    hasById(id: Runtime["id"]): boolean {
+        const runtime = super.values().find(o => o.id === id)
+        return runtime !== undefined
     }
 
     values(): DRuntimeView[] {
@@ -71,8 +78,22 @@ export class RuntimeService extends DRuntimeReactiveService {
         return super.values();
     }
 
-    runtimeCreate(payload: RuntimesCreateInput): Promise<RuntimesCreatePayload | undefined> {
-        return Promise.resolve(undefined);
+    async runtimeCreate(payload: RuntimesCreateInput): Promise<RuntimesCreatePayload | undefined> {
+        const result = await this.client.mutate<Mutation, RuntimesCreateInput>({
+            mutation: createRuntimeMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        if (result.data && result.data.runtimesCreate && result.data.runtimesCreate.runtime) {
+            const runtime = result.data.runtimesCreate.runtime
+            if (!this.hasById(runtime.id)) {
+                this.add(new DRuntimeView(runtime))
+            }
+        }
+
+        return result.data?.runtimesCreate ?? undefined
     }
 
     runtimeDelete(payload: RuntimesDeleteInput): Promise<RuntimesDeletePayload | undefined> {
