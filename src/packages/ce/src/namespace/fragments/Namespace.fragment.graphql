@@ -1,0 +1,35 @@
+fragment Namespace on Namespace {
+    __typename
+    id
+    updatedAt
+    createdAt
+    roles {
+        count
+    }
+    namespaceLicenses {
+        count
+    }
+    members {
+        count
+    }
+    projects {
+        count
+    }
+    runtimes {
+        count
+    }
+    currentNamespaceLicense {
+        id
+    }
+    parent {
+        __typename
+    }
+    userAbilities {
+        createNamespaceLicense
+        createNamespaceProject
+        createNamespaceRole
+        createRuntime
+        inviteMember
+        __typename
+    }
+}
