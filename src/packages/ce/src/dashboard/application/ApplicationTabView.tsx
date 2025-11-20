@@ -18,7 +18,8 @@ export const ApplicationTabView: React.FC = () => {
     const defaultValue = pathname.includes("organizations") ? "organizations"
         : pathname.includes("users") ? "users"
             : pathname.includes("settings") ? "settings"
-                : "overview"
+                : pathname.includes("runtimes") ? "runtimes"
+                    : "overview"
 
     const adminLinks = React.useMemo(() => {
         return currentUser && currentUser.admin ? (
