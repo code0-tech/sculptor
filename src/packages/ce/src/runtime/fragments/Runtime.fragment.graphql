@@ -11,38 +11,14 @@ fragment Runtime on Runtime {
     updatedAt
     status
     token
-    dataTypes (first: $firstDataType, after: $afterDataType) {
+    dataTypes {
         count
-        nodes {
-            __typename
-            id
-        }
-        pageInfo {
-            endCursor
-            hasNextPage
-        }
     }
-    flowTypes (first: $firstFlowType, after: $afterFlowType) {
+    flowTypes {
         count
-        nodes {
-            __typename
-            id
-        }
-        pageInfo {
-            endCursor
-            hasNextPage
-        }
     }
-    projects (first: $firstProject, after: $afterProject) {
+    projects {
         count
-        nodes {
-            __typename
-            id
-        }
-        pageInfo {
-            endCursor
-            hasNextPage
-        }
     }
     userAbilities {
         deleteRuntime

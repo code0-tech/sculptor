@@ -1,4 +1,4 @@
-#import "../fragments/Runtime.basic.fragment.graphql"
+#import "../fragments/Runtime.fragment.graphql"
 
 mutation runtimeCreate($name: String!, $description: String, $namespaceId: NamespaceID) {
     runtimesCreate(input: {
@@ -15,7 +15,7 @@ mutation runtimeCreate($name: String!, $description: String, $namespaceId: Names
             }
         }
         runtime {
-            ...RuntimeBasic
+            ...Runtime
         }
     }
 }
