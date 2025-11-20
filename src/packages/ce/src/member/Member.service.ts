@@ -1,5 +1,6 @@
 import {DNamespaceMemberReactiveService, DNamespaceMemberView, ReactiveArrayStore} from "@code0-tech/pictor";
 import {
+    Namespace,
     NamespacesMembersAssignRolesInput,
     NamespacesMembersAssignRolesPayload,
     NamespacesMembersDeleteInput,
@@ -12,9 +13,11 @@ import {GraphqlClient} from "@core/util/graphql-client";
 export class MemberService extends DNamespaceMemberReactiveService {
 
     private readonly client: GraphqlClient
+    private readonly namespaceId: Namespace['id']
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<DNamespaceMemberView>) {
+    constructor(namespaceId: Namespace['id'], client: GraphqlClient, store: ReactiveArrayStore<DNamespaceMemberView>) {
         super(store);
+        this.namespaceId = namespaceId
         this.client = client
     }
 
