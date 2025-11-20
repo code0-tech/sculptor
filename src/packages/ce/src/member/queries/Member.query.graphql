@@ -1,0 +1,18 @@
+query Members (
+    $namespaceId: NamespaceID!,
+    $firstMember: Int!,
+    $afterMember: String,
+) {
+    namespace(id: $namespaceId) {
+        members (first: $firstMember, after: $afterMember) {
+            count
+            nodes {
+                ...Member
+            }
+            pageInfo {
+                endCursor
+                hasNextPage
+            }
+        }
+    }
+}
