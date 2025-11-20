@@ -1,0 +1,27 @@
+fragment Member on NamespaceMember {
+    id
+    roles (first: $firstRole, after: $afterRole) {
+        count
+        nodes {
+            __typename
+            id
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+
+    }
+    user {
+        ...UserId
+    }
+    namespace {
+        ...NamespaceId
+    }
+    updatedAt
+    createdAt
+    userAbilities {
+        assignMemberRoles
+        deleteMember
+    }
+}
