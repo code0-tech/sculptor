@@ -1,3 +1,4 @@
+#import "../fragments/Runtime.fragment.graphql"
 query Runtimes (
     $firstRuntime: Int!,
     $afterRuntime: String,
