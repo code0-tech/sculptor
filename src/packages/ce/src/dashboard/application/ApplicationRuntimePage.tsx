@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, DOrganizationList, DRuntimeList, Flex, Spacing, Text, TextInput} from "@code0-tech/pictor";
+import {Button, DRuntimeList, Flex, Spacing, Text, TextInput} from "@code0-tech/pictor";
 import {IconSearch} from "@tabler/icons-react";
 import Link from "next/link";
 
@@ -11,8 +11,8 @@ export const ApplicationRuntimePage: React.FC = () => {
             </Text>
             <Flex align={"center"} style={{gap: "0.7rem"}}>
                 <TextInput left={<IconSearch size={16}/>} placeholder={"Find a global runtime..."}/>
-                <Link href={"/organizations/create"}>
-                    <Button color={"success"}>Add Runtime</Button>
+                <Link href={"/runtimes/create"}>
+                    <Button color={"success"}>Link Runtime</Button>
                 </Link>
             </Flex>
         </Flex>
