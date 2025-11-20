@@ -1,3 +1,4 @@
+#we get the dataTypes, flowTypes and projects over the namespace id and over the respected services
 fragment Runtime on Runtime {
     __typename
     id
