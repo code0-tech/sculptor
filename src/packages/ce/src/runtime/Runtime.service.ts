@@ -8,8 +8,8 @@ import {
     RuntimesDeletePayload, RuntimesRotateTokenInput, RuntimesRotateTokenPayload
 } from "@code0-tech/sagittarius-graphql-types";
 import {GraphqlClient} from "@core/util/graphql-client";
-import globalRuntimesQuery from "queries/Runtime.global.query.graphql"
-import namespaceRuntimesQuery from "queries/Runtime.namespace.query.graphql"
+import globalRuntimesQuery from "./queries/Runtime.global.query.graphql"
+import namespaceRuntimesQuery from "./queries/Runtime.namespace.query.graphql"
 
 export class RuntimeService extends DRuntimeReactiveService {
 
@@ -28,7 +28,17 @@ export class RuntimeService extends DRuntimeReactiveService {
         let i = 0;
 
         this.client.query<Query>({
-            query: globalRuntimesQuery
+            query: globalRuntimesQuery,
+            variables: {
+                firstRuntime: 50,
+                afterRuntime: null,
+                firstDataType: 0,
+                afterDataType: null,
+                firstFlowType: 0,
+                afterFlowType: null,
+                firstProject: 0,
+                afterProject: null,
+            },
         }).then(result => {
             const data = result.data
             if (!data) return
