@@ -1,3 +1,5 @@
+#import "../../user/fragments/User.id.fragment.graphql"
+#import "../../namespace/fragments/Namespace.id.fragment.graphql"
 fragment Member on NamespaceMember {
     id
     roles (first: $firstRole, after: $afterRole) {
