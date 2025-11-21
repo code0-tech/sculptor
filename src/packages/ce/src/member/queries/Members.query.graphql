@@ -1,3 +1,4 @@
+#import "../fragments/Member.fragment.graphql"
 query Members (
     $namespaceId: NamespaceID!,
 
