@@ -14,17 +14,16 @@ export default function Page() {
             <DLayout leftContent={
                 <TabList>
                     <InputLabel>Application</InputLabel>
-                    <Spacing spacing={"xs"}/>
                     <TabTrigger value={"general"}>
-                        <Button variant={"none"}>
+                        <Button paddingSize={"xxs"} variant={"none"}>
                             <IconSettings size={16}/>
-                            General
+                            <Text size={"md"} hierarchy={"primary"}>General</Text>
                         </Button>
                     </TabTrigger>
                     <TabTrigger value={"restrictions"}>
-                        <Button variant={"none"}>
+                        <Button paddingSize={"xxs"} variant={"none"}>
                             <IconGavel size={16}/>
-                            Restrictions
+                            <Text size={"md"} hierarchy={"primary"}>Restrictions</Text>
                         </Button>
                     </TabTrigger>
                 </TabList>
