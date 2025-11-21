@@ -38,7 +38,7 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
 
     const user = usePersistentReactiveArrayService<DUserView, UserService>(`dashboard::users::${currentSession?.id}`, (store: ReactiveArrayStore<DUserView>) => new UserService(graphqlClient, store))
     const organization = usePersistentReactiveArrayService<DOrganizationView, OrganizationService>(`dashboard::organizations::${currentSession?.id}`, (store: ReactiveArrayStore<DOrganizationView>) => new OrganizationService(graphqlClient, store))
-    const member = usePersistentReactiveArrayService<DNamespaceMemberView, MemberService>(`dashboard::members::${currentSession?.id}`, (store: ReactiveArrayStore<DNamespaceMemberView>) => new MemberService(graphqlClient, store))
+    const member = usePersistentReactiveArrayService<DNamespaceMemberView, MemberService>(`dashboard::members::${currentSession?.id}`, (store: ReactiveArrayStore<DNamespaceMemberView>) => new MemberService("gid://sagittarius/Namespace/1", graphqlClient, store))
     const namespace = usePersistentReactiveArrayService<DNamespaceView, NamespaceService>(`dashboard::namespaces::${currentSession?.id}`, (store: ReactiveArrayStore<DNamespaceView>) => new NamespaceService(graphqlClient, store))
     const runtime = usePersistentReactiveArrayService<DRuntimeView, RuntimeService>(`dashboard::global_runtimes::${currentSession?.id}`, (store: ReactiveArrayStore<DRuntimeView>) => new RuntimeService(graphqlClient, store))
 
