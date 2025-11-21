@@ -7,11 +7,15 @@ import {IconBuilding, IconFolder, IconHome, IconServer, IconSettings, IconUser} 
 import {usePathname} from "next/navigation";
 import Link from "next/link";
 import {UserService} from "@edition/user/User.service";
+import {RuntimeService} from "@edition/runtime/Runtime.service";
+import {OrganizationService} from "@edition/organization/Organization.service";
 
 export const ApplicationTabView: React.FC = () => {
 
     const pathname = usePathname()
     const userService = useService(UserService)
+    const runtimeService = useService(RuntimeService)
+    const organizationService = useService(OrganizationService)
     const userStore = useStore(UserService)
     const currentSession = useUserSession()
     const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [userStore, currentSession])
@@ -20,6 +24,7 @@ export const ApplicationTabView: React.FC = () => {
             : pathname.includes("settings") ? "settings"
                 : pathname.includes("runtimes") ? "runtimes"
                     : "overview"
+
 
     const adminLinks = React.useMemo(() => {
         return currentUser && currentUser.admin ? (
@@ -38,7 +43,7 @@ export const ApplicationTabView: React.FC = () => {
                         <Button variant={"none"}>
                             <IconServer size={16}/>
                             Runtimes
-                            <Badge>3</Badge>
+                            <Badge>{runtimeService.values().length}</Badge>
                         </Button>
                     </Link>
                 </TabTrigger>
@@ -79,7 +84,7 @@ export const ApplicationTabView: React.FC = () => {
                         <Button variant={"none"}>
                             <IconBuilding size={16}/>
                             Organizations
-                            <Badge>2</Badge>
+                            <Badge>{organizationService.values().length}</Badge>
                         </Button>
                     </Link>
                 </TabTrigger>
