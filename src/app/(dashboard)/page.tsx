@@ -1,43 +1,10 @@
 "use client"
 
-import {Button, Flex, Text} from "@code0-tech/pictor";
-import {IconChevronDown, IconPlus} from "@tabler/icons-react";
 import React from "react";
+import {ApplicationPage} from "@edition/dashboard/application/ApplicationPage";
 
 const Page = () => {
-
-    return <Flex style={{flexDirection: "column", gap: "1.3rem"}}>
-        <Flex justify={"space-between"} align={"center"}>
-            <Text size={"xl"} hierarchy={"primary"}>
-                Personal projects
-            </Text>
-            <Flex style={{gap: ".7rem"}} align={"center"}>
-                <Button>
-                    Sort
-                    <IconChevronDown size={16}/>
-                </Button>
-                <Button color={"success"}>
-                    Create project
-                    <IconPlus size={16}/>
-                </Button>
-            </Flex>
-        </Flex>
-        <Flex justify={"space-between"} align={"center"}>
-            <Text size={"xl"} hierarchy={"primary"}>
-                Organizations you joined
-            </Text>
-            <Flex style={{gap: ".7rem"}} align={"center"}>
-                <Button>
-                    Sort
-                    <IconChevronDown size={16}/>
-                </Button>
-                <Button color={"success"}>
-                    Create organization
-                    <IconPlus size={16}/>
-                </Button>
-            </Flex>
-        </Flex>
-    </Flex>
+    return <ApplicationPage/>
 }
 
 export default React.memo(Page);
