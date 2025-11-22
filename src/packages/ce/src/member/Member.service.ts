@@ -1,9 +1,4 @@
-import {
-    DNamespaceMemberReactiveService,
-    DNamespaceMemberView,
-    DRuntimeView,
-    ReactiveArrayStore
-} from "@code0-tech/pictor";
+import {DNamespaceMemberReactiveService, DNamespaceMemberView, ReactiveArrayStore} from "@code0-tech/pictor";
 import {
     Namespace,
     NamespacesMembersAssignRolesInput,
@@ -11,7 +6,8 @@ import {
     NamespacesMembersDeleteInput,
     NamespacesMembersDeletePayload,
     NamespacesMembersInviteInput,
-    NamespacesMembersInvitePayload, Query,
+    NamespacesMembersInvitePayload,
+    Query,
     User
 } from "@code0-tech/sagittarius-graphql-types";
 import {GraphqlClient} from "@core/util/graphql-client";
@@ -20,12 +16,10 @@ import membersQuery from "./queries/Members.query.graphql"
 export class MemberService extends DNamespaceMemberReactiveService {
 
     private readonly client: GraphqlClient
-    private readonly namespaceId: Namespace['id']
     private i = 0;
 
-    constructor(namespaceId: Namespace['id'], client: GraphqlClient, store: ReactiveArrayStore<DNamespaceMemberView>) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<DNamespaceMemberView>) {
         super(store);
-        this.namespaceId = namespaceId
         this.client = client
     }
 
