@@ -1,4 +1,10 @@
-import {DOrganizationView, DRuntimeReactiveService, DRuntimeView, ReactiveArrayStore} from "@code0-tech/pictor";
+import {
+    DOrganizationView,
+    DRuntimeDependencies,
+    DRuntimeReactiveService,
+    DRuntimeView,
+    ReactiveArrayStore
+} from "@code0-tech/pictor";
 import {
     Mutation, Organization, OrganizationsCreateInput,
     Query,
@@ -16,12 +22,10 @@ import createRuntimeMutation from "./mutations/Runtime.create.mutation.graphql"
 export class RuntimeService extends DRuntimeReactiveService {
 
     private readonly client: GraphqlClient
-    private readonly namespaceId?: Runtime['id']
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<DRuntimeView>, namespaceId?: Runtime['id']) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<DRuntimeView>) {
         super(store);
         this.client = client
-        this.namespaceId = namespaceId ?? undefined
     }
 
     hasById(id: Runtime["id"]): boolean {
@@ -29,7 +33,7 @@ export class RuntimeService extends DRuntimeReactiveService {
         return runtime !== undefined
     }
 
-    values(): DRuntimeView[] {
+    values(dependencies?: DRuntimeDependencies): DRuntimeView[] {
         if (super.values().length > 0) return super.values();
 
         let i = 0;
@@ -57,11 +61,11 @@ export class RuntimeService extends DRuntimeReactiveService {
             }
         })
 
-        if (this.namespaceId) {
+        if (dependencies?.namespaceId) {
             this.client.query<Query>({
                 query: namespaceRuntimesQuery,
                 variables: {
-                    namespaceId: this.namespaceId
+                    namespaceId: dependencies.namespaceId
                 }
             }).then(result => {
                 const data = result.data
