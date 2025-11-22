@@ -6,7 +6,7 @@ import {
     Container,
     ContextStoreProvider,
     DLayout,
-    DNamespaceMemberView,
+    DNamespaceMemberView, DNamespaceProjectView,
     DNamespaceView,
     DOrganizationView, DRuntimeView,
     DUserView,
@@ -21,6 +21,7 @@ import {MemberService} from "@edition/member/Member.service";
 import {NamespaceService} from "@edition/namespace/Namespace.service";
 import {usePersistentReactiveArrayService} from "@/hooks/usePersistentReactiveArrayService";
 import {RuntimeService} from "@edition/runtime/Runtime.service";
+import {ProjectService} from "@edition/project/Project.service";
 
 interface ApplicationLayoutProps {
     children: React.ReactNode
@@ -38,13 +39,14 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
 
     const user = usePersistentReactiveArrayService<DUserView, UserService>(`dashboard::users::${currentSession?.id}`, (store: ReactiveArrayStore<DUserView>) => new UserService(graphqlClient, store))
     const organization = usePersistentReactiveArrayService<DOrganizationView, OrganizationService>(`dashboard::organizations::${currentSession?.id}`, (store: ReactiveArrayStore<DOrganizationView>) => new OrganizationService(graphqlClient, store))
-    const member = usePersistentReactiveArrayService<DNamespaceMemberView, MemberService>(`dashboard::members::${currentSession?.id}`, (store: ReactiveArrayStore<DNamespaceMemberView>) => new MemberService("gid://sagittarius/Namespace/1", graphqlClient, store))
+    const member = usePersistentReactiveArrayService<DNamespaceMemberView, MemberService>(`dashboard::members::${currentSession?.id}`, (store: ReactiveArrayStore<DNamespaceMemberView>) => new MemberService(graphqlClient, store))
     const namespace = usePersistentReactiveArrayService<DNamespaceView, NamespaceService>(`dashboard::namespaces::${currentSession?.id}`, (store: ReactiveArrayStore<DNamespaceView>) => new NamespaceService(graphqlClient, store))
     const runtime = usePersistentReactiveArrayService<DRuntimeView, RuntimeService>(`dashboard::global_runtimes::${currentSession?.id}`, (store: ReactiveArrayStore<DRuntimeView>) => new RuntimeService(graphqlClient, store))
+    const project = usePersistentReactiveArrayService<DNamespaceProjectView, ProjectService>(`dashboard::projects::${currentSession?.id}`, (store: ReactiveArrayStore<DNamespaceProjectView>) => new ProjectService(graphqlClient, store))
 
     if (currentSession === null) router.push("/login")
 
-    return <ContextStoreProvider services={[user, organization, member, namespace, runtime]}>
+    return <ContextStoreProvider services={[user, organization, member, namespace, runtime, project]}>
         <DLayout style={{zIndex: 0}} topContent={
             <>
                 <div style={{background: "rgba(255,2552,255,.1)", borderBottom: "1px solid rgba(255,2552,255,.1)"}}>
