@@ -6,9 +6,7 @@ interface NamespaceLayoutProps {
 }
 
 const NamespaceLayout: React.FC<NamespaceLayoutProps> = ({children}) => {
-    return <div>
-        {children}
-    </div>
+    return children
 }
 
 export default NamespaceLayout
