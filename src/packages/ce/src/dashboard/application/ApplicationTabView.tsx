@@ -70,15 +70,6 @@ export const ApplicationTabView: React.FC = () => {
                         </Button>
                     </Link>
                 </TabTrigger>
-                <TabTrigger value={"projects"}>
-                    <Link href={"/projects"}>
-                        <Button variant={"none"}>
-                            <IconFolder size={16}/>
-                            Personal projects
-                            <Badge>2</Badge>
-                        </Button>
-                    </Link>
-                </TabTrigger>
                 <TabTrigger value={"organizations"}>
                     <Link href={"/organizations"}>
                         <Button variant={"none"}>
