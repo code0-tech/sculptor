@@ -1,18 +1,23 @@
 import {
     DNamespaceProjectReactiveService,
     DNamespaceProjectView,
-    DProjectDependencies, DRuntimeView, DUserView,
+    DProjectDependencies,
     ReactiveArrayStore
 } from "@code0-tech/pictor";
 import {
+    Mutation,
+    NamespaceProject,
     NamespacesProjectsAssignRuntimesInput,
     NamespacesProjectsAssignRuntimesPayload,
     NamespacesProjectsCreateInput,
     NamespacesProjectsCreatePayload,
-    NamespacesProjectsDeleteInput, NamespacesProjectsDeletePayload, Query
+    NamespacesProjectsDeleteInput,
+    NamespacesProjectsDeletePayload,
+    Query
 } from "@code0-tech/sagittarius-graphql-types";
 import {GraphqlClient} from "@core/util/graphql-client";
 import projectsQuery from "./queries/Projects.query.graphql"
+import projectCreateMutation from "./mutations/Project.create.mutation.graphql"
 
 export class ProjectService extends DNamespaceProjectReactiveService {
 
@@ -25,6 +30,7 @@ export class ProjectService extends DNamespaceProjectReactiveService {
     }
 
     values(dependencies: DProjectDependencies): DNamespaceProjectView[] {
+        if (super.values().length > 0) return super.values()
         this.client.query<Query>({
             query: projectsQuery,
             variables: {
@@ -46,15 +52,34 @@ export class ProjectService extends DNamespaceProjectReactiveService {
         return super.values(dependencies);
     }
 
-    projectAssignRuntimes(payload: NamespacesProjectsAssignRuntimesInput): Promise<NamespacesProjectsAssignRuntimesPayload | undefined> {
+    hasById(id: NamespaceProject["id"]): boolean {
+        const project = super.values().find(p => p.id === id)
+        return project !== undefined
+    }
+
+    async projectAssignRuntimes(payload: NamespacesProjectsAssignRuntimesInput): Promise<NamespacesProjectsAssignRuntimesPayload | undefined> {
         return Promise.resolve(undefined);
     }
 
-    projectCreate(payload: NamespacesProjectsCreateInput): Promise<NamespacesProjectsCreatePayload | undefined> {
-        return Promise.resolve(undefined);
+    async projectCreate(payload: NamespacesProjectsCreateInput): Promise<NamespacesProjectsCreatePayload | undefined> {
+        const result = await this.client.mutate<Mutation, NamespacesProjectsCreateInput>({
+            mutation: projectCreateMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        if (result.data && result.data.namespacesProjectsCreate && result.data.namespacesProjectsCreate.namespaceProject) {
+            const project = result.data.namespacesProjectsCreate.namespaceProject
+            if (!this.hasById(project.id)) {
+                this.add(new DNamespaceProjectView(project))
+            }
+        }
+
+        return result.data?.namespacesProjectsCreate ?? undefined
     }
 
-    projectDelete(payload: NamespacesProjectsDeleteInput): Promise<NamespacesProjectsDeletePayload | undefined> {
+    async projectDelete(payload: NamespacesProjectsDeleteInput): Promise<NamespacesProjectsDeletePayload | undefined> {
         return Promise.resolve(undefined);
     }
 
