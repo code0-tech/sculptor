@@ -1,23 +1,24 @@
+import {DRuntimeDependencies, DRuntimeReactiveService, DRuntimeView, ReactiveArrayStore} from "@code0-tech/pictor";
 import {
-    DOrganizationView,
-    DRuntimeDependencies,
-    DRuntimeReactiveService,
-    DRuntimeView,
-    ReactiveArrayStore
-} from "@code0-tech/pictor";
-import {
-    Mutation, Organization, OrganizationsCreateInput,
+    Mutation,
     Query,
     Runtime,
     RuntimesCreateInput,
     RuntimesCreatePayload,
     RuntimesDeleteInput,
-    RuntimesDeletePayload, RuntimesRotateTokenInput, RuntimesRotateTokenPayload
+    RuntimesDeletePayload,
+    RuntimesRotateTokenInput,
+    RuntimesRotateTokenPayload,
+    RuntimesUpdateInput,
+    RuntimesUpdatePayload
 } from "@code0-tech/sagittarius-graphql-types";
 import {GraphqlClient} from "@core/util/graphql-client";
 import globalRuntimesQuery from "./queries/Runtime.global.query.graphql"
 import namespaceRuntimesQuery from "./queries/Runtime.namespace.query.graphql"
 import createRuntimeMutation from "./mutations/Runtime.create.mutation.graphql"
+import updateRuntimeMutation from "./mutations/Runtime.update.mutation.graphql"
+import deleteRuntimeMutation from "./mutations/Runtime.delete.mutation.graphql"
+import rotateTokenRuntimeMutation from "./mutations/Runtime.rotateToken.mutation.graphql"
 
 export class RuntimeService extends DRuntimeReactiveService {
 
@@ -100,12 +101,58 @@ export class RuntimeService extends DRuntimeReactiveService {
         return result.data?.runtimesCreate ?? undefined
     }
 
-    runtimeDelete(payload: RuntimesDeleteInput): Promise<RuntimesDeletePayload | undefined> {
-        return Promise.resolve(undefined);
+    async runtimeUpdate(payload: RuntimesUpdateInput): Promise<RuntimesUpdatePayload | undefined> {
+        const result = await this.client.mutate<Mutation, RuntimesUpdateInput>({
+            mutation: updateRuntimeMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        if (result.data && result.data.runtimesUpdate && result.data.runtimesUpdate.runtime) {
+            const runtime = result.data.runtimesUpdate.runtime
+            const index = this.values().findIndex(r => r.id === runtime.id)
+            this.set(index, new DRuntimeView(runtime))
+
+        }
+
+        return result.data?.runtimesUpdate ?? undefined
     }
 
-    runtimeRotateToken(payload: RuntimesRotateTokenInput): Promise<RuntimesRotateTokenPayload | undefined> {
-        return Promise.resolve(undefined);
+    async runtimeDelete(payload: RuntimesDeleteInput): Promise<RuntimesDeletePayload | undefined> {
+        const result = await this.client.mutate<Mutation, RuntimesDeleteInput>({
+            mutation: deleteRuntimeMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        if (result.data && result.data.runtimesDelete && result.data.runtimesDelete.runtime) {
+            const runtime = result.data.runtimesDelete.runtime
+            const index = this.values().findIndex(r => r.id === runtime.id)
+            this.delete(index)
+
+        }
+
+        return result.data?.runtimesDelete ?? undefined
+    }
+
+    async runtimeRotateToken(payload: RuntimesRotateTokenInput): Promise<RuntimesRotateTokenPayload | undefined> {
+        const result = await this.client.mutate<Mutation, RuntimesRotateTokenInput>({
+            mutation: rotateTokenRuntimeMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        if (result.data && result.data.runtimesRotateToken && result.data.runtimesRotateToken.runtime) {
+            const runtime = result.data.runtimesRotateToken.runtime
+            const index = this.values().findIndex(r => r.id === runtime.id)
+            this.set(index, new DRuntimeView(runtime))
+
+        }
+
+        return result.data?.runtimesRotateToken ?? undefined
     }
 
 }
