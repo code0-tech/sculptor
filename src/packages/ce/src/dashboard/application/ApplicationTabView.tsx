@@ -6,19 +6,27 @@ import {Badge, Button, Container, useService, useStore, useUserSession} from "@c
 import {IconBuilding, IconFolder, IconHome, IconServer, IconSettings, IconUser} from "@tabler/icons-react";
 import {usePathname} from "next/navigation";
 import Link from "next/link";
-import {UserService} from "@core/user/User.service";
+import {UserService} from "@edition/user/User.service";
+import {RuntimeService} from "@edition/runtime/Runtime.service";
+import {OrganizationService} from "@edition/organization/Organization.service";
 
 export const ApplicationTabView: React.FC = () => {
 
     const pathname = usePathname()
     const userService = useService(UserService)
+    const runtimeService = useService(RuntimeService)
+    const runtimeStore = useStore(RuntimeService)
+    const organizationService = useService(OrganizationService)
+    const organizationStore = useStore(OrganizationService)
     const userStore = useStore(UserService)
     const currentSession = useUserSession()
     const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [userStore, currentSession])
     const defaultValue = pathname.includes("organizations") ? "organizations"
         : pathname.includes("users") ? "users"
             : pathname.includes("settings") ? "settings"
-                : "overview"
+                : pathname.includes("runtimes") ? "runtimes"
+                    : "overview"
+
 
     const adminLinks = React.useMemo(() => {
         return currentUser && currentUser.admin ? (
@@ -28,7 +36,7 @@ export const ApplicationTabView: React.FC = () => {
                         <Button variant={"none"}>
                             <IconUser size={16}/>
                             Users
-                            <Badge>19</Badge>
+                            <Badge>{userService.values().length}</Badge>
                         </Button>
                     </Link>
                 </TabTrigger>
@@ -37,7 +45,7 @@ export const ApplicationTabView: React.FC = () => {
                         <Button variant={"none"}>
                             <IconServer size={16}/>
                             Runtimes
-                            <Badge>3</Badge>
+                            <Badge>{runtimeService.values().length}</Badge>
                         </Button>
                     </Link>
                 </TabTrigger>
@@ -51,7 +59,7 @@ export const ApplicationTabView: React.FC = () => {
                 </TabTrigger>
             </>
         ) : null
-    }, [currentUser])
+    }, [currentUser, runtimeStore, organizationStore])
 
     return <Container>
         <Tab defaultValue={defaultValue}>
@@ -64,21 +72,12 @@ export const ApplicationTabView: React.FC = () => {
                         </Button>
                     </Link>
                 </TabTrigger>
-                <TabTrigger value={"projects"}>
-                    <Link href={"/projects"}>
-                        <Button variant={"none"}>
-                            <IconFolder size={16}/>
-                            Personal projects
-                            <Badge>2</Badge>
-                        </Button>
-                    </Link>
-                </TabTrigger>
                 <TabTrigger value={"organizations"}>
                     <Link href={"/organizations"}>
                         <Button variant={"none"}>
                             <IconBuilding size={16}/>
                             Organizations
-                            <Badge>2</Badge>
+                            <Badge>{organizationService.values().length}</Badge>
                         </Button>
                     </Link>
                 </TabTrigger>

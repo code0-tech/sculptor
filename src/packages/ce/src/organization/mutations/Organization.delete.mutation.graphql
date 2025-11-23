@@ -1,0 +1,17 @@
+mutation deleteOrganization ($organizationId: OrganizationID!) {
+    organizationsDelete(input: {
+        organizationId: $organizationId
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        organization {
+            ...Organization
+        }
+    }
+}

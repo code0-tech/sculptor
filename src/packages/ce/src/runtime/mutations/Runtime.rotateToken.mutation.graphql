@@ -1,0 +1,19 @@
+#import "../fragments/Runtime.fragment.graphql"
+
+mutation runtimeRotateToken($runtimeId: RuntimeID!) {
+    runtimesRotateToken(input: {
+        runtimeId: $runtimeId
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        runtime {
+            ...Runtime
+        }
+    }
+}

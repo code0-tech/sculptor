@@ -1,0 +1,17 @@
+mutation logout($userSessionId: UserSessionID!) {
+    usersLogout(input: {
+        userSessionId: $userSessionId
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        userSession {
+            id
+        }
+    }
+}

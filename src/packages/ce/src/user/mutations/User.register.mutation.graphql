@@ -1,0 +1,28 @@
+#import '../fragments/User.basic.fragment.graphql'
+mutation register($email: String!, $password: String!, $passwordRepeat: String!, $username: String!) {
+    usersRegister(input: {
+        email: $email
+        password: $password
+        passwordRepeat: $passwordRepeat
+        username: $username
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        userSession {
+            updatedAt
+            token
+            active
+            createdAt
+            id
+            user {
+                ...UserBasic
+            }
+        }
+    }
+}

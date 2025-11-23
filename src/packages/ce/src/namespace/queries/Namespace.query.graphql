@@ -1,0 +1,6 @@
+#import "../fragments/Namespace.fragment.graphql"
+query Namespace ($id: NamespaceID!) {
+    namespace(id: $id) {
+        ...Namespace
+    }
+}

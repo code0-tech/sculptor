@@ -3,20 +3,23 @@
 import {
     Badge,
     Breadcrumb,
-    Button, Container,
+    Button,
+    Container,
     Flex,
     MenuItem,
     MenuSeparator,
     Text,
-    TextInput, useService,
+    TextInput,
+    useService,
     useUserSession
 } from "@code0-tech/pictor";
 import DUserMenu from "@code0-tech/pictor/dist/components/d-user/DUserMenu";
 import {IconBuilding, IconInbox, IconLogout, IconSearch, IconSettings} from "@tabler/icons-react";
 import React from "react";
 import Image from "next/image";
-import {UserService} from "@core/user/User.service";
+import {UserService} from "@edition/user/User.service";
 import {useRouter} from "next/navigation";
+import Link from "next/link";
 
 const Page = () => {
 
@@ -44,12 +47,11 @@ const Page = () => {
         }
 
         return <DUserMenu userId={currentSession.user?.id!!}>
-            <MenuItem>
-                <IconBuilding size={16}/>Organizations
-            </MenuItem>
-            <MenuItem>
-                <IconSettings size={16}/>Settings
-            </MenuItem>
+            <Link href={"/organizations"}>
+                <MenuItem>
+                    <IconBuilding size={16}/>Organizations
+                </MenuItem>
+            </Link>
             <MenuSeparator/>
             <MenuItem onSelect={userLogout}>
                 <IconLogout size={16}/>Logout
@@ -61,7 +63,7 @@ const Page = () => {
         <Flex style={{gap: "0.7rem", flexDirection: "column"}} py={0.7} w={"100%"}>
             <Flex align={"center"} justify={"space-between"}>
                 <Flex align={"center"} style={{gap: "1.3rem"}}>
-                    <Image src={"/CodeZero_App_Background_Colorful.png"} alt={"CodeZero Banner"} width={160} height={0}
+                    <Image src={"/CodeZero_App_MVP.png"} alt={"CodeZero Banner"} width={160} height={0}
                            style={{width: '42px', height: 'auto'}}/>
                     <Breadcrumb>
                         <Text>Application</Text>

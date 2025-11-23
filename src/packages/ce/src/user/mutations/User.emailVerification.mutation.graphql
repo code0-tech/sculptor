@@ -1,0 +1,18 @@
+#import '../fragments/User.basic.fragment.graphql'
+mutation emailVerification($token: String!) {
+    usersEmailVerification(input: {
+        token: $token
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        user {
+            ...UserBasic
+        }
+    }
+}

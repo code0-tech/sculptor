@@ -1,0 +1,4 @@
+fragment NamespaceId on Namespace {
+    __typename
+    id
+}

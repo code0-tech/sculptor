@@ -1,0 +1,4 @@
+fragment OrganizationId on Organization {
+    __typename
+    id
+}

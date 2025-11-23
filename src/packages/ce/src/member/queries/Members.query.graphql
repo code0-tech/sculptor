@@ -1,0 +1,24 @@
+#import "../fragments/Member.fragment.graphql"
+query Members (
+    $namespaceId: NamespaceID!,
+
+    $firstMember: Int!,
+    $afterMember: String,
+
+    $firstRole:Int!,
+    $afterRole:String
+
+) {
+    namespace(id: $namespaceId) {
+        members (first: $firstMember, after: $afterMember) {
+            count
+            nodes {
+                ...Member
+            }
+            pageInfo {
+                endCursor
+                hasNextPage
+            }
+        }
+    }
+}

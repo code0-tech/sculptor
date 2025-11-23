@@ -1,0 +1,21 @@
+#import "../fragments/Runtime.fragment.graphql"
+
+mutation runtimeCreate($name: String!, $description: String, $namespaceId: NamespaceID) {
+    runtimesCreate(input: {
+        name: $name,
+        description: $description,
+        namespaceId: $namespaceId
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        runtime {
+            ...Runtime
+        }
+    }
+}

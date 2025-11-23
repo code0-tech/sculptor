@@ -1,0 +1,28 @@
+#import "../../runtime/fragments/Runtime.fragment.graphql"
+fragment Project on NamespaceProject {
+    __typename
+    id
+    name
+    description
+    createdAt
+    updatedAt
+    namespace {
+        id
+    }
+    flows {
+        count
+    }
+    runtimes {
+        count
+    }
+    primaryRuntime {
+        ...Runtime
+    }
+    userAbilities {
+        assignProjectRuntimes
+        createFlow
+        deleteNamespaceProject
+        updateNamespaceProject
+        __typename
+    }
+}

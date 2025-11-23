@@ -1,0 +1,19 @@
+#import "../fragments/Runtime.fragment.graphql"
+
+mutation runtimeDelete($runtimeId: RuntimeID!) {
+    runtimesDelete(input: {
+        runtimeId: $runtimeId
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        runtime {
+            ...Runtime
+        }
+    }
+}

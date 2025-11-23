@@ -1,0 +1,20 @@
+#import "../fragments/Runtime.fragment.graphql"
+
+query NamespaceRuntimes (
+    $namespaceId: NamespaceID!,
+    $firstRuntime: Int!,
+    $afterRuntime: String,
+) {
+    namespace(id: $namespaceId) {
+        runtimes (first: $firstRuntime, after: $afterRuntime) {
+            count
+            nodes {
+                ...Runtime
+            }
+            pageInfo {
+                endCursor
+                hasNextPage
+            }
+        }
+    }
+}

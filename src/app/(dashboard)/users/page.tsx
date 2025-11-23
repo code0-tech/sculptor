@@ -1,3 +1,5 @@
+import {UsersPage} from "@edition/dashboard/application/UsersPage";
+
 export default function Page() {
-    return null
+    return <UsersPage/>
 }

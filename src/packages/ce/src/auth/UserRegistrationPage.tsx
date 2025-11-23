@@ -14,7 +14,7 @@ import {
 } from "@code0-tech/pictor";
 import Image from "next/image";
 import Link from "next/link";
-import {UserService} from "@core/user/User.service";
+import {UserService} from "@edition/user/User.service";
 import {useRouter} from "next/navigation";
 
 export const UserRegistrationPage: React.FC = () => {
@@ -69,7 +69,7 @@ export const UserRegistrationPage: React.FC = () => {
     })
 
     return <>
-        <Image src={"/CodeZero_App_Background_Colorful.png"} alt={"CodeZero Logo"}
+        <Image src={"/CodeZero_App_MVP.png"} alt={"CodeZero Logo"}
                width={40}
                height={40}
                style={{marginBottom: "1.3rem"}}/>

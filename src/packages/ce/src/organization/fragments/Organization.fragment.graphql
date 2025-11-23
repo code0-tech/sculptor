@@ -1,0 +1,14 @@
+fragment Organization on Organization {
+    __typename
+    id
+    updatedAt
+    createdAt
+    name
+    namespace {
+        id
+    }
+    userAbilities {
+        updateOrganization
+        deleteOrganization
+    }
+}

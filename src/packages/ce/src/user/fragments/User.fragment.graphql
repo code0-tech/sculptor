@@ -1,0 +1,42 @@
+#import "../identity/fragments/Identity.fragment.graphql"
+#import "../session/fragments/Session.fragment.graphql"
+fragment User on User {
+    __typename
+    admin
+    avatarPath
+    createdAt
+    email
+    emailVerifiedAt
+    firstname
+    id
+    lastname
+    namespace {
+        id
+    }
+    identities (first: $firstIdentity, after: $afterIdentity) {
+        count
+        nodes {
+            ...Identity
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+    }
+    sessions (first: $firstSession, after: $afterSession) {
+        count
+        nodes {
+            ...Session
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+    }
+    updatedAt
+    username
+    userAbilities {
+        updateUser
+        manageMfa
+    }
+}

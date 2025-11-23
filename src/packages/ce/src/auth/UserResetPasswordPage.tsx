@@ -2,7 +2,7 @@
 
 import React from "react";
 import {Alert, Button, PasswordInput, Spacing, Text, TextInput, useForm, useService} from "@code0-tech/pictor";
-import {UserService} from "@core/user/User.service";
+import {UserService} from "@edition/user/User.service";
 import Link from "next/link";
 import Image from "next/image";
 import {useRouter, useSearchParams} from "next/navigation";
@@ -51,7 +51,7 @@ export const UserResetPasswordPage: React.FC = () => {
     })
 
     return <>
-        <Image src={"/CodeZero_App_Background_Colorful.png"} alt={"CodeZero Logo"}
+        <Image src={"/CodeZero_App_MVP.png"} alt={"CodeZero Logo"}
                width={40}
                height={40}
                style={{marginBottom: "1.3rem"}}/>
