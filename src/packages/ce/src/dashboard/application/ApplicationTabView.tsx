@@ -15,7 +15,9 @@ export const ApplicationTabView: React.FC = () => {
     const pathname = usePathname()
     const userService = useService(UserService)
     const runtimeService = useService(RuntimeService)
+    const runtimeStore = useStore(RuntimeService)
     const organizationService = useService(OrganizationService)
+    const organizationStore = useStore(OrganizationService)
     const userStore = useStore(UserService)
     const currentSession = useUserSession()
     const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [userStore, currentSession])
@@ -57,7 +59,7 @@ export const ApplicationTabView: React.FC = () => {
                 </TabTrigger>
             </>
         ) : null
-    }, [currentUser])
+    }, [currentUser, runtimeStore, organizationStore])
 
     return <Container>
         <Tab defaultValue={defaultValue}>
