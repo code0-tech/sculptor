@@ -3,6 +3,7 @@ fragment Runtime on Runtime {
     __typename
     id
     name
+    status
     description
     namespace {
         __typename
