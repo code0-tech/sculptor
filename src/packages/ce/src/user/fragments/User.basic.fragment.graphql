@@ -4,6 +4,8 @@ fragment UserBasic on User {
     avatarPath
     createdAt
     firstname
+    emailVerifiedAt
+    email
     id
     lastname
     namespace {
