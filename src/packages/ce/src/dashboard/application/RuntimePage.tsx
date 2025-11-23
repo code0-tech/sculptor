@@ -1,9 +1,15 @@
+"use client"
+
 import React from "react";
 import {Button, DRuntimeList, Flex, Spacing, Text, TextInput} from "@code0-tech/pictor";
 import {IconSearch} from "@tabler/icons-react";
 import Link from "next/link";
+import {useRouter} from "next/navigation";
 
-export const ApplicationRuntimePage: React.FC = () => {
+export const RuntimePage: React.FC = () => {
+
+    const router = useRouter()
+
     return <>
         <Flex align={"center"} justify={"space-between"}>
             <Text size={"xl"} hierarchy={"primary"}>
@@ -17,6 +23,9 @@ export const ApplicationRuntimePage: React.FC = () => {
             </Flex>
         </Flex>
         <Spacing spacing={"xl"}/>
-        <DRuntimeList/>
+        <DRuntimeList onSetting={(runtimeId) => {
+            const number = runtimeId?.match(/Runtime\/(\d+)$/)?.[1]
+            router.push(`/runtimes/${number}/settings`)
+        }}/>
     </>
 }
