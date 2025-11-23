@@ -61,7 +61,8 @@ export const ApplicationPersonalProjectCreatePage: React.FC = () => {
                     namespaceId: currentUser.namespace.id
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
-                        router.push(`/namespace/${currentUser.namespace?.id}`)
+                        router.push("/")
+                        //router.push(`/namespace/${currentUser.namespace?.id}`)
                     }
                 })
             })
