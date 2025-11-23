@@ -13,7 +13,7 @@ import {UserService} from "@edition/user/User.service";
 import {IconSearch} from "@tabler/icons-react";
 import Link from "next/link";
 
-export const ApplicationPersonalProjectView: React.FC = () => {
+export const PersonalProjectsView: React.FC = () => {
 
     const userSession = useUserSession()
     const userStore = useStore(UserService)

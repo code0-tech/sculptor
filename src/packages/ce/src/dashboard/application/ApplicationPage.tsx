@@ -1,14 +1,14 @@
-import {ApplicationPersonalProjectView} from "@edition/dashboard/application/ApplicationPersonalProjectView";
-import {ApplicationOrganizationView} from "@edition/dashboard/application/ApplicationOrganizationView";
+import {PersonalProjectsView} from "@edition/dashboard/application/PersonalProjectsView";
+import {OrganizationsView} from "@edition/dashboard/application/OrganizationsView";
 import {Spacing} from "@code0-tech/pictor";
 
 export const ApplicationPage = () => {
 
     return <>
 
-        <ApplicationPersonalProjectView/>
+        <PersonalProjectsView/>
         <Spacing spacing={"xl"}/>
-        <ApplicationOrganizationView/>
+        <OrganizationsView/>
 
     </>
 

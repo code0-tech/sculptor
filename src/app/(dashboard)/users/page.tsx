@@ -1,5 +1,5 @@
-import {ApplicationUsersPage} from "@edition/dashboard/application/ApplicationUsersPage";
+import {UsersPage} from "@edition/dashboard/application/UsersPage";
 
 export default function Page() {
-    return <ApplicationUsersPage/>
+    return <UsersPage/>
 }

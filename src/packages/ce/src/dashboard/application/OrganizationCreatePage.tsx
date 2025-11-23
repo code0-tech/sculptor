@@ -6,7 +6,7 @@ import {OrganizationService} from "@edition/organization/Organization.service";
 import React from "react";
 import {useRouter} from "next/navigation";
 
-export const ApplicationOrganizationCreatePage = () => {
+export const OrganizationCreatePage = () => {
 
     const organizationService = useService(OrganizationService)
     const [, startTransition] = React.useTransition()

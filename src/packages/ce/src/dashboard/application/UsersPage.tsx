@@ -10,7 +10,7 @@ import {
     TextInput,
 } from "@code0-tech/pictor";
 import {IconSearch} from "@tabler/icons-react";
-export const ApplicationUsersPage: React.FC = () => {
+export const UsersPage: React.FC = () => {
 
     return <>
         <Flex align={"center"} justify={"space-between"}>

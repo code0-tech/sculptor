@@ -6,7 +6,7 @@ import {IconSearch} from "@tabler/icons-react";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
 
-export const RuntimePage: React.FC = () => {
+export const RuntimesPage: React.FC = () => {
 
     const router = useRouter()
 

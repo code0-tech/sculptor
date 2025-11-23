@@ -3,7 +3,7 @@ import {IconSearch} from "@tabler/icons-react";
 import Link from "next/link";
 import React from "react";
 
-export const ApplicationOrganizationView = () => {
+export const OrganizationsView = () => {
 
     return <>
         <Flex align={"center"} justify={"space-between"}>
