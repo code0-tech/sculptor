@@ -28,17 +28,6 @@ const inter = Inter({
     display: "swap",
 })
 
-/**
- * Override console error and warn in development to log to console.log
- */
-if (process.env.NODE_ENV === "development" && typeof window !== "undefined") {
-    console.error = (...args: unknown[]) => {
-        console.log(args)
-    }
-
-    console.error.bind(console);
-    console.warn.bind(console);
-}
 
 /**
  * Mapping of error codes to their descriptions

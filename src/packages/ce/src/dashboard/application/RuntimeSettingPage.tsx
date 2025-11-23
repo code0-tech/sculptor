@@ -38,11 +38,11 @@ export const RuntimeSettingPage: React.FC = () => {
     const runtime = React.useMemo(() => runtimeService.getById(`gid://sagittarius/Runtime/${params.runtimeId as any}`), [runtimeStore, params])
 
     if (currentUser && !currentUser.admin) {
-        return notFound()
+        notFound()
     }
 
     if (runtime?.userAbilities && (!runtime?.userAbilities?.updateRuntime || !runtime.userAbilities.deleteRuntime || !runtime.userAbilities.rotateRuntimeToken)) {
-        return notFound()
+        notFound()
     }
 
     const initialValues = React.useMemo(() => ({

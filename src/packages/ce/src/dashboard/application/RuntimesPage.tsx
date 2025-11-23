@@ -26,7 +26,7 @@ export const RuntimesPage: React.FC = () => {
     const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [userStore, currentSession])
 
     if (currentUser && !currentUser.admin) {
-        return notFound()
+        notFound()
     }
 
     return <>

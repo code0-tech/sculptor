@@ -10,7 +10,8 @@ import {
     TextInput,
     toast,
     useForm,
-    useService, useStore,
+    useService,
+    useStore,
     useUserSession
 } from "@code0-tech/pictor";
 import Link from "next/link";
@@ -25,12 +26,13 @@ export const RuntimeCreatePage: React.FC = () => {
     const [token, setToken] = React.useState<string | null | undefined>(undefined)
     const router = useRouter()
     const currentSession = useUserSession()
+
     const userStore = useStore(UserService)
     const userService = useService(UserService)
     const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [userStore, currentSession])
 
     if (currentUser && !currentUser.admin) {
-        return notFound()
+        notFound()
     }
 
     const [inputs, validate] = useForm({
@@ -56,7 +58,7 @@ export const RuntimeCreatePage: React.FC = () => {
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
                         if (payload?.runtime?.token) {
-                            setToken(payload.runtime.token)
+                            if (!token) setToken(payload.runtime.token)
                         } else {
                             toast({
                                 title: "The runtime was created but no token was provided.",
