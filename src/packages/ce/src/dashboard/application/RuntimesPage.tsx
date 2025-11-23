@@ -1,14 +1,33 @@
 "use client"
 
 import React from "react";
-import {Button, DRuntimeList, Flex, Spacing, Text, TextInput} from "@code0-tech/pictor";
+import {
+    Button,
+    DRuntimeList,
+    Flex,
+    Spacing,
+    Text,
+    TextInput,
+    useService,
+    useStore,
+    useUserSession
+} from "@code0-tech/pictor";
 import {IconSearch} from "@tabler/icons-react";
 import Link from "next/link";
-import {useRouter} from "next/navigation";
+import {notFound, useRouter} from "next/navigation";
+import {UserService} from "@edition/user/User.service";
 
 export const RuntimesPage: React.FC = () => {
 
     const router = useRouter()
+    const currentSession = useUserSession()
+    const userStore = useStore(UserService)
+    const userService = useService(UserService)
+    const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [userStore, currentSession])
+
+    if (currentUser && !currentUser.admin) {
+        return notFound()
+    }
 
     return <>
         <Flex align={"center"} justify={"space-between"}>
