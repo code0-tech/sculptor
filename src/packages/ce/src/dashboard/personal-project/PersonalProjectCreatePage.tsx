@@ -19,7 +19,7 @@ import {useRouter} from "next/navigation";
 import {ProjectService} from "@edition/project/Project.service";
 import {UserService} from "@edition/user/User.service";
 
-export const PersonalProjectsCreatePage: React.FC = () => {
+export const PersonalProjectCreatePage: React.FC = () => {
 
     const currentSession = useUserSession()
     const userStore = useStore(UserService)
