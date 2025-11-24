@@ -36,7 +36,6 @@ export class RuntimeService extends DRuntimeReactiveService {
     }
 
     values(dependencies?: DRuntimeDependencies): DRuntimeView[] {
-        if (super.values().length > 0) return super.values()
         const runtimes = super.values()
 
         if (!dependencies?.namespaceId) {

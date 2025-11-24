@@ -56,7 +56,6 @@ export class MemberService extends DNamespaceMemberReactiveService {
     }
 
     values(dependencies?: DMemberDependencies): DNamespaceMemberView[] {
-        if (super.values().length > 0) return super.values()
         const members = super.values()
         if (!dependencies?.namespaceId) return members
 
