@@ -29,32 +29,6 @@ export class MemberService extends DNamespaceMemberReactiveService {
         this.client = client
     }
 
-    getByNamespaceIdAndUserId(namespaceId: Namespace["id"], userId: User["id"]): DNamespaceMemberView | undefined {
-        if (super.getByNamespaceIdAndUserId(namespaceId, userId)) return super.getByNamespaceIdAndUserId(namespaceId, userId)
-
-        this.client.query<Query>({
-            query: membersQuery,
-            variables: {
-                namespaceId: namespaceId,
-                firstMember: 50,
-                afterMember: null,
-                firstRole: 50,
-                afterRole: null,
-            }
-        }).then(result => {
-            const data = result.data
-            if (!data) return
-
-            if (data.namespace && data.namespace.members && data.namespace.members.nodes) {
-                data.namespace.members.nodes.forEach((member) => {
-                    if (member) this.set(this.i++, new DNamespaceMemberView(member))
-                })
-            }
-        })
-
-        return super.getByNamespaceIdAndUserId(namespaceId, userId)
-    }
-
     values(dependencies?: DMemberDependencies): DNamespaceMemberView[] {
         const members = super.values()
         if (!dependencies?.namespaceId) return members
