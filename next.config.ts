@@ -2,6 +2,7 @@ import type {NextConfig} from "next";
 import path from "node:path";
 
 const EDITION = process.env.EDITION ?? "ce";
+const SAGITTARIUS_GRAPHQL_URL = process.env.SAGITTARIUS_GRAPHQL_URL ?? 'http://localhost:3001/graphql';
 
 const cspHeader = `
     default-src 'self';
@@ -55,7 +56,7 @@ const nextConfig: NextConfig = {
         return [
             {
                 source: '/graphql',
-                destination: 'http://localhost:3001/graphql' // Proxy to Backend
+                destination: SAGITTARIUS_GRAPHQL_URL // Proxy to Backend
             }
         ];
     }
