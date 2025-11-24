@@ -22,7 +22,7 @@ import {IconGavel, IconSettings} from "@tabler/icons-react";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {UserService} from "@edition/user/User.service";
 
-export const RuntimeSettingPage: React.FC = () => {
+export const RuntimeSettingsPage: React.FC = () => {
 
     const runtimeService = useService(RuntimeService)
     const runtimeStore = useStore(RuntimeService)
