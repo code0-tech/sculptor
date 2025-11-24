@@ -1,6 +1,6 @@
 "use client"
 
-import {RuntimesPage} from "@edition/dashboard/application/RuntimesPage";
+import {RuntimesPage} from "@edition/dashboard/runtime/RuntimesPage";
 
 export default function Page() {
     return <RuntimesPage/>
