@@ -23,6 +23,7 @@ import rotateTokenRuntimeMutation from "./mutations/Runtime.rotateToken.mutation
 export class RuntimeService extends DRuntimeReactiveService {
 
     private readonly client: GraphqlClient
+    private i = 0
 
     constructor(client: GraphqlClient, store: ReactiveArrayStore<DRuntimeView>) {
         super(store);
@@ -35,52 +36,59 @@ export class RuntimeService extends DRuntimeReactiveService {
     }
 
     values(dependencies?: DRuntimeDependencies): DRuntimeView[] {
-        if (super.values().length > 0) return super.values();
+        const runtimes = super.values()
 
-        let i = 0;
-
-        this.client.query<Query>({
-            query: globalRuntimesQuery,
-            variables: {
-                firstRuntime: 50,
-                afterRuntime: null,
-                firstDataType: 0,
-                afterDataType: null,
-                firstFlowType: 0,
-                afterFlowType: null,
-                firstProject: 0,
-                afterProject: null,
-            },
-        }).then(result => {
-            const data = result.data
-            if (!data) return
-
-            if (data.globalRuntimes && data.globalRuntimes.nodes) {
-                data.globalRuntimes.nodes.forEach((runtime) => {
-                    if (runtime) this.set(i++, new DRuntimeView(runtime))
+        if (!dependencies?.namespaceId) {
+            if (runtimes.length === 0) {
+                this.client.query<Query>({
+                    query: globalRuntimesQuery,
+                    variables: {
+                        firstRuntime: 50,
+                        afterRuntime: null,
+                        firstDataType: 0,
+                        afterDataType: null,
+                        firstFlowType: 0,
+                        afterFlowType: null,
+                        firstProject: 0,
+                        afterProject: null,
+                    },
+                }).then(res => {
+                    const nodes = res.data?.globalRuntimes?.nodes ?? []
+                    nodes.forEach(runtime => {
+                        if (runtime && !this.hasById(runtime.id)) {
+                            this.set(this.i++, new DRuntimeView(runtime))
+                        }
+                    })
                 })
             }
-        })
 
-        if (dependencies?.namespaceId) {
+            return runtimes
+        }
+
+        const namespaceId = dependencies.namespaceId
+        const filtered = runtimes.filter(r => r.namespace?.id === namespaceId)
+
+        if (filtered.length === 0) {
             this.client.query<Query>({
                 query: namespaceRuntimesQuery,
                 variables: {
-                    namespaceId: dependencies.namespaceId
-                }
-            }).then(result => {
-                const data = result.data
-                if (!data) return
-
-                if (data.namespace && data.namespace.runtimes && data.namespace.runtimes.nodes) {
-                    data.namespace.runtimes.nodes.forEach((runtime) => {
-                        if (runtime) this.set(i++, new DRuntimeView(runtime))
-                    })
-                }
+                    namespaceId,
+                },
+            }).then(res => {
+                const nodes = res.data?.namespace?.runtimes?.nodes ?? []
+                nodes.forEach(runtime => {
+                    if (
+                        runtime &&
+                        runtime.namespace?.id === namespaceId &&
+                        !this.hasById(runtime.id)
+                    ) {
+                        this.set(this.i++, new DRuntimeView(runtime))
+                    }
+                })
             })
         }
 
-        return super.values();
+        return filtered
     }
 
     async runtimeCreate(payload: RuntimesCreateInput): Promise<RuntimesCreatePayload | undefined> {
