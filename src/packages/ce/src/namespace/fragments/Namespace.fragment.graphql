@@ -1,3 +1,5 @@
+#import "../../organization/fragments/Organization.id.fragment.graphql"
+#import "../../user/fragments/User.id.fragment.graphql"
 fragment Namespace on Namespace {
     __typename
     id
@@ -23,6 +25,12 @@ fragment Namespace on Namespace {
     }
     parent {
         __typename
+        ...on Organization {
+            ...OrganizationId
+        }
+        ...on User{
+            ...UserId
+        }
     }
     userAbilities {
         createNamespaceLicense
