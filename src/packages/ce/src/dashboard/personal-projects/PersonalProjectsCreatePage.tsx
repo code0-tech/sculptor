@@ -92,7 +92,7 @@ export const PersonalProjectsCreatePage: React.FC = () => {
                        {...inputs.getInputProps("description")}/>
             <Spacing spacing={"xl"}/>
             <Flex style={{gap: "0.35rem"}} justify={"space-between"}>
-                <Link href={"/"}>
+                <Link href={"/public"}>
                     <Button color={"primary"}>
                         Go back to project overview
                     </Button>
