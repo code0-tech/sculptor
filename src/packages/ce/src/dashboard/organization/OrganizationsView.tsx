@@ -1,9 +1,14 @@
+"use client"
+
 import {Button, DOrganizationList, Flex, Spacing, Text, TextInput} from "@code0-tech/pictor";
 import {IconSearch} from "@tabler/icons-react";
 import Link from "next/link";
 import React from "react";
+import {useRouter} from "next/navigation";
 
 export const OrganizationsView = () => {
+
+    const router = useRouter()
 
     return <>
         <Flex align={"center"} justify={"space-between"}>
@@ -18,7 +23,11 @@ export const OrganizationsView = () => {
             </Flex>
         </Flex>
         <Spacing spacing={"xl"}/>
-        <DOrganizationList/>
+        {/**TODO: use namespaceId*/}
+        <DOrganizationList onSelect={(organizationId) => {
+            const number = organizationId?.match(/Organization\/(\d+)$/)?.[1]
+            router.push(`/namespace/${number}`)
+        }}/>
     </>
 
 }
