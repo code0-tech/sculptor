@@ -11,8 +11,8 @@ import {OrganizationService} from "@edition/organization/Organization.service";
 
 export const NamespaceTabView: React.FC = () => {
 
-    const params = useParams()
     const pathname = usePathname()
+    const params = useParams()
     const namespaceId = params.namespaceId as any
 
     const namespaceService = useService(NamespaceService)
@@ -37,6 +37,7 @@ export const NamespaceTabView: React.FC = () => {
         && (
             parentOrganization.userAbilities?.deleteOrganization
             || parentOrganization?.userAbilities?.updateOrganization
+            //TODO add license check for enterprise features
         ) ? (
             <TabTrigger value={"settings"}>
                 <Link href={`${baseLink}/settings`}>
