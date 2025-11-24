@@ -56,13 +56,14 @@ export class MemberService extends DNamespaceMemberReactiveService {
     }
 
     values(dependencies?: DMemberDependencies): DNamespaceMemberView[] {
+        if (super.values().length > 0) return super.values()
         const members = super.values()
         if (!dependencies?.namespaceId) return members
 
         const namespaceId = dependencies.namespaceId
         const filtered = members.filter(m => m.namespace?.id === namespaceId)
 
-        if (filtered.length === 0) {
+        if (filtered.length <= 0) {
             this.client.query<Query>({
                 query: membersQuery,
                 variables: {
