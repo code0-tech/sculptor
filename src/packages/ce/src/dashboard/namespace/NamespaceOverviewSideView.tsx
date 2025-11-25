@@ -2,18 +2,24 @@
 
 import React from "react";
 import {
-    Avatar, Badge,
+    Avatar,
+    Badge,
     Button,
-    DRuntimeCard,
     DRuntimeList,
     Flex,
     Spacing,
     Text,
-    useService, useStore
+    Tooltip, TooltipArrow,
+    TooltipContent,
+    TooltipPortal,
+    TooltipTrigger,
+    useService,
+    useStore
 } from "@code0-tech/pictor";
 import {MemberService} from "@edition/member/Member.service";
 import {useParams} from "next/navigation";
 import {NamespaceService} from "@edition/namespace/Namespace.service";
+import {UserService} from "@edition/user/User.service";
 
 export const NamespaceOverviewSideView: React.FC = () => {
 
@@ -22,10 +28,12 @@ export const NamespaceOverviewSideView: React.FC = () => {
     const memberStore = useStore(MemberService)
     const namespaceService = useService(NamespaceService)
     const namespaceStore = useStore(NamespaceService)
+    const userService = useService(UserService)
+    const userStore = useStore(UserService)
 
     const namespaceId = params.namespaceId as any as number
     const namespace = React.useMemo(() => namespaceService.getById(`gid://sagittarius/Namespace/${namespaceId}`), [namespaceStore, namespaceId])
-    const members = React.useMemo(() => memberService.values({namespaceId: `gid://sagittarius/Namespace/${namespaceId}`}), [memberStore])
+    const members = React.useMemo(() => memberService.values({namespaceId: `gid://sagittarius/Namespace/${namespaceId}`}), [memberStore, userStore])
 
     return <Flex maw={"250px"} style={{flexDirection: "column"}}>
         <Button color={"info"} w={"100%"}>
@@ -43,7 +51,25 @@ export const NamespaceOverviewSideView: React.FC = () => {
         <Spacing spacing={"xs"}/>
         <Flex align={"center"} style={{flexWrap: "wrap", gap: ".35rem"}}>
             {members.map(member => {
-                return <Avatar identifier={member.user?.id!!}/>
+                const user = userService.getById(member.user?.id!!)
+                return <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Avatar identifier={user?.username ?? ""}/>
+                    </TooltipTrigger>
+                    <TooltipPortal>
+                        <TooltipContent side={"bottom"} sideOffset={8}>
+                            <Flex style={{flexDirection: "column"}}>
+                                <Text size={"md"} hierarchy={"secondary"}>
+                                    {user?.username}
+                                </Text>
+                                <Text size={"xs"} hierarchy={"tertiary"}>
+                                    {user?.email}
+                                </Text>
+                            </Flex>
+                            <TooltipArrow/>
+                        </TooltipContent>
+                    </TooltipPortal>
+                </Tooltip>
             })}
             <Button paddingSize={"xxs"}>Invite user</Button>
         </Flex>
