@@ -9,7 +9,8 @@ import {
     Flex,
     Spacing,
     Text,
-    Tooltip, TooltipArrow,
+    Tooltip,
+    TooltipArrow,
     TooltipContent,
     TooltipPortal,
     TooltipTrigger,
@@ -21,7 +22,7 @@ import {useParams} from "next/navigation";
 import {NamespaceService} from "@edition/namespace/Namespace.service";
 import {UserService} from "@edition/user/User.service";
 
-export const NamespaceOverviewSideView: React.FC = () => {
+export const NamespaceOverviewRightView: React.FC = () => {
 
     const params = useParams()
     const memberService = useService(MemberService)
@@ -36,7 +37,7 @@ export const NamespaceOverviewSideView: React.FC = () => {
     const members = React.useMemo(() => memberService.values({namespaceId: `gid://sagittarius/Namespace/${namespaceId}`}), [memberStore, userStore])
 
     return <Flex maw={"250px"} style={{flexDirection: "column"}}>
-        <Button color={"info"} w={"100%"}>
+        <Button color={"info"} w={"100%"} paddingSize={"xs"}>
             Upgrade to <Badge>PRO</Badge>
         </Button>
         <Spacing spacing={"xs"}/>
