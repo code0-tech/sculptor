@@ -59,7 +59,7 @@ export const UserLoginPage: React.FC = () => {
     })
 
     return <>
-        <Image src={"/CodeZero_App_MVP.png"} alt={"CodeZero Logo"}
+        <Image src={"/CodeZero_Logo_MVP.png"} alt={"CodeZero Logo"}
                width={40}
                height={40}
                style={{marginBottom: "1.3rem"}}/>
