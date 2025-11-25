@@ -30,26 +30,35 @@ export class ProjectService extends DNamespaceProjectReactiveService {
     }
 
     values(dependencies: DProjectDependencies): DNamespaceProjectView[] {
-        if (super.values().length > 0) return super.values()
-        this.client.query<Query>({
-            query: projectsQuery,
-            variables: {
-                namespaceId: dependencies?.namespaceId,
-                firstProject: 0,
-                afterProject: null,
-            },
-        }).then(result => {
-            const data = result.data
-            if (!data) return
+        const projects = super.values()
+        if (!dependencies?.namespaceId) return projects
 
-            if (data.namespace && data.namespace.projects && data.namespace.projects.nodes) {
-                data.namespace.projects.nodes.forEach((project) => {
-                    if (project) this.set(this.i++, new DNamespaceProjectView(project))
+        const namespaceId = dependencies.namespaceId
+        const filtered = projects.filter(p => p.namespace?.id === namespaceId)
+
+        if (filtered.length === 0) {
+            this.client.query<Query>({
+                query: projectsQuery,
+                variables: {
+                    namespaceId,
+                    firstProject: 50,
+                    afterProject: null,
+                },
+            }).then(res => {
+                const nodes = res.data?.namespace?.projects?.nodes ?? []
+                nodes.forEach(project => {
+                    if (
+                        project &&
+                        project.namespace?.id === namespaceId &&
+                        !this.hasById(project.id)
+                    ) {
+                        this.set(this.i++, new DNamespaceProjectView(project))
+                    }
                 })
-            }
-        })
+            })
+        }
 
-        return super.values(dependencies);
+        return filtered
     }
 
     hasById(id: NamespaceProject["id"]): boolean {
