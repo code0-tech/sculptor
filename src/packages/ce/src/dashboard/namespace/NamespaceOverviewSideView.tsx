@@ -7,7 +7,6 @@ import {
     DRuntimeCard,
     DRuntimeList,
     Flex,
-    GradientButton,
     Spacing,
     Text,
     useService, useStore
@@ -29,9 +28,9 @@ export const NamespaceOverviewSideView: React.FC = () => {
     const members = React.useMemo(() => memberService.values({namespaceId: `gid://sagittarius/Namespace/${namespaceId}`}), [memberStore])
 
     return <Flex maw={"250px"} style={{flexDirection: "column"}}>
-        <GradientButton color={"info"} w={"100%"}>
+        <Button color={"info"} w={"100%"}>
             Upgrade to pro
-        </GradientButton>
+        </Button>
         <Spacing spacing={"xs"}/>
         <hr style={{width: "100%"}} color={"#1c1a2c"}/>
         <Spacing spacing={"xs"}/>
@@ -53,7 +52,7 @@ export const NamespaceOverviewSideView: React.FC = () => {
         <Spacing spacing={"xs"}/>
         <Text size={"md"}>Runtimes</Text>
         <Spacing spacing={"xs"}/>
-        <DRuntimeList/>
+        <DRuntimeList minimized namespaceId={`gid://sagittarius/Namespace/${namespaceId}`}/>
     </Flex>
 
 }
