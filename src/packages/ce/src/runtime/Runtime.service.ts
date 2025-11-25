@@ -44,13 +44,7 @@ export class RuntimeService extends DRuntimeReactiveService {
                     query: globalRuntimesQuery,
                     variables: {
                         firstRuntime: 50,
-                        afterRuntime: null,
-                        firstDataType: 0,
-                        afterDataType: null,
-                        firstFlowType: 0,
-                        afterFlowType: null,
-                        firstProject: 0,
-                        afterProject: null,
+                        afterRuntime: null
                     },
                 }).then(res => {
                     const nodes = res.data?.globalRuntimes?.nodes ?? []
@@ -73,6 +67,8 @@ export class RuntimeService extends DRuntimeReactiveService {
                 query: namespaceRuntimesQuery,
                 variables: {
                     namespaceId,
+                    firstRuntime: 50,
+                    afterRuntime: null
                 },
             }).then(res => {
                 const nodes = res.data?.namespace?.runtimes?.nodes ?? []
