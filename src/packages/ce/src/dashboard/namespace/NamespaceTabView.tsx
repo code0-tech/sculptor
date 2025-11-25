@@ -1,13 +1,14 @@
 "use client"
 
 import React from "react";
-import {Button, Container, useService, useStore} from "@code0-tech/pictor";
+import {Badge, Button, Container, useService, useStore} from "@code0-tech/pictor";
 import {Tab, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {IconFolders, IconHome, IconServer, IconSettings, IconUserCog, IconUsers} from "@tabler/icons-react";
 import Link from "next/link";
 import {useParams, usePathname} from "next/navigation";
 import {NamespaceService} from "@edition/namespace/Namespace.service";
 import {OrganizationService} from "@edition/organization/Organization.service";
+import {ProjectService} from "@edition/project/Project.service";
 
 export const NamespaceTabView: React.FC = () => {
 
@@ -19,6 +20,7 @@ export const NamespaceTabView: React.FC = () => {
     const namespaceStore = useStore(NamespaceService)
     const organizationService = useService(OrganizationService)
     const organizationStore = useStore(OrganizationService)
+    const projectService = useService(ProjectService)
 
     const namespace = React.useMemo(() => namespaceService.getById(`gid://sagittarius/Namespace/${namespaceId}`), [namespaceStore, namespaceId])
     const parentOrganization = React.useMemo(() => namespace?.parent?.__typename === "Organization" ? organizationService.getById(namespace?.parent?.id) : null, [organizationStore, namespace])
@@ -66,6 +68,7 @@ export const NamespaceTabView: React.FC = () => {
                         <Button variant={"none"}>
                             <IconFolders size={16}/>
                             Projects
+                            <Badge>{projectService.values({namespaceId: `gid://sagittarius/Namespace/${namespaceId}`}).length}</Badge>
                         </Button>
                     </Link>
                 </TabTrigger>
