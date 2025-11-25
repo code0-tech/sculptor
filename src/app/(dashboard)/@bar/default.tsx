@@ -63,7 +63,7 @@ const Page = () => {
         <Flex style={{gap: "0.7rem", flexDirection: "column"}} py={0.7} w={"100%"}>
             <Flex align={"center"} justify={"space-between"}>
                 <Flex align={"center"} style={{gap: "1.3rem"}}>
-                    <Image src={"/CodeZero_App_MVP.png"} alt={"CodeZero Banner"} width={160} height={0}
+                    <Image src={"/CodeZero_Logo_MVP.png"} alt={"CodeZero Banner"} width={160} height={0}
                            style={{width: '42px', height: 'auto'}}/>
                     <Breadcrumb>
                         <Text>Application</Text>
