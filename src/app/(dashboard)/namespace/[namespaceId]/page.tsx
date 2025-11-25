@@ -1,7 +1,7 @@
 "use client"
 
-import {NamespaceProjectsPage} from "@edition/dashboard/namespace/NamespaceProjectsPage";
+import {NamespaceOverviewPage} from "@edition/dashboard/namespace/NamespaceOverviewPage";
 
 export default function Page() {
-    return <NamespaceProjectsPage/>
+    return <NamespaceOverviewPage/>
 }
