@@ -24,8 +24,8 @@ export const OrganizationsView = () => {
         </Flex>
         <Spacing spacing={"xl"}/>
         {/**TODO: use namespaceId*/}
-        <DOrganizationList onSelect={(organizationId) => {
-            const number = organizationId?.match(/Organization\/(\d+)$/)?.[1]
+        <DOrganizationList onSelect={(organization) => {
+            const number = organization.namespace?.id?.match(/Namespace\/(\d+)$/)?.[1]
             router.push(`/namespace/${number}`)
         }}/>
     </>
