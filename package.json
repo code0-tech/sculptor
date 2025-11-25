@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@apollo/client": "^4.0.9",
-    "@code0-tech/pictor": "^0.0.0-mvp.21",
+    "@code0-tech/pictor": "^0.0.0-mvp.22",
     "graphql": "^16.12.0",
     "graphql-tag": "^2.12.6",
     "next": "16.0.7",
