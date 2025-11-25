@@ -2,7 +2,7 @@
 
 import React from "react";
 import {
-    Avatar,
+    Avatar, Badge,
     Button,
     DRuntimeCard,
     DRuntimeList,
@@ -29,7 +29,7 @@ export const NamespaceOverviewSideView: React.FC = () => {
 
     return <Flex maw={"250px"} style={{flexDirection: "column"}}>
         <Button color={"info"} w={"100%"}>
-            Upgrade to pro
+            Upgrade to <Badge>PRO</Badge>
         </Button>
         <Spacing spacing={"xs"}/>
         <hr style={{width: "100%"}} color={"#1c1a2c"}/>
