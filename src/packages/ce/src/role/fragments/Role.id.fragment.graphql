@@ -1,0 +1,4 @@
+fragment RoleId on NamespaceRole {
+    __typename
+    id
+}
