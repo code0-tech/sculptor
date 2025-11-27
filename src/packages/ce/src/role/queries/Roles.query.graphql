@@ -1,0 +1,24 @@
+#import "../fragments/Role.fragment.graphql"
+query Roles (
+    $namespaceId: NamespaceID!,
+
+    $firstRole: Int!,
+    $afterRole: String,
+
+    $firstProject: Int!,
+    $afterProject: String
+
+) {
+    namespace(id: $namespaceId) {
+        roles (first: $firstRole, after: $afterRole) {
+            count
+            nodes {
+                ...Role
+            }
+            pageInfo {
+                endCursor
+                hasNextPage
+            }
+        }
+    }
+}
