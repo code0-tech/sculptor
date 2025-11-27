@@ -1,0 +1,31 @@
+#import "../../namespace/fragments/Namespace.id.fragment.graphql"
+#import "../../project/fragments/Project.id.fragment.graphql"
+fragment Role on NamespaceRole {
+    __typename
+    id
+    name
+    createdAt
+    updatedAt
+    namespace {
+        ...NamespaceId
+    }
+    assignedProjects (first: $firstProject, after: $afterProject) {
+        count
+        nodes {
+            ...ProjectId
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+
+    }
+    abilities
+    userAbilities {
+        __typename
+        assignRoleAbilities
+        assignRoleProjects
+        deleteNamespaceRole
+        updateNamespaceRole
+    }
+}
