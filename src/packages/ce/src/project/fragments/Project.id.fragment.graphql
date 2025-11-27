@@ -1,0 +1,4 @@
+fragment ProjectId on NamespaceProject {
+    __typename
+    id
+}
