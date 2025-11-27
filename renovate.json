@@ -1,6 +1,20 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
+    "github>code0-tech/monoceros//renovate/global.json5",
+    ":assignee(nicosammito)"
+  ],
+  "packageRules": [
+    {
+      "matchManagers": [
+        "asdf",
+        "github-actions",
+        "gitlabci",
+        "gitlabci-include"
+      ],
+      "extends": [
+        ":assignee(Taucher2003)"
+      ]
+    }
   ]
 }
