@@ -5,7 +5,7 @@ import {
     ReactiveArrayStore
 } from "@code0-tech/pictor"
 import {
-    Namespace,
+    Mutation,
     NamespaceMember,
     NamespacesMembersAssignRolesInput,
     NamespacesMembersAssignRolesPayload,
@@ -13,11 +13,11 @@ import {
     NamespacesMembersDeletePayload,
     NamespacesMembersInviteInput,
     NamespacesMembersInvitePayload,
-    Query,
-    User
+    Query
 } from "@code0-tech/sagittarius-graphql-types"
 import {GraphqlClient} from "@core/util/graphql-client"
 import membersQuery from "./queries/Members.query.graphql"
+import memberAssignRoleMutation from "./mutations/Member.assignRoles.mutation.graphql"
 
 export class MemberService extends DNamespaceMemberReactiveService {
 
@@ -64,8 +64,31 @@ export class MemberService extends DNamespaceMemberReactiveService {
         return member !== undefined
     }
 
-    memberAssignRoles(payload: NamespacesMembersAssignRolesInput): Promise<NamespacesMembersAssignRolesPayload | undefined> {
-        return Promise.resolve(undefined)
+    async memberAssignRoles(payload: NamespacesMembersAssignRolesInput): Promise<NamespacesMembersAssignRolesPayload | undefined> {
+        const result = await this.client.mutate<Mutation, NamespacesMembersAssignRolesInput>({
+            mutation: memberAssignRoleMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        //TODO: should be done by a new query
+        if (result.data && result.data.namespacesMembersAssignRoles) {
+            const currentMember = this.getById(payload.memberId)
+            const index = super.values().findIndex(m => m.id === payload.memberId)
+
+            const newMember = new DNamespaceMemberView({
+                ...currentMember?.json(),
+                roles: {
+                    count: payload.roleIds.length,
+                    nodes: payload.roleIds.map(roleId => ({ id: roleId }))
+                }
+            })
+
+            this.set(index, newMember)
+        }
+
+        return result.data?.namespacesMembersAssignRoles ?? undefined
     }
 
     memberDelete(payload: NamespacesMembersDeleteInput): Promise<NamespacesMembersDeletePayload | undefined> {
