@@ -23,6 +23,12 @@ export const MembersView: React.FC = () => {
                     roleIds: roles.map(r => r.id!)
                 })
             })
+        }} onRemove={(member) => {
+            startTransition(() => {
+                memberService.memberDelete({
+                    namespaceMemberId: member.id!
+                })
+            })
         }} namespaceId={`gid://sagittarius/Namespace/${namespaceId}`}/>
     }, [namespaceId, memberStore])
 
