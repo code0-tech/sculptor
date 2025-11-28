@@ -14,10 +14,13 @@ import {
 } from "@code0-tech/pictor";
 import {IconSearch} from "@tabler/icons-react";
 import Link from "next/link";
-import {notFound, useRouter} from "next/navigation";
+import {notFound, useParams, useRouter} from "next/navigation";
 import {UserService} from "@edition/user/User.service";
 
 export const RuntimesPage: React.FC = () => {
+
+    const params = useParams()
+    const namespaceId = params.namespaceId as any as number
 
     const router = useRouter()
     const currentSession = useUserSession()
@@ -32,19 +35,20 @@ export const RuntimesPage: React.FC = () => {
     return <>
         <Flex align={"center"} justify={"space-between"}>
             <Text size={"xl"} hierarchy={"primary"}>
-                Global runtimes
+                Runtimes
             </Text>
             <Flex align={"center"} style={{gap: "0.7rem"}}>
                 <TextInput left={<IconSearch size={16}/>} placeholder={"Find a global runtime..."}/>
-                <Link href={"/runtimes/create"}>
-                    <Button color={"success"}>Create global runtime</Button>
+                <Link href={namespaceId ? `/namespace/${namespaceId}/runtimes/create` : "/runtimes/create"}>
+                    <Button color={"success"}>Create runtime</Button>
                 </Link>
             </Flex>
         </Flex>
         <Spacing spacing={"xl"}/>
-        <DRuntimeList namespaceId={currentUser?.namespace?.id} onSetting={(runtime) => {
+        <DRuntimeList namespaceId={namespaceId ? `gid://sagittarius/Namespace/${namespaceId}` : undefined}
+                      filter={(runtime) => namespaceId ? true : !runtime?.namespace?.id} onSetting={(runtime) => {
             const number = runtime.id?.match(/Runtime\/(\d+)$/)?.[1]
-            router.push(`/runtimes/${number}/settings`)
+            router.push(namespaceId ? `/namespace/${namespaceId}/runtimes/${number}/settings` :`/runtimes/${number}/settings`)
         }}/>
     </>
 }
