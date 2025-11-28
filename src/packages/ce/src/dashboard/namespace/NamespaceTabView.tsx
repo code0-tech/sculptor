@@ -9,6 +9,8 @@ import {useParams, usePathname} from "next/navigation";
 import {NamespaceService} from "@edition/namespace/Namespace.service";
 import {OrganizationService} from "@edition/organization/Organization.service";
 import {ProjectService} from "@edition/project/Project.service";
+import {RoleService} from "@edition/role/Role.service";
+import {MemberService} from "@edition/member/Member.service";
 
 export const NamespaceTabView: React.FC = () => {
 
@@ -21,6 +23,8 @@ export const NamespaceTabView: React.FC = () => {
     const organizationService = useService(OrganizationService)
     const organizationStore = useStore(OrganizationService)
     const projectService = useService(ProjectService)
+    const roleService = useService(RoleService)
+    const memberService = useService(MemberService)
 
     const namespace = React.useMemo(() => namespaceService.getById(`gid://sagittarius/Namespace/${namespaceId}`), [namespaceStore, namespaceId])
     const parentOrganization = React.useMemo(() => namespace?.parent?.__typename === "Organization" ? organizationService.getById(namespace?.parent?.id) : null, [organizationStore, namespace])
@@ -77,6 +81,7 @@ export const NamespaceTabView: React.FC = () => {
                         <Button variant={"none"}>
                             <IconUsers size={16}/>
                             Members
+                            <Badge>{memberService.values({namespaceId: `gid://sagittarius/Namespace/${namespaceId}`}).length}</Badge>
                         </Button>
                     </Link>
                 </TabTrigger>
@@ -85,6 +90,7 @@ export const NamespaceTabView: React.FC = () => {
                         <Button variant={"none"}>
                             <IconUserCog size={16}/>
                             Roles
+                            <Badge>{roleService.values({namespaceId: `gid://sagittarius/Namespace/${namespaceId}`}).length}</Badge>
                         </Button>
                     </Link>
                 </TabTrigger>
