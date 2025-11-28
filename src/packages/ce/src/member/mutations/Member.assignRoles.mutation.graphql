@@ -1,0 +1,15 @@
+mutation memberAssignRoles($memberId: NamespaceMemberID!, $roleIds: [NamespaceRoleID!]!) {
+    namespacesMembersAssignRoles(input: {
+        roleIds: $roleIds,
+        memberId: $memberId
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+    }
+}
