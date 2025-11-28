@@ -24,9 +24,12 @@ import {UserService} from "@edition/user/User.service";
 
 export const RuntimeSettingsPage: React.FC = () => {
 
+    const params = useParams()
+    const namespaceId = params.namespaceId as any as number
+    const runtimeId = params.runtimeId as any as number
+
     const runtimeService = useService(RuntimeService)
     const runtimeStore = useStore(RuntimeService)
-    const params = useParams()
     const [, startTransition] = React.useTransition()
     const [token, setToken] = React.useState<string | null | undefined>(undefined)
     const router = useRouter()
@@ -35,7 +38,7 @@ export const RuntimeSettingsPage: React.FC = () => {
     const userService = useService(UserService)
     const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [userStore, currentSession])
 
-    const runtime = React.useMemo(() => runtimeService.getById(`gid://sagittarius/Runtime/${params.runtimeId as any}`), [runtimeStore, params])
+    const runtime = React.useMemo(() => runtimeService.getById(`gid://sagittarius/Runtime/${runtimeId}`), [runtimeStore, params])
 
     if (currentUser && !currentUser.admin) {
         notFound()
@@ -93,7 +96,7 @@ export const RuntimeSettingsPage: React.FC = () => {
                         dismissible: true,
                     })
                 }
-                router.push("/runtimes")
+                router.push(namespaceId ? `/namespace/${namespaceId}/runtimes` : "/runtimes")
             })
         })
     }, [runtime, router])
