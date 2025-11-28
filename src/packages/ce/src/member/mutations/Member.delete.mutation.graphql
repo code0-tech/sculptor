@@ -1,3 +1,4 @@
+#import "../fragments/Member.basic.fragment.graphql"
 mutation deleteMember($namespaceMemberId: NamespaceMemberID!) {
     namespacesMembersDelete(input: {
         namespaceMemberId: $namespaceMemberId
@@ -11,7 +12,7 @@ mutation deleteMember($namespaceMemberId: NamespaceMemberID!) {
             }
         }
         namespaceMember {
-            ...Member
+            ...BasicMember
         }
     }
 }
