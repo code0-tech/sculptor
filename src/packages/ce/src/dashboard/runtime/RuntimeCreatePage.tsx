@@ -15,11 +15,14 @@ import {
     useUserSession
 } from "@code0-tech/pictor";
 import Link from "next/link";
-import {notFound, useRouter} from "next/navigation";
+import {notFound, useParams, useRouter} from "next/navigation";
 import {RuntimeService} from "@edition/runtime/Runtime.service";
 import {UserService} from "@edition/user/User.service";
 
 export const RuntimeCreatePage: React.FC = () => {
+
+    const params = useParams()
+    const namespaceId = params.namespaceId as any as number
 
     const runtimeService = useService(RuntimeService)
     const [, startTransition] = React.useTransition()
@@ -54,7 +57,8 @@ export const RuntimeCreatePage: React.FC = () => {
             startTransition(() => {
                 runtimeService.runtimeCreate({
                     name: values.name as unknown as string,
-                    description: values.description as unknown as string
+                    description: values.description as unknown as string,
+                    ...(namespaceId ? {namespaceId: `gid://sagittarius/Namespace/${namespaceId}`} : {})
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
                         if (payload?.runtime?.token) {
@@ -65,7 +69,7 @@ export const RuntimeCreatePage: React.FC = () => {
                                 color: "error",
                                 dismissible: true,
                             })
-                            router.push("/runtimes")
+                            router.push(namespaceId ? `/namespace/${namespaceId}/runtimes` : "/runtimes")
                         }
                     }
                 })
@@ -76,11 +80,11 @@ export const RuntimeCreatePage: React.FC = () => {
     return <Flex mih={"100%"} miw={"100%"} align={"center"} justify={"center"}>
         <Col xs={4}>
             <Text size={"xl"} hierarchy={"primary"} display={"block"}>
-                {!token ? "Create new global runtime" : "Global runtime created successfully"}
+                {!token ? "Create new runtime" : "Runtime created successfully"}
             </Text>
             <Spacing spacing={"xs"}/>
             <Text size={"md"} hierarchy={"tertiary"} display={"block"}>
-                Global runtimes are shared runtimes that can be used across multiple organizations.
+                Runtimes are shared runtimes that can be used across multiple organizations.
             </Text>
             <Spacing spacing={"xl"}/>
             {!token ? (
@@ -108,14 +112,14 @@ export const RuntimeCreatePage: React.FC = () => {
                 </>
             )}
             <Flex style={{gap: "0.35rem"}} justify={"space-between"}>
-                <Link href={"/runtimes"}>
+                <Link href={namespaceId ? `/namespace/${namespaceId}/runtimes` : "/runtimes"}>
                     <Button color={"primary"}>
                         Go back to runtimes
                     </Button>
                 </Link>
                 {!token ? (
                     <Button color={"success"} onClick={validate}>
-                        Create global runtime
+                        Create runtime
                     </Button>
                 ) : null}
             </Flex>
