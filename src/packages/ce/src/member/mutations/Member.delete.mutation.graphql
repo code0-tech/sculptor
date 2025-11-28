@@ -1,0 +1,17 @@
+mutation deleteMember($namespaceMemberId: NamespaceMemberID!) {
+    namespacesMembersDelete(input: {
+        namespaceMemberId: $namespaceMemberId
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        namespaceMember {
+            ...Member
+        }
+    }
+}
