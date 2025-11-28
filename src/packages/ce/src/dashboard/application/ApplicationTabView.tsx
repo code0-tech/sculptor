@@ -45,7 +45,7 @@ export const ApplicationTabView: React.FC = () => {
                         <Button variant={"none"}>
                             <IconServer size={16}/>
                             Runtimes
-                            <Badge>{runtimeService.values().length}</Badge>
+                            <Badge>{runtimeService.values().filter(runtime => !runtime.namespace?.id).length}</Badge>
                         </Button>
                     </Link>
                 </TabTrigger>
