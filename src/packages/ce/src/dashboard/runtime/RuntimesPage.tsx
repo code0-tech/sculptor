@@ -42,8 +42,8 @@ export const RuntimesPage: React.FC = () => {
             </Flex>
         </Flex>
         <Spacing spacing={"xl"}/>
-        <DRuntimeList onSetting={(runtimeId) => {
-            const number = runtimeId?.match(/Runtime\/(\d+)$/)?.[1]
+        <DRuntimeList namespaceId={currentUser?.namespace?.id} onSetting={(runtime) => {
+            const number = runtime.id?.match(/Runtime\/(\d+)$/)?.[1]
             router.push(`/runtimes/${number}/settings`)
         }}/>
     </>
