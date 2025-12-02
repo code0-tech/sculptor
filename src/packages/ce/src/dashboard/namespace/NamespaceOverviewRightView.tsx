@@ -21,6 +21,7 @@ import {MemberService} from "@edition/member/Member.service";
 import {useParams} from "next/navigation";
 import {NamespaceService} from "@edition/namespace/Namespace.service";
 import {UserService} from "@edition/user/User.service";
+import Link from "next/link";
 
 export const NamespaceOverviewRightView: React.FC = () => {
 
@@ -72,7 +73,9 @@ export const NamespaceOverviewRightView: React.FC = () => {
                     </TooltipPortal>
                 </Tooltip>
             })}
-            <Button paddingSize={"xxs"}>Invite user</Button>
+            <Link href={`/namespace/${namespaceId}/members/add`}>
+                <Button paddingSize={"xxs"}>Invite user</Button>
+            </Link>
         </Flex>
         <Spacing spacing={"xs"}/>
         <hr style={{width: "100%"}} color={"#1c1a2c"}/>
