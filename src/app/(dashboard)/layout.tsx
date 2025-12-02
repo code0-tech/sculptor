@@ -24,6 +24,7 @@ import {usePersistentReactiveArrayService} from "@/hooks/usePersistentReactiveAr
 import {RuntimeService} from "@edition/runtime/Runtime.service";
 import {ProjectService} from "@edition/project/Project.service";
 import {RoleService} from "@edition/role/Role.service";
+import {Spacing} from "@code0-tech/pictor/dist/components/spacing/Spacing";
 
 interface ApplicationLayoutProps {
     children: React.ReactNode
@@ -55,6 +56,7 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
                 <div style={{background: "rgba(255,2552,255,.1)", borderBottom: "1px solid rgba(255,2552,255,.1)"}}>
                     {bar}
                     {tab}
+                    <Spacing spacing={"xxs"}/>
                 </div>
             </>
         }>
