@@ -78,7 +78,7 @@ export const NamespaceProjectsCreatePage: React.FC = () => {
                        {...inputs.getInputProps("description")}/>
             <Spacing spacing={"xl"}/>
             <Flex style={{gap: "0.35rem"}} justify={"space-between"}>
-                <Link href={"/public"}>
+                <Link href={"/"}>
                     <Button color={"primary"}>
                         Go back to projects
                     </Button>
