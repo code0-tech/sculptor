@@ -4,8 +4,7 @@ import React from "react";
 import {Badge, Button, Container, useService, useStore} from "@code0-tech/pictor";
 import {Tab, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {IconFolders, IconHome, IconServer, IconSettings, IconUserCog, IconUsers} from "@tabler/icons-react";
-import Link from "next/link";
-import {useParams, usePathname} from "next/navigation";
+import {useParams, usePathname, useRouter} from "next/navigation";
 import {NamespaceService} from "@edition/namespace/Namespace.service";
 import {OrganizationService} from "@edition/organization/Organization.service";
 import {ProjectService} from "@edition/project/Project.service";
@@ -16,6 +15,7 @@ import {RuntimeService} from "@edition/runtime/Runtime.service";
 export const NamespaceTabView: React.FC = () => {
 
     const pathname = usePathname()
+    const router = useRouter()
     const params = useParams()
     const namespaceId = params.namespaceId as any
 
@@ -48,13 +48,11 @@ export const NamespaceTabView: React.FC = () => {
             || parentOrganization?.userAbilities?.updateOrganization
             //TODO add license check for enterprise features
         ) ? (
-            <TabTrigger value={"settings"}>
-                <Link href={`${baseLink}/settings`}>
-                    <Button variant={"none"}>
-                        <IconSettings size={16}/>
-                        Settings
-                    </Button>
-                </Link>
+            <TabTrigger value={"settings"} asChild>
+                <Button variant={"none"} paddingSize={"xxs"} onClick={() => router.push(`${baseLink}/settings`)}>
+                    <IconSettings size={16}/>
+                    Settings
+                </Button>
             </TabTrigger>
         ) : null
     }, [namespace, parentOrganization])
@@ -62,51 +60,41 @@ export const NamespaceTabView: React.FC = () => {
     return <Container>
         <Tab defaultValue={defaultValue}>
             <TabList>
-                <TabTrigger value={"overview"}>
-                    <Link href={baseLink}>
-                        <Button variant={"none"}>
-                            <IconHome size={16}/>
-                            Overview
-                        </Button>
-                    </Link>
+                <TabTrigger value={"overview"} asChild>
+                    <Button variant={"none"} paddingSize={"xxs"} onClick={() => router.push(baseLink)}>
+                        <IconHome size={16}/>
+                        Overview
+                    </Button>
                 </TabTrigger>
-                <TabTrigger value={"projects"}>
-                    <Link href={`${baseLink}/projects`}>
-                        <Button variant={"none"}>
-                            <IconFolders size={16}/>
-                            Projects
-                            <Badge>{projectService.values({namespaceId: `gid://sagittarius/Namespace/${namespaceId}`}).length}</Badge>
-                        </Button>
-                    </Link>
+                <TabTrigger value={"projects"} asChild>
+                    <Button variant={"none"} paddingSize={"xxs"} onClick={() => router.push(`${baseLink}/projects`)}>
+                        <IconFolders size={16}/>
+                        Projects
+                        <Badge>{projectService.values({namespaceId: `gid://sagittarius/Namespace/${namespaceId}`}).length}</Badge>
+                    </Button>
                 </TabTrigger>
-                <TabTrigger value={"members"}>
-                    <Link href={`${baseLink}/members`}>
-                        <Button variant={"none"}>
-                            <IconUsers size={16}/>
-                            Members
-                            <Badge>{memberService.values({namespaceId: `gid://sagittarius/Namespace/${namespaceId}`}).length}</Badge>
-                        </Button>
-                    </Link>
+                <TabTrigger value={"members"} asChild>
+                    <Button variant={"none"} paddingSize={"xxs"} onClick={() => router.push(`${baseLink}/members`)}>
+                        <IconUsers size={16}/>
+                        Members
+                        <Badge>{memberService.values({namespaceId: `gid://sagittarius/Namespace/${namespaceId}`}).length}</Badge>
+                    </Button>
                 </TabTrigger>
-                <TabTrigger value={"roles"}>
-                    <Link href={`${baseLink}/roles`}>
-                        <Button variant={"none"}>
-                            <IconUserCog size={16}/>
-                            Roles
-                            <Badge>{roleService.values({namespaceId: `gid://sagittarius/Namespace/${namespaceId}`}).length}</Badge>
-                        </Button>
-                    </Link>
+                <TabTrigger value={"roles"} asChild>
+                    <Button variant={"none"} paddingSize={"xxs"} onClick={() => router.push(`${baseLink}/roles`)}>
+                        <IconUserCog size={16}/>
+                        Roles
+                        <Badge>{roleService.values({namespaceId: `gid://sagittarius/Namespace/${namespaceId}`}).length}</Badge>
+                    </Button>
                 </TabTrigger>
-                <TabTrigger value={"runtimes"}>
-                    <Link href={`${baseLink}/runtimes`}>
-                        <Button variant={"none"}>
-                            <IconServer size={16}/>
-                            Runtimes
-                            {React.useMemo(() => {
-                                return <Badge>{runtimeService.values({namespaceId: `gid://sagittarius/Namespace/${namespaceId}`}).length}</Badge>
-                            }, [runtimeStore, namespaceId])}
-                        </Button>
-                    </Link>
+                <TabTrigger value={"runtimes"} asChild>
+                    <Button variant={"none"} paddingSize={"xxs"} onClick={() => router.push(`${baseLink}/runtimes`)}>
+                        <IconServer size={16}/>
+                        Runtimes
+                        {React.useMemo(() => {
+                            return <Badge>{runtimeService.values({namespaceId: `gid://sagittarius/Namespace/${namespaceId}`}).length}</Badge>
+                        }, [runtimeStore, namespaceId])}
+                    </Button>
                 </TabTrigger>
                 {settings}
             </TabList>
