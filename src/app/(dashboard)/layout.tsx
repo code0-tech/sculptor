@@ -56,7 +56,6 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
                 <div style={{background: "rgba(255,2552,255,.1)", borderBottom: "1px solid rgba(255,2552,255,.1)"}}>
                     {bar}
                     {tab}
-                    <Spacing spacing={"xxs"}/>
                 </div>
             </>
         }>
