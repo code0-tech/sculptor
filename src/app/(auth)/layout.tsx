@@ -40,7 +40,7 @@ export default function AuthLayout({children}: Readonly<{ children: React.ReactN
                     gap: "1.3rem"
                 }}>
                     <Text>All rights reserved &copy; Code0 UG (haftungsbeschränkt)</Text>
-                    <Image src={"/CodeZero_Banner_Transparent.png"} alt={"CodeZero Banner"} width={150} height={0}
+                    <Image src={"/CodeZero_Banner_MVP.png"} alt={"CodeZero Banner"} width={150} height={0}
                            style={{width: '150px', height: 'auto'}}/>
                 </div>
             </div>
