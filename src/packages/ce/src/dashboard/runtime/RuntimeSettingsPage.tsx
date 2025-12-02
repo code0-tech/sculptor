@@ -138,13 +138,11 @@ export const RuntimeSettingsPage: React.FC = () => {
                     <InputLabel>Runtime</InputLabel>
                     <TabTrigger value={"general"}>
                         <Button paddingSize={"xxs"} variant={"none"}>
-                            <IconSettings size={16}/>
                             <Text size={"md"} hierarchy={"primary"}>General</Text>
                         </Button>
                     </TabTrigger>
                     <TabTrigger value={"access"}>
                         <Button paddingSize={"xxs"} variant={"none"}>
-                            <IconGavel size={16}/>
                             <Text size={"md"} hierarchy={"primary"}>Access</Text>
                         </Button>
                     </TabTrigger>
