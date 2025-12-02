@@ -100,7 +100,6 @@ export class MemberService extends DNamespaceMemberReactiveService {
             }
         })
 
-        //TODO: should be done by a new query
         if (result.data && result.data.namespacesMembersDelete && result.data.namespacesMembersDelete.namespaceMember) {
             const member = result.data.namespacesMembersDelete.namespaceMember
             const index = this.values().findIndex(m => m.id === member.id)
