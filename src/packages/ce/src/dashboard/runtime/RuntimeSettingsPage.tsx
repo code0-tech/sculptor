@@ -6,19 +6,18 @@ import {
     Card,
     DLayout,
     Flex,
-    InputLabel,
     Spacing,
     Text,
     TextInput,
     toast,
     useForm,
     useService,
-    useStore, useUserSession
+    useStore,
+    useUserSession
 } from "@code0-tech/pictor";
 import {RuntimeService} from "@edition/runtime/Runtime.service";
 import {notFound, useParams, useRouter} from "next/navigation";
 import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
-import {IconGavel, IconSettings} from "@tabler/icons-react";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {UserService} from "@edition/user/User.service";
 
