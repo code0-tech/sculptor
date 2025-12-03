@@ -59,6 +59,7 @@ export const UserLoginPage: React.FC = () => {
     })
 
     return <>
+        <Spacing spacing={"xl"}/>
         <Image src={"/CodeZero_Logo.png"} alt={"CodeZero Logo"}
                width={40}
                height={40}
@@ -87,10 +88,10 @@ export const UserLoginPage: React.FC = () => {
                 Forgot password?
             </Text>
         </Link>
-        <Text display={"block"} hierarchy={"tertiary"} size={"md"}>
+        <Text display={"flex"} hierarchy={"tertiary"} size={"md"}>
             Don't have an account yet
             <Link href={"/register"}>
-                <Text ml={0.35} hierarchy={"primary"} size={"md"}>
+                <Text ml={0.35} hierarchy={"primary"} display={"flex"} size={"md"}>
                     Sign up
                 </Text>
             </Link>
