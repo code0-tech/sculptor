@@ -1,0 +1,119 @@
+"use client"
+
+import React from "react";
+import {useParams} from "next/navigation";
+import {Namespace} from "@code0-tech/sagittarius-graphql-types";
+import {
+    Avatar,
+    Badge,
+    Button,
+    Card,
+    DLayout,
+    Flex,
+    Spacing,
+    Text,
+    TextInput,
+    useService,
+    useStore
+} from "@code0-tech/pictor";
+import {NamespaceService} from "@edition/namespace/Namespace.service";
+import {OrganizationService} from "@edition/organization/Organization.service";
+import {IconFolders, IconServer, IconUserCog, IconUsers} from "@tabler/icons-react";
+import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
+import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
+
+export const OrganizationSettingsPage: React.FC = () => {
+
+    const params = useParams()
+    const namespaceService = useService(NamespaceService)
+    const namespaceStore = useStore(NamespaceService)
+    const organizationService = useService(OrganizationService)
+    const organizationStore = useStore(OrganizationService)
+    const [, startTransition] = React.useTransition()
+
+    const namespaceIndex = params.namespaceId as any as number
+    const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
+    const namespace = React.useMemo(() => namespaceService.getById(namespaceId), [namespaceStore, namespaceId])
+    const parentOrganization = React.useMemo(() => namespace?.parent?.__typename === "Organization" ? organizationService.getById(namespace?.parent?.id) : null, [organizationStore, namespace])
+
+    console.log(namespace)
+
+    return <>
+        <Spacing spacing={"xl"}/>
+        <Flex style={{gap: "0.7rem"}} align={"center"}>
+            <Avatar w={"60px"} bg={"transparent"} identifier={parentOrganization?.name!!}/>
+            <Flex style={{gap: "0.35rem", flexDirection: "column"}}>
+                <Text size={"xl"} hierarchy={"primary"} display={"block"}>
+                    {parentOrganization?.name}
+                </Text>
+                <Flex style={{gap: "0.35rem"}} align={"center"}>
+                    <Badge color={"secondary"} border>
+                        <IconUsers size={16}/>
+                        {namespace?.members?.count}
+                    </Badge>
+                    <Badge color={"secondary"} border>
+                        <IconFolders size={16}/>
+                        {namespace?.projects?.count}
+                    </Badge>
+                    <Badge color={"secondary"} border>
+                        <IconUserCog size={16}/>
+                        {namespace?.roles?.count}
+                    </Badge>
+                    <Badge color={"secondary"} border>
+                        <IconServer size={16}/>
+                        {namespace?.runtimes?.count}
+                    </Badge>
+                </Flex>
+            </Flex>
+        </Flex>
+        <Spacing spacing={"xl"}/>
+        <Tab orientation={"vertical"} defaultValue={"general"}>
+            <DLayout leftContent={
+                <TabList>
+                    <TabTrigger value={"general"} asChild>
+                        <Button paddingSize={"xxs"} variant={"none"}>
+                            <Text size={"md"} hierarchy={"primary"}>General adjustments</Text>
+                        </Button>
+                    </TabTrigger>
+                    <TabTrigger value={"upgrade"} asChild>
+                        <Button color={"info"} paddingSize={"xxs"} variant={"none"}>
+                            <Text size={"md"} hierarchy={"primary"} display={"flex"} style={{gap: "0.35rem"}}>Upgrade to <Badge color={"info"} border>Team</Badge></Text>
+                        </Button>
+                    </TabTrigger>
+                    <TabTrigger disabled value={"usage"} asChild>
+                        <Button paddingSize={"xxs"} variant={"none"}>
+                            <Text size={"md"} hierarchy={"primary"}>Runtime usage</Text>
+                        </Button>
+                    </TabTrigger>
+                    <TabTrigger value={"delete"} asChild>
+                        <Button color={"error"} paddingSize={"xxs"} variant={"none"}>
+                            <Text size={"md"} hierarchy={"primary"}>Delete organization forever</Text>
+                        </Button>
+                    </TabTrigger>
+                </TabList>
+            }>
+                <>
+                    <TabContent value={"general"}>
+                        <Flex justify={"space-between"} align={"end"}>
+                            <Text size={"xl"} hierarchy={"primary"}>General adjustments</Text>
+                            <Button color={"success"}>
+                                Update Organization
+                            </Button>
+                        </Flex>
+                        <Spacing spacing={"xl"}/>
+                        <div style={{borderBottom: "1px solid rgba(255,255,255,.1)"}}/>
+                        <Spacing spacing={"xl"}/>
+                        <Card p={1.3}>
+                            <CardSection border>
+                                <Flex justify={"space-between"} align={"center"}>
+                                    <Text size={"md"} hierarchy={"primary"}>Name</Text>
+                                    <TextInput/>
+                                </Flex>
+                            </CardSection>
+                        </Card>
+                    </TabContent>
+                </>
+            </DLayout>
+        </Tab>
+    </>
+}
