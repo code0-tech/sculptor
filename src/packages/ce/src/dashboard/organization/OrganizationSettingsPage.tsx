@@ -8,12 +8,10 @@ import {
     Avatar,
     Badge,
     Button,
-    Card,
     DLayout,
     Flex,
     Spacing,
     Text,
-    TextInput,
     useService,
     useStore
 } from "@code0-tech/pictor";
@@ -21,7 +19,6 @@ import {NamespaceService} from "@edition/namespace/Namespace.service";
 import {OrganizationService} from "@edition/organization/Organization.service";
 import {IconFolders, IconServer, IconUserCog, IconUsers} from "@tabler/icons-react";
 import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
-import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {UsageView} from "@edition/dashboard/usage/UsageView";
 import {OrganizationUpgradeView} from "@edition/dashboard/organization/OrganizationUpgradeView";
 import {OrganizationDeleteView} from "@edition/dashboard/organization/OrganizationDeleteView";
@@ -79,7 +76,8 @@ export const OrganizationSettingsPage: React.FC = () => {
                     </TabTrigger>
                     <TabTrigger value={"upgrade"} asChild>
                         <Button color={"primary"} paddingSize={"xxs"} variant={"none"}>
-                            <Text size={"md"} hierarchy={"primary"} display={"flex"} align={"center"} style={{gap: "0.35rem"}}>Upgrade to <Badge color={"info"}>Team</Badge></Text>
+                            <Text size={"md"} hierarchy={"primary"} display={"flex"} align={"center"}
+                                  style={{gap: "0.35rem"}}>Upgrade to <Badge color={"info"}>Team</Badge></Text>
                             <AuroraBackground/>
                         </Button>
                     </TabTrigger>
@@ -97,21 +95,7 @@ export const OrganizationSettingsPage: React.FC = () => {
             }>
                 <>
                     <TabContent value={"general"}>
-                        <Flex justify={"space-between"} align={"end"}>
-                            <Text size={"xl"} hierarchy={"primary"}>General adjustments</Text>
-                            <Button color={"success"}>
-                                Update Organization
-                            </Button>
-                        </Flex>
-                        <Spacing spacing={"xl"}/>
-                        <Card p={1.3}>
-                            <CardSection border>
-                                <Flex justify={"space-between"} align={"center"}>
-                                    <Text size={"md"} hierarchy={"primary"}>Name</Text>
-                                    <TextInput/>
-                                </Flex>
-                            </CardSection>
-                        </Card>
+                        <OrganizationDeleteView/>
                     </TabContent>
                     <TabContent value={"upgrade"}>
                         <OrganizationUpgradeView/>
