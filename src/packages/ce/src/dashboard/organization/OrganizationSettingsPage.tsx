@@ -4,6 +4,7 @@ import React from "react";
 import {useParams} from "next/navigation";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
 import {
+    AuroraBackground,
     Avatar,
     Badge,
     Button,
@@ -21,6 +22,8 @@ import {OrganizationService} from "@edition/organization/Organization.service";
 import {IconFolders, IconServer, IconUserCog, IconUsers} from "@tabler/icons-react";
 import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
+import {UsageView} from "@edition/dashboard/usage/UsageView";
+import {OrganizationUpgradeView} from "@edition/dashboard/organization/OrganizationUpgradeView";
 
 export const OrganizationSettingsPage: React.FC = () => {
 
@@ -35,8 +38,6 @@ export const OrganizationSettingsPage: React.FC = () => {
     const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
     const namespace = React.useMemo(() => namespaceService.getById(namespaceId), [namespaceStore, namespaceId])
     const parentOrganization = React.useMemo(() => namespace?.parent?.__typename === "Organization" ? organizationService.getById(namespace?.parent?.id) : null, [organizationStore, namespace])
-
-    console.log(namespace)
 
     return <>
         <Spacing spacing={"xl"}/>
@@ -76,8 +77,9 @@ export const OrganizationSettingsPage: React.FC = () => {
                         </Button>
                     </TabTrigger>
                     <TabTrigger value={"upgrade"} asChild>
-                        <Button color={"info"} paddingSize={"xxs"} variant={"none"}>
-                            <Text size={"md"} hierarchy={"primary"} display={"flex"} style={{gap: "0.35rem"}}>Upgrade to <Badge color={"info"} border>Team</Badge></Text>
+                        <Button color={"primary"} paddingSize={"xxs"} variant={"none"}>
+                            <Text size={"md"} hierarchy={"primary"} display={"flex"} align={"center"} style={{gap: "0.35rem"}}>Upgrade to <Badge color={"info"}>Team</Badge></Text>
+                            <AuroraBackground/>
                         </Button>
                     </TabTrigger>
                     <TabTrigger disabled value={"usage"} asChild>
@@ -101,8 +103,6 @@ export const OrganizationSettingsPage: React.FC = () => {
                             </Button>
                         </Flex>
                         <Spacing spacing={"xl"}/>
-                        <div style={{borderBottom: "1px solid rgba(255,255,255,.1)"}}/>
-                        <Spacing spacing={"xl"}/>
                         <Card p={1.3}>
                             <CardSection border>
                                 <Flex justify={"space-between"} align={"center"}>
@@ -111,6 +111,12 @@ export const OrganizationSettingsPage: React.FC = () => {
                                 </Flex>
                             </CardSection>
                         </Card>
+                    </TabContent>
+                    <TabContent value={"usage"}>
+                        <UsageView/>
+                    </TabContent>
+                    <TabContent value={"upgrade"}>
+                        <OrganizationUpgradeView/>
                     </TabContent>
                 </>
             </DLayout>
