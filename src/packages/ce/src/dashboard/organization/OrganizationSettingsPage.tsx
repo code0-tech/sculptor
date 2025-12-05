@@ -24,6 +24,7 @@ import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/comp
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {UsageView} from "@edition/dashboard/usage/UsageView";
 import {OrganizationUpgradeView} from "@edition/dashboard/organization/OrganizationUpgradeView";
+import {OrganizationDeleteView} from "@edition/dashboard/organization/OrganizationDeleteView";
 
 export const OrganizationSettingsPage: React.FC = () => {
 
@@ -112,11 +113,14 @@ export const OrganizationSettingsPage: React.FC = () => {
                             </CardSection>
                         </Card>
                     </TabContent>
+                    <TabContent value={"upgrade"}>
+                        <OrganizationUpgradeView/>
+                    </TabContent>
                     <TabContent value={"usage"}>
                         <UsageView/>
                     </TabContent>
-                    <TabContent value={"upgrade"}>
-                        <OrganizationUpgradeView/>
+                    <TabContent value={"delete"}>
+                        <OrganizationDeleteView/>
                     </TabContent>
                 </>
             </DLayout>
