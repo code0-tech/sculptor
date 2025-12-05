@@ -1,3 +1,5 @@
+#import '../fragments/Organization.fragment.graphql'
+
 mutation deleteOrganization ($organizationId: OrganizationID!) {
     organizationsDelete(input: {
         organizationId: $organizationId
