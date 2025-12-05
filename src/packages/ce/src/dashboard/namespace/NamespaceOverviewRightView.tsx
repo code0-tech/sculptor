@@ -2,6 +2,7 @@
 
 import React from "react";
 import {
+    AuroraBackground,
     Avatar,
     Badge,
     Button,
@@ -38,17 +39,14 @@ export const NamespaceOverviewRightView: React.FC = () => {
     const members = React.useMemo(() => memberService.values({namespaceId: `gid://sagittarius/Namespace/${namespaceId}`}), [memberStore, userStore])
 
     return <Flex maw={"250px"} style={{flexDirection: "column"}}>
-        <Button color={"info"} w={"100%"} paddingSize={"xs"}>
-            Upgrade to <Badge>PRO</Badge>
+        <Button color={"primary"} w={"100%"}>
+            Upgrade to <Badge border>Team</Badge>
+            <AuroraBackground/>
         </Button>
-        <Spacing spacing={"xs"}/>
-        <hr style={{width: "100%"}} color={"#1c1a2c"}/>
-        <Spacing spacing={"xs"}/>
+        <Spacing spacing={"xl"}/>
         <Text>This is your personal space where you can manage your projects, roles, runtimes and invite outside
             users.</Text>
-        <Spacing spacing={"xs"}/>
-        <hr style={{width: "100%"}} color={"#1c1a2c"}/>
-        <Spacing spacing={"xs"}/>
+        <Spacing spacing={"xl"}/>
         <Text size={"md"}>Members</Text>
         <Spacing spacing={"xs"}/>
         <Flex align={"center"} style={{flexWrap: "wrap", gap: ".35rem"}}>
@@ -77,9 +75,7 @@ export const NamespaceOverviewRightView: React.FC = () => {
                 <Button paddingSize={"xxs"}>Invite user</Button>
             </Link>
         </Flex>
-        <Spacing spacing={"xs"}/>
-        <hr style={{width: "100%"}} color={"#1c1a2c"}/>
-        <Spacing spacing={"xs"}/>
+        <Spacing spacing={"xl"}/>
         <Text size={"md"}>Runtimes</Text>
         <Spacing spacing={"xs"}/>
         <DRuntimeList minimized namespaceId={`gid://sagittarius/Namespace/${namespaceId}`}/>
