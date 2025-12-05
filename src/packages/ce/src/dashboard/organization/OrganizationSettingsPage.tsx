@@ -22,6 +22,7 @@ import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/comp
 import {UsageView} from "@edition/dashboard/usage/UsageView";
 import {OrganizationUpgradeView} from "@edition/dashboard/organization/OrganizationUpgradeView";
 import {OrganizationDeleteView} from "@edition/dashboard/organization/OrganizationDeleteView";
+import {OrganizationGeneralSettingsView} from "@edition/dashboard/organization/OrganizationGeneralSettingsView";
 
 export const OrganizationSettingsPage: React.FC = () => {
 
@@ -30,7 +31,6 @@ export const OrganizationSettingsPage: React.FC = () => {
     const namespaceStore = useStore(NamespaceService)
     const organizationService = useService(OrganizationService)
     const organizationStore = useStore(OrganizationService)
-    const [, startTransition] = React.useTransition()
 
     const namespaceIndex = params.namespaceId as any as number
     const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
@@ -39,32 +39,34 @@ export const OrganizationSettingsPage: React.FC = () => {
 
     return <>
         <Spacing spacing={"xl"}/>
-        <Flex style={{gap: "0.7rem"}} align={"center"}>
-            <Avatar w={"60px"} bg={"transparent"} identifier={parentOrganization?.name!!}/>
-            <Flex style={{gap: "0.35rem", flexDirection: "column"}}>
-                <Text size={"xl"} hierarchy={"primary"} display={"block"}>
-                    {parentOrganization?.name}
-                </Text>
-                <Flex style={{gap: "0.35rem"}} align={"center"}>
-                    <Badge color={"secondary"} border>
-                        <IconUsers size={16}/>
-                        {namespace?.members?.count}
-                    </Badge>
-                    <Badge color={"secondary"} border>
-                        <IconFolders size={16}/>
-                        {namespace?.projects?.count}
-                    </Badge>
-                    <Badge color={"secondary"} border>
-                        <IconUserCog size={16}/>
-                        {namespace?.roles?.count}
-                    </Badge>
-                    <Badge color={"secondary"} border>
-                        <IconServer size={16}/>
-                        {namespace?.runtimes?.count}
-                    </Badge>
+        {React.useMemo(() => {
+            return <Flex style={{gap: "0.7rem"}} align={"center"}>
+                <Avatar w={"60px"} bg={"transparent"} identifier={parentOrganization?.name!!}/>
+                <Flex style={{gap: "0.35rem", flexDirection: "column"}}>
+                    <Text size={"xl"} hierarchy={"primary"} display={"block"}>
+                        {parentOrganization?.name}
+                    </Text>
+                    <Flex style={{gap: "0.35rem"}} align={"center"}>
+                        <Badge color={"secondary"} border>
+                            <IconUsers size={16}/>
+                            {namespace?.members?.count}
+                        </Badge>
+                        <Badge color={"secondary"} border>
+                            <IconFolders size={16}/>
+                            {namespace?.projects?.count}
+                        </Badge>
+                        <Badge color={"secondary"} border>
+                            <IconUserCog size={16}/>
+                            {namespace?.roles?.count}
+                        </Badge>
+                        <Badge color={"secondary"} border>
+                            <IconServer size={16}/>
+                            {namespace?.runtimes?.count}
+                        </Badge>
+                    </Flex>
                 </Flex>
             </Flex>
-        </Flex>
+        }, [parentOrganization])}
         <Spacing spacing={"xl"}/>
         <Tab orientation={"vertical"} defaultValue={"general"}>
             <DLayout leftContent={
@@ -95,7 +97,7 @@ export const OrganizationSettingsPage: React.FC = () => {
             }>
                 <>
                     <TabContent value={"general"}>
-                        <OrganizationDeleteView/>
+                        <OrganizationGeneralSettingsView/>
                     </TabContent>
                     <TabContent value={"upgrade"}>
                         <OrganizationUpgradeView/>
