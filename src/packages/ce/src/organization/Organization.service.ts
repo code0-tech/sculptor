@@ -5,10 +5,14 @@ import {
     OrganizationsCreateInput,
     OrganizationsCreatePayload,
     OrganizationsDeleteInput,
-    OrganizationsDeletePayload, Query
+    OrganizationsDeletePayload,
+    OrganizationsUpdateInput,
+    OrganizationsUpdatePayload,
+    Query
 } from "@code0-tech/sagittarius-graphql-types";
 import {GraphqlClient} from "@core/util/graphql-client";
 import createOrganizationMutation from "./mutations/Organization.create.mutation.graphql";
+import updateOrganizationMutation from "./mutations/Organization.update.mutation.graphql";
 import organizationQuery from "./queries/Organization.query.graphql";
 
 export class OrganizationService extends DOrganizationReactiveService {
@@ -68,6 +72,24 @@ export class OrganizationService extends DOrganizationReactiveService {
 
     async organizationDelete(payload: OrganizationsDeleteInput): Promise<OrganizationsDeletePayload | undefined> {
         return Promise.resolve(undefined)
+    }
+
+    async organizationUpdate(payload: OrganizationsUpdateInput): Promise<OrganizationsUpdatePayload | undefined> {
+        const result = await this.client.mutate<Mutation, OrganizationsUpdateInput>({
+            mutation: updateOrganizationMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        if (result.data && result.data.organizationsUpdate && result.data.organizationsUpdate.organization) {
+            const organization = result.data.organizationsUpdate.organization
+            const index = this.values().findIndex(o => o.id === organization.id)
+            this.set(index, new DOrganizationView(organization))
+
+        }
+
+        return result.data?.organizationsUpdate ?? undefined
     }
 
 }
