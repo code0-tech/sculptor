@@ -43,11 +43,6 @@ export class OrganizationService extends DOrganizationReactiveService {
         return super.values();
     }
 
-    deleteById(id: Organization["id"]): void {
-        const index = this.values().findIndex(o => o.id === id)
-        this.delete(index)
-    }
-
     hasById(id: Organization["id"]): boolean {
         const organization = super.values().find(o => o.id === id)
         return organization !== undefined
