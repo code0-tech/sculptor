@@ -13,6 +13,7 @@ import {
 import {GraphqlClient} from "@core/util/graphql-client";
 import createOrganizationMutation from "./mutations/Organization.create.mutation.graphql";
 import updateOrganizationMutation from "./mutations/Organization.update.mutation.graphql";
+import deleteOrganizationMutation from "./mutations/Organization.delete.mutation.graphql";
 import organizationQuery from "./queries/Organization.query.graphql";
 
 export class OrganizationService extends DOrganizationReactiveService {
@@ -71,7 +72,21 @@ export class OrganizationService extends DOrganizationReactiveService {
     }
 
     async organizationDelete(payload: OrganizationsDeleteInput): Promise<OrganizationsDeletePayload | undefined> {
-        return Promise.resolve(undefined)
+        const result = await this.client.mutate<Mutation, OrganizationsDeleteInput>({
+            mutation: deleteOrganizationMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        if (result.data && result.data.organizationsDelete && result.data.organizationsDelete.organization) {
+            const organization = result.data.organizationsDelete.organization
+            const index = this.values().findIndex(o => o.id === organization.id)
+            this.delete(index)
+
+        }
+
+        return result.data?.organizationsDelete ?? undefined
     }
 
     async organizationUpdate(payload: OrganizationsUpdateInput): Promise<OrganizationsUpdatePayload | undefined> {
