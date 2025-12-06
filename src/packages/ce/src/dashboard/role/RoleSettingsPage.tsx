@@ -1,68 +1,238 @@
 "use client"
 
 import React from "react";
-import {Namespace, NamespaceRole} from "@code0-tech/sagittarius-graphql-types";
+import type {Namespace, NamespaceRole, NamespaceRoleAbility} from "@code0-tech/sagittarius-graphql-types";
 import {useParams} from "next/navigation";
-import {Button, Card, CheckboxInput, DLayout, Flex, Spacing, Text, useService, useStore} from "@code0-tech/pictor";
-import {NamespaceService} from "@edition/namespace/Namespace.service";
+import {
+    Button,
+    Card,
+    CheckboxInput,
+    Col,
+    DLayout,
+    Flex,
+    Row,
+    Spacing,
+    Text,
+    useForm,
+    useService,
+    useStore,
+    toast
+} from "@code0-tech/pictor";
 import {RoleService} from "@edition/role/Role.service";
 import {ProjectService} from "@edition/project/Project.service";
 import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {DNamespaceRolePermissions} from "@code0-tech/pictor/dist/components/d-role/DNamespaceRolePermissions";
 
+type Permission = {
+    label: string
+    ability: NamespaceRoleAbility | string
+}
+
+type PermissionGroup = {
+    title: string
+    permissions: Permission[]
+}
+
+type PermissionObject = {
+    [key: NamespaceRoleAbility | string]: boolean
+}
+
+type PermissionTemplate = {
+    name: string
+    description: string
+    abilities: PermissionObject
+}
+
+
+const permissions: PermissionGroup[] = [
+    {
+        title: "Member permissions",
+        permissions: [
+            {label: "Assign member roles", ability: "ASSIGN_MEMBER_ROLES"},
+            {label: "Add member", ability: "INVITE_MEMBER"},
+            {label: "Remove member", ability: "DELETE_MEMBER"},
+        ]
+    },
+    {
+        title: "Project permissions",
+        permissions: [
+            {label: "Create project", ability: "CREATE_NAMESPACE_PROJECT"},
+            {label: "Update project", ability: "UPDATE_NAMESPACE_PROJECT"},
+            {label: "Delete project", ability: "DELETE_NAMESPACE_PROJECT"},
+            {label: "Read project", ability: "READ_NAMESPACE_PROJECT"},
+        ]
+    },
+    {
+        title: "Role permissions",
+        permissions: [
+            {label: "Create role", ability: "CREATE_NAMESPACE_ROLE"},
+            {label: "Update role", ability: "UPDATE_NAMESPACE_ROLE"},
+            {label: "Assign project roles", ability: "ASSIGN_ROLE_PROJECTS"},
+            {label: "Assign role abilities", ability: "ASSIGN_ROLE_ABILITIES"},
+        ]
+    },
+    {
+        title: "Runtime permissions",
+        permissions: [
+            {label: "Create runtime", ability: "CREATE_RUNTIME"},
+            {label: "Update runtime", ability: "UPDATE_RUNTIME"},
+            {label: "Delete runtime", ability: "DELETE_RUNTIME"},
+            {label: "Rotate runtime token", ability: "ROTATE_RUNTIME_TOKEN"},
+            {label: "Assign runtime to projects", ability: "ASSIGN_PROJECT_RUNTIMES"},
+        ]
+    },
+    {
+        title: "Flow permissions",
+        permissions: [
+            {label: "Create flow", ability: "CREATE_FLOW"},
+            {label: "Update flow", ability: "UPDATE_FLOW"},
+            {label: "Delete flow", ability: "DELETE_FLOW"},
+        ]
+    },
+    {
+        title: "License permissions",
+        permissions: [
+            {label: "Create license", ability: "CREATE_NAMESPACE_LICENSE"},
+            {label: "Read license", ability: "READ_NAMESPACE_LICENSE"},
+            {label: "Delete license", ability: "DELETE_NAMESPACE_LICENSE"},
+        ]
+    },
+    {
+        title: "Organization permissions",
+        permissions: [
+            {label: "Update organization", ability: "UPDATE_ORGANIZATION"},
+            {label: "Delete organization", ability: "DELETE_ORGANIZATION"},
+        ]
+    },
+    {
+        title: "Administrator permissions",
+        permissions: [
+            {label: "Namespace administrator", ability: "NAMESPACE_ADMINISTRATOR"},
+        ]
+    }
+]
+
+const defaultPermissions = {
+    ...permissions.reduce((acc, group) => {
+        group.permissions.forEach(permission => {
+            acc[permission.ability] = false
+        })
+        return acc
+    }, {} as Record<string, boolean>)
+}
+
+const permissionTemplates: PermissionTemplate[] = [
+    {
+        name: "Flow builder role template",
+        description: "",
+        abilities: {
+            ...defaultPermissions,
+            "CREATE_FLOW": true,
+            "UPDATE_FLOW": true,
+            "DELETE_FLOW": true,
+            "CREATE_NAMESPACE_PROJECT": true,
+            "UPDATE_NAMESPACE_PROJECT": true,
+            "ASSIGN_PROJECT_RUNTIMES": true
+        }
+    },
+    {
+        name: "Team manager role template",
+        description: "",
+        abilities: {
+            ...defaultPermissions,
+            "INVITE_MEMBER": true,
+            "DELETE_MEMBER": true,
+            "ASSIGN_MEMBER_ROLES": true,
+            "CREATE_NAMESPACE_ROLE": true,
+            "UPDATE_NAMESPACE_ROLE": true,
+            "ASSIGN_ROLE_PROJECTS": true,
+            "ASSIGN_ROLE_ABILITIES": true
+
+        }
+    },
+    {
+        name: "Infrastructure role template",
+        description: "",
+        abilities: {
+            ...defaultPermissions,
+            "CREATE_RUNTIME": true,
+            "UPDATE_RUNTIME": true,
+            "DELETE_RUNTIME": true,
+            "ROTATE_RUNTIME_TOKEN": true,
+            "ASSIGN_PROJECT_RUNTIMES": true
+        }
+    },
+    {
+        name: "Project role template",
+        description: "",
+        abilities: {
+            ...defaultPermissions,
+            "CREATE_NAMESPACE_PROJECT": true,
+            "UPDATE_NAMESPACE_PROJECT": true,
+            "DELETE_NAMESPACE_PROJECT": true,
+            "READ_NAMESPACE_PROJECT": true,
+            "ASSIGN_PROJECT_RUNTIMES": true
+        }
+    }
+]
+
 export const RoleSettingsPage: React.FC = () => {
 
     const params = useParams()
-    const namespaceService = useService(NamespaceService)
-    const namespaceStore = useStore(NamespaceService)
     const roleService = useService(RoleService)
     const roleStore = useStore(RoleService)
     const projectService = useService(ProjectService)
     const projectStore = useStore(ProjectService)
+    const [, startTransition] = React.useTransition()
 
     const namespaceIndex = params.namespaceId as any as number
     const roleIndex = params.roleId as any as number
     const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
     const roleId: NamespaceRole['id'] = `gid://sagittarius/NamespaceRole/${roleIndex}`
 
-    const namespace = React.useMemo(() => namespaceService.getById(namespaceId), [namespaceStore, namespaceId])
     const role = React.useMemo(() => roleService.getById(roleId, {namespaceId: namespaceId}), [roleStore, roleId, namespaceId])
+    const roleAbilities = React.useMemo(() => {
+        return {
+            ...permissions.reduce((acc, group) => {
+                group.permissions.forEach(permission => {
+                    acc[permission.ability] = role?.abilities?.includes(permission.ability as NamespaceRoleAbility) ?? false
+                })
+                return acc
+            }, {} as Record<string, boolean>)
+        }
+    }, [role])
 
-    const abilityCategoryByAbility: Record<string, string> = {
-        ASSIGN_MEMBER_ROLES: "members",
-        INVITE_MEMBER: "members",
-        DELETE_MEMBER: "members",
+    const [initialValues, setInitialValues] = React.useState(roleAbilities)
 
-        CREATE_NAMESPACE_PROJECT: "projects",
-        UPDATE_NAMESPACE_PROJECT: "projects",
-        DELETE_NAMESPACE_PROJECT: "projects",
-        ASSIGN_ROLE_PROJECTS: "projects",
-        READ_NAMESPACE_PROJECT: "projects",
+    React.useEffect(() => {
+        setInitialValues(roleAbilities)
+    }, [role])
 
-        CREATE_NAMESPACE_ROLE: "roles",
-        UPDATE_NAMESPACE_ROLE: "roles",
-        ASSIGN_ROLE_ABILITIES: "roles",
-
-        CREATE_RUNTIME: "runtimes",
-        UPDATE_RUNTIME: "runtimes",
-        DELETE_RUNTIME: "runtimes",
-        ROTATE_RUNTIME_TOKEN: "runtimes",
-        ASSIGN_PROJECT_RUNTIMES: "runtimes",
-
-        CREATE_FLOW: "flows",
-        UPDATE_FLOW: "flows",
-        DELETE_FLOW: "flows",
-
-        CREATE_NAMESPACE_LICENSE: "license",
-        READ_NAMESPACE_LICENSE: "license",
-        DELETE_NAMESPACE_LICENSE: "license",
-
-        UPDATE_ORGANIZATION: "organization",
-        DELETE_ORGANIZATION: "organization",
-
-        NAMESPACE_ADMINISTRATOR: "admin",
-    }
+    const [inputs, validate] = useForm({
+        initialValues: initialValues,
+        validate: {},
+        onSubmit: (values) => {
+            startTransition(() => {
+                const updatedAbilities = Object.entries(values)
+                    .filter(([_, enabled]) => enabled)
+                    .map(([ability, _]) => ability as NamespaceRoleAbility)
+                console.log(updatedAbilities)
+                roleService.roleAssignAbilities({
+                    roleId: roleId!!,
+                    abilities: updatedAbilities
+                }).then(payload => {
+                    if ((payload?.errors?.length ?? 0) <= 0) {
+                        toast({
+                            title: "The permissions were successfully updated.",
+                            color: "success",
+                            dismissible: true,
+                        })
+                    }
+                })
+            })
+        }
+    })
 
     return <>
         <Spacing spacing={"xl"}/>
@@ -88,101 +258,56 @@ export const RoleSettingsPage: React.FC = () => {
                 </TabList>
             }>
                 <>
-                    <TabContent value={"permission"}>
-                        <Flex justify={"space-between"} align={"end"}>
-                            <Text size={"xl"} hierarchy={"primary"}>General adjustments</Text>
-                        </Flex>
-                        <Spacing spacing={"xxs"}/>
+                    <TabContent value={"permission"} style={{overflow: "hidden"}}>
+                        <Text size={"xl"} hierarchy={"primary"}>Select from role templates</Text>
+                        <Spacing spacing={"xl"}/>
+                        <Row>
+                            {permissionTemplates.map(permissionTemplate => {
+                                return <Col>
+                                    <Card>
+                                        <Text size={"lg"} hierarchy={"secondary"}>
+                                            {permissionTemplate.name}
+                                        </Text>
+                                        <Spacing spacing={"xxs"}/>
+                                        <Text size={"sm"} hierarchy={"tertiary"}>
+                                            {permissionTemplate.description}
+                                        </Text>
+                                        <Spacing spacing={"xl"}/>
+                                        <Button color={"primary"} w={"100%"}
+                                                onClick={() => setInitialValues(permissionTemplate.abilities)}>Select
+                                            template</Button>
+                                    </Card>
+                                </Col>
+                            })}
+                        </Row>
+                        <Spacing spacing={"xl"}/>
+                        <Text size={"xl"} hierarchy={"primary"}>Current applied permissions</Text>
+                        <Spacing spacing={"xs"}/>
                         <DNamespaceRolePermissions abilities={role?.abilities!!}/>
                         <Spacing spacing={"xl"}/>
                         <Card p={1.3}>
-                            <CardSection border>
-                                <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
-                                    <Text size={"md"} hierarchy={"primary"}>Member permissions</Text>
-                                    <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
-                                        <CheckboxInput initialValue={true} label={"Assign member roles"}/>
-                                        <CheckboxInput initialValue={true} label={"Rdd member"}/>
-                                        <CheckboxInput initialValue={true} label={"Remove member"}/>
-                                    </Flex>
+                            {permissions.map(permissionGroup => {
+                                return <CardSection border>
+                                    <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
+                                        <Text size={"md"} hierarchy={"primary"}>{permissionGroup.title}</Text>
+                                        <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
+                                            {permissionGroup.permissions.map(permission => (
+                                                <>
+                                                    <CheckboxInput label={permission.label}
+                                                                   key={String(permission.ability + inputs.getInputProps(permission.ability).initialValue)}
+                                                                   {...inputs.getInputProps(permission.ability)}/>
+                                                </>
+                                            ))}
+                                        </Flex>
 
-                                </Flex>
-                            </CardSection>
-                            <CardSection border>
-                                <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
-                                    <Text size="md" hierarchy="primary">Project permissions</Text>
-                                    <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
-                                        <CheckboxInput initialValue={true} label="Create project"/>
-                                        <CheckboxInput initialValue={true} label="Update project"/>
-                                        <CheckboxInput initialValue={true} label="Delete project"/>
-                                        <CheckboxInput initialValue={true} label="Assign project roles"/>
-                                        <CheckboxInput initialValue={true} label="Read project"/>
                                     </Flex>
-                                </Flex>
-                            </CardSection>
-                            <CardSection border>
-                                <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
-                                    <Text size="md" hierarchy="primary">Role permissions</Text>
-                                    <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
-                                        <CheckboxInput initialValue={true} label="Create role"/>
-                                        <CheckboxInput initialValue={true} label="Update role"/>
-                                        <CheckboxInput initialValue={true} label="Assign role abilities"/>
-                                    </Flex>
-                                </Flex>
-                            </CardSection>
-                            <CardSection border>
-                                <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
-                                    <Text size="md" hierarchy="primary">Runtime permissions</Text>
-                                    <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
-                                        <CheckboxInput initialValue={true} label="Create runtime"/>
-                                        <CheckboxInput initialValue={true} label="Update runtime"/>
-                                        <CheckboxInput initialValue={true} label="Delete runtime"/>
-                                        <CheckboxInput initialValue={true} label="Rotate runtime token"/>
-                                        <CheckboxInput initialValue={true} label="Assign runtime to projects"/>
-                                    </Flex>
-                                </Flex>
-                            </CardSection>
-                            <CardSection border>
-                                <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
-                                    <Text size="md" hierarchy="primary">Flow permissions</Text>
-                                    <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
-                                        <CheckboxInput initialValue={true} label="Create flow"/>
-                                        <CheckboxInput initialValue={true} label="Update flow"/>
-                                        <CheckboxInput initialValue={true} label="Delete flow"/>
-                                    </Flex>
-                                </Flex>
-                            </CardSection>
-                            <CardSection border>
-                                <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
-                                    <Text size="md" hierarchy="primary">License permissions</Text>
-                                    <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
-                                        <CheckboxInput initialValue={true} label="Create license"/>
-                                        <CheckboxInput initialValue={true} label="Read license"/>
-                                        <CheckboxInput initialValue={true} label="Delete license"/>
-                                    </Flex>
-                                </Flex>
-                            </CardSection>
-                            <CardSection border>
-                                <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
-                                    <Text size="md" hierarchy="primary">Organization permissions</Text>
-                                    <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
-                                        <CheckboxInput initialValue={true} label="Update organization"/>
-                                        <CheckboxInput initialValue={true} label="Delete organization"/>
-                                    </Flex>
-                                </Flex>
-                            </CardSection>
-                            <CardSection border>
-                                <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
-                                    <Text size="md" hierarchy="primary">Administrator permissions</Text>
-                                    <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
-                                        <CheckboxInput initialValue={true} label="Namespace administrator"/>
-                                    </Flex>
-                                </Flex>
-                            </CardSection>
+                                </CardSection>
+                            })}
                         </Card>
                         <Spacing spacing={"xl"}/>
                         <Flex justify={"end"}>
-                            <Button color={"success"}>
-                                Update role
+                            <Button color={"success"} onClick={validate}>
+                                Update role permissions
                             </Button>
                         </Flex>
                     </TabContent>
