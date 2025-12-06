@@ -12,14 +12,12 @@ import {
     toast,
     useForm,
     useService,
-    useStore,
-    useUserSession
+    useStore
 } from "@code0-tech/pictor";
 import {RuntimeService} from "@edition/runtime/Runtime.service";
 import {notFound, useParams, useRouter} from "next/navigation";
 import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
-import {UserService} from "@edition/user/User.service";
 
 export const RuntimeSettingsPage: React.FC = () => {
 
@@ -32,16 +30,8 @@ export const RuntimeSettingsPage: React.FC = () => {
     const [, startTransition] = React.useTransition()
     const [token, setToken] = React.useState<string | null | undefined>(undefined)
     const router = useRouter()
-    const currentSession = useUserSession()
-    const userStore = useStore(UserService)
-    const userService = useService(UserService)
-    const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [userStore, currentSession])
 
     const runtime = React.useMemo(() => runtimeService.getById(`gid://sagittarius/Runtime/${runtimeId}`), [runtimeStore, params])
-
-    if (currentUser && !currentUser.admin) {
-        notFound()
-    }
 
     if (runtime?.userAbilities && (!runtime?.userAbilities?.updateRuntime || !runtime.userAbilities.deleteRuntime || !runtime.userAbilities.rotateRuntimeToken)) {
         notFound()

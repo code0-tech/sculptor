@@ -1,23 +1,10 @@
 "use client"
 
 import React from "react";
-import {
-    Button,
-    Col,
-    Flex,
-    Spacing,
-    Text,
-    TextInput,
-    toast,
-    useForm,
-    useService,
-    useStore,
-    useUserSession
-} from "@code0-tech/pictor";
+import {Button, Col, Flex, Spacing, Text, TextInput, toast, useForm, useService} from "@code0-tech/pictor";
 import Link from "next/link";
-import {notFound, useParams, useRouter} from "next/navigation";
+import {useParams, useRouter} from "next/navigation";
 import {RuntimeService} from "@edition/runtime/Runtime.service";
-import {UserService} from "@edition/user/User.service";
 
 export const RuntimeCreatePage: React.FC = () => {
 
@@ -28,15 +15,6 @@ export const RuntimeCreatePage: React.FC = () => {
     const [, startTransition] = React.useTransition()
     const [token, setToken] = React.useState<string | null | undefined>(undefined)
     const router = useRouter()
-    const currentSession = useUserSession()
-
-    const userStore = useStore(UserService)
-    const userService = useService(UserService)
-    const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [userStore, currentSession])
-
-    if (currentUser && !currentUser.admin) {
-        notFound()
-    }
 
     const [inputs, validate] = useForm({
         initialValues: {
