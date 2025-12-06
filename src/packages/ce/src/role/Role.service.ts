@@ -1,6 +1,12 @@
-import {DRoleDependencies, DNamespaceRoleReactiveService,ReactiveArrayStore, DNamespaceRoleView} from "@code0-tech/pictor"
 import {
-    NamespaceProject, NamespaceRole,
+    DNamespaceRoleReactiveService,
+    DNamespaceRoleView,
+    DRoleDependencies,
+    ReactiveArrayStore
+} from "@code0-tech/pictor"
+import {
+    Mutation,
+    NamespaceRole,
     NamespacesRolesAssignAbilitiesInput,
     NamespacesRolesAssignAbilitiesPayload,
     NamespacesRolesAssignProjectsInput,
@@ -13,6 +19,7 @@ import {
 } from "@code0-tech/sagittarius-graphql-types"
 import {GraphqlClient} from "@core/util/graphql-client";
 import rolesQuery from "@edition/role/queries/Roles.query.graphql";
+import roleAssignAbilitiesMutation from "@edition/role/mutations/Role.assignAbilities.mutation.graphql";
 
 export class RoleService extends DNamespaceRoleReactiveService {
 
@@ -63,15 +70,38 @@ export class RoleService extends DNamespaceRoleReactiveService {
         return role !== undefined
     }
 
-    roleAssignAbilities(payload: NamespacesRolesAssignAbilitiesInput): Promise<NamespacesRolesAssignAbilitiesPayload | undefined> {
-        throw new Error("Method not implemented.")
+    async roleAssignAbilities(payload: NamespacesRolesAssignAbilitiesInput): Promise<NamespacesRolesAssignAbilitiesPayload | undefined> {
+        const result = await this.client.mutate<Mutation, NamespacesRolesAssignAbilitiesInput>({
+            mutation: roleAssignAbilitiesMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        //TODO: should be done by a new query
+        if (result.data && result.data.namespacesRolesAssignAbilities) {
+            const currentRole = this.getById(payload.roleId)
+            const index = super.values().findIndex(m => m.id === payload.roleId)
+
+            const newRole = new DNamespaceRoleView({
+                ...currentRole?.json(),
+                abilities: payload.abilities
+            })
+
+            this.set(index, newRole)
+        }
+
+        return result.data?.namespacesRolesAssignAbilities ?? undefined
     }
+
     roleAssignProject(payload: NamespacesRolesAssignProjectsInput): Promise<NamespacesRolesAssignProjectsPayload | undefined> {
         throw new Error("Method not implemented.")
     }
+
     roleCreate(payload: NamespacesRolesCreateInput): Promise<NamespacesRolesCreatePayload | undefined> {
         throw new Error("Method not implemented.")
     }
+
     roleDelete(payload: NamespacesRolesDeleteInput): Promise<NamespacesRolesDeletePayload | undefined> {
         throw new Error("Method not implemented.")
     }
