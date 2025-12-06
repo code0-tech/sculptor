@@ -19,6 +19,7 @@ import {GraphqlClient} from "@core/util/graphql-client"
 import membersQuery from "./queries/Members.query.graphql"
 import memberAssignRoleMutation from "./mutations/Member.assignRoles.mutation.graphql"
 import memberDeleteMutation from "./mutations/Member.delete.mutation.graphql"
+import memberInviteMutation from "./mutations/Member.invite.mutation.graphql"
 
 export class MemberService extends DNamespaceMemberReactiveService {
 
@@ -109,8 +110,20 @@ export class MemberService extends DNamespaceMemberReactiveService {
         return result.data?.namespacesMembersDelete ?? undefined
     }
 
-    memberInvite(payload: NamespacesMembersInviteInput): Promise<NamespacesMembersInvitePayload | undefined> {
-        return Promise.resolve(undefined)
+    async memberInvite(payload: NamespacesMembersInviteInput): Promise<NamespacesMembersInvitePayload | undefined> {
+        const result = await this.client.mutate<Mutation, NamespacesMembersInviteInput>({
+            mutation: memberInviteMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        if (result.data && result.data.namespacesMembersInvite && result.data.namespacesMembersInvite.namespaceMember) {
+            const member = result.data.namespacesMembersInvite.namespaceMember
+            this.set(this.i++, new DNamespaceMemberView(member))
+        }
+
+        return result.data?.namespacesMembersInvite ?? undefined
     }
 
 }
