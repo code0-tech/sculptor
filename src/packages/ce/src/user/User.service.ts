@@ -39,10 +39,12 @@ import passwordResetMutation from "./mutations/User.passwordReset.mutation.graph
 import passwordResetRequestMutation from "./mutations/User.passwordResetRequest.mutation.graphql"
 import usersQuery from "./queries/Users.query.graphql";
 import userByUsernameQuery from "./queries/User.byUsername.query.graphql";
+import userByIdQuery from "./queries/User.byId.query.graphql";
 
 export class UserService extends DUserReactiveService {
 
     private readonly client: GraphqlClient
+    private i = 0;
 
     constructor(client: GraphqlClient, store: ReactiveArrayStore<DUserView>) {
         super(store);
@@ -54,18 +56,38 @@ export class UserService extends DUserReactiveService {
         this.client.query<Query>({
             query: usersQuery
         }).then(result => {
-            let i = 0;
             const data = result.data
             if (!data) return
 
-            if (data && data.currentUser) this.set(i++, new DUserView(data.currentUser))
+            if (data && data.currentUser && !this.hasById(data.currentUser.id)) this.set(this.i++, new DUserView(data.currentUser))
             if (data.users && data.users.nodes) {
                 data.users.nodes.forEach((user) => {
-                    if (user && !(user.id === data.currentUser?.id)) this.set(i++, new DUserView(user))
+                    if (user && !(user.id === data.currentUser?.id) && !this.hasById(user.id)) this.set(this.i++, new DUserView(user))
                 })
             }
         })
         return super.values();
+    }
+
+    getById(id: User["id"]): DUserView | undefined {
+        const user = super.getById(id)
+        if (user) return user
+
+        if (id) {
+            this.client.query<Query>({
+                query: userByIdQuery,
+                variables: {
+                    id: id
+                }
+            }).then(result => {
+                const data = result.data
+                if (!data) return
+
+                if (data && data.user && !this.hasById(data.user.id)) this.set(this.i++, new DUserView(data.user))
+            })
+        }
+
+        return super.getById(id)
     }
 
     getByUsername(username: User["username"]): DUserView | undefined {
@@ -77,11 +99,10 @@ export class UserService extends DUserReactiveService {
                 username: username ?? ""
             }
         }).then(result => {
-            let i = 0;
             const data = result.data
             if (!data) return
 
-            if (data && data.user) this.set(i++, new DUserView(data.user))
+            if (data && data.user && !this.hasById(data.user.id)) this.set(this.i++, new DUserView(data.user))
         })
 
         return super.getByUsername(username)
