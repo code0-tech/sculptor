@@ -4,6 +4,7 @@ import React from "react";
 import type {Namespace, NamespaceRole, NamespaceRoleAbility} from "@code0-tech/sagittarius-graphql-types";
 import {useParams} from "next/navigation";
 import {
+    AuroraBackground,
     Button,
     Card,
     CheckboxInput,
@@ -13,10 +14,10 @@ import {
     Row,
     Spacing,
     Text,
+    toast,
     useForm,
     useService,
-    useStore,
-    toast
+    useStore
 } from "@code0-tech/pictor";
 import {RoleService} from "@edition/role/Role.service";
 import {ProjectService} from "@edition/project/Project.service";
@@ -40,7 +41,6 @@ type PermissionObject = {
 
 type PermissionTemplate = {
     name: string
-    description: string
     abilities: PermissionObject
 }
 
@@ -68,7 +68,7 @@ const permissions: PermissionGroup[] = [
         permissions: [
             {label: "Create role", ability: "CREATE_NAMESPACE_ROLE"},
             {label: "Update role", ability: "UPDATE_NAMESPACE_ROLE"},
-            {label: "Assign project roles", ability: "ASSIGN_ROLE_PROJECTS"},
+            {label: "Limit roles to projects", ability: "ASSIGN_ROLE_PROJECTS"},
             {label: "Assign role abilities", ability: "ASSIGN_ROLE_ABILITIES"},
         ]
     },
@@ -124,8 +124,7 @@ const defaultPermissions = {
 
 const permissionTemplates: PermissionTemplate[] = [
     {
-        name: "Flow builder role template",
-        description: "",
+        name: "Flow developer role template",
         abilities: {
             ...defaultPermissions,
             "CREATE_FLOW": true,
@@ -138,7 +137,6 @@ const permissionTemplates: PermissionTemplate[] = [
     },
     {
         name: "Team manager role template",
-        description: "",
         abilities: {
             ...defaultPermissions,
             "INVITE_MEMBER": true,
@@ -152,8 +150,7 @@ const permissionTemplates: PermissionTemplate[] = [
         }
     },
     {
-        name: "Infrastructure role template",
-        description: "",
+        name: "Runtime manager role template",
         abilities: {
             ...defaultPermissions,
             "CREATE_RUNTIME": true,
@@ -164,8 +161,7 @@ const permissionTemplates: PermissionTemplate[] = [
         }
     },
     {
-        name: "Project role template",
-        description: "",
+        name: "Project manager role template",
         abilities: {
             ...defaultPermissions,
             "CREATE_NAMESPACE_PROJECT": true,
@@ -217,7 +213,6 @@ export const RoleSettingsPage: React.FC = () => {
                 const updatedAbilities = Object.entries(values)
                     .filter(([_, enabled]) => enabled)
                     .map(([ability, _]) => ability as NamespaceRoleAbility)
-                console.log(updatedAbilities)
                 roleService.roleAssignAbilities({
                     roleId: roleId!!,
                     abilities: updatedAbilities
@@ -259,29 +254,52 @@ export const RoleSettingsPage: React.FC = () => {
             }>
                 <>
                     <TabContent value={"permission"} style={{overflow: "hidden"}}>
-                        <Text size={"xl"} hierarchy={"primary"}>Select from role templates</Text>
+                        <Text size={"xl"} hierarchy={"primary"} style={{fontWeight: 600}}>Select from role
+                            templates</Text>
                         <Spacing spacing={"xl"}/>
-                        <Row>
-                            {permissionTemplates.map(permissionTemplate => {
-                                return <Col>
-                                    <Card>
-                                        <Text size={"lg"} hierarchy={"secondary"}>
-                                            {permissionTemplate.name}
-                                        </Text>
-                                        <Spacing spacing={"xxs"}/>
-                                        <Text size={"sm"} hierarchy={"tertiary"}>
-                                            {permissionTemplate.description}
-                                        </Text>
-                                        <Spacing spacing={"xl"}/>
-                                        <Button color={"primary"} w={"100%"}
-                                                onClick={() => setInitialValues(permissionTemplate.abilities)}>Select
-                                            template</Button>
-                                    </Card>
-                                </Col>
-                            })}
-                        </Row>
+                        {React.useMemo(() => {
+                            return <Row>
+                                {permissionTemplates.map(permissionTemplate => {
+
+                                    //schreibe mir hier eine variable isSelected die true ist wenn die permissionTemplate.abilities genau den gleichen inhalten entsprechen wie die aktuellen rule abilities hat
+
+
+                                    const templateAbilities = Object.entries(permissionTemplate.abilities)
+                                        .filter(([_, enabled]) => enabled)
+                                        .map(([ability]) => ability as NamespaceRoleAbility);
+
+                                    const roleAbilities = Object.entries(initialValues)
+                                        .filter(([_, enabled]) => enabled)
+                                        .map(([ability]) => ability as NamespaceRoleAbility);
+
+                                    const isSelected = templateAbilities.length === roleAbilities.length
+                                        && templateAbilities.every(a => new Set(roleAbilities).has(a));
+
+
+                                    return <Col>
+                                        <Card>
+                                            <Text style={{fontWeight: 500}} size={"lg"} hierarchy={"secondary"}>
+                                                {permissionTemplate.name}
+                                            </Text>
+                                            <Spacing spacing={"xs"}/>
+                                            <DNamespaceRolePermissions
+                                                abilities={Object.entries(permissionTemplate.abilities)
+                                                    .filter(([_, enabled]) => enabled)
+                                                    .map(([ability, _]) => ability as NamespaceRoleAbility)}/>
+                                            <Spacing spacing={"xl"}/>
+                                            <Button disabled={isSelected} color={"secondary"} variant={"filled"}
+                                                    w={"100%"}
+                                                    onClick={() => setInitialValues(permissionTemplate.abilities)}>Select
+                                                template</Button>
+                                            {isSelected ? <AuroraBackground/> : null}
+                                        </Card>
+                                    </Col>
+                                })}
+                            </Row>
+                        }, [initialValues, role])}
                         <Spacing spacing={"xl"}/>
-                        <Text size={"xl"} hierarchy={"primary"}>Current applied permissions</Text>
+                        <Text size={"xl"} hierarchy={"primary"} style={{fontWeight: 600}}>Current stored
+                            permissions</Text>
                         <Spacing spacing={"xs"}/>
                         <DNamespaceRolePermissions abilities={role?.abilities!!}/>
                         <Spacing spacing={"xl"}/>
