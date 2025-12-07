@@ -1,0 +1,16 @@
+mutation roleAssignProjects($roleId: NamespaceRoleID!, $projectIds: [NamespaceProjectID!]!) {
+    namespacesRolesAssignProjects(input: {
+        roleId: $roleId,
+        projectIds: $projectIds
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+
+    }
+}

@@ -20,6 +20,7 @@ import {
 import {GraphqlClient} from "@core/util/graphql-client";
 import rolesQuery from "@edition/role/queries/Roles.query.graphql";
 import roleAssignAbilitiesMutation from "@edition/role/mutations/Role.assignAbilities.mutation.graphql";
+import roleAssignProjectsMutation from "@edition/role/mutations/Role.assignProjects.mutation.graphql";
 
 export class RoleService extends DNamespaceRoleReactiveService {
 
@@ -94,8 +95,33 @@ export class RoleService extends DNamespaceRoleReactiveService {
         return result.data?.namespacesRolesAssignAbilities ?? undefined
     }
 
-    roleAssignProject(payload: NamespacesRolesAssignProjectsInput): Promise<NamespacesRolesAssignProjectsPayload | undefined> {
-        throw new Error("Method not implemented.")
+    async roleAssignProject(payload: NamespacesRolesAssignProjectsInput): Promise<NamespacesRolesAssignProjectsPayload | undefined> {
+        const result = await this.client.mutate<Mutation, NamespacesRolesAssignProjectsInput>({
+            mutation: roleAssignProjectsMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        //TODO: should be done by a new query
+        if (result.data && result.data.namespacesRolesAssignProjects) {
+            const currentRole = this.getById(payload.roleId)
+            const index = super.values().findIndex(m => m.id === payload.roleId)
+
+            const newRole = new DNamespaceRoleView({
+                ...currentRole?.json(),
+                assignedProjects: {
+                    count: payload.projectIds.length,
+                    nodes: payload.projectIds.map(id => ({
+                        id: id,
+                    })),
+                }
+            })
+
+            this.set(index, newRole)
+        }
+
+        return result.data?.namespacesRolesAssignProjects ?? undefined
     }
 
     roleCreate(payload: NamespacesRolesCreateInput): Promise<NamespacesRolesCreatePayload | undefined> {

@@ -1,15 +1,17 @@
 "use client"
 
 import React from "react";
-import type {Namespace, NamespaceRole, NamespaceRoleAbility} from "@code0-tech/sagittarius-graphql-types";
+import type {Namespace, NamespaceRole, NamespaceRoleAbility, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {useParams} from "next/navigation";
 import {
+    Alert,
     AuroraBackground,
     Button,
     Card,
     CheckboxInput,
     Col,
     DLayout,
+    DNamespaceProjectView,
     Flex,
     Row,
     Spacing,
@@ -24,6 +26,9 @@ import {ProjectService} from "@edition/project/Project.service";
 import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {DNamespaceRolePermissions} from "@code0-tech/pictor/dist/components/d-role/DNamespaceRolePermissions";
+import DNamespaceProjectMenu from "@code0-tech/pictor/dist/components/d-project/DNamespaceProjectMenu";
+import {DNamespaceProjectContent} from "@code0-tech/pictor/dist/components/d-project/DNamespaceProjectContent";
+import {IconTrash} from "@tabler/icons-react";
 
 type Permission = {
     label: string
@@ -199,7 +204,13 @@ export const RoleSettingsPage: React.FC = () => {
         }
     }, [role])
 
+    const roleAssignedProjects = React.useMemo(() => role?.assignedProjects?.nodes?.map(p => p?.id!!) ?? [], [role])
+    const [assignedProjectIds, setAssignedProjectIds] = React.useState<Scalars['NamespaceProjectID']['output'][]>(roleAssignedProjects)
     const [initialValues, setInitialValues] = React.useState(roleAbilities)
+
+    React.useEffect(() => {
+        setAssignedProjectIds(roleAssignedProjects)
+    }, [role])
 
     React.useEffect(() => {
         setInitialValues(roleAbilities)
@@ -229,6 +240,39 @@ export const RoleSettingsPage: React.FC = () => {
         }
     })
 
+    const assignProjects = () => {
+        startTransition(() => {
+            roleService.roleAssignProject({
+                roleId: roleId,
+                projectIds: assignedProjectIds as Scalars['NamespaceProjectID']['output'][]
+            }).then(payload => {
+                if ((payload?.errors?.length ?? 0) <= 0) {
+                    toast({
+                        title: "All projects were successfully assigned to the role.",
+                        color: "success",
+                        dismissible: true,
+                    })
+                }
+            })
+        })
+    }
+
+    const addAssignedProject = (projectId: Scalars['NamespaceProjectID']['output']) => {
+        setAssignedProjectIds(prevState => {
+            return [...prevState, projectId]
+        })
+    }
+
+    const removeAssignedProject = (projectId: Scalars['NamespaceProjectID']['output']) => {
+        setAssignedProjectIds(prevState => {
+            return prevState.filter(id => id !== projectId)
+        })
+    }
+
+    const filterProjects = React.useCallback((project: DNamespaceProjectView) => {
+        return !assignedProjectIds.find(projectId => projectId == project.id!!)
+    }, [assignedProjectIds])
+
     return <>
         <Spacing spacing={"xl"}/>
         <Flex style={{gap: "0.7rem"}} align={"center"}>
@@ -247,22 +291,20 @@ export const RoleSettingsPage: React.FC = () => {
                     </TabTrigger>
                     <TabTrigger value={"project"} asChild>
                         <Button paddingSize={"xxs"} variant={"none"}>
-                            <Text size={"md"} hierarchy={"primary"}>Assigned projects</Text>
+                            <Text size={"md"} hierarchy={"primary"}>Limit to projects</Text>
                         </Button>
                     </TabTrigger>
                 </TabList>
             }>
                 <>
                     <TabContent value={"permission"} style={{overflow: "hidden"}}>
-                        <Text size={"xl"} hierarchy={"primary"} style={{fontWeight: 600}}>Select from role
-                            templates</Text>
+                        <Text size={"xl"} hierarchy={"primary"} style={{fontWeight: 600}}>
+                            Select from role templates
+                        </Text>
                         <Spacing spacing={"xl"}/>
                         {React.useMemo(() => {
                             return <Row>
                                 {permissionTemplates.map(permissionTemplate => {
-
-                                    //schreibe mir hier eine variable isSelected die true ist wenn die permissionTemplate.abilities genau den gleichen inhalten entsprechen wie die aktuellen rule abilities hat
-
 
                                     const templateAbilities = Object.entries(permissionTemplate.abilities)
                                         .filter(([_, enabled]) => enabled)
@@ -298,10 +340,17 @@ export const RoleSettingsPage: React.FC = () => {
                             </Row>
                         }, [initialValues, role])}
                         <Spacing spacing={"xl"}/>
-                        <Text size={"xl"} hierarchy={"primary"} style={{fontWeight: 600}}>Current stored
-                            permissions</Text>
-                        <Spacing spacing={"xs"}/>
-                        <DNamespaceRolePermissions abilities={role?.abilities!!}/>
+                        <Flex align={"center"} justify={"space-between"}>
+                            <div>
+                                <Text size={"xl"} hierarchy={"primary"} style={{fontWeight: 600}}>Current stored
+                                    permissions</Text>
+                                <Spacing spacing={"xs"}/>
+                                <DNamespaceRolePermissions abilities={role?.abilities!!}/>
+                            </div>
+                            <Button color={"success"} onClick={validate}>
+                                Update role permissions
+                            </Button>
+                        </Flex>
                         <Spacing spacing={"xl"}/>
                         <Card p={1.3}>
                             {permissions.map(permissionGroup => {
@@ -322,12 +371,44 @@ export const RoleSettingsPage: React.FC = () => {
                                 </CardSection>
                             })}
                         </Card>
-                        <Spacing spacing={"xl"}/>
-                        <Flex justify={"end"}>
-                            <Button color={"success"} onClick={validate}>
-                                Update role permissions
-                            </Button>
+                    </TabContent>
+                    <TabContent value={"project"} style={{overflow: "hidden"}}>
+                        <Flex align={"center"} justify={"space-between"}>
+                            <Text size={"xl"} hierarchy={"primary"} style={{fontWeight: 600}}>Projects that members can
+                                access</Text>
+                            <Flex align={"center"} style={{gap: ".7rem"}}>
+                                <Button color={"success"} onClick={assignProjects}>Update assigned projects</Button>
+                                <DNamespaceProjectMenu namespaceId={namespaceId}
+                                                       key={String(assignedProjectIds)}
+                                                       filter={filterProjects}
+                                                       onProjectSelect={(project) => addAssignedProject(project.id!!)}>
+                                    <Button>Add project</Button>
+                                </DNamespaceProjectMenu>
+                            </Flex>
                         </Flex>
+
+                        <Spacing spacing={"xl"}/>
+                        {(assignedProjectIds.length ?? 0) <= 0 ? (
+                            <Alert color={"info"}>
+                                <Text style={{textAlign: "center"}} size={"md"} hierarchy={"secondary"}>
+                                    This role has no project assignments. Members with this role will have access to all
+                                    projects in the organization namespace.
+                                </Text>
+                            </Alert>
+                        ) : (
+                            <Card>
+                                {assignedProjectIds.map(projectId => {
+                                    return <CardSection key={projectId} border>
+                                        <Flex align={"center"} style={{gap: "1.3rem"}} justify={"space-between"}>
+                                            <DNamespaceProjectContent minimized projectId={projectId}/>
+                                            <Button color={"error"} variant={"filled"} onClick={() => removeAssignedProject(projectId)}>
+                                                <IconTrash size={16}/>
+                                            </Button>
+                                        </Flex>
+                                    </CardSection>
+                                })}
+                            </Card>
+                        )}
                     </TabContent>
                 </>
             </DLayout>
