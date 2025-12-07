@@ -23,7 +23,6 @@ export const NamespaceProjectsView: React.FC = () => {
                 Projects
             </Text>
             <Flex align={"center"} style={{gap: "0.7rem"}}>
-                <TextInput left={<IconSearch size={16}/>} placeholder={"Find a project..."}/>
                 <Link href={`/namespace/${namespaceId}/projects/create`}>
                     <Button color={"success"}>Create project</Button>
                 </Link>

@@ -39,7 +39,6 @@ export const MembersView: React.FC = () => {
                 Members
             </Text>
             <Flex align={"center"} style={{gap: "0.7rem"}}>
-                <TextInput left={<IconSearch size={16}/>} placeholder={"Find a member..."}/>
                 <Link href={`/namespace/${namespaceId}/members/add`}>
                     <Button color={"success"}>Add user</Button>
                 </Link>

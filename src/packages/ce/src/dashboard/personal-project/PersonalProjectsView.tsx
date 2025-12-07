@@ -37,7 +37,6 @@ export const PersonalProjectsView: React.FC = () => {
                 Personal projects
             </Text>
             <Flex align={"center"} style={{gap: "0.7rem"}}>
-                <TextInput left={<IconSearch size={16}/>} placeholder={"Find a personal project..."}/>
                 <Link href={`/namespace/${namespaceIndex}/projects/create`}>
                     <Button color={"success"}>Create personal project</Button>
                 </Link>

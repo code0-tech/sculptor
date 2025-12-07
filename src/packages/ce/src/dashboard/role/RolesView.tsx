@@ -26,7 +26,6 @@ export const RolesView: React.FC = () => {
                 Roles
             </Text>
             <Flex align={"center"} style={{gap: "0.7rem"}}>
-                <TextInput left={<IconSearch size={16}/>} placeholder={"Find a role..."}/>
                 <Link href={`/namespace/${namespaceId}/roles/create`}>
                     <Button color={"success"}>Create role</Button>
                 </Link>

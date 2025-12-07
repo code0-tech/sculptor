@@ -29,7 +29,6 @@ export const UsersPage: React.FC = () => {
                 Users
             </Text>
             <Flex align={"center"} style={{gap: "0.7rem"}}>
-                <TextInput left={<IconSearch size={16}/>} placeholder={"Find a user..."}/>
                 <Button color={"success"}>Invite user</Button>
             </Flex>
         </Flex>
