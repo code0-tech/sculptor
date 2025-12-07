@@ -26,6 +26,8 @@ import {OrganizationGeneralSettingsView} from "@edition/dashboard/organization/O
 
 export const OrganizationSettingsPage: React.FC = () => {
 
+    //TODO: add ability check for organization settings access for every settings tab
+
     const params = useParams()
     const namespaceService = useService(NamespaceService)
     const namespaceStore = useStore(NamespaceService)

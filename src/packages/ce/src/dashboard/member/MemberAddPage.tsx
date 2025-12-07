@@ -62,6 +62,8 @@ export const MemberAddPage: React.FC = () => {
         }
     })
 
+    //TODO: user abilities for add user as member within namespace
+
     return <Flex mih={"100%"} miw={"100%"} align={"center"} justify={"center"}>
         <Col xs={4}>
             <Text size={"xl"} hierarchy={"primary"} display={"block"}>

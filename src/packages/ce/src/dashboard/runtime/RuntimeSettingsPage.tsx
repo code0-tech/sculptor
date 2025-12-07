@@ -21,6 +21,8 @@ import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 
 export const RuntimeSettingsPage: React.FC = () => {
 
+    //TODO: add ability check for runtime settings access for every settings tab
+
     const params = useParams()
     const namespaceId = params.namespaceId as any as number
     const runtimeId = params.runtimeId as any as number

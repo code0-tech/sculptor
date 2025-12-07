@@ -19,6 +19,8 @@ export const RolesView: React.FC = () => {
         }} namespaceId={`gid://sagittarius/Namespace/${namespaceId}`}/>
     }, [namespaceId])
 
+    //TODO: user abilities for add role within namespace
+
     return <>
 
         <Flex align={"center"} justify={"space-between"}>

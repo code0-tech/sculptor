@@ -1,20 +1,49 @@
 "use client"
 
 import React from "react";
-import {Button, Col, Flex, Spacing, Text, TextInput, toast, useForm, useService} from "@code0-tech/pictor";
+import {
+    Button,
+    Col,
+    Flex,
+    Spacing,
+    Text,
+    TextInput,
+    toast,
+    useForm,
+    useService,
+    useStore,
+    useUserSession
+} from "@code0-tech/pictor";
 import Link from "next/link";
-import {useParams, useRouter} from "next/navigation";
+import {notFound, useParams, useRouter} from "next/navigation";
 import {RuntimeService} from "@edition/runtime/Runtime.service";
+import {UserService} from "@edition/user/User.service";
+import {NamespaceService} from "@edition/namespace/Namespace.service";
 
 export const RuntimeCreatePage: React.FC = () => {
 
     const params = useParams()
-    const namespaceId = params.namespaceId as any as number
+    const namespaceIndex = params.namespaceId as any as number
 
     const runtimeService = useService(RuntimeService)
     const [, startTransition] = React.useTransition()
     const [token, setToken] = React.useState<string | null | undefined>(undefined)
     const router = useRouter()
+    const currentSession = useUserSession()
+    const userStore = useStore(UserService)
+    const userService = useService(UserService)
+    const namespaceService = useService(NamespaceService)
+    const namespaceStore = useStore(NamespaceService)
+
+    const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [userStore, currentSession])
+    const namespace = React.useMemo(() => namespaceService.getById(`gid://sagittarius/Namespace/${namespaceIndex}`), [namespaceStore, namespaceIndex])
+
+    if (!namespaceIndex && currentUser && !currentUser.admin) {
+        notFound()
+    }
+
+    //TODO: user abilities for runtime creation within namespace
+    // if (namespace.)
 
     const [inputs, validate] = useForm({
         initialValues: {
@@ -36,7 +65,7 @@ export const RuntimeCreatePage: React.FC = () => {
                 runtimeService.runtimeCreate({
                     name: values.name as unknown as string,
                     description: values.description as unknown as string,
-                    ...(namespaceId ? {namespaceId: `gid://sagittarius/Namespace/${namespaceId}`} : {})
+                    ...(namespaceIndex ? {namespaceId: `gid://sagittarius/Namespace/${namespaceIndex}`} : {})
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
                         if (payload?.runtime?.token) {
@@ -47,7 +76,7 @@ export const RuntimeCreatePage: React.FC = () => {
                                 color: "error",
                                 dismissible: true,
                             })
-                            router.push(namespaceId ? `/namespace/${namespaceId}/runtimes` : "/runtimes")
+                            router.push(namespaceIndex ? `/namespace/${namespaceIndex}/runtimes` : "/runtimes")
                         }
                     }
                 })
@@ -90,7 +119,7 @@ export const RuntimeCreatePage: React.FC = () => {
                 </>
             )}
             <Flex style={{gap: "0.35rem"}} justify={"space-between"}>
-                <Link href={namespaceId ? `/namespace/${namespaceId}/runtimes` : "/runtimes"}>
+                <Link href={namespaceIndex ? `/namespace/${namespaceIndex}/runtimes` : "/runtimes"}>
                     <Button color={"primary"}>
                         Go back to runtimes
                     </Button>

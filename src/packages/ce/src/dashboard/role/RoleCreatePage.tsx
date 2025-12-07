@@ -5,6 +5,9 @@ import {Button, Col, Flex, Spacing, Text, TextInput} from "@code0-tech/pictor";
 import Link from "next/link";
 
 export const RoleCreatePage: React.FC = () => {
+
+    //TODO: user abilities for add role within namespace
+
     return <Flex mih={"100%"} miw={"100%"} align={"center"} justify={"center"}>
         <Col xs={4}>
             <Text size={"xl"} hierarchy={"primary"} display={"block"}>

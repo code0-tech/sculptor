@@ -2,8 +2,7 @@
 
 import React from "react";
 import {useParams} from "next/navigation";
-import {Button, DNamespaceMemberList, Flex, Spacing, Text, TextInput, useService, useStore} from "@code0-tech/pictor";
-import {IconSearch} from "@tabler/icons-react";
+import {Button, DNamespaceMemberList, Flex, Spacing, Text, useService, useStore} from "@code0-tech/pictor";
 import Link from "next/link";
 import {MemberService} from "@edition/member/Member.service";
 
@@ -31,6 +30,8 @@ export const MembersView: React.FC = () => {
             })
         }} namespaceId={`gid://sagittarius/Namespace/${namespaceId}`}/>
     }, [namespaceId, memberStore])
+
+    //TODO: user abilities for add user as member within namespace
 
     return <>
 

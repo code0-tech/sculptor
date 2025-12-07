@@ -17,6 +17,8 @@ export const NamespaceProjectsCreatePage: React.FC = () => {
     const namespaceIndex = params?.namespaceId as string
     const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex as unknown as number}`
 
+    //TODO: user abilities for project creation within namespace
+
     const [inputs, validate] = useForm({
         initialValues: {
             name: null,
