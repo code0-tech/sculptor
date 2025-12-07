@@ -33,10 +33,7 @@ export const MemberAddPage: React.FC = () => {
     const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex as unknown as number}`
 
     const members = React.useMemo(() => memberService.values({namespaceId: namespaceId}), [memberStore, userStore])
-    const formInitialValues = React.useMemo(
-        () => ({ users: null as null | InputSuggestion[] }),
-        []
-    )
+    const formInitialValues = React.useMemo(() => ({ users: null }), [])
     const filteredUsers = React.useMemo(() => {
         return (user: DUserView) => {
             return !members.find(m => m.user?.id === user.id)
