@@ -18,7 +18,6 @@ export const RuntimesPage: React.FC = () => {
                 Runtimes
             </Text>
             <Flex align={"center"} style={{gap: "0.7rem"}}>
-                <TextInput left={<IconSearch size={16}/>} placeholder={"Find a global runtime..."}/>
                 <Link href={namespaceId ? `/namespace/${namespaceId}/runtimes/create` : "/runtimes/create"}>
                     <Button color={"success"}>Create runtime</Button>
                 </Link>
