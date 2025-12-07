@@ -1,0 +1,16 @@
+mutation roleAssignAbilities($roleId: NamespaceRoleID!, $abilities: [NamespaceRoleAbility!]!) {
+    namespacesRolesAssignAbilities(input: {
+        roleId: $roleId,
+        abilities: $abilities
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+
+    }
+}

@@ -1,0 +1,20 @@
+#import '../fragments/Organization.fragment.graphql'
+
+mutation updateOrganization ($organizationId: OrganizationID!, $name: String!) {
+    organizationsUpdate(input: {
+        name: $name,
+        organizationId: $organizationId
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        organization {
+            ...Organization
+        }
+    }
+}

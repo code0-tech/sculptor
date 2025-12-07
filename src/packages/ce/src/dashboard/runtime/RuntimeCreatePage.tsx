@@ -15,25 +15,35 @@ import {
     useUserSession
 } from "@code0-tech/pictor";
 import Link from "next/link";
-import {notFound, useRouter} from "next/navigation";
+import {notFound, useParams, useRouter} from "next/navigation";
 import {RuntimeService} from "@edition/runtime/Runtime.service";
 import {UserService} from "@edition/user/User.service";
+import {NamespaceService} from "@edition/namespace/Namespace.service";
 
 export const RuntimeCreatePage: React.FC = () => {
+
+    const params = useParams()
+    const namespaceIndex = params.namespaceId as any as number
 
     const runtimeService = useService(RuntimeService)
     const [, startTransition] = React.useTransition()
     const [token, setToken] = React.useState<string | null | undefined>(undefined)
     const router = useRouter()
     const currentSession = useUserSession()
-
     const userStore = useStore(UserService)
     const userService = useService(UserService)
-    const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [userStore, currentSession])
+    const namespaceService = useService(NamespaceService)
+    const namespaceStore = useStore(NamespaceService)
 
-    if (currentUser && !currentUser.admin) {
+    const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [userStore, currentSession])
+    const namespace = React.useMemo(() => namespaceService.getById(`gid://sagittarius/Namespace/${namespaceIndex}`), [namespaceStore, namespaceIndex])
+
+    if (!namespaceIndex && currentUser && !currentUser.admin) {
         notFound()
     }
+
+    //TODO: user abilities for runtime creation within namespace
+    // if (namespace.)
 
     const [inputs, validate] = useForm({
         initialValues: {
@@ -54,7 +64,8 @@ export const RuntimeCreatePage: React.FC = () => {
             startTransition(() => {
                 runtimeService.runtimeCreate({
                     name: values.name as unknown as string,
-                    description: values.description as unknown as string
+                    description: values.description as unknown as string,
+                    ...(namespaceIndex ? {namespaceId: `gid://sagittarius/Namespace/${namespaceIndex}`} : {})
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
                         if (payload?.runtime?.token) {
@@ -65,7 +76,7 @@ export const RuntimeCreatePage: React.FC = () => {
                                 color: "error",
                                 dismissible: true,
                             })
-                            router.push("/runtimes")
+                            router.push(namespaceIndex ? `/namespace/${namespaceIndex}/runtimes` : "/runtimes")
                         }
                     }
                 })
@@ -76,11 +87,11 @@ export const RuntimeCreatePage: React.FC = () => {
     return <Flex mih={"100%"} miw={"100%"} align={"center"} justify={"center"}>
         <Col xs={4}>
             <Text size={"xl"} hierarchy={"primary"} display={"block"}>
-                {!token ? "Create new global runtime" : "Global runtime created successfully"}
+                {!token ? "Create new runtime" : "Runtime created successfully"}
             </Text>
             <Spacing spacing={"xs"}/>
             <Text size={"md"} hierarchy={"tertiary"} display={"block"}>
-                Global runtimes are shared runtimes that can be used across multiple organizations.
+                Runtimes are shared runtimes that can be used across multiple organizations.
             </Text>
             <Spacing spacing={"xl"}/>
             {!token ? (
@@ -108,14 +119,14 @@ export const RuntimeCreatePage: React.FC = () => {
                 </>
             )}
             <Flex style={{gap: "0.35rem"}} justify={"space-between"}>
-                <Link href={"/runtimes"}>
+                <Link href={namespaceIndex ? `/namespace/${namespaceIndex}/runtimes` : "/runtimes"}>
                     <Button color={"primary"}>
                         Go back to runtimes
                     </Button>
                 </Link>
                 {!token ? (
                     <Button color={"success"} onClick={validate}>
-                        Create global runtime
+                        Create runtime
                     </Button>
                 ) : null}
             </Flex>

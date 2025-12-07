@@ -19,6 +19,7 @@ import {Toaster} from "sonner";
 import {Error} from "@code0-tech/sagittarius-graphql-types";
 import {toast} from "@code0-tech/pictor";
 import {Inter} from 'next/font/google'
+import {GraphQLFormattedError} from "graphql/error";
 
 /**
  * Load the Inter font with Latin subset and swap display strategy
@@ -66,8 +67,8 @@ const ErrorCodeDescription: Record<string, string> = {
 /**
  * Handles error toasts based on error type
  */
-const toastHandler = (error: Error) => {
-    if (error.__typename === "ErrorCode") {
+const toastHandler = (error: Error | GraphQLFormattedError) => {
+    if (error && "errorCode" in error) {
         toast({
             title: ErrorCodeDescription[(error.errorCode as string)],
             color: "error",
@@ -94,7 +95,7 @@ export default function RootLayout({children}: Readonly<{ children: React.ReactN
      */
     const errorLink = new ErrorLink(({error, result, operation, forward}) => {
         if (error instanceof CombinedGraphQLErrors) {
-            error.errors.forEach((error: Error) => {
+            error.errors.forEach((error: GraphQLFormattedError) => {
                 toastHandler(error)
             })
             return

@@ -32,16 +32,28 @@ export default function AuthLayout({children}: Readonly<{ children: React.ReactN
                     </Container>
                 </ContextStoreProvider>
                 <div style={{
-                    position: "fixed",
-                    bottom: "1.3rem",
-                    right: "1.3rem",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "1.3rem"
+                    position: "absolute",
+                    width: "100%",
+                    boxSizing: "border-box",
+                    padding: "1.3rem",
+                    bottom: 0,
+                    left: 0
                 }}>
-                    <Text>All rights reserved &copy; Code0 UG (haftungsbeschränkt)</Text>
-                    <Image src={"/CodeZero_Banner_MVP.png"} alt={"CodeZero Banner"} width={150} height={0}
-                           style={{width: '150px', height: 'auto'}}/>
+                    <Flex justify={"space-between"} align={"end"} style={{gap: "1.3rem"}}>
+                        <Text maw={"25%"} style={{fontSize: "2rem", fontWeight: "600", lineHeight: "1"}} hierarchy={"primary"}
+                              display={"inline-block"}>
+                            Every great idea starts at zero. {" "}
+                            <Text style={{fontSize: "2rem", fontWeight: "600", lineHeight: "1"}}
+                                  hierarchy={"tertiary"} display={"inline"}>
+                                Start with CodeZero.
+                            </Text>
+                        </Text>
+                        <Flex align={"center"} style={{gap: "1.3rem"}}>
+                            <Text>All rights reserved &copy; Code0 UG (haftungsbeschränkt)</Text>
+                            <Image src={"/CodeZero_Banner_MVP.png"} alt={"CodeZero Banner"} width={150} height={0}
+                                   style={{width: '150px', height: 'auto'}}/>
+                        </Flex>
+                    </Flex>
                 </div>
             </div>
         </DFullScreen>

@@ -5,15 +5,21 @@ import {
     OrganizationsCreateInput,
     OrganizationsCreatePayload,
     OrganizationsDeleteInput,
-    OrganizationsDeletePayload, Query
+    OrganizationsDeletePayload,
+    OrganizationsUpdateInput,
+    OrganizationsUpdatePayload,
+    Query
 } from "@code0-tech/sagittarius-graphql-types";
 import {GraphqlClient} from "@core/util/graphql-client";
 import createOrganizationMutation from "./mutations/Organization.create.mutation.graphql";
+import updateOrganizationMutation from "./mutations/Organization.update.mutation.graphql";
+import deleteOrganizationMutation from "./mutations/Organization.delete.mutation.graphql";
 import organizationQuery from "./queries/Organization.query.graphql";
 
 export class OrganizationService extends DOrganizationReactiveService {
 
     private readonly client: GraphqlClient
+    private i = 0;
 
     constructor(client: GraphqlClient, store: ReactiveArrayStore<DOrganizationView>) {
         super(store);
@@ -29,17 +35,12 @@ export class OrganizationService extends DOrganizationReactiveService {
             if (!data) return
 
             if (data.organizations && data.organizations.nodes) {
-                data.organizations.nodes.forEach((organization, index) => {
-                    if (organization) this.set(index, new DOrganizationView(organization))
+                data.organizations.nodes.forEach((organization) => {
+                    if (organization && !this.hasById(organization.id)) this.set(this.i++, new DOrganizationView(organization))
                 })
             }
         })
         return super.values();
-    }
-
-    deleteById(id: Organization["id"]): void {
-        const index = this.values().findIndex(o => o.id === id)
-        this.delete(index)
     }
 
     hasById(id: Organization["id"]): boolean {
@@ -66,7 +67,39 @@ export class OrganizationService extends DOrganizationReactiveService {
     }
 
     async organizationDelete(payload: OrganizationsDeleteInput): Promise<OrganizationsDeletePayload | undefined> {
-        return Promise.resolve(undefined)
+        const result = await this.client.mutate<Mutation, OrganizationsDeleteInput>({
+            mutation: deleteOrganizationMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        if (result.data && result.data.organizationsDelete && result.data.organizationsDelete.organization) {
+            const organization = result.data.organizationsDelete.organization
+            const index = this.values().findIndex(o => o.id === organization.id)
+            this.delete(index)
+
+        }
+
+        return result.data?.organizationsDelete ?? undefined
+    }
+
+    async organizationUpdate(payload: OrganizationsUpdateInput): Promise<OrganizationsUpdatePayload | undefined> {
+        const result = await this.client.mutate<Mutation, OrganizationsUpdateInput>({
+            mutation: updateOrganizationMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        if (result.data && result.data.organizationsUpdate && result.data.organizationsUpdate.organization) {
+            const organization = result.data.organizationsUpdate.organization
+            const index = this.values().findIndex(o => o.id === organization.id)
+            this.set(index, new DOrganizationView(organization))
+
+        }
+
+        return result.data?.organizationsUpdate ?? undefined
     }
 
 }

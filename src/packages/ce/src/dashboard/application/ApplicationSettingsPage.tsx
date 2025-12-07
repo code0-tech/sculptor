@@ -38,13 +38,13 @@ export const ApplicationSettingsPage: React.FC = () => {
             <DLayout leftContent={
                 <TabList>
                     <InputLabel>Application</InputLabel>
-                    <TabTrigger value={"general"}>
+                    <TabTrigger value={"general"} asChild>
                         <Button paddingSize={"xxs"} variant={"none"}>
                             <IconSettings size={16}/>
                             <Text size={"md"} hierarchy={"primary"}>General</Text>
                         </Button>
                     </TabTrigger>
-                    <TabTrigger value={"restrictions"}>
+                    <TabTrigger value={"restrictions"} asChild>
                         <Button paddingSize={"xxs"} variant={"none"}>
                             <IconGavel size={16}/>
                             <Text size={"md"} hierarchy={"primary"}>Restrictions</Text>

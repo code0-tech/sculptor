@@ -2,7 +2,8 @@ import React from "react";
 import {
     Button,
     DNamespaceProjectList,
-    Flex, Spacing,
+    Flex,
+    Spacing,
     Text,
     TextInput,
     useService,
@@ -20,6 +21,8 @@ export const PersonalProjectsView: React.FC = () => {
     const userService = useService(UserService)
 
     const currentUser = React.useMemo(() => userService.getById(userSession?.user?.id), [userStore, userSession])
+    const namespaceId = currentUser?.namespace?.id
+    const namespaceIndex = namespaceId?.match(/Namespace\/(\d+)$/)?.[1]
 
     const projectsList = React.useMemo(() => {
         if (!currentUser || !currentUser.namespace) return null
@@ -34,8 +37,7 @@ export const PersonalProjectsView: React.FC = () => {
                 Personal projects
             </Text>
             <Flex align={"center"} style={{gap: "0.7rem"}}>
-                <TextInput left={<IconSearch size={16}/>} placeholder={"Find a personal project..."}/>
-                <Link href={"/projects/create"}>
+                <Link href={`/namespace/${namespaceIndex}/projects/create`}>
                     <Button color={"success"}>Create personal project</Button>
                 </Link>
             </Flex>

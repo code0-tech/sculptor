@@ -1,34 +1,23 @@
 "use client"
 
 import React from "react";
-import {
-    Button,
-    Col,
-    Flex,
-    Spacing,
-    Text,
-    TextInput,
-    toast,
-    useForm,
-    useService,
-    useStore,
-    useUserSession
-} from "@code0-tech/pictor";
+import {Button, Col, Flex, Spacing, Text, TextInput, toast, useForm, useService} from "@code0-tech/pictor";
 import Link from "next/link";
-import {useRouter} from "next/navigation";
+import {useParams, useRouter} from "next/navigation";
 import {ProjectService} from "@edition/project/Project.service";
-import {UserService} from "@edition/user/User.service";
+import {Namespace} from "@code0-tech/sagittarius-graphql-types";
 
-export const PersonalProjectsCreatePage: React.FC = () => {
+export const NamespaceProjectsCreatePage: React.FC = () => {
 
-    const currentSession = useUserSession()
-    const userStore = useStore(UserService)
-    const userService = useService(UserService)
+    const params = useParams()
     const projectService = useService(ProjectService)
     const [, startTransition] = React.useTransition()
     const router = useRouter()
 
-    const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [currentSession, userStore])
+    const namespaceIndex = params?.namespaceId as string
+    const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex as unknown as number}`
+
+    //TODO: user abilities for project creation within namespace
 
     const [inputs, validate] = useForm({
         initialValues: {
@@ -47,7 +36,7 @@ export const PersonalProjectsCreatePage: React.FC = () => {
         },
         onSubmit: (values) => {
             startTransition(() => {
-                if (!currentUser?.namespace?.id) {
+                if (!namespaceId) {
                     toast({
                         title: "The current user does not have a personal namespace.",
                         color: "error",
@@ -58,11 +47,10 @@ export const PersonalProjectsCreatePage: React.FC = () => {
                 projectService.projectCreate({
                     name: values.name as unknown as string,
                     description: values.description as unknown as string,
-                    namespaceId: currentUser.namespace.id
+                    namespaceId: namespaceId
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
-                        router.push("/")
-                        //router.push(`/namespace/${currentUser.namespace?.id}`)
+                        router.push(`/namespace/${namespaceIndex}/projects`)
                     }
                 })
             })
@@ -72,7 +60,7 @@ export const PersonalProjectsCreatePage: React.FC = () => {
     return <Flex mih={"100%"} miw={"100%"} align={"center"} justify={"center"}>
         <Col xs={4}>
             <Text size={"xl"} hierarchy={"primary"} display={"block"}>
-                Create new personal project
+                Create new project
             </Text>
             <Spacing spacing={"xs"}/>
             <Text size={"md"} hierarchy={"tertiary"} display={"block"}>
@@ -94,11 +82,11 @@ export const PersonalProjectsCreatePage: React.FC = () => {
             <Flex style={{gap: "0.35rem"}} justify={"space-between"}>
                 <Link href={"/"}>
                     <Button color={"primary"}>
-                        Go back to project overview
+                        Go back to projects
                     </Button>
                 </Link>
                 <Button color={"success"} onClick={validate}>
-                    Create personal project
+                    Create project
                 </Button>
             </Flex>
         </Col>

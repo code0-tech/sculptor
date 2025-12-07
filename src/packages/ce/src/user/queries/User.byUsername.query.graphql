@@ -1,0 +1,6 @@
+#import '../fragments/User.basic.fragment.graphql'
+query User ($username: String!) {
+    user (username: $username) {
+        ...UserBasic
+    }
+}

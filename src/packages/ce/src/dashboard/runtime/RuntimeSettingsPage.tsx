@@ -6,40 +6,34 @@ import {
     Card,
     DLayout,
     Flex,
-    InputLabel,
     Spacing,
     Text,
     TextInput,
     toast,
     useForm,
     useService,
-    useStore, useUserSession
+    useStore
 } from "@code0-tech/pictor";
 import {RuntimeService} from "@edition/runtime/Runtime.service";
 import {notFound, useParams, useRouter} from "next/navigation";
 import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
-import {IconGavel, IconSettings} from "@tabler/icons-react";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
-import {UserService} from "@edition/user/User.service";
 
-export const RuntimeSettingPage: React.FC = () => {
+export const RuntimeSettingsPage: React.FC = () => {
+
+    //TODO: add ability check for runtime settings access for every settings tab
+
+    const params = useParams()
+    const namespaceId = params.namespaceId as any as number
+    const runtimeId = params.runtimeId as any as number
 
     const runtimeService = useService(RuntimeService)
     const runtimeStore = useStore(RuntimeService)
-    const params = useParams()
     const [, startTransition] = React.useTransition()
     const [token, setToken] = React.useState<string | null | undefined>(undefined)
     const router = useRouter()
-    const currentSession = useUserSession()
-    const userStore = useStore(UserService)
-    const userService = useService(UserService)
-    const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [userStore, currentSession])
 
-    const runtime = React.useMemo(() => runtimeService.getById(`gid://sagittarius/Runtime/${params.runtimeId as any}`), [runtimeStore, params])
-
-    if (currentUser && !currentUser.admin) {
-        notFound()
-    }
+    const runtime = React.useMemo(() => runtimeService.getById(`gid://sagittarius/Runtime/${runtimeId}`), [runtimeStore, params])
 
     if (runtime?.userAbilities && (!runtime?.userAbilities?.updateRuntime || !runtime.userAbilities.deleteRuntime || !runtime.userAbilities.rotateRuntimeToken)) {
         notFound()
@@ -93,7 +87,7 @@ export const RuntimeSettingPage: React.FC = () => {
                         dismissible: true,
                     })
                 }
-                router.push("/runtimes")
+                router.push(namespaceId ? `/namespace/${namespaceId}/runtimes` : "/runtimes")
             })
         })
     }, [runtime, router])
@@ -132,17 +126,19 @@ export const RuntimeSettingPage: React.FC = () => {
         <Tab orientation={"vertical"} defaultValue={"general"}>
             <DLayout leftContent={
                 <TabList>
-                    <InputLabel>Runtime</InputLabel>
-                    <TabTrigger value={"general"}>
+                    <TabTrigger value={"general"} asChild>
                         <Button paddingSize={"xxs"} variant={"none"}>
-                            <IconSettings size={16}/>
-                            <Text size={"md"} hierarchy={"primary"}>General</Text>
+                            <Text size={"md"} hierarchy={"primary"}>General adjustments</Text>
                         </Button>
                     </TabTrigger>
-                    <TabTrigger value={"access"}>
-                        <Button paddingSize={"xxs"} variant={"none"}>
-                            <IconGavel size={16}/>
-                            <Text size={"md"} hierarchy={"primary"}>Access</Text>
+                    <TabTrigger value={"access"} asChild>
+                        <Button color={"warning"} paddingSize={"xxs"} variant={"none"}>
+                            <Text size={"md"} hierarchy={"primary"}>How to connect</Text>
+                        </Button>
+                    </TabTrigger>
+                    <TabTrigger value={"delete"} asChild>
+                        <Button color={"error"} paddingSize={"xxs"} variant={"none"}>
+                            <Text size={"md"} hierarchy={"primary"}>Delete runtime forever</Text>
                         </Button>
                     </TabTrigger>
                 </TabList>
@@ -150,7 +146,7 @@ export const RuntimeSettingPage: React.FC = () => {
                 <>
                     <TabContent value={"general"}>
                         <Flex justify={"space-between"} align={"end"}>
-                            <Text size={"xl"} hierarchy={"primary"}>General</Text>
+                            <Text size={"xl"} hierarchy={"primary"}>General adjustments</Text>
                             <Button color={"success"} onClick={validate}>
                                 Update Runtime
                             </Button>
@@ -174,27 +170,9 @@ export const RuntimeSettingPage: React.FC = () => {
                                 </Flex>
                             </CardSection>
                         </Card>
-                        <Spacing spacing={"xl"}/>
-                        <Text size={"xl"} hierarchy={"primary"}>Danger zone</Text>
-                        <Spacing spacing={"xl"}/>
-                        <div style={{borderBottom: "1px solid rgba(255,255,255,.1)"}}/>
-                        <Spacing spacing={"xl"}/>
-                        <Card p={1.3} color={"error"}>
-                            <Flex justify={"space-between"} align={"center"}>
-                                <Flex style={{gap: ".35rem", flexDirection: "column"}}>
-                                    <Text size={"md"} hierarchy={"primary"}>Delete runtime</Text>
-                                    <Text size={"md"} hierarchy={"tertiary"}>
-                                        This will delete the runtime and cannot be undone.
-                                    </Text>
-                                </Flex>
-                                <Button color={"error"} onClick={deleteRuntime}>
-                                    Delete runtime forever
-                                </Button>
-                            </Flex>
-                        </Card>
                     </TabContent>
                     <TabContent value={"access"}>
-                        <Text size={"xl"} hierarchy={"primary"}>Access</Text>
+                        <Text size={"xl"} hierarchy={"primary"}>How to connect</Text>
                         <Spacing spacing={"xl"}/>
                         <div style={{borderBottom: "1px solid rgba(255,255,255,.1)"}}/>
                         <Spacing spacing={"xl"}/>
@@ -217,6 +195,27 @@ export const RuntimeSettingPage: React.FC = () => {
                             </CardSection>
                         </Card>
 
+                    </TabContent>
+                    <TabContent value={"delete"}>
+                        <Flex justify={"space-between"} align={"end"}>
+                            <Text size={"xl"} hierarchy={"primary"}>Delete runtime forever</Text>
+                        </Flex>
+                        <Spacing spacing={"xl"}/>
+                        <div style={{borderBottom: "1px solid rgba(255,255,255,.1)"}}/>
+                        <Spacing spacing={"xl"}/>
+                        <Card p={1.3} color={"error"}>
+                            <Flex justify={"space-between"} align={"center"}>
+                                <Flex style={{gap: ".35rem", flexDirection: "column"}}>
+                                    <Text size={"md"} hierarchy={"primary"}>Delete runtime</Text>
+                                    <Text size={"md"} hierarchy={"tertiary"}>
+                                        This will delete the runtime and cannot be undone.
+                                    </Text>
+                                </Flex>
+                                <Button color={"error"} onClick={deleteRuntime}>
+                                    Delete runtime forever
+                                </Button>
+                            </Flex>
+                        </Card>
                     </TabContent>
                 </>
             </DLayout>

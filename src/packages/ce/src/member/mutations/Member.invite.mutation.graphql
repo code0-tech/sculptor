@@ -1,0 +1,19 @@
+#import "../fragments/Member.basic.fragment.graphql"
+mutation inviteMember($userId: UserID!, $namespaceId: NamespaceID!) {
+    namespacesMembersInvite(input: {
+        userId: $userId,
+        namespaceId: $namespaceId
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        namespaceMember {
+            ...BasicMember
+        }
+    }
+}

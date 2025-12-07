@@ -1,0 +1,20 @@
+#import "../../user/fragments/User.id.fragment.graphql"
+#import "../../namespace/fragments/Namespace.id.fragment.graphql"
+fragment BasicMember on NamespaceMember {
+    id
+    roles {
+        count
+    }
+    user {
+        ...UserId
+    }
+    namespace {
+        ...NamespaceId
+    }
+    updatedAt
+    createdAt
+    userAbilities {
+        assignMemberRoles
+        deleteMember
+    }
+}

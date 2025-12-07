@@ -1,0 +1,18 @@
+mutation createRole($namespaceId: NamespaceID!, $name: String!) {
+    namespacesRolesCreate(input: {
+        namespaceId: $namespaceId,
+        name: $name,
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        namespaceRole {
+            ...RoleBasic
+        }
+    }
+}

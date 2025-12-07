@@ -1,0 +1,18 @@
+#import "../fragments/Member.basic.fragment.graphql"
+mutation deleteMember($namespaceMemberId: NamespaceMemberID!) {
+    namespacesMembersDelete(input: {
+        namespaceMemberId: $namespaceMemberId
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        namespaceMember {
+            ...BasicMember
+        }
+    }
+}
