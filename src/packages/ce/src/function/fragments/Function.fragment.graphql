@@ -1,0 +1,180 @@
+fragment DataTypeIdentifier on DataTypeIdentifier {
+    id
+    createdAt
+    updatedAt
+    genericKey
+    genericType {
+        id
+        updatedAt
+        createdAt
+        genericMappers {
+            id
+            target
+            sourceDataTypeIdentifiers {
+                id
+            }
+            updatedAt
+            createdAt
+            genericCombinationStrategies {
+                id
+                type
+                createdAt
+                updatedAt
+                __typename
+            }
+            __typename
+        }
+        dataType {
+            identifier
+            id
+            __typename
+        }
+    }
+    dataType {
+        id
+        identifier
+    }
+    __typename
+}
+
+fragment Function on FunctionDefinition {
+    id
+    createdAt
+    updatedAt
+    aliases (first: $first1, after: $after1) {
+        count
+        nodes {
+            code
+            content
+            __typename
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+    }
+    deprecationMessages (first: $first2, after: $after2) {
+        count
+        nodes {
+            code
+            content
+            __typename
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+    }
+    descriptions (first: $first3, after: $after3) {
+        count
+        nodes {
+            code
+            content
+            __typename
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+    }
+    documentations (first: $first4, after: $after4) {
+        count
+        nodes {
+            code
+            content
+            __typename
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+    }
+    genericKeys
+    displayMessages (first: $first5, after: $after5) {
+        count
+        nodes {
+            code
+            content
+            __typename
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+    }
+    identifier
+    names (first: $first6, after: $after6) {
+        count
+        nodes {
+            code
+            content
+            __typename
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+    }
+    returnType {
+        ...DataTypeIdentifier
+    }
+    parameterDefinitions (first: $first7, after: $after7) {
+        nodes {
+            id
+            identifier
+            updatedAt
+            createdAt
+            identifier
+            names (first: $first8, after: $after8) {
+                count
+                nodes {
+                    code
+                    content
+                    __typename
+                }
+                pageInfo {
+                    endCursor
+                    hasNextPage
+                }
+            }
+            descriptions (first: $first9, after: $after9) {
+                count
+                nodes {
+                    code
+                    content
+                    __typename
+                }
+                pageInfo {
+                    endCursor
+                    hasNextPage
+                }
+            }
+            documentations (first: $first10, after: $after10) {
+                count
+                nodes {
+                    code
+                    content
+                    __typename
+                }
+                pageInfo {
+                    endCursor
+                    hasNextPage
+                }
+            }
+            dataTypeIdentifier {
+                ...DataTypeIdentifier
+            }
+            __typename
+        }
+    }
+    throwsError
+    runtimeFunctionDefinition {
+        id
+        identifier
+        runtime {
+            id
+        }
+        __typename
+    }
+    __typename
+}
