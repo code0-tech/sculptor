@@ -1,0 +1,23 @@
+#import "../fragments/Flow.fragment.graphql"
+
+query Flows (
+    $namespaceId: NamespaceID!
+    $projectId: NamespaceProjectID!
+    $firstFlow: Int!
+    $afterFlow: String
+) {
+    namespace(id: $namespaceId) {
+        project(id: $projectId) {
+            flows (first: $firstFlow, after: $afterFlow) {
+                count
+                nodes {
+                    ...Flow
+                }
+                pageInfo {
+                    endCursor
+                    hasNextPage
+                }
+            }
+        }
+    }
+}
