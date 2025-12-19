@@ -1,0 +1,6 @@
+fragment Flow on Flow {
+    id
+    createdAt
+    updatedAt
+    name
+}
