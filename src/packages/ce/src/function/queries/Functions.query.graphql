@@ -1,0 +1,41 @@
+#import "../fragments/Function.fragment.graphql"
+
+query Functions (
+    $namespaceId: NamespaceID!
+    $projectId: NamespaceProjectID!
+    $firstFunction: Int!
+    $afterFunction: String
+    $first1: Int!
+    $after1: String
+    $first2: Int!
+    $after2: String
+    $first3: Int!
+    $after3: String
+    $first4: Int!
+    $after4: String
+    $first5: Int!
+    $after5: String
+    $first6: Int!
+    $after6: String
+    $first7: Int!
+    $after7: String
+    $first8: Int!
+    $after8: String
+    $first9: Int!
+    $after9: String
+    $first10: Int!
+    $after10: String
+) {
+    namespace(id: $namespaceId) {
+        project(id: $projectId) {
+            primaryRuntime {
+                functionDefinitions (first: $firstFunction, after: $afterFunction) {
+                    count
+                    nodes {
+                        ...Function
+                    }
+                }
+            }
+        }
+    }
+}
