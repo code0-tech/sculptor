@@ -15,7 +15,7 @@ import {
     Flex,
     Row,
     Spacing,
-    Text,
+    Text, TextInput,
     toast,
     useForm,
     useService,
@@ -29,6 +29,9 @@ import {DNamespaceRolePermissions} from "@code0-tech/pictor/dist/components/d-ro
 import DNamespaceProjectMenu from "@code0-tech/pictor/dist/components/d-project/DNamespaceProjectMenu";
 import {DNamespaceProjectContent} from "@code0-tech/pictor/dist/components/d-project/DNamespaceProjectContent";
 import {IconTrash} from "@tabler/icons-react";
+import {RoleProjectView} from "@edition/dashboard/role/RoleProjectView";
+import {RolePermissionView} from "@edition/dashboard/role/RolePermissionView";
+import {RoleGeneralAdjustmentView} from "@edition/dashboard/role/RoleGeneralAdjustmentView";
 
 type Permission = {
     label: string
@@ -187,9 +190,6 @@ export const RoleSettingsPage: React.FC = () => {
     const params = useParams()
     const roleService = useService(RoleService)
     const roleStore = useStore(RoleService)
-    const projectService = useService(ProjectService)
-    const projectStore = useStore(ProjectService)
-    const [, startTransition] = React.useTransition()
 
     const namespaceIndex = params.namespaceId as any as number
     const roleIndex = params.roleId as any as number
@@ -197,85 +197,6 @@ export const RoleSettingsPage: React.FC = () => {
     const roleId: NamespaceRole['id'] = `gid://sagittarius/NamespaceRole/${roleIndex}`
 
     const role = React.useMemo(() => roleService.getById(roleId, {namespaceId: namespaceId}), [roleStore, roleId, namespaceId])
-    const roleAbilities = React.useMemo(() => {
-        return {
-            ...permissions.reduce((acc, group) => {
-                group.permissions.forEach(permission => {
-                    acc[permission.ability] = role?.abilities?.includes(permission.ability as NamespaceRoleAbility) ?? false
-                })
-                return acc
-            }, {} as Record<string, boolean>)
-        }
-    }, [role])
-
-    const roleAssignedProjects = React.useMemo(() => role?.assignedProjects?.nodes?.map(p => p?.id!!) ?? [], [role])
-    const [assignedProjectIds, setAssignedProjectIds] = React.useState<Scalars['NamespaceProjectID']['output'][]>(roleAssignedProjects)
-    const [initialValues, setInitialValues] = React.useState(roleAbilities)
-
-    React.useEffect(() => {
-        setAssignedProjectIds(roleAssignedProjects)
-    }, [role])
-
-    React.useEffect(() => {
-        setInitialValues(roleAbilities)
-    }, [role])
-
-    const [inputs, validate] = useForm({
-        initialValues: initialValues,
-        validate: {},
-        onSubmit: (values) => {
-            startTransition(() => {
-                const updatedAbilities = Object.entries(values)
-                    .filter(([_, enabled]) => enabled)
-                    .map(([ability, _]) => ability as NamespaceRoleAbility)
-                roleService.roleAssignAbilities({
-                    roleId: roleId!!,
-                    abilities: updatedAbilities
-                }).then(payload => {
-                    if ((payload?.errors?.length ?? 0) <= 0) {
-                        toast({
-                            title: "The permissions were successfully updated.",
-                            color: "success",
-                            dismissible: true,
-                        })
-                    }
-                })
-            })
-        }
-    })
-
-    const assignProjects = () => {
-        startTransition(() => {
-            roleService.roleAssignProject({
-                roleId: roleId,
-                projectIds: assignedProjectIds as Scalars['NamespaceProjectID']['output'][]
-            }).then(payload => {
-                if ((payload?.errors?.length ?? 0) <= 0) {
-                    toast({
-                        title: "All projects were successfully assigned to the role.",
-                        color: "success",
-                        dismissible: true,
-                    })
-                }
-            })
-        })
-    }
-
-    const addAssignedProject = (projectId: Scalars['NamespaceProjectID']['output']) => {
-        setAssignedProjectIds(prevState => {
-            return [...prevState, projectId]
-        })
-    }
-
-    const removeAssignedProject = (projectId: Scalars['NamespaceProjectID']['output']) => {
-        setAssignedProjectIds(prevState => {
-            return prevState.filter(id => id !== projectId)
-        })
-    }
-
-    const filterProjects = React.useCallback((project: DNamespaceProjectView) => {
-        return !assignedProjectIds.find(projectId => projectId == project.id!!)
-    }, [assignedProjectIds])
 
     return <>
         <Spacing spacing={"xl"}/>
@@ -287,7 +208,12 @@ export const RoleSettingsPage: React.FC = () => {
         <Spacing spacing={"xl"}/>
         <Tab orientation={"vertical"} defaultValue={"permission"}>
             <DLayout leftContent={
-                <TabList>
+                <TabList pr={"0.7"}>
+                    <TabTrigger value={"general"} asChild>
+                        <Button paddingSize={"xxs"} variant={"none"}>
+                            <Text size={"md"} hierarchy={"primary"}>General adjustments</Text>
+                        </Button>
+                    </TabTrigger>
                     <TabTrigger value={"permission"} asChild>
                         <Button paddingSize={"xxs"} variant={"none"}>
                             <Text size={"md"} hierarchy={"primary"}>Permission adjustments</Text>
@@ -301,119 +227,9 @@ export const RoleSettingsPage: React.FC = () => {
                 </TabList>
             }>
                 <>
-                    <TabContent value={"permission"} style={{overflow: "hidden"}}>
-                        <Text size={"xl"} hierarchy={"primary"} style={{fontWeight: 600}}>
-                            Select from role templates
-                        </Text>
-                        <Spacing spacing={"xl"}/>
-                        {React.useMemo(() => {
-                            return <Row>
-                                {permissionTemplates.map(permissionTemplate => {
-
-                                    const templateAbilities = Object.entries(permissionTemplate.abilities)
-                                        .filter(([_, enabled]) => enabled)
-                                        .map(([ability]) => ability as NamespaceRoleAbility);
-
-                                    const roleAbilities = Object.entries(initialValues)
-                                        .filter(([_, enabled]) => enabled)
-                                        .map(([ability]) => ability as NamespaceRoleAbility);
-
-                                    const isSelected = templateAbilities.length === roleAbilities.length
-                                        && templateAbilities.every(a => new Set(roleAbilities).has(a));
-
-
-                                    return <Col>
-                                        <Card>
-                                            <Text style={{fontWeight: 500}} size={"lg"} hierarchy={"secondary"}>
-                                                {permissionTemplate.name}
-                                            </Text>
-                                            <Spacing spacing={"xs"}/>
-                                            <DNamespaceRolePermissions
-                                                abilities={Object.entries(permissionTemplate.abilities)
-                                                    .filter(([_, enabled]) => enabled)
-                                                    .map(([ability, _]) => ability as NamespaceRoleAbility)}/>
-                                            <Spacing spacing={"xl"}/>
-                                            <Button disabled={isSelected} color={"secondary"} variant={"filled"}
-                                                    w={"100%"}
-                                                    onClick={() => setInitialValues(permissionTemplate.abilities)}>Select
-                                                template</Button>
-                                            {isSelected ? <AuroraBackground/> : null}
-                                        </Card>
-                                    </Col>
-                                })}
-                            </Row>
-                        }, [initialValues, role])}
-                        <Spacing spacing={"xl"}/>
-                        <Flex align={"center"} justify={"space-between"}>
-                            <div>
-                                <Text size={"xl"} hierarchy={"primary"} style={{fontWeight: 600}}>Current stored
-                                    permissions</Text>
-                                <Spacing spacing={"xs"}/>
-                                <DNamespaceRolePermissions abilities={role?.abilities!!}/>
-                            </div>
-                            <Button color={"success"} onClick={validate}>
-                                Update role permissions
-                            </Button>
-                        </Flex>
-                        <Spacing spacing={"xl"}/>
-                        <Card p={1.3}>
-                            {permissions.map(permissionGroup => {
-                                return <CardSection border>
-                                    <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
-                                        <Text size={"md"} hierarchy={"primary"}>{permissionGroup.title}</Text>
-                                        <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
-                                            {permissionGroup.permissions.map(permission => (
-                                                <>
-                                                    <CheckboxInput label={permission.label}
-                                                                   key={String(permission.ability + inputs.getInputProps(permission.ability).initialValue)}
-                                                                   {...inputs.getInputProps(permission.ability)}/>
-                                                </>
-                                            ))}
-                                        </Flex>
-
-                                    </Flex>
-                                </CardSection>
-                            })}
-                        </Card>
-                    </TabContent>
-                    <TabContent value={"project"} style={{overflow: "hidden"}}>
-                        <Flex align={"center"} justify={"space-between"}>
-                            <Text size={"xl"} hierarchy={"primary"} style={{fontWeight: 600}}>Projects that members can
-                                access</Text>
-                            <Flex align={"center"} style={{gap: ".7rem"}}>
-                                <Button color={"success"} onClick={assignProjects}>Update assigned projects</Button>
-                                <DNamespaceProjectMenu namespaceId={namespaceId}
-                                                       key={String(assignedProjectIds)}
-                                                       filter={filterProjects}
-                                                       onProjectSelect={(project) => addAssignedProject(project.id!!)}>
-                                    <Button>Add project</Button>
-                                </DNamespaceProjectMenu>
-                            </Flex>
-                        </Flex>
-
-                        <Spacing spacing={"xl"}/>
-                        {(assignedProjectIds.length ?? 0) <= 0 ? (
-                            <Alert color={"info"}>
-                                <Text style={{textAlign: "center"}} size={"md"} hierarchy={"secondary"}>
-                                    This role has no project assignments. Members with this role will have access to all
-                                    projects in the organization namespace.
-                                </Text>
-                            </Alert>
-                        ) : (
-                            <Card>
-                                {assignedProjectIds.map(projectId => {
-                                    return <CardSection key={projectId} border>
-                                        <Flex align={"center"} style={{gap: "1.3rem"}} justify={"space-between"}>
-                                            <DNamespaceProjectContent minimized projectId={projectId}/>
-                                            <Button color={"error"} variant={"filled"} onClick={() => removeAssignedProject(projectId)}>
-                                                <IconTrash size={16}/>
-                                            </Button>
-                                        </Flex>
-                                    </CardSection>
-                                })}
-                            </Card>
-                        )}
-                    </TabContent>
+                    <RoleGeneralAdjustmentView/>
+                    <RolePermissionView/>
+                    <RoleProjectView/>
                 </>
             </DLayout>
         </Tab>
