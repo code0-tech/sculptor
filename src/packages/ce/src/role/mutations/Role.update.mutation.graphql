@@ -1,0 +1,20 @@
+#import "../fragments/Role.basic.fragment.graphql"
+
+mutation updateRole($namespaceRoleId: NamespaceRoleID!, $name: String!) {
+    namespacesRolesUpdate(input: {
+        namespaceRoleId: $namespaceRoleId,
+        name: $name
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        namespaceRole {
+            ...RoleBasic
+        }
+    }
+}
