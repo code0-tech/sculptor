@@ -15,10 +15,13 @@ import {
     NamespacesRolesCreatePayload,
     NamespacesRolesDeleteInput,
     NamespacesRolesDeletePayload,
+    NamespacesRolesUpdateInput,
+    NamespacesRolesUpdatePayload,
     Query
 } from "@code0-tech/sagittarius-graphql-types"
 import {GraphqlClient} from "@core/util/graphql-client";
 import rolesQuery from "@edition/role/queries/Roles.query.graphql";
+import roleUpdateMutation from "@edition/role/mutations/Role.update.mutation.graphql";
 import roleAssignAbilitiesMutation from "@edition/role/mutations/Role.assignAbilities.mutation.graphql";
 import roleAssignProjectsMutation from "@edition/role/mutations/Role.assignProjects.mutation.graphql";
 
@@ -122,6 +125,30 @@ export class RoleService extends DNamespaceRoleReactiveService {
         }
 
         return result.data?.namespacesRolesAssignProjects ?? undefined
+    }
+
+    async roleUpdate(payload: NamespacesRolesUpdateInput): Promise<NamespacesRolesUpdatePayload | undefined> {
+        const result = await this.client.mutate<Mutation, NamespacesRolesUpdateInput>({
+            mutation: roleUpdateMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        //TODO: should be done by a new query
+        if (result.data && result.data.namespacesRolesUpdate) {
+            const currentRole = this.getById(payload.namespaceRoleId)
+            const index = super.values().findIndex(m => m.id === payload.namespaceRoleId)
+
+            const newRole = new DNamespaceRoleView({
+                ...currentRole?.json(),
+                name: payload.name
+            })
+
+            this.set(index, newRole)
+        }
+
+        return result.data?.namespacesRolesUpdate ?? undefined
     }
 
     roleCreate(payload: NamespacesRolesCreateInput): Promise<NamespacesRolesCreatePayload | undefined> {
