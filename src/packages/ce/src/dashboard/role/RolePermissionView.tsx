@@ -9,8 +9,11 @@ import {
     Flex,
     Row,
     Spacing,
-    Text, toast,
-    useForm, useService, useStore
+    Text,
+    toast,
+    useForm,
+    useService,
+    useStore
 } from "@code0-tech/pictor";
 import React from "react";
 import type {Namespace, NamespaceRole, NamespaceRoleAbility} from "@code0-tech/sagittarius-graphql-types";
