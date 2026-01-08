@@ -9,6 +9,7 @@ import {Tab, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/T
 import {RoleProjectView} from "@edition/dashboard/role/RoleProjectView";
 import {RolePermissionView} from "@edition/dashboard/role/RolePermissionView";
 import {RoleGeneralAdjustmentView} from "@edition/dashboard/role/RoleGeneralAdjustmentView";
+import {RoleDeleteView} from "@edition/dashboard/role/RoleDeleteView";
 
 export const RoleSettingsPage: React.FC = () => {
 
@@ -53,12 +54,18 @@ export const RoleSettingsPage: React.FC = () => {
                             <Text size={"md"} hierarchy={"primary"}>Limit to projects</Text>
                         </Button>
                     </TabTrigger>
+                    <TabTrigger value={"delete"} asChild>
+                        <Button color={"error"} paddingSize={"xxs"} variant={"none"}>
+                            <Text size={"md"} hierarchy={"primary"}>Delete role forever</Text>
+                        </Button>
+                    </TabTrigger>
                 </TabList>
             }>
                 <>
                     <RoleGeneralAdjustmentView/>
                     <RolePermissionView/>
                     <RoleProjectView/>
+                    <RoleDeleteView/>
                 </>
             </DLayout>
         </Tab>
