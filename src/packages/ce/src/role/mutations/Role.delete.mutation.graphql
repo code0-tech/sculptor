@@ -1,0 +1,19 @@
+#import "../fragments/Role.basic.fragment.graphql"
+
+mutation deleteRole($namespaceRoleId: NamespaceRoleID!) {
+    namespacesRolesDelete(input: {
+        namespaceRoleId: $namespaceRoleId,
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        namespaceRole {
+            ...RoleBasic
+        }
+    }
+}
