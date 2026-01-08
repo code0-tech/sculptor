@@ -2,7 +2,7 @@ import type {NextConfig} from "next";
 import path from "node:path";
 
 const EDITION = process.env.EDITION ?? "ce";
-const SAGITTARIUS_GRAPHQL_URL = process.env.SAGITTARIUS_GRAPHQL_URL ?? 'http://localhost:3001/graphql';
+const SAGITTARIUS_GRAPHQL_URL = process.env.SAGITTARIUS_GRAPHQL_URL ?? 'http://localhost:3010/graphql';
 
 const cspHeader = `
     default-src 'self';
