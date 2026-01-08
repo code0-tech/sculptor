@@ -16,12 +16,13 @@ import {
     NamespacesRolesDeleteInput,
     NamespacesRolesDeletePayload,
     NamespacesRolesUpdateInput,
-    NamespacesRolesUpdatePayload,
+    NamespacesRolesUpdatePayload, OrganizationsDeleteInput,
     Query
 } from "@code0-tech/sagittarius-graphql-types"
 import {GraphqlClient} from "@core/util/graphql-client";
 import rolesQuery from "@edition/role/queries/Roles.query.graphql";
 import roleUpdateMutation from "@edition/role/mutations/Role.update.mutation.graphql";
+import roleDeleteMutation from "@edition/role/mutations/Role.delete.mutation.graphql";
 import roleAssignAbilitiesMutation from "@edition/role/mutations/Role.assignAbilities.mutation.graphql";
 import roleAssignProjectsMutation from "@edition/role/mutations/Role.assignProjects.mutation.graphql";
 
@@ -155,8 +156,22 @@ export class RoleService extends DNamespaceRoleReactiveService {
         throw new Error("Method not implemented.")
     }
 
-    roleDelete(payload: NamespacesRolesDeleteInput): Promise<NamespacesRolesDeletePayload | undefined> {
-        throw new Error("Method not implemented.")
+    async roleDelete(payload: NamespacesRolesDeleteInput): Promise<NamespacesRolesDeletePayload | undefined> {
+        const result = await this.client.mutate<Mutation, NamespacesRolesDeleteInput>({
+            mutation: roleDeleteMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        if (result.data && result.data.namespacesRolesDelete && result.data.namespacesRolesDelete.namespaceRole) {
+            const role = result.data.namespacesRolesDelete.namespaceRole
+            const index = this.values({namespaceId: role?.namespace?.id}).findIndex(o => o.id === role.id)
+            this.delete(index)
+
+        }
+
+        return result.data?.namespacesRolesDelete ?? undefined
     }
 
 }
