@@ -100,8 +100,8 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
             </>
         }>
             <DLayout>
-                <DResizablePanelGroup direction={"horizontal"}>
-                    <DResizablePanel id={"1"} order={1} defaultSize={15}>
+                <DResizablePanelGroup orientation={"horizontal"}>
+                    <DResizablePanel id={"1"} defaultSize={15}>
                         <DLayout topContent={
                             <Flex style={{gap: "0.35rem"}} align={"center"} justify={"space-between"} p={0.75}>
                                 <Button paddingSize={"xxs"} color={"success"}>
