@@ -17,7 +17,7 @@ import {IconDatabase, IconFile, IconMessageChatbot} from "@tabler/icons-react";
 export default function Page() {
     const [show, setShow] = React.useState(false);
 
-    return <DResizablePanel id={"2"} order={2}>
+    return <DResizablePanel id={"2"}>
         <DLayout rightContent={
             <Flex p={0.35} style={{flexDirection: "column", gap: "0.7rem"}}>
                 <Button onClick={() => setShow(prevState => !prevState)} variant={"none"} paddingSize={"xs"}>
@@ -40,15 +40,15 @@ export default function Page() {
                 </Button>
             </Flex>
         }>
-            <DResizablePanelGroup direction={"horizontal"}>
-                <DResizablePanel id={"2"} order={2}>
-                    <DFlow flowId={"gid://sagittarius/Flow/1"}/>
+            <DResizablePanelGroup orientation={"horizontal"}>
+                <DResizablePanel id={"2"}>
+                    <DFlow flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined} projectId={undefined}/>
                 </DResizablePanel>
                 {show && (
                     <>
                         <DResizableHandle/>
-                        <DResizablePanel id={"3"} order={3} defaultSize={25}>
-                            <DFlowTabs flowId={"gid://sagittarius/Flow/1"}/>
+                        <DResizablePanel id={"3"} defaultSize={25}>
+                            <DFlowTabs flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined} projectId={undefined}/>
                         </DResizablePanel>
                     </>
                 )}
