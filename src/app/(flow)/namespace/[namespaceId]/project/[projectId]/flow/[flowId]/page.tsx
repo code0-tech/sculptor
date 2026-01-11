@@ -47,7 +47,7 @@ export default function Page() {
                 {show && (
                     <>
                         <DResizableHandle/>
-                        <DResizablePanel id={"3"} defaultSize={25}>
+                        <DResizablePanel id={"3"} defaultSize={"25%"}>
                             <DFlowTabs flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined} projectId={undefined}/>
                         </DResizablePanel>
                     </>

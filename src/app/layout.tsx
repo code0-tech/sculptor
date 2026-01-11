@@ -68,6 +68,7 @@ const ErrorCodeDescription: Record<string, string> = {
  * Handles error toasts based on error type
  */
 const toastHandler = (error: Error | GraphQLFormattedError) => {
+    console.error("[ERROR]", error)
     if (error && "errorCode" in error) {
         toast({
             title: ErrorCodeDescription[(error.errorCode as string)],
