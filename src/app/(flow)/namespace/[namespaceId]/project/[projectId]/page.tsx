@@ -18,7 +18,7 @@ export default function Page() {
 
     const [show, setShow] = React.useState(false);
 
-    return <DResizablePanel id={"2"} order={2}>
+    return <DResizablePanel id={"2"}>
         <ScrollArea h={"100%"} w={"100%"} >
             <ScrollAreaViewport style={{paddingTop: "40vh"}}>
                 <Flex mih={"100%"} miw={"100%"} pos={"relative"} align={"start"}
