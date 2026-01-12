@@ -5,18 +5,30 @@ import {useApolloClient} from "@apollo/client/react";
 import {
     Button,
     ContextStoreProvider,
-    DataTypeView, DFlowFolder, DFlowFolderHandle,
+    DataTypeView,
+    DFlowFolder,
+    DFlowFolderHandle,
     DLayout,
     DNamespaceMemberView,
     DNamespaceProjectView,
     DNamespaceRoleView,
     DNamespaceView,
-    DOrganizationView, DResizableHandle, DResizablePanel, DResizablePanelGroup,
+    DOrganizationView,
+    DResizableHandle,
+    DResizablePanel,
+    DResizablePanelGroup,
     DRuntimeView,
-    DUserView, Flex,
+    DUserView,
+    Flex,
     FlowTypeView,
     FunctionDefinitionView,
-    ReactiveArrayStore, Text, Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger,
+    ReactiveArrayStore,
+    Text,
+    Tooltip,
+    TooltipArrow,
+    TooltipContent,
+    TooltipPortal,
+    TooltipTrigger,
     useUserSession
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/User.service";
@@ -55,8 +67,10 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
 
     const namespaceIndex = params.namespaceId as any as number
     const projectIndex = params.projectId as any as number
+    const flowIndex = params.flowId as any as number
     const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
     const projectId: NamespaceProject['id'] = `gid://sagittarius/NamespaceProject/${projectIndex}`
+    const flowId: Flow['id'] = `gid://sagittarius/Flow/${flowIndex}`
 
     const user = usePersistentReactiveArrayService<DUserView, UserService>(`dashboard::users::${currentSession?.id}`, (store: ReactiveArrayStore<DUserView>) => new UserService(graphqlClient, store))
     const organization = usePersistentReactiveArrayService<DOrganizationView, OrganizationService>(`dashboard::organizations::${currentSession?.id}`, (store: ReactiveArrayStore<DOrganizationView>) => new OrganizationService(graphqlClient, store))
@@ -110,7 +124,8 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
                                 <Flex style={{gap: "0.35rem"}}>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
-                                            <Button variant={"none"} paddingSize={"xxs"} onClick={() => ref.current?.openActivePath()}>
+                                            <Button variant={"none"} paddingSize={"xxs"}
+                                                    onClick={() => ref.current?.openActivePath()}>
                                                 <IconCircleDot size={16}/>
                                             </Button>
                                         </TooltipTrigger>
@@ -123,7 +138,8 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
                                     </Tooltip>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
-                                            <Button variant={"none"} paddingSize={"xxs"} onClick={() => ref.current?.closeAll()}>
+                                            <Button variant={"none"} paddingSize={"xxs"}
+                                                    onClick={() => ref.current?.closeAll()}>
                                                 <IconArrowsMinimize size={16}/>
                                             </Button>
                                         </TooltipTrigger>
@@ -136,7 +152,8 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
                                     </Tooltip>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
-                                            <Button paddingSize={"xxs"} variant={"none"} onClick={() => ref.current?.openAll()}>
+                                            <Button paddingSize={"xxs"} variant={"none"}
+                                                    onClick={() => ref.current?.openAll()}>
                                                 <IconArrowsMaximize size={16}/>
                                             </Button>
                                         </TooltipTrigger>
@@ -151,7 +168,11 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
                             </Flex>
                         }>
                             <div style={{padding: "0.75rem"}}>
-                                <DFlowFolder ref={ref} activeFlowId={"gid://sagittarius/Flow/2"}
+                                <DFlowFolder ref={ref} activeFlowId={flowId}
+                                             onSelect={(flow) => {
+                                                 const number = flow.id?.match(/Flow\/(\d+)$/)?.[1]
+                                                 router.push(`/namespace/${namespaceIndex}/project/${projectIndex}/flow/${number}`)
+                                             }}
                                              namespaceId={`gid://sagittarius/Namespace/${namespaceIndex}`}
                                              projectId={`gid://sagittarius/NamespaceProject/${projectIndex}`}/>
                             </div>
