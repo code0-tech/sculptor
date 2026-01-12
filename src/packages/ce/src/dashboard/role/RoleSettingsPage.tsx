@@ -14,8 +14,6 @@ import {RoleDeleteView} from "@edition/dashboard/role/RoleDeleteView";
 export const RoleSettingsPage: React.FC = () => {
 
     //TODO: limit tabs based on user abilities for roles
-    //TODO: add general adjustments tab for role name update
-    //TODO: delete role functionality as tab
 
     const params = useParams()
     const roleService = useService(RoleService)

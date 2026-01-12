@@ -36,7 +36,7 @@ export const ApplicationSettingsPage: React.FC = () => {
         <Spacing spacing={"xl"}/>
         <Tab orientation={"vertical"} defaultValue={"general"}>
             <DLayout leftContent={
-                <TabList>
+                <TabList pr={"0.7"}>
                     <InputLabel>Application</InputLabel>
                     <TabTrigger value={"general"} asChild>
                         <Button paddingSize={"xxs"} variant={"none"}>
@@ -53,7 +53,7 @@ export const ApplicationSettingsPage: React.FC = () => {
                 </TabList>
             }>
                 <>
-                    <TabContent value={"general"}>
+                    <TabContent pl={"0.7"} value={"general"}>
                         <Text size={"xl"} hierarchy={"primary"}>General</Text>
                         <Spacing spacing={"xl"}/>
                         <div style={{borderBottom: "1px solid rgba(255,255,255,.1)"}}/>
@@ -91,7 +91,7 @@ export const ApplicationSettingsPage: React.FC = () => {
                             </CardSection>
                         </Card>
                     </TabContent>
-                    <TabContent value={"restrictions"}>
+                    <TabContent pl={"0.7"} value={"restrictions"}>
                         <Text size={"xl"} hierarchy={"primary"}>Restrictions</Text>
                         <Spacing spacing={"xl"}/>
                         <div style={{borderBottom: "1px solid rgba(255,255,255,.1)"}}/>

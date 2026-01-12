@@ -72,7 +72,7 @@ export const OrganizationSettingsPage: React.FC = () => {
         <Spacing spacing={"xl"}/>
         <Tab orientation={"vertical"} defaultValue={"general"}>
             <DLayout leftContent={
-                <TabList>
+                <TabList pr={"0.7"}>
                     <TabTrigger value={"general"} asChild>
                         <Button paddingSize={"xxs"} variant={"none"}>
                             <Text size={"md"} hierarchy={"primary"}>General adjustments</Text>
@@ -98,16 +98,16 @@ export const OrganizationSettingsPage: React.FC = () => {
                 </TabList>
             }>
                 <>
-                    <TabContent value={"general"}>
+                    <TabContent pl={"0.7"} value={"general"}>
                         <OrganizationGeneralSettingsView/>
                     </TabContent>
-                    <TabContent value={"upgrade"}>
+                    <TabContent pl={"0.7"} value={"upgrade"}>
                         <OrganizationUpgradeView/>
                     </TabContent>
-                    <TabContent value={"usage"}>
+                    <TabContent pl={"0.7"} value={"usage"}>
                         <UsageView/>
                     </TabContent>
-                    <TabContent value={"delete"}>
+                    <TabContent pl={"0.7"} value={"delete"}>
                         <OrganizationDeleteView/>
                     </TabContent>
                 </>

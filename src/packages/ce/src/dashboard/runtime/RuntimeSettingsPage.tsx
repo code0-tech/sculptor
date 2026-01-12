@@ -125,7 +125,7 @@ export const RuntimeSettingsPage: React.FC = () => {
         <Spacing spacing={"xl"}/>
         <Tab orientation={"vertical"} defaultValue={"general"}>
             <DLayout leftContent={
-                <TabList>
+                <TabList pr={"0.7"}>
                     <TabTrigger value={"general"} asChild>
                         <Button paddingSize={"xxs"} variant={"none"}>
                             <Text size={"md"} hierarchy={"primary"}>General adjustments</Text>
@@ -144,7 +144,7 @@ export const RuntimeSettingsPage: React.FC = () => {
                 </TabList>
             }>
                 <>
-                    <TabContent value={"general"}>
+                    <TabContent pl={"0.7"} value={"general"}>
                         <Flex justify={"space-between"} align={"end"}>
                             <Text size={"xl"} hierarchy={"primary"}>General adjustments</Text>
                             <Button color={"success"} onClick={validate}>
@@ -171,7 +171,7 @@ export const RuntimeSettingsPage: React.FC = () => {
                             </CardSection>
                         </Card>
                     </TabContent>
-                    <TabContent value={"access"}>
+                    <TabContent pl={"0.7"} value={"access"}>
                         <Text size={"xl"} hierarchy={"primary"}>How to connect</Text>
                         <Spacing spacing={"xl"}/>
                         <div style={{borderBottom: "1px solid rgba(255,255,255,.1)"}}/>
@@ -196,7 +196,7 @@ export const RuntimeSettingsPage: React.FC = () => {
                         </Card>
 
                     </TabContent>
-                    <TabContent value={"delete"}>
+                    <TabContent pl={"0.7"} value={"delete"}>
                         <Flex justify={"space-between"} align={"end"}>
                             <Text size={"xl"} hierarchy={"primary"}>Delete runtime forever</Text>
                         </Flex>
