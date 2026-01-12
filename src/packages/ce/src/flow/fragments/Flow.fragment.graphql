@@ -1,6 +1,29 @@
 fragment Flow on Flow {
+    __typename
     id
     createdAt
-    updatedAt
+    inputType {
+        id
+    }
     name
+    nodes {
+        __typename
+    }
+    project {
+        id
+    }
+    returnType {
+        id
+    }
+    settings {
+        __typename
+    }
+    startingNodeId
+    type {
+        id
+    }
+    updatedAt
+    userAbilities {
+        deleteFlow
+    }
 }
