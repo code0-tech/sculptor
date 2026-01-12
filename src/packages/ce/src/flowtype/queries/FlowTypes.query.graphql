@@ -1,0 +1,25 @@
+#import "../fragments/FlowType.fragment.graphql"
+
+query FlowTypes (
+    $namespaceId: NamespaceID!
+    $projectId: NamespaceProjectID!
+    $firstFlowType: Int!
+    $afterFlowType: String
+) {
+    namespace(id: $namespaceId) {
+        project(id: $projectId) {
+            primaryRuntime {
+                flowTypes (first: $firstFlowType, after: $afterFlowType) {
+                    count
+                    nodes {
+                        ...FlowType
+                    }
+                    pageInfo {
+                        endCursor
+                        hasNextPage
+                    }
+                }
+            }
+        }
+    }
+}
