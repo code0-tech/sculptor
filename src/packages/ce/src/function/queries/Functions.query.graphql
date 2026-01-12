@@ -18,6 +18,10 @@ query Functions (
                     nodes {
                         ...Function
                     }
+                    pageInfo {
+                        endCursor
+                        hasNextPage
+                    }
                 }
             }
         }
