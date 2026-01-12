@@ -10,9 +10,7 @@ fragment DataTypeIdentifier on DataTypeIdentifier {
         genericMappers {
             id
             target
-            sourceDataTypeIdentifiers {
-                id
-            }
+            sourceDataTypeIdentifierIds
             updatedAt
             createdAt
             genericCombinationStrategies {
@@ -41,125 +39,73 @@ fragment Function on FunctionDefinition {
     id
     createdAt
     updatedAt
-    aliases (first: $first1, after: $after1) {
+    dataTypeIdentifiers (first: $firstDataTypeIdentifier, after: $afterDataTypeIdentifier) {
         count
         nodes {
-            code
-            content
-            __typename
+            ...DataTypeIdentifier
         }
         pageInfo {
             endCursor
             hasNextPage
         }
+        __typename
     }
-    deprecationMessages (first: $first2, after: $after2) {
-        count
-        nodes {
-            code
-            content
-            __typename
-        }
-        pageInfo {
-            endCursor
-            hasNextPage
-        }
+    aliases {
+        code
+        content
+        __typename
     }
-    descriptions (first: $first3, after: $after3) {
-        count
-        nodes {
-            code
-            content
-            __typename
-        }
-        pageInfo {
-            endCursor
-            hasNextPage
-        }
+    deprecationMessages {
+        code
+        content
+        __typename
     }
-    documentations (first: $first4, after: $after4) {
-        count
-        nodes {
-            code
-            content
-            __typename
-        }
-        pageInfo {
-            endCursor
-            hasNextPage
-        }
+    descriptions {
+        code
+        content
+        __typename
+    }
+    documentations {
+        code
+        content
+        __typename
     }
     genericKeys
-    displayMessages (first: $first5, after: $after5) {
-        count
-        nodes {
-            code
-            content
-            __typename
-        }
-        pageInfo {
-            endCursor
-            hasNextPage
-        }
+    displayMessages {
+        code
+        content
+        __typename
     }
     identifier
-    names (first: $first6, after: $after6) {
-        count
-        nodes {
-            code
-            content
-            __typename
-        }
-        pageInfo {
-            endCursor
-            hasNextPage
-        }
+    names {
+        code
+        content
+        __typename
     }
     returnType {
         ...DataTypeIdentifier
     }
-    parameterDefinitions (first: $first7, after: $after7) {
+    parameterDefinitions (first: $firstParameterDefinition, after: $afterParameterDefinition) {
         nodes {
             id
             identifier
             updatedAt
             createdAt
             identifier
-            names (first: $first8, after: $after8) {
-                count
-                nodes {
-                    code
-                    content
-                    __typename
-                }
-                pageInfo {
-                    endCursor
-                    hasNextPage
-                }
+            names {
+                code
+                content
+                __typename
             }
-            descriptions (first: $first9, after: $after9) {
-                count
-                nodes {
-                    code
-                    content
-                    __typename
-                }
-                pageInfo {
-                    endCursor
-                    hasNextPage
-                }
+            descriptions {
+                code
+                content
+                __typename
             }
-            documentations (first: $first10, after: $after10) {
-                count
-                nodes {
-                    code
-                    content
-                    __typename
-                }
-                pageInfo {
-                    endCursor
-                    hasNextPage
-                }
+            documentations {
+                code
+                content
+                __typename
             }
             dataTypeIdentifier {
                 ...DataTypeIdentifier
