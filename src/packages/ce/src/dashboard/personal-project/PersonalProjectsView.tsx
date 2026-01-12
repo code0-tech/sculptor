@@ -5,17 +5,17 @@ import {
     Flex,
     Spacing,
     Text,
-    TextInput,
     useService,
     useStore,
     useUserSession
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/User.service";
-import {IconSearch} from "@tabler/icons-react";
 import Link from "next/link";
+import {useRouter} from "next/navigation";
 
 export const PersonalProjectsView: React.FC = () => {
 
+    const router = useRouter()
     const userSession = useUserSession()
     const userStore = useStore(UserService)
     const userService = useService(UserService)
@@ -26,7 +26,10 @@ export const PersonalProjectsView: React.FC = () => {
 
     const projectsList = React.useMemo(() => {
         if (!currentUser || !currentUser.namespace) return null
-        return <DNamespaceProjectList namespaceId={currentUser.namespace.id}/>
+        return <DNamespaceProjectList onSelect={(project) => {
+            const number = project.id?.match(/NamespaceProject\/(\d+)$/)?.[1]
+            router.push(`/namespace/${namespaceIndex}/project/${number}`)
+        }} namespaceId={currentUser.namespace.id}/>
 
     }, [currentUser])
 
