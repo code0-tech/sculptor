@@ -2,12 +2,12 @@
 
 import {
     Badge,
-    Breadcrumb, Button,
+    Button,
     Container,
     Flex,
     MenuItem,
     MenuSeparator,
-    Text, TextInput,
+    TextInput,
     useService,
     useUserSession
 } from "@code0-tech/pictor";
@@ -21,15 +21,18 @@ import Image from "next/image";
 import {ApplicationBreadcrumbView} from "@edition/dashboard/application/ApplicationBreadcrumbView";
 
 export const ApplicationBarView: React.FC = () => {
+
     const currentSession = useUserSession()
     const userService = useService(UserService)
+    const userStore = useService(UserService)
     const router = useRouter()
     const [loading, startTransition] = React.useTransition()
 
+    const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [userStore, currentSession])
 
     const userMenu = React.useMemo(() => {
 
-        if (!currentSession?.token) {
+        if (!currentUser || !currentSession) {
             return null
         }
 
@@ -44,7 +47,7 @@ export const ApplicationBarView: React.FC = () => {
             })
         }
 
-        const namespaceIndex = currentSession.user?.namespace?.id?.match(/Namespace\/(\d+)$/)?.[1]
+        const namespaceIndex = currentUser?.namespace?.id?.match(/Namespace\/(\d+)$/)?.[1]
 
         return <DUserMenu userId={currentSession.user?.id!!}>
             <Link href={"/organizations"}>
@@ -62,7 +65,7 @@ export const ApplicationBarView: React.FC = () => {
                 <IconLogout size={16}/>Logout
             </MenuItem>
         </DUserMenu>
-    }, [currentSession])
+    }, [currentUser, currentSession])
 
     return <Container>
         <Flex style={{gap: "0.7rem", flexDirection: "column"}} py={0.7} w={"100%"}>
