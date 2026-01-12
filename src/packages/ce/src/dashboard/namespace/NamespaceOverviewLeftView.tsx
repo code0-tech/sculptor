@@ -15,7 +15,7 @@ export const NamespaceOverviewLeftView: React.FC = () => {
     const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [userStore, currentSession])
     const organizations = React.useMemo(() => organizationService.values(), [organizationStore])
 
-    return <Flex w={"200px"} style={{flexDirection: "column"}}>
+    return <Flex pr={1.3} w={"200px"} style={{flexDirection: "column"}}>
         <Avatar style={{width: "100%"}} identifier={currentUser?.username!!}/>
         <Spacing spacing={"xl"}/>
         <Flex align={"center"} style={{gap: "0.7rem"}}>

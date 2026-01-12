@@ -38,7 +38,7 @@ export const NamespaceOverviewRightView: React.FC = () => {
     const namespace = React.useMemo(() => namespaceService.getById(`gid://sagittarius/Namespace/${namespaceId}`), [namespaceStore, namespaceId])
     const members = React.useMemo(() => memberService.values({namespaceId: `gid://sagittarius/Namespace/${namespaceId}`}), [memberStore, userStore])
 
-    return <Flex maw={"250px"} style={{flexDirection: "column"}}>
+    return <Flex pl={1.3} maw={"250px"} style={{flexDirection: "column"}}>
         <Button color={"primary"} w={"100%"}>
             Upgrade to <Badge border>Team</Badge>
             <AuroraBackground/>

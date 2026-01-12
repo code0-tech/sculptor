@@ -17,7 +17,7 @@ export const NamespaceProjectsView: React.FC = () => {
 
     //TODO: user abilities for project creation within namespace
 
-    return <>
+    return <div style={{padding: "0 1.3rem"}}>
 
         <Flex align={"center"} justify={"space-between"}>
             <Text size={"xl"} hierarchy={"primary"}>
@@ -32,5 +32,5 @@ export const NamespaceProjectsView: React.FC = () => {
         <Spacing spacing={"xl"}/>
         {projectsList}
 
-    </>
+    </div>
 }
