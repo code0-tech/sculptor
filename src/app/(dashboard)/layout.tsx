@@ -60,6 +60,7 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
             </>
         }>
             <Container h={"100%"} w={"100%"}>
+                <Spacing spacing={"xl"}/>
                 {children}
             </Container>
         </DLayout>
