@@ -1,0 +1,32 @@
+fragment FlowType on FlowType {
+    __typename
+    id
+    updatedAt
+    createdAt
+    identifier
+    names {
+        code
+        content
+        __typename
+    }
+    aliases {
+        code
+        content
+        __typename
+    }
+    displayMessages {
+        code
+        content
+        __typename
+    }
+    descriptions {
+        code
+        content
+        __typename
+    }
+    runtime {
+        id
+    }
+    editable
+
+}
