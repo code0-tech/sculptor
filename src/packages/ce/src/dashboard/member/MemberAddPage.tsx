@@ -18,6 +18,7 @@ import {useParams, useRouter} from "next/navigation";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
 import Link from "next/link";
 import {UserService} from "@edition/user/User.service";
+import {InputSyntaxSegment} from "@code0-tech/pictor/dist/components/form/Input.syntax.hook";
 
 export const MemberAddPage: React.FC = () => {
 
@@ -40,7 +41,7 @@ export const MemberAddPage: React.FC = () => {
         }
     }, [members])
 
-    const [inputs, validate] = useForm<{ users: null | InputSuggestion[] }>({
+    const [inputs, validate] = useForm<{ users: null | InputSyntaxSegment[] }>({
         initialValues: formInitialValues,
         validate: {
             users: (value) => {
@@ -54,7 +55,7 @@ export const MemberAddPage: React.FC = () => {
                 for (const value of values.users!!) {
                     await memberService.memberInvite({
                         namespaceId: namespaceId!!,
-                        userId: (value.valueData as DUserView).id!!
+                        userId: (value.value)._id!!
                     })
                 }
                 router.push(`/namespace/${namespaceIndex}/members`)
@@ -78,7 +79,7 @@ export const MemberAddPage: React.FC = () => {
             <DUserInput title={"Description"}
                         description={"Provide a simple project description"}
                         filter={filteredUsers}
-                        validationUsesSuggestions
+                        validationUsesSyntax
                         {...inputs.getInputProps("users")}/>
             <Spacing spacing={"xl"}/>
             <Flex style={{gap: "0.35rem"}} justify={"space-between"}>
