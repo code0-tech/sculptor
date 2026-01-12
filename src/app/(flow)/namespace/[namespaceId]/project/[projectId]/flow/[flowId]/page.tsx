@@ -15,12 +15,13 @@ import React from "react";
 import {IconDatabase, IconFile, IconMessageChatbot} from "@tabler/icons-react";
 
 export default function Page() {
+
     const [show, setShow] = React.useState(false);
 
     return <DResizablePanel id={"2"}>
         <DLayout rightContent={
             <Flex p={0.35} style={{flexDirection: "column", gap: "0.7rem"}}>
-                <Button onClick={() => setShow(prevState => !prevState)} variant={"none"} paddingSize={"xs"}>
+                <Button aria-selected={show} onClick={() => setShow(prevState => !prevState)} variant={"none"} paddingSize={"xs"}>
                     <IconFile size={16}/>
                 </Button>
                 <Button variant={"none"} paddingSize={"xs"}>
