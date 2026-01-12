@@ -4,15 +4,19 @@
 import React from "react";
 import {Button, DNamespaceProjectList, Flex, Spacing, Text} from "@code0-tech/pictor";
 import Link from "next/link";
-import {useParams} from "next/navigation";
+import {useParams, useRouter} from "next/navigation";
 
 export const NamespaceProjectsView: React.FC = () => {
 
     const params = useParams()
+    const router = useRouter()
     const namespaceId = params.namespaceId as any as number
 
     const projectsList = React.useMemo(() => {
-        return <DNamespaceProjectList namespaceId={`gid://sagittarius/Namespace/${namespaceId}`}/>
+        return <DNamespaceProjectList onSelect={(project) => {
+            const number = project.id?.match(/NamespaceProject\/(\d+)$/)?.[1]
+            router.push(`/namespace/${namespaceId}/project/${number}`)
+        }} namespaceId={`gid://sagittarius/Namespace/${namespaceId}`}/>
     }, [namespaceId])
 
     //TODO: user abilities for project creation within namespace
