@@ -90,7 +90,7 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
 
     const runtimeId = React.useMemo(() => project[1].getById(projectId, {namespaceId})?.primaryRuntime?.id, [projectId, project[0], namespaceId])
 
-    React.useMemo(() => {
+    React.useEffect(() => {
         flow[1].values({namespaceId, projectId})
         functions[1].values({namespaceId, projectId, runtimeId})
         datatype[1].values({namespaceId, projectId, runtimeId})
