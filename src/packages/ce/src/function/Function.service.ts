@@ -5,7 +5,7 @@ import {
     ReactiveArrayStore
 } from "@code0-tech/pictor";
 import {GraphqlClient} from "@core/util/graphql-client";
-import {Flow, FunctionDefinition, Query} from "@code0-tech/sagittarius-graphql-types";
+import {FunctionDefinition, Query} from "@code0-tech/sagittarius-graphql-types";
 import functionsQuery from "@edition/function/queries/Functions.query.graphql";
 
 export class FunctionService extends DFlowFunctionReactiveService {
@@ -37,26 +37,11 @@ export class FunctionService extends DFlowFunctionReactiveService {
                     firstFunction: 50,
                     afterFunction: null,
 
-                    first1: 50,
-                    after1: null,
-                    first2: 50,
-                    after2: null,
-                    first3: 50,
-                    after3: null,
-                    first4: 50,
-                    after4: null,
-                    first5: 50,
-                    after5: null,
-                    first6: 50,
-                    after6: null,
-                    first7: 50,
-                    after7: null,
-                    first8: 50,
-                    after8: null,
-                    first9: 50,
-                    after9: null,
-                    first10: 50,
-                    after10: null,
+                    firstDataTypeIdentifier: 50,
+                    afterDataTypeIdentifier: null,
+
+                    firstParameterDefinition: 50,
+                    afterParameterDefinition: null,
                 }
             }).then(res => {
                 const nodes = res.data?.namespace?.project?.primaryRuntime?.functionDefinitions?.nodes ?? []
