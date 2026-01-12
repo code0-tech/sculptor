@@ -6,20 +6,24 @@ import {
     DResizablePanel,
     Flex,
     ScrollArea,
-    ScrollAreaScrollbar, ScrollAreaThumb,
+    ScrollAreaScrollbar,
+    ScrollAreaThumb,
     ScrollAreaViewport,
     Spacing,
     Text
 } from "@code0-tech/pictor";
 import React from "react";
 import Link from "next/link";
+import {useParams} from "next/navigation";
 
 export default function Page() {
 
-    const [show, setShow] = React.useState(false);
+    const params = useParams()
+
+    const namespaceIndex = params?.namespaceId as any as number
 
     return <DResizablePanel id={"2"}>
-        <ScrollArea h={"100%"} w={"100%"} >
+        <ScrollArea h={"100%"} w={"100%"}>
             <ScrollAreaViewport style={{paddingTop: "40vh"}}>
                 <Flex mih={"100%"} miw={"100%"} pos={"relative"} align={"start"}
                       justify={"center"}>
@@ -33,7 +37,7 @@ export default function Page() {
                         </Text>
                         <Spacing spacing={"xl"}/>
                         <Flex style={{gap: "0.7rem"}}>
-                            <Link href={"/"}>
+                            <Link href={`/namespace/${namespaceIndex}/projects`}>
                                 <Button color={"primary"}>
                                     Go back to project overview
                                 </Button>
