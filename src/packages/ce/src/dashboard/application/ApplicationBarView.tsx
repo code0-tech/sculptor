@@ -8,7 +8,7 @@ import {
     MenuItem,
     MenuSeparator,
     TextInput,
-    useService,
+    useService, useStore,
     useUserSession
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/User.service";
@@ -24,7 +24,7 @@ export const ApplicationBarView: React.FC = () => {
 
     const currentSession = useUserSession()
     const userService = useService(UserService)
-    const userStore = useService(UserService)
+    const userStore = useStore(UserService)
     const router = useRouter()
     const [loading, startTransition] = React.useTransition()
 
