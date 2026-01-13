@@ -45,7 +45,7 @@ import {Flow, Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql
 import {FlowService} from "@edition/flow/Flow.service";
 import {FunctionService} from "@edition/function/Function.service";
 import {DatatypeService} from "@edition/datatype/Datatype.service";
-import {FlowtypeService} from "@edition/flowtype/Flowtype.service";
+import {FlowTypeService} from "@edition/flowtype/FlowTypeService";
 import {FileTabsView} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.view";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
 import {IconArrowsMaximize, IconArrowsMinimize, IconCircleDot} from "@tabler/icons-react";
@@ -82,7 +82,7 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
     const flow = usePersistentReactiveArrayService<Flow, FlowService>(`dashboard::flows::${currentSession?.id}`, (store: ReactiveArrayStore<Flow>) => new FlowService(graphqlClient, store))
     const functions = usePersistentReactiveArrayService<FunctionDefinitionView, FunctionService>(`dashboard::functions::${currentSession?.id}`, (store: ReactiveArrayStore<FunctionDefinitionView>) => new FunctionService(graphqlClient, store))
     const datatype = usePersistentReactiveArrayService<DataTypeView, DatatypeService>(`dashboard::datatypes::${currentSession?.id}`, (store: ReactiveArrayStore<DataTypeView>) => new DatatypeService(graphqlClient, store))
-    const flowtype = usePersistentReactiveArrayService<FlowTypeView, FlowtypeService>(`dashboard::flowtypes::${currentSession?.id}`, (store: ReactiveArrayStore<FlowTypeView>) => new FlowtypeService(graphqlClient, store))
+    const flowtype = usePersistentReactiveArrayService<FlowTypeView, FlowTypeService>(`dashboard::flowtypes::${currentSession?.id}`, (store: ReactiveArrayStore<FlowTypeView>) => new FlowTypeService(graphqlClient, store))
     const file = usePersistentReactiveArrayService<FileTabsView, FileTabsService>(`dashboard::files::${currentSession?.id}`, FileTabsService, [])
 
 

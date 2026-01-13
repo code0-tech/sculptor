@@ -1,14 +1,9 @@
-import {
-    DFlowTypeDependencies,
-    DFlowTypeReactiveService,
-    FlowTypeView, FunctionDefinitionView,
-    ReactiveArrayStore
-} from "@code0-tech/pictor";
+import {DFlowTypeDependencies, DFlowTypeReactiveService, FlowTypeView, ReactiveArrayStore} from "@code0-tech/pictor";
 import {GraphqlClient} from "@core/util/graphql-client";
-import {FlowType, FunctionDefinition, Query} from "@code0-tech/sagittarius-graphql-types";
+import {FlowType, Query} from "@code0-tech/sagittarius-graphql-types";
 import flowTypesQuery from "@edition/flowtype/queries/FlowTypes.query.graphql"
 
-export class FlowtypeService extends DFlowTypeReactiveService {
+export class FlowTypeService extends DFlowTypeReactiveService {
 
     private readonly client: GraphqlClient
     private i = 0
