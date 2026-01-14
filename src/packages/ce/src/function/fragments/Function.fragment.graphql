@@ -113,7 +113,7 @@ fragment Function on FunctionDefinition {
             __typename
         }
     }
-    throwsError
+    #throwsError
     runtimeFunctionDefinition {
         id
         identifier
