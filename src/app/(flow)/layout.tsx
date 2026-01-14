@@ -101,7 +101,7 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
 
     return <ContextStoreProvider
         services={[user, organization, member, namespace, runtime, project, role, flow, functions, datatype, flowtype, file]}>
-        <DLayout style={{zIndex: 0}} topContent={
+        <DLayout layoutGap={0} style={{zIndex: 0}} topContent={
             <>
                 <div style={{
                     padding: "0 1.3rem",
@@ -116,7 +116,7 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
             <DLayout>
                 <DResizablePanelGroup orientation={"horizontal"}>
                     <DResizablePanel id={"1"} defaultSize={"25%"}>
-                        <DLayout topContent={
+                        <DLayout layoutGap={0} topContent={
                             <Flex style={{gap: "0.35rem"}} align={"center"} justify={"space-between"} p={0.75}>
                                 <Button paddingSize={"xxs"} color={"success"}>
                                     <Text>Create new flow</Text>

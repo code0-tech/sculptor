@@ -19,7 +19,7 @@ export default function Page() {
     const [show, setShow] = React.useState(false);
 
     return <DResizablePanel id={"2"}>
-        <DLayout rightContent={
+        <DLayout layoutGap={0} rightContent={
             <Flex p={0.35} style={{flexDirection: "column", gap: "0.7rem"}}>
                 <Button aria-selected={show} onClick={() => setShow(prevState => !prevState)} variant={"none"} paddingSize={"xs"}>
                     <IconFile size={16}/>
