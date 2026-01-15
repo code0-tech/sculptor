@@ -1,3 +1,5 @@
+#import "../../function/fragments/DataTypeIdentifier.fragment.graphql"
+
 fragment Flow on Flow {
     __typename
     id
@@ -6,13 +8,82 @@ fragment Flow on Flow {
         id
     }
     name
-    nodes {
+    nodes (first: $firstNode, after: $afterNode) {
         __typename
+        nodes {
+            __typename
+            id
+            nextNodeId
+            createdAt
+            updatedAt
+            parameters (first: $firstNodeParameter, after: $afterNodeParameter) {
+                __typename
+                count
+                nodes {
+                    __typename
+                    id
+                    updatedAt
+                    createdAt
+                    runtimeParameter {
+                        __typename
+                        id
+                        identifier
+                        createdAt
+                        updatedAt
+                    }
+                    value {
+                        __typename
+                        ... on LiteralValue {
+                            __typename
+                            value
+                            createdAt
+                            updatedAt
+                        }
+                        ... on NodeFunctionIdWrapper {
+                            __typename
+                            id
+                        }
+                        ... on ReferenceValue {
+                            __typename
+                            id
+                            updatedAt
+                            createdAt
+                            dataTypeIdentifier {
+                                ...DataTypeIdentifier
+                            }
+                            node
+                            depth
+                            scope
+                            nodeFunctionId
+                            referencePath {
+                                __typename
+                                id
+                                createdAt
+                                updatedAt
+                                arrayIndex
+                                path
+                            }
+                        }
+                    }
+                }
+                pageInfo {
+                    endCursor
+                    hasNextPage
+                }
+            }
+            functionDefinition {
+                __typename
+                id
+                identifier
+            }
+        }
     }
     project {
+        __typename
         id
     }
     returnType {
+        __typename
         id
     }
     settings {
