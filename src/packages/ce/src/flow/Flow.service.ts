@@ -1,15 +1,18 @@
-import {DFlowDependencies, DFlowReactiveService, DNamespaceMemberView, ReactiveArrayStore} from "@code0-tech/pictor";
+import {DFlowDependencies, DFlowReactiveService, DNamespaceProjectView, ReactiveArrayStore} from "@code0-tech/pictor";
 import {
-    Flow, NamespaceMember,
+    Flow,
+    Mutation,
     NamespacesProjectsFlowsCreateInput,
     NamespacesProjectsFlowsCreatePayload,
     NamespacesProjectsFlowsDeleteInput,
     NamespacesProjectsFlowsDeletePayload,
     NamespacesProjectsFlowsUpdateInput,
-    NamespacesProjectsFlowsUpdatePayload, Query
+    NamespacesProjectsFlowsUpdatePayload,
+    Query
 } from "@code0-tech/sagittarius-graphql-types";
 import {GraphqlClient} from "@core/util/graphql-client";
 import flowsQuery from "@edition/flow/queries/Flows.query.graphql";
+import flowCreateMutation from "@edition/flow/mutations/Flow.create.mutation.graphql";
 
 export class FlowService extends DFlowReactiveService {
 
@@ -63,8 +66,23 @@ export class FlowService extends DFlowReactiveService {
         return flow !== undefined
     }
 
-    flowCreate(payload: NamespacesProjectsFlowsCreateInput): Promise<NamespacesProjectsFlowsCreatePayload | undefined> {
-        return Promise.resolve(undefined);
+    async flowCreate(payload: NamespacesProjectsFlowsCreateInput): Promise<NamespacesProjectsFlowsCreatePayload | undefined> {
+        const result = await this.client.mutate<Mutation, NamespacesProjectsFlowsCreateInput>({
+            mutation: flowCreateMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        if (result.data && result.data.namespacesProjectsFlowsCreate && result.data.namespacesProjectsFlowsCreate.flow) {
+            const flow = result.data.namespacesProjectsFlowsCreate.flow
+            if (!this.hasById(flow.id)) {
+                flow.nodes = {nodes: []} //TODO: to avoid issues, when fixed in pictor
+                this.add(flow)
+            }
+        }
+
+        return result.data?.namespacesProjectsFlowsCreate ?? undefined
     }
 
     flowDelete(payload: NamespacesProjectsFlowsDeleteInput): Promise<NamespacesProjectsFlowsDeletePayload | undefined> {
