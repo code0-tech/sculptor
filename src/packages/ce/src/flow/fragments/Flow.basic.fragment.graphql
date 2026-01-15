@@ -1,0 +1,28 @@
+fragment BasicFlow on Flow {
+    __typename
+    id
+    createdAt
+    inputType {
+        id
+    }
+    name
+    project {
+        __typename
+        id
+    }
+    returnType {
+        __typename
+        id
+    }
+    settings {
+        __typename
+    }
+    startingNodeId
+    type {
+        id
+    }
+    updatedAt
+    userAbilities {
+        deleteFlow
+    }
+}
