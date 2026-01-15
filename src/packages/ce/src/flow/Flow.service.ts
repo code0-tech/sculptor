@@ -35,8 +35,15 @@ export class FlowService extends DFlowReactiveService {
                 variables: {
                     namespaceId: namespaceId,
                     projectId: projectId,
+
                     firstFlow: 50,
                     afterFlow: null,
+
+                    firstNode: 50,
+                    afterNode: null,
+
+                    firstNodeParameter: 50,
+                    afterNodeParameter: null,
                 }
             }).then(res => {
                 const nodes = res.data?.namespace?.project?.flows?.nodes ?? []
