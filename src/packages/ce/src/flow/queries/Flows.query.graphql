@@ -5,6 +5,10 @@ query Flows (
     $projectId: NamespaceProjectID!
     $firstFlow: Int!
     $afterFlow: String
+    $firstNode: Int!,
+    $afterNode: String,
+    $firstNodeParameter: Int!,
+    $afterNodeParameter: String,
 ) {
     namespace(id: $namespaceId) {
         project(id: $projectId) {
