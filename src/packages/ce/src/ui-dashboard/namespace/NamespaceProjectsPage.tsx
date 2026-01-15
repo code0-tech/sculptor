@@ -1,6 +1,6 @@
 "use client"
 
-import {NamespaceProjectsView} from "@edition/dashboard/namespace/NamespaceProjectsView";
+import {NamespaceProjectsView} from "@edition/ui-dashboard/namespace/NamespaceProjectsView";
 import React from "react";
 
 export const NamespaceProjectsPage: React.FC = () => {

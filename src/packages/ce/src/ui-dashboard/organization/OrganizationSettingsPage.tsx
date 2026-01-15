@@ -19,10 +19,10 @@ import {NamespaceService} from "@edition/namespace/Namespace.service";
 import {OrganizationService} from "@edition/organization/Organization.service";
 import {IconFolders, IconServer, IconUserCog, IconUsers} from "@tabler/icons-react";
 import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
-import {UsageView} from "@edition/dashboard/usage/UsageView";
-import {OrganizationUpgradeView} from "@edition/dashboard/organization/OrganizationUpgradeView";
-import {OrganizationDeleteView} from "@edition/dashboard/organization/OrganizationDeleteView";
-import {OrganizationGeneralSettingsView} from "@edition/dashboard/organization/OrganizationGeneralSettingsView";
+import {UsageView} from "@edition/ui-dashboard/usage/UsageView";
+import {OrganizationUpgradeView} from "@edition/ui-dashboard/organization/OrganizationUpgradeView";
+import {OrganizationDeleteView} from "@edition/ui-dashboard/organization/OrganizationDeleteView";
+import {OrganizationGeneralSettingsView} from "@edition/ui-dashboard/organization/OrganizationGeneralSettingsView";
 
 export const OrganizationSettingsPage: React.FC = () => {
 

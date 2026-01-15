@@ -1,4 +1,4 @@
-import {NamespaceProjectsCreatePage} from "@edition/dashboard/namespace/NamespaceProjectsCreatePage";
+import {NamespaceProjectsCreatePage} from "@edition/ui-dashboard/namespace/NamespaceProjectsCreatePage";
 
 export default function Page() {
     return <NamespaceProjectsCreatePage/>

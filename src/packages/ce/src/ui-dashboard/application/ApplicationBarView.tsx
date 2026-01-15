@@ -18,7 +18,7 @@ import DUserMenu from "@code0-tech/pictor/dist/components/d-user/DUserMenu";
 import Link from "next/link";
 import {IconBuilding, IconFolders, IconInbox, IconLogout, IconSearch} from "@tabler/icons-react";
 import Image from "next/image";
-import {ApplicationBreadcrumbView} from "@edition/dashboard/application/ApplicationBreadcrumbView";
+import {ApplicationBreadcrumbView} from "@edition/ui-dashboard/application/ApplicationBreadcrumbView";
 
 export const ApplicationBarView: React.FC = () => {
 

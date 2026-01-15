@@ -1,4 +1,4 @@
-import {RolesPage} from "@edition/dashboard/role/RolesPage";
+import {RolesPage} from "@edition/ui-dashboard/role/RolesPage";
 
 export default function Page() {
     return <RolesPage/>

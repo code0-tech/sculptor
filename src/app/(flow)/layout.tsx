@@ -49,6 +49,7 @@ import {FlowTypeService} from "@edition/flowtype/FlowTypeService";
 import {FileTabsView} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.view";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
 import {IconArrowsMaximize, IconArrowsMinimize, IconCircleDot} from "@tabler/icons-react";
+import {FolderView} from "@edition/ui-flow/folder/FolderView";
 
 interface ApplicationLayoutProps {
     children: React.ReactNode
@@ -116,67 +117,7 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
             <DLayout>
                 <DResizablePanelGroup orientation={"horizontal"}>
                     <DResizablePanel id={"1"} defaultSize={"25%"}>
-                        <DLayout layoutGap={0} topContent={
-                            <Flex style={{gap: "0.35rem"}} align={"center"} justify={"space-between"} p={0.75}>
-                                <Button paddingSize={"xxs"} color={"success"}>
-                                    <Text>Create new flow</Text>
-                                </Button>
-                                <Flex style={{gap: "0.35rem"}}>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Button variant={"none"} paddingSize={"xxs"}
-                                                    onClick={() => ref.current?.openActivePath()}>
-                                                <IconCircleDot size={16}/>
-                                            </Button>
-                                        </TooltipTrigger>
-                                        <TooltipPortal>
-                                            <TooltipContent side={"bottom"}>
-                                                <Text>Open active flow</Text>
-                                                <TooltipArrow/>
-                                            </TooltipContent>
-                                        </TooltipPortal>
-                                    </Tooltip>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Button variant={"none"} paddingSize={"xxs"}
-                                                    onClick={() => ref.current?.closeAll()}>
-                                                <IconArrowsMinimize size={16}/>
-                                            </Button>
-                                        </TooltipTrigger>
-                                        <TooltipPortal>
-                                            <TooltipContent side={"bottom"}>
-                                                <Text>Close all</Text>
-                                                <TooltipArrow/>
-                                            </TooltipContent>
-                                        </TooltipPortal>
-                                    </Tooltip>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Button paddingSize={"xxs"} variant={"none"}
-                                                    onClick={() => ref.current?.openAll()}>
-                                                <IconArrowsMaximize size={16}/>
-                                            </Button>
-                                        </TooltipTrigger>
-                                        <TooltipPortal>
-                                            <TooltipContent side={"bottom"}>
-                                                <Text>Open all</Text>
-                                                <TooltipArrow/>
-                                            </TooltipContent>
-                                        </TooltipPortal>
-                                    </Tooltip>
-                                </Flex>
-                            </Flex>
-                        }>
-                            <div style={{padding: "0.75rem"}}>
-                                <DFlowFolder ref={ref} activeFlowId={flowId}
-                                             onSelect={(flow) => {
-                                                 const number = flow.id?.match(/Flow\/(\d+)$/)?.[1]
-                                                 router.push(`/namespace/${namespaceIndex}/project/${projectIndex}/flow/${number}`)
-                                             }}
-                                             namespaceId={`gid://sagittarius/Namespace/${namespaceIndex}`}
-                                             projectId={`gid://sagittarius/NamespaceProject/${projectIndex}`}/>
-                            </div>
-                        </DLayout>
+                        <FolderView/>
                     </DResizablePanel>
                     <DResizableHandle/>
                     {children}

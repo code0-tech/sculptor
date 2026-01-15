@@ -1,4 +1,4 @@
-import {UsersPage} from "@edition/dashboard/user/UsersPage";
+import {UsersPage} from "@edition/ui-dashboard/user/UsersPage";
 
 export default function Page() {
     return <UsersPage/>

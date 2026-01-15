@@ -6,10 +6,10 @@ import {useParams} from "next/navigation";
 import {Button, DLayout, Flex, Spacing, Text, useService, useStore} from "@code0-tech/pictor";
 import {RoleService} from "@edition/role/Role.service";
 import {Tab, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
-import {RoleProjectView} from "@edition/dashboard/role/RoleProjectView";
-import {RolePermissionView} from "@edition/dashboard/role/RolePermissionView";
-import {RoleGeneralAdjustmentView} from "@edition/dashboard/role/RoleGeneralAdjustmentView";
-import {RoleDeleteView} from "@edition/dashboard/role/RoleDeleteView";
+import {RoleProjectView} from "@edition/ui-dashboard/role/RoleProjectView";
+import {RolePermissionView} from "@edition/ui-dashboard/role/RolePermissionView";
+import {RoleGeneralAdjustmentView} from "@edition/ui-dashboard/role/RoleGeneralAdjustmentView";
+import {RoleDeleteView} from "@edition/ui-dashboard/role/RoleDeleteView";
 
 export const RoleSettingsPage: React.FC = () => {
 

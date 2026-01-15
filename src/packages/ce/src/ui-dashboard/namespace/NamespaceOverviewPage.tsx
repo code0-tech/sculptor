@@ -1,10 +1,10 @@
 "use client"
 
 import React from "react";
-import {NamespaceProjectsView} from "@edition/dashboard/namespace/NamespaceProjectsView";
+import {NamespaceProjectsView} from "@edition/ui-dashboard/namespace/NamespaceProjectsView";
 import {DLayout, useService, useStore, useUserSession} from "@code0-tech/pictor";
-import {NamespaceOverviewRightView} from "@edition/dashboard/namespace/NamespaceOverviewRightView";
-import {NamespaceOverviewLeftView} from "@edition/dashboard/namespace/NamespaceOverviewLeftView";
+import {NamespaceOverviewRightView} from "@edition/ui-dashboard/namespace/NamespaceOverviewRightView";
+import {NamespaceOverviewLeftView} from "@edition/ui-dashboard/namespace/NamespaceOverviewLeftView";
 import {useParams} from "next/navigation";
 import {UserService} from "@edition/user/User.service";
 

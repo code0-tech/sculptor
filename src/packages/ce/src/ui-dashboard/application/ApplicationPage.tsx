@@ -1,5 +1,5 @@
-import {PersonalProjectsView} from "@edition/dashboard/personal-project/PersonalProjectsView";
-import {OrganizationsView} from "@edition/dashboard/organization/OrganizationsView";
+import {PersonalProjectsView} from "@edition/ui-dashboard/personal-project/PersonalProjectsView";
+import {OrganizationsView} from "@edition/ui-dashboard/organization/OrganizationsView";
 import {Spacing} from "@code0-tech/pictor";
 
 export const ApplicationPage = () => {
