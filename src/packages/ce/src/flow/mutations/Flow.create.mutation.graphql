@@ -1,0 +1,20 @@
+#import "../fragments/Flow.basic.fragment.graphql"
+
+mutation flowCreate($flow: FlowInput!, $projectId: NamespaceProjectID!) {
+    namespacesProjectsFlowsCreate(input: {
+        flow: $flow,
+        projectId: $projectId
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        flow {
+            ...BasicFlow
+        }
+    }
+}
