@@ -1,4 +1,10 @@
-import {DFlowDependencies, DFlowReactiveService, DNamespaceProjectView, ReactiveArrayStore} from "@code0-tech/pictor";
+import {
+    DFlowDependencies,
+    DFlowReactiveService,
+    DNamespaceProjectView,
+    DOrganizationView,
+    ReactiveArrayStore
+} from "@code0-tech/pictor";
 import {
     Flow,
     Mutation,
@@ -7,12 +13,15 @@ import {
     NamespacesProjectsFlowsDeleteInput,
     NamespacesProjectsFlowsDeletePayload,
     NamespacesProjectsFlowsUpdateInput,
-    NamespacesProjectsFlowsUpdatePayload,
+    NamespacesProjectsFlowsUpdatePayload, OrganizationsUpdateInput,
     Query
 } from "@code0-tech/sagittarius-graphql-types";
 import {GraphqlClient} from "@core/util/graphql-client";
 import flowsQuery from "@edition/flow/queries/Flows.query.graphql";
 import flowCreateMutation from "@edition/flow/mutations/Flow.create.mutation.graphql";
+import flowDeleteMutation from "@edition/flow/mutations/Flow.delete.mutation.graphql";
+import flowUpdateMutation from "@edition/flow/mutations/Flow.update.mutation.graphql";
+
 
 export class FlowService extends DFlowReactiveService {
 
@@ -85,12 +94,40 @@ export class FlowService extends DFlowReactiveService {
         return result.data?.namespacesProjectsFlowsCreate ?? undefined
     }
 
-    flowDelete(payload: NamespacesProjectsFlowsDeleteInput): Promise<NamespacesProjectsFlowsDeletePayload | undefined> {
-        return Promise.resolve(undefined);
+    async flowDelete(payload: NamespacesProjectsFlowsDeleteInput): Promise<NamespacesProjectsFlowsDeletePayload | undefined> {
+        const result = await this.client.mutate<Mutation, NamespacesProjectsFlowsDeleteInput>({
+            mutation: flowDeleteMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        if (result.data && result.data.namespacesProjectsFlowsDelete && result.data.namespacesProjectsFlowsDelete.flow) {
+            const flow = result.data.namespacesProjectsFlowsDelete.flow
+            const index = this.values().findIndex(f => f.id === flow.id)
+            this.delete(index)
+
+        }
+
+        return result.data?.namespacesProjectsFlowsDelete ?? undefined
     }
 
-    flowUpdate(payload: NamespacesProjectsFlowsUpdateInput): Promise<NamespacesProjectsFlowsUpdatePayload | undefined> {
-        return Promise.resolve(undefined);
+    async flowUpdate(payload: NamespacesProjectsFlowsUpdateInput): Promise<NamespacesProjectsFlowsUpdatePayload | undefined> {
+        const result = await this.client.mutate<Mutation, NamespacesProjectsFlowsUpdateInput>({
+            mutation: flowUpdateMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        if (result.data && result.data.namespacesProjectsFlowsUpdate && result.data.namespacesProjectsFlowsUpdate.flow) {
+            const flow = result.data.namespacesProjectsFlowsUpdate.flow
+            const index = this.values().findIndex(f => f.id === flow.id)
+            this.set(index, {...this.get(index), ...flow})
+
+        }
+
+        return result.data?.namespacesProjectsFlowsUpdate ?? undefined
     }
 
 }
