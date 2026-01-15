@@ -5,32 +5,47 @@ import {
     Button,
     DFlowFolder,
     DFlowFolderCreateDialog,
+    DFlowFolderDeleteDialog,
     DFlowFolderHandle,
     DLayout,
     Flex,
-    Text, toast,
+    Text,
+    toast,
     Tooltip,
     TooltipArrow,
     TooltipContent,
     TooltipPortal,
-    TooltipTrigger, useService, useStore
+    TooltipTrigger,
+    useService,
+    useStore
 } from "@code0-tech/pictor";
 import {IconArrowsMaximize, IconArrowsMinimize, IconCircleDot} from "@tabler/icons-react";
 import {useParams, useRouter} from "next/navigation";
 import {Flow, FlowType, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {FlowService} from "@edition/flow/Flow.service";
+import {
+    DFlowFolderContextMenuGroupData,
+    DFlowFolderContextMenuItemData
+} from "@code0-tech/pictor/dist/components/d-flow-folder/DFlowFolderContextMenu";
 
 export const FolderView: React.FC = () => {
 
-    const flowService = useService(FlowService)
-    const flowStore = useStore(FlowService)
     const router = useRouter()
     const params = useParams()
+    const flowService = useService(FlowService)
 
     const [, startTransition] = React.useTransition()
     const ref = React.useRef<DFlowFolderHandle>(null)
+
     const [createDialogOpen, setCreateDialogOpen] = React.useState(false)
     const [flowTypeId, setFlowTypeId] = React.useState<FlowType['id']>(undefined)
+
+    const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
+    const [contextData, setContextData] = React.useState<DFlowFolderContextMenuGroupData | DFlowFolderContextMenuItemData>({
+        flow: [],
+        name: "",
+        type: "folder"
+    })
 
     const namespaceIndex = params.namespaceId as any as number
     const projectIndex = params.projectId as any as number
@@ -57,6 +72,25 @@ export const FolderView: React.FC = () => {
                         color: "success",
                         dismissible: true,
                     })
+
+                }
+            })
+        })
+    }, [flowService])
+
+    const deleteFlow = React.useCallback((flow: Flow) => {
+        if (!flow?.id) return
+        startTransition(() => {
+            flowService.flowDelete({
+                flowId: flow.id!
+            }).then(payload => {
+                if ((payload?.errors?.length ?? 0) <= 0) {
+                    toast({
+                        title: "The flow was successfully deleted.",
+                        color: "success",
+                        dismissible: true,
+                    })
+                    router.push(`/namespace/${namespaceIndex}/project/${projectIndex}/`)
                 }
             })
         })
@@ -68,6 +102,11 @@ export const FolderView: React.FC = () => {
                                  onOpenChange={(open) => setCreateDialogOpen(open)}
                                  onCreate={createFlow}
                                  flowTypeId={flowTypeId}/>
+
+        <DFlowFolderDeleteDialog open={deleteDialogOpen}
+                                 onOpenChange={(open) => setDeleteDialogOpen(open)}
+                                 contextData={contextData}
+                                 onDelete={deleteFlow}/>
 
         <DLayout layoutGap={0} topContent={
             <Flex style={{gap: "0.35rem"}} align={"center"} justify={"space-between"} p={0.75}>
@@ -129,6 +168,10 @@ export const FolderView: React.FC = () => {
                              onCreate={flowTypeId => {
                                  setCreateDialogOpen(true)
                                  setFlowTypeId(flowTypeId)
+                             }}
+                             onDelete={contextData => {
+                                 setDeleteDialogOpen(true)
+                                 setContextData(contextData)
                              }}
                              namespaceId={`gid://sagittarius/Namespace/${namespaceIndex}`}
                              projectId={`gid://sagittarius/NamespaceProject/${projectIndex}`}/>
