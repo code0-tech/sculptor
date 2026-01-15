@@ -1,0 +1,20 @@
+#import "../fragments/Flow.basic.fragment.graphql"
+
+mutation flowUpdate($flowId: FlowID!, $flowInput: FlowInput!) {
+    namespacesProjectsFlowsUpdate(input: {
+        flowId: $flowId
+        flowInput: $flowInput
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        flow {
+            ...BasicFlow
+        }
+    }
+}
