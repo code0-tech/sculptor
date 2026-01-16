@@ -1,0 +1,102 @@
+#import "../../function/fragments/DataTypeIdentifier.fragment.graphql"
+
+fragment DataType on DataType {
+    __typename
+    id
+    createdAt
+    updatedAt
+    identifier
+    genericKeys
+    variant
+
+
+    name {
+        __typename
+        code
+        content
+    }
+    aliases {
+        __typename
+        code
+        content
+    }
+    displayMessages {
+        __typename
+        code
+        content
+    }
+
+    runtime {
+        id
+    }
+
+    dataTypeIdentifiers (first: $firstDataTypeIdentifier, after: $afterDataTypeIdentifier) {
+        __typename
+        count
+        nodes {
+            ...DataTypeIdentifier
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+    }
+
+    rules (first: $firstRule, after: $afterRule) {
+        __typename
+        count
+        nodes {
+            __typename
+            id
+            variant
+            updatedAt
+            createdAt
+            config {
+                ... on DataTypeRulesContainsKeyConfig {
+                    __typename
+                    dataTypeIdentifierId
+                    key
+                }
+                ... on DataTypeRulesContainsTypeConfig {
+                    __typename
+                    dataTypeIdentifierId
+                }
+                ... on DataTypeRulesParentTypeConfig {
+                    __typename
+                    dataTypeIdentifierId
+                }
+                ... on DataTypeRulesReturnTypeConfig {
+                    __typename
+                    dataTypeIdentifierId
+                }
+                ... on DataTypeRulesInputTypesConfig {
+                    __typename
+                    inputTypes {
+                        __typename
+                        inputIdentifier
+                        dataTypeIdentifierId
+                    }
+                }
+                ... on DataTypeRulesItemOfCollectionConfig {
+                    __typename
+                    items
+                }
+                ... on DataTypeRulesNumberRangeConfig {
+                    __typename
+                    from
+                    steps
+                    to
+                }
+                ... on DataTypeRulesRegexConfig {
+                    __typename
+                    pattern
+                }
+            }
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+    }
+
+}
