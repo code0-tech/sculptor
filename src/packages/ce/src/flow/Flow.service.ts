@@ -1,10 +1,4 @@
-import {
-    DFlowDependencies,
-    DFlowReactiveService,
-    DNamespaceProjectView,
-    DOrganizationView,
-    ReactiveArrayStore
-} from "@code0-tech/pictor";
+import {DFlowDependencies, DFlowReactiveService, ReactiveArrayStore} from "@code0-tech/pictor";
 import {
     Flow,
     Mutation,
@@ -13,7 +7,8 @@ import {
     NamespacesProjectsFlowsDeleteInput,
     NamespacesProjectsFlowsDeletePayload,
     NamespacesProjectsFlowsUpdateInput,
-    NamespacesProjectsFlowsUpdatePayload, OrganizationsUpdateInput,
+    NamespacesProjectsFlowsUpdatePayload,
+    NodeFunction,
     Query
 } from "@code0-tech/sagittarius-graphql-types";
 import {GraphqlClient} from "@core/util/graphql-client";
@@ -73,6 +68,22 @@ export class FlowService extends DFlowReactiveService {
     hasById(id: Flow["id"]): boolean {
         const flow = super.values().find(f => f.id === id)
         return flow !== undefined
+    }
+
+
+    async addNextNodeById(flowId: Flow["id"], parentNodeId: NodeFunction["id"] | null, nextNode: NodeFunction): Promise<void> {
+
+        await super.addNextNodeById(flowId, parentNodeId, nextNode)
+
+        const flow = this.values().find(f => f.id === flowId)
+        const flowInput = this.getPayloadById(flowId)
+
+        if (!flow || !flowInput || !flowId) return Promise.reject()
+
+        await this.flowUpdate({
+            flowId: flowId,
+            flowInput: flowInput
+        })
     }
 
     async flowCreate(payload: NamespacesProjectsFlowsCreateInput): Promise<NamespacesProjectsFlowsCreatePayload | undefined> {
