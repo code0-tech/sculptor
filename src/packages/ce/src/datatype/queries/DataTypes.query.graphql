@@ -1,0 +1,30 @@
+#import "../fragments/DataType.fragment.graphql"
+
+query DataTypes (
+    $namespaceId: NamespaceID!
+    $projectId: NamespaceProjectID!
+    $firstDataType: Int!
+    $afterDataType: String
+    $firstDataTypeIdentifier: Int!
+    $afterDataTypeIdentifier: String
+    $firstRule: Int!
+    $afterRule: String
+) {
+    namespace(id: $namespaceId) {
+        project(id: $projectId) {
+            primaryRuntime {
+                dataTypes (first: $firstDataType, after: $afterDataType) {
+                    __typename
+                    count
+                    nodes {
+                        ...DataType
+                    }
+                    pageInfo {
+                        endCursor
+                        hasNextPage
+                    }
+                }
+            }
+        }
+    }
+}
