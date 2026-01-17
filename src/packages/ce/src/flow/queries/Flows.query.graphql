@@ -9,6 +9,19 @@ query Flows (
     $afterNode: String,
     $firstNodeParameter: Int!,
     $afterNodeParameter: String,
+
+    $firstSetting: Int!,
+    $afterSetting: String,
+
+    #$firstInputDataTypeIdentifier: Int!
+    #$afterInputDataTypeIdentifier: String
+    #$firstInputRule: Int!
+    #$afterInputRule: String
+
+    #$firstReturnDataTypeIdentifier: Int!
+    #$afterReturnDataTypeIdentifier: String
+    #$firstReturnRule: Int!
+    #$afterReturnRule: String
 ) {
     namespace(id: $namespaceId) {
         project(id: $projectId) {
