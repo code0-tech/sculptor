@@ -4,9 +4,7 @@ fragment Flow on Flow {
     __typename
     id
     createdAt
-    inputType {
-        id
-    }
+
     name
     nodes (first: $firstNode, after: $afterNode) {
         __typename
@@ -82,12 +80,21 @@ fragment Flow on Flow {
         __typename
         id
     }
-    returnType {
+    settings (first: $firstSetting, after: $afterSetting) {
         __typename
-        id
-    }
-    settings {
-        __typename
+        count
+        nodes {
+            __typename
+            id
+            createdAt
+            updatedAt
+            flowSettingIdentifier
+            value
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
     }
     startingNodeId
     type {
