@@ -1,3 +1,7 @@
+#import "../../function/fragments/DataTypeIdentifier.fragment.graphql"
+#import "../../datatype/fragments/DataType.basic.fragment.graphql"
+#import "../../datatype/fragments/DataTypeRule.fragment.graphql"
+
 fragment FlowType on FlowType {
     __typename
     id
@@ -26,6 +30,82 @@ fragment FlowType on FlowType {
     }
     runtime {
         id
+    }
+    inputType {
+        ...BasicDataType
+        dataTypeIdentifiers (first: $firstInputDataTypeIdentifier, after: $afterInputDataTypeIdentifier) {
+            __typename
+            count
+            nodes {
+                ...DataTypeIdentifier
+            }
+            pageInfo {
+                endCursor
+                hasNextPage
+            }
+        }
+        rules (first: $firstInputRule, after: $afterInputRule) {
+            __typename
+            count
+            nodes {
+                ...DataTypeRule
+            }
+            pageInfo {
+                endCursor
+                hasNextPage
+            }
+        }
+
+    }
+    returnType {
+        ...BasicDataType
+        dataTypeIdentifiers (first: $firstReturnDataTypeIdentifier, after: $afterReturnDataTypeIdentifier) {
+            __typename
+            count
+            nodes {
+                ...DataTypeIdentifier
+            }
+            pageInfo {
+                endCursor
+                hasNextPage
+            }
+        }
+        rules (first: $firstReturnRule, after: $afterReturnRule) {
+            __typename
+            count
+            nodes {
+                ...DataTypeRule
+            }
+            pageInfo {
+                endCursor
+                hasNextPage
+            }
+        }
+    }
+    flowTypeSettings {
+        __typename
+        id
+        createdAt
+        updatedAt
+        identifier
+        unique
+
+
+        dataType {
+            id
+        }
+
+        names {
+            __typename
+            code
+            content
+        }
+        descriptions {
+            __typename
+            code
+            content
+        }
+
     }
     editable
 

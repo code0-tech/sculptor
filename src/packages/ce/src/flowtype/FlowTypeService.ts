@@ -31,6 +31,16 @@ export class FlowTypeService extends DFlowTypeReactiveService {
 
                     firstFlowType: 50,
                     afterFlowType: null,
+
+                    firstInputDataTypeIdentifier: 50,
+                    afterInputDataTypeIdentifier: null,
+                    firstInputRule: 50,
+                    afterInputRule: null,
+
+                    firstReturnDataTypeIdentifier: 50,
+                    afterReturnDataTypeIdentifier: null,
+                    firstReturnRule: 50,
+                    afterReturnRule: null
                 }
             }).then(res => {
                 const nodes = res.data?.namespace?.project?.primaryRuntime?.flowTypes?.nodes ?? []
