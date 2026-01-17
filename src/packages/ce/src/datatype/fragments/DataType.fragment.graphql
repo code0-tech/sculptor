@@ -1,4 +1,5 @@
 #import "../../function/fragments/DataTypeIdentifier.fragment.graphql"
+#import "./DataTypeRule.fragment.graphql"
 
 fragment DataType on DataType {
     __typename
@@ -46,52 +47,7 @@ fragment DataType on DataType {
         __typename
         count
         nodes {
-            __typename
-            id
-            variant
-            updatedAt
-            createdAt
-            config {
-                ... on DataTypeRulesContainsKeyConfig {
-                    __typename
-                    dataTypeIdentifierId
-                    key
-                }
-                ... on DataTypeRulesContainsTypeConfig {
-                    __typename
-                    dataTypeIdentifierId
-                }
-                ... on DataTypeRulesParentTypeConfig {
-                    __typename
-                    dataTypeIdentifierId
-                }
-                ... on DataTypeRulesReturnTypeConfig {
-                    __typename
-                    dataTypeIdentifierId
-                }
-                ... on DataTypeRulesInputTypesConfig {
-                    __typename
-                    inputTypes {
-                        __typename
-                        inputIdentifier
-                        dataTypeIdentifierId
-                    }
-                }
-                ... on DataTypeRulesItemOfCollectionConfig {
-                    __typename
-                    items
-                }
-                ... on DataTypeRulesNumberRangeConfig {
-                    __typename
-                    from
-                    steps
-                    to
-                }
-                ... on DataTypeRulesRegexConfig {
-                    __typename
-                    pattern
-                }
-            }
+            ...DataTypeRule
         }
         pageInfo {
             endCursor
