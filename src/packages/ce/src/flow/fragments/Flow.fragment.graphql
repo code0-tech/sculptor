@@ -34,8 +34,6 @@ fragment Flow on Flow {
                         ... on LiteralValue {
                             __typename
                             value
-                            createdAt
-                            updatedAt
                         }
                         ... on NodeFunctionIdWrapper {
                             __typename
