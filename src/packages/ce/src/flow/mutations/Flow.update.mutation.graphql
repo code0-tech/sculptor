@@ -9,6 +9,7 @@ mutation flowUpdate($flowId: FlowID!, $flowInput: FlowInput!) {
             ...on Error {
                 errorCode,
                 details {
+                    ...on ActiveModelError { attribute type }
                     __typename
                 }
             }
