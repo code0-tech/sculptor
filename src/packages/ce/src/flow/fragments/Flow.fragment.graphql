@@ -22,7 +22,7 @@ fragment Flow on Flow {
                     id
                     updatedAt
                     createdAt
-                    runtimeParameter {
+                    parameterDefinition {
                         __typename
                         id
                         identifier
