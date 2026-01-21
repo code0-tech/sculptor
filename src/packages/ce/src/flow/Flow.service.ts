@@ -1,6 +1,6 @@
 import {DFlowDependencies, DFlowReactiveService, ReactiveArrayStore} from "@code0-tech/pictor";
 import {
-    Flow,
+    Flow, LiteralValue,
     Mutation,
     NamespacesProjectsFlowsCreateInput,
     NamespacesProjectsFlowsCreatePayload,
@@ -8,14 +8,15 @@ import {
     NamespacesProjectsFlowsDeletePayload,
     NamespacesProjectsFlowsUpdateInput,
     NamespacesProjectsFlowsUpdatePayload,
-    NodeFunction,
-    Query
+    NodeFunction, NodeParameter,
+    Query, ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
 import {GraphqlClient} from "@core/util/graphql-client";
 import flowsQuery from "@edition/flow/queries/Flows.query.graphql";
 import flowCreateMutation from "@edition/flow/mutations/Flow.create.mutation.graphql";
 import flowDeleteMutation from "@edition/flow/mutations/Flow.delete.mutation.graphql";
 import flowUpdateMutation from "@edition/flow/mutations/Flow.update.mutation.graphql";
+import {store} from "next/dist/build/output/store";
 
 
 export class FlowService extends DFlowReactiveService {
@@ -85,9 +86,23 @@ export class FlowService extends DFlowReactiveService {
 
 
     async addNextNodeById(flowId: Flow["id"], parentNodeId: NodeFunction["id"] | null, nextNode: NodeFunction): Promise<void> {
-
         await super.addNextNodeById(flowId, parentNodeId, nextNode)
+        return this.syncFlow(flowId)
+    }
 
+
+    async deleteNodeById(flowId: Flow["id"], nodeId: NodeFunction["id"]): Promise<void> {
+        await super.deleteNodeById(flowId, nodeId)
+        return this.syncFlow(flowId)
+    }
+
+
+    async setParameterValue(flowId: Flow["id"], nodeId: NodeFunction["id"], parameterId: NodeParameter["id"], value?: LiteralValue | ReferenceValue | NodeFunction): Promise<void> {
+        await super.setParameterValue(flowId, nodeId, parameterId, value)
+        return this.syncFlow(flowId)
+    }
+
+    private async syncFlow(flowId: Flow["id"]) {
         const flow = this.values().find(f => f.id === flowId)
         const flowInput = this.getPayloadById(flowId)
 
@@ -145,10 +160,7 @@ export class FlowService extends DFlowReactiveService {
         })
 
         if (result.data && result.data.namespacesProjectsFlowsUpdate && result.data.namespacesProjectsFlowsUpdate.flow) {
-            const flow = result.data.namespacesProjectsFlowsUpdate.flow
-            const index = this.values().findIndex(f => f.id === flow.id)
-            this.set(index, {...this.get(index), ...flow})
-
+            //TODO: update store if needed
         }
 
         return result.data?.namespacesProjectsFlowsUpdate ?? undefined
