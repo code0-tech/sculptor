@@ -16,17 +16,19 @@ import flowsQuery from "@edition/flow/queries/Flows.query.graphql";
 import flowCreateMutation from "@edition/flow/mutations/Flow.create.mutation.graphql";
 import flowDeleteMutation from "@edition/flow/mutations/Flow.delete.mutation.graphql";
 import flowUpdateMutation from "@edition/flow/mutations/Flow.update.mutation.graphql";
-import {store} from "next/dist/build/output/store";
 
 
 export class FlowService extends DFlowReactiveService {
 
     private readonly client: GraphqlClient
-    private i = 0
+    private flowUpdateQueue: Array<Flow["id"]>
+    private i
 
     constructor(client: GraphqlClient, store: ReactiveArrayStore<Flow>) {
         super(store)
         this.client = client
+        this.flowUpdateQueue = []
+        this.i = 0
     }
 
     values(dependencies?: DFlowDependencies): Flow[] {
@@ -87,31 +89,41 @@ export class FlowService extends DFlowReactiveService {
 
     async addNextNodeById(flowId: Flow["id"], parentNodeId: NodeFunction["id"] | null, nextNode: NodeFunction): Promise<void> {
         await super.addNextNodeById(flowId, parentNodeId, nextNode)
-        return this.syncFlow(flowId)
+        await this.syncFlow(flowId)
     }
 
 
     async deleteNodeById(flowId: Flow["id"], nodeId: NodeFunction["id"]): Promise<void> {
         await super.deleteNodeById(flowId, nodeId)
-        return this.syncFlow(flowId)
+        await this.syncFlow(flowId)
     }
 
 
     async setParameterValue(flowId: Flow["id"], nodeId: NodeFunction["id"], parameterId: NodeParameter["id"], value?: LiteralValue | ReferenceValue | NodeFunction): Promise<void> {
         await super.setParameterValue(flowId, nodeId, parameterId, value)
-        return this.syncFlow(flowId)
+        await this.syncFlow(flowId)
     }
 
     private async syncFlow(flowId: Flow["id"]) {
-        const flow = this.values().find(f => f.id === flowId)
-        const flowInput = this.getPayloadById(flowId)
 
-        if (!flow || !flowInput || !flowId) return Promise.reject()
+        const alreadyQueued = this.flowUpdateQueue.includes(flowId)
+        if (alreadyQueued) return Promise.resolve()
 
-        await this.flowUpdate({
-            flowId: flowId,
-            flowInput: flowInput
-        })
+        this.flowUpdateQueue.push(flowId)
+
+        setTimeout(async () => {
+            const flow = this.values().find(f => f.id === flowId)
+            const flowInput = this.getPayloadById(flowId)
+
+            if (!flow || !flowInput || !flowId) return Promise.reject()
+
+            await this.flowUpdate({
+                flowId: flowId,
+                flowInput: flowInput
+            })
+
+            this.flowUpdateQueue.splice(this.flowUpdateQueue.indexOf(flowId), 1)
+        }, 1000*60) // 1 min
     }
 
     async flowCreate(payload: NamespacesProjectsFlowsCreateInput): Promise<NamespacesProjectsFlowsCreatePayload | undefined> {
