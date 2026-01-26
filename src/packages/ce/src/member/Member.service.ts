@@ -20,13 +20,14 @@ import membersQuery from "./queries/Members.query.graphql"
 import memberAssignRoleMutation from "./mutations/Member.assignRoles.mutation.graphql"
 import memberDeleteMutation from "./mutations/Member.delete.mutation.graphql"
 import memberInviteMutation from "./mutations/Member.invite.mutation.graphql"
+import {View} from "@code0-tech/pictor/dist/utils/view";
 
 export class MemberService extends DNamespaceMemberReactiveService {
 
     private readonly client: GraphqlClient
     private i = 0
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<DNamespaceMemberView>) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<DNamespaceMemberView>>) {
         super(store)
         this.client = client
     }
@@ -52,7 +53,7 @@ export class MemberService extends DNamespaceMemberReactiveService {
                 const nodes = res.data?.namespace?.members?.nodes ?? []
                 nodes.forEach(member => {
                     if (member && !this.hasById(member.id)) {
-                        this.set(this.i++, new DNamespaceMemberView(member))
+                        this.set(this.i++, new View(new DNamespaceMemberView(member)))
                     }
                 })
             })
@@ -87,7 +88,7 @@ export class MemberService extends DNamespaceMemberReactiveService {
                 }
             })
 
-            this.set(index, newMember)
+            this.set(index, new View(newMember))
         }
 
         return result.data?.namespacesMembersAssignRoles ?? undefined
@@ -120,7 +121,7 @@ export class MemberService extends DNamespaceMemberReactiveService {
 
         if (result.data && result.data.namespacesMembersInvite && result.data.namespacesMembersInvite.namespaceMember) {
             const member = result.data.namespacesMembersInvite.namespaceMember
-            this.set(this.i++, new DNamespaceMemberView(member))
+            this.set(this.i++, new View(new DNamespaceMemberView(member)))
         }
 
         return result.data?.namespacesMembersInvite ?? undefined

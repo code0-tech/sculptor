@@ -15,13 +15,14 @@ import createOrganizationMutation from "./mutations/Organization.create.mutation
 import updateOrganizationMutation from "./mutations/Organization.update.mutation.graphql";
 import deleteOrganizationMutation from "./mutations/Organization.delete.mutation.graphql";
 import organizationQuery from "./queries/Organization.query.graphql";
+import {View} from "@code0-tech/pictor/dist/utils/view";
 
 export class OrganizationService extends DOrganizationReactiveService {
 
     private readonly client: GraphqlClient
     private i = 0;
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<DOrganizationView>) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<DOrganizationView>>) {
         super(store);
         this.client = client
     }
@@ -36,7 +37,7 @@ export class OrganizationService extends DOrganizationReactiveService {
 
             if (data.organizations && data.organizations.nodes) {
                 data.organizations.nodes.forEach((organization) => {
-                    if (organization && !this.hasById(organization.id)) this.set(this.i++, new DOrganizationView(organization))
+                    if (organization && !this.hasById(organization.id)) this.set(this.i++, new View(new DOrganizationView(organization)))
                 })
             }
         })
@@ -59,7 +60,7 @@ export class OrganizationService extends DOrganizationReactiveService {
         if (result.data && result.data.organizationsCreate && result.data.organizationsCreate.organization) {
             const organization = result.data.organizationsCreate.organization
             if (!this.hasById(organization.id)) {
-                this.add(new DOrganizationView(organization))
+                this.add(new View(new DOrganizationView(organization)))
             }
         }
 
@@ -95,7 +96,7 @@ export class OrganizationService extends DOrganizationReactiveService {
         if (result.data && result.data.organizationsUpdate && result.data.organizationsUpdate.organization) {
             const organization = result.data.organizationsUpdate.organization
             const index = this.values().findIndex(o => o.id === organization.id)
-            this.set(index, new DOrganizationView(organization))
+            this.set(index, new View(new DOrganizationView(organization)))
 
         }
 

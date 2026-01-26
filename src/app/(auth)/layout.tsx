@@ -7,6 +7,7 @@ import {GraphqlClient} from "@core/util/graphql-client";
 import Image from "next/image";
 import React from "react";
 import {usePersistentReactiveArrayService} from "@/hooks/usePersistentReactiveArrayService";
+import {View} from "@code0-tech/pictor/dist/utils/view";
 
 export default function AuthLayout({children}: Readonly<{ children: React.ReactNode }>) {
 

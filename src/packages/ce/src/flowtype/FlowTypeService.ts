@@ -2,13 +2,14 @@ import {DFlowTypeDependencies, DFlowTypeReactiveService, FlowTypeView, ReactiveA
 import {GraphqlClient} from "@core/util/graphql-client";
 import {FlowType, Query} from "@code0-tech/sagittarius-graphql-types";
 import flowTypesQuery from "@edition/flowtype/queries/FlowTypes.query.graphql"
+import {View} from "@code0-tech/pictor/dist/utils/view";
 
 export class FlowTypeService extends DFlowTypeReactiveService {
 
     private readonly client: GraphqlClient
     private i = 0
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<FlowTypeView>) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<FlowTypeView>>) {
         super(store)
         this.client = client
     }
@@ -46,7 +47,7 @@ export class FlowTypeService extends DFlowTypeReactiveService {
                 const nodes = res.data?.namespace?.project?.primaryRuntime?.flowTypes?.nodes ?? []
                 nodes.forEach(flowType => {
                     if (flowType && !this.hasById(flowType.id)) {
-                        this.set(this.i++, new FlowTypeView(flowType))
+                        this.set(this.i++, new View(new FlowTypeView(flowType)))
                     }
                 })
             })

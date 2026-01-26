@@ -6,13 +6,14 @@ import {
 import {GraphqlClient} from "@core/util/graphql-client";
 import {DataType, Query} from "@code0-tech/sagittarius-graphql-types";
 import dataTypeQuery from "@edition/datatype/queries/DataTypes.query.graphql"
+import {View} from "@code0-tech/pictor/dist/utils/view";
 
 export class DatatypeService extends DFlowDataTypeReactiveService {
 
     private readonly client: GraphqlClient
     private i = 0
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<DataTypeView>) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<DataTypeView>>) {
         super(store)
         this.client = client
     }
@@ -46,7 +47,7 @@ export class DatatypeService extends DFlowDataTypeReactiveService {
                 const nodes = res.data?.namespace?.project?.primaryRuntime?.dataTypes?.nodes ?? []
                 nodes.forEach(dataType => {
                     if (dataType && !this.hasById(dataType.id)) {
-                        this.set(this.i++, new DataTypeView(dataType))
+                        this.set(this.i++, new View(new DataTypeView(dataType)))
                     }
                 })
             })

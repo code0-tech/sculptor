@@ -7,13 +7,14 @@ import {
 import {GraphqlClient} from "@core/util/graphql-client";
 import {FunctionDefinition, Query} from "@code0-tech/sagittarius-graphql-types";
 import functionsQuery from "@edition/function/queries/Functions.query.graphql";
+import {View} from "@code0-tech/pictor/dist/utils/view";
 
 export class FunctionService extends DFlowFunctionReactiveService {
 
     private readonly client: GraphqlClient
     private i = 0
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<FunctionDefinitionView>) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<FunctionDefinitionView>>) {
         super(store)
         this.client = client
     }
@@ -47,7 +48,7 @@ export class FunctionService extends DFlowFunctionReactiveService {
                 const nodes = res.data?.namespace?.project?.primaryRuntime?.functionDefinitions?.nodes ?? []
                 nodes.forEach(functionD => {
                     if (functionD && !this.hasById(functionD.id)) {
-                        this.set(this.i++, new FunctionDefinitionView(functionD))
+                        this.set(this.i++, new View(new FunctionDefinitionView(functionD)))
                     }
                 })
             })

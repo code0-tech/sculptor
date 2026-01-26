@@ -18,13 +18,14 @@ import {
 import {GraphqlClient} from "@core/util/graphql-client";
 import projectsQuery from "./queries/Projects.query.graphql"
 import projectCreateMutation from "./mutations/Project.create.mutation.graphql"
+import {View} from "@code0-tech/pictor/dist/utils/view";
 
 export class ProjectService extends DNamespaceProjectReactiveService {
 
     private readonly client: GraphqlClient
     private i = 0;
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<DNamespaceProjectView>) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<DNamespaceProjectView>>) {
         super(store);
         this.client = client
     }
@@ -52,7 +53,7 @@ export class ProjectService extends DNamespaceProjectReactiveService {
                         project.namespace?.id === namespaceId &&
                         !this.hasById(project.id)
                     ) {
-                        this.set(this.i++, new DNamespaceProjectView(project))
+                        this.set(this.i++, new View(new DNamespaceProjectView(project)))
                     }
                 })
             })
@@ -81,7 +82,7 @@ export class ProjectService extends DNamespaceProjectReactiveService {
         if (result.data && result.data.namespacesProjectsCreate && result.data.namespacesProjectsCreate.namespaceProject) {
             const project = result.data.namespacesProjectsCreate.namespaceProject
             if (!this.hasById(project.id)) {
-                this.add(new DNamespaceProjectView(project))
+                this.add(new View(new DNamespaceProjectView(project)))
             }
         }
 

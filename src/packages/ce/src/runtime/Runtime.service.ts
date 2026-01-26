@@ -19,13 +19,14 @@ import createRuntimeMutation from "./mutations/Runtime.create.mutation.graphql"
 import updateRuntimeMutation from "./mutations/Runtime.update.mutation.graphql"
 import deleteRuntimeMutation from "./mutations/Runtime.delete.mutation.graphql"
 import rotateTokenRuntimeMutation from "./mutations/Runtime.rotateToken.mutation.graphql"
+import {View} from "@code0-tech/pictor/dist/utils/view";
 
 export class RuntimeService extends DRuntimeReactiveService {
 
     private readonly client: GraphqlClient
     private i = 0
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<DRuntimeView>) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<DRuntimeView>>) {
         super(store);
         this.client = client
     }
@@ -50,7 +51,7 @@ export class RuntimeService extends DRuntimeReactiveService {
                     const nodes = res.data?.globalRuntimes?.nodes ?? []
                     nodes.forEach(runtime => {
                         if (runtime && !this.hasById(runtime.id)) {
-                            this.set(this.i++, new DRuntimeView(runtime))
+                            this.set(this.i++, new View(new DRuntimeView(runtime)))
                         }
                     })
                 })
@@ -78,7 +79,7 @@ export class RuntimeService extends DRuntimeReactiveService {
                         runtime.namespace?.id === namespaceId &&
                         !this.hasById(runtime.id)
                     ) {
-                        this.set(this.i++, new DRuntimeView(runtime))
+                        this.set(this.i++, new View(new DRuntimeView(runtime)))
                     }
                 })
             })
@@ -98,7 +99,7 @@ export class RuntimeService extends DRuntimeReactiveService {
         if (result.data && result.data.runtimesCreate && result.data.runtimesCreate.runtime) {
             const runtime = result.data.runtimesCreate.runtime
             if (!this.hasById(runtime.id)) {
-                this.add(new DRuntimeView(runtime))
+                this.add(new View(new DRuntimeView(runtime)))
             }
         }
 
@@ -116,7 +117,7 @@ export class RuntimeService extends DRuntimeReactiveService {
         if (result.data && result.data.runtimesUpdate && result.data.runtimesUpdate.runtime) {
             const runtime = result.data.runtimesUpdate.runtime
             const index = this.values().findIndex(r => r.id === runtime.id)
-            this.set(index, new DRuntimeView(runtime))
+            this.set(index, new View(new DRuntimeView(runtime)))
 
         }
 
@@ -152,7 +153,7 @@ export class RuntimeService extends DRuntimeReactiveService {
         if (result.data && result.data.runtimesRotateToken && result.data.runtimesRotateToken.runtime) {
             const runtime = result.data.runtimesRotateToken.runtime
             const index = this.values().findIndex(r => r.id === runtime.id)
-            this.set(index, new DRuntimeView(runtime))
+            this.set(index, new View(new DRuntimeView(runtime)))
 
         }
 

@@ -3,17 +3,18 @@
 import React from "react";
 import type {ArrayService} from "@code0-tech/pictor/dist/utils/arrayService";
 import type {ReactiveArrayStore} from "@code0-tech/pictor/dist/utils/reactiveArrayService";
+import {Payload, View} from "@code0-tech/pictor/dist/utils/view";
 
-export type ArrayServiceCtor<K, S extends ArrayService<K>> = new (store: ReactiveArrayStore<K>) => S;
-export type ServiceFactory<K, S extends ArrayService<K>> = ArrayServiceCtor<K, S> | ((store: ReactiveArrayStore<K>) => S);
-type InitialArg<K, S extends ArrayService<K>> = K[] | ((svc: S) => K[]);
+export type ArrayServiceCtor<R extends Payload, S extends ArrayService<View<R>, R>> = new (store: ReactiveArrayStore<View<R>>) => S;
+export type ServiceFactory<R extends Payload, S extends ArrayService<View<R>, R>> = ArrayServiceCtor<R, S> | ((store: ReactiveArrayStore<View<R>>) => S);
+type InitialArg<R extends Payload, S extends ArrayService<View<R>, R>> = View<R>[] | ((svc: S) => View<R>[]);
 
 type Listener = () => void;
 
-type PersistentEntry<K, S extends ArrayService<K>> = {
+type PersistentEntry<R extends Payload, S extends ArrayService<View<R>, R>> = {
     service: S;
-    store: ReactiveArrayStore<K>;
-    getSnapshot: () => K[];
+    store: ReactiveArrayStore<View<R>>;
+    getSnapshot: () => View<R>[];
     listeners: Set<Listener>;
 };
 
@@ -31,30 +32,30 @@ const registry = (): Registry => {
     return globalThis.__sculptorPersistentReactiveServices;
 };
 
-function isConstructor<K, S extends ArrayService<K>>(value: ServiceFactory<K, S>): value is ArrayServiceCtor<K, S> {
+function isConstructor<R extends Payload, S extends ArrayService<View<R>, R>>(value: ServiceFactory<R, S>): value is ArrayServiceCtor<R, S> {
     return typeof value === "function" && !!value.prototype && value.prototype.constructor === value;
 }
 
-function instantiateService<K, S extends ArrayService<K>>(factory: ServiceFactory<K, S>, store: ReactiveArrayStore<K>): S {
+function instantiateService<R extends Payload, S extends ArrayService<View<R>, R>>(factory: ServiceFactory<R, S>, store: ReactiveArrayStore<View<R>>): S {
     return isConstructor(factory)
         ? new factory(store)
         : factory(store);
 }
 
-function ensureEntry<K, S extends ArrayService<K>>(key: string, factory: ServiceFactory<K, S>, initial: InitialArg<K, S>): PersistentEntry<K, S> {
+function ensureEntry<R extends Payload, S extends ArrayService<View<R>, R>>(key: string, factory: ServiceFactory<R, S>, initial: InitialArg<R, S>): PersistentEntry<R, S> {
     const map = registry();
     const existing = map.get(key);
     if (existing) {
-        return existing as PersistentEntry<K, S>;
+        return existing as PersistentEntry<R, S>;
     }
 
     const listeners = new Set<Listener>();
-    let snapshot: K[] = Array.isArray(initial) ? [...initial] : [];
+    let snapshot: View<R>[] = Array.isArray(initial) ? [...initial] : [];
 
-    const store: ReactiveArrayStore<K> = {
+    const store: ReactiveArrayStore<View<R>> = {
         getState: () => snapshot,
         setState: (update) => {
-            snapshot = typeof update === "function" ? (update as (prev: K[]) => K[])(snapshot) : update;
+            snapshot = typeof update === "function" ? (update as (prev: View<R>[]) => View<R>[])(snapshot) : update;
             listeners.forEach((listener) => listener());
         },
     };
@@ -65,7 +66,7 @@ function ensureEntry<K, S extends ArrayService<K>>(key: string, factory: Service
         snapshot = initial(service);
     }
 
-    const entry: PersistentEntry<K, S> = {
+    const entry: PersistentEntry<R, S> = {
         service,
         store,
         getSnapshot: () => snapshot,
@@ -76,11 +77,11 @@ function ensureEntry<K, S extends ArrayService<K>>(key: string, factory: Service
     return entry;
 }
 
-export function usePersistentReactiveArrayService<K, S extends ArrayService<K>>(
+export function usePersistentReactiveArrayService<R extends Payload, S extends ArrayService<View<R>, R>>(
     key: string,
-    factory: ServiceFactory<K, S>,
-    initial: InitialArg<K, S> = []
-): [K[], S] {
+    factory: ServiceFactory<R, S>,
+    initial: InitialArg<R, S> = []
+): [View<R>[], S] {
     const entry = React.useMemo(() => ensureEntry(key, factory, initial), [key, factory, initial]);
 
     const subscribe = React.useCallback((listener: Listener) => {

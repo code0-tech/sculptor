@@ -16,6 +16,7 @@ import flowsQuery from "@edition/flow/queries/Flows.query.graphql";
 import flowCreateMutation from "@edition/flow/mutations/Flow.create.mutation.graphql";
 import flowDeleteMutation from "@edition/flow/mutations/Flow.delete.mutation.graphql";
 import flowUpdateMutation from "@edition/flow/mutations/Flow.update.mutation.graphql";
+import {View} from "@code0-tech/pictor/dist/utils/view";
 
 
 export class FlowService extends DFlowReactiveService {
@@ -24,7 +25,7 @@ export class FlowService extends DFlowReactiveService {
     private flowUpdateQueue: Array<Flow["id"]>
     private i
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<Flow>) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<Flow>>) {
         super(store)
         this.client = client
         this.flowUpdateQueue = []
@@ -72,7 +73,7 @@ export class FlowService extends DFlowReactiveService {
                 const nodes = res.data?.namespace?.project?.flows?.nodes ?? []
                 nodes.forEach(flow => {
                     if (flow && !this.hasById(flow.id)) {
-                        this.set(this.i++, flow)
+                        this.set(this.i++, new View(flow))
                     }
                 })
             })
@@ -138,7 +139,7 @@ export class FlowService extends DFlowReactiveService {
             const flow = result.data.namespacesProjectsFlowsCreate.flow
             if (!this.hasById(flow.id)) {
                 flow.nodes = {nodes: []} //TODO: to avoid issues, when fixed in pictor
-                this.add(flow)
+                this.add(new View(flow))
             }
         }
 
@@ -164,6 +165,11 @@ export class FlowService extends DFlowReactiveService {
     }
 
     async flowUpdate(payload: NamespacesProjectsFlowsUpdateInput): Promise<NamespacesProjectsFlowsUpdatePayload | undefined> {
+
+        const flow = this.getById(payload.flowId)
+
+        if (!flow) return Promise.reject()
+
         const result = await this.client.mutate<Mutation, NamespacesProjectsFlowsUpdateInput>({
             mutation: flowUpdateMutation,
             variables: {
@@ -172,7 +178,10 @@ export class FlowService extends DFlowReactiveService {
         })
 
         if (result.data && result.data.namespacesProjectsFlowsUpdate && result.data.namespacesProjectsFlowsUpdate.flow) {
-            //TODO: update store if needed
+            const flowIndex = this.values().findIndex(f => f.id === payload.flowId)
+            flow.updatedAt = result.data.namespacesProjectsFlowsUpdate.flow.updatedAt
+            flow.editedAt = undefined
+            this.set(flowIndex, new View(flow))
         }
 
         return result.data?.namespacesProjectsFlowsUpdate ?? undefined

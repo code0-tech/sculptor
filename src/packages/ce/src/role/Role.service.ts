@@ -25,13 +25,14 @@ import roleUpdateMutation from "@edition/role/mutations/Role.update.mutation.gra
 import roleDeleteMutation from "@edition/role/mutations/Role.delete.mutation.graphql";
 import roleAssignAbilitiesMutation from "@edition/role/mutations/Role.assignAbilities.mutation.graphql";
 import roleAssignProjectsMutation from "@edition/role/mutations/Role.assignProjects.mutation.graphql";
+import {View} from "@code0-tech/pictor/dist/utils/view";
 
 export class RoleService extends DNamespaceRoleReactiveService {
 
     private readonly client: GraphqlClient
     private i = 0;
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<DNamespaceRoleView>) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<DNamespaceRoleView>>) {
         super(store);
         this.client = client
     }
@@ -61,7 +62,7 @@ export class RoleService extends DNamespaceRoleReactiveService {
                         role.namespace?.id === namespaceId &&
                         !this.hasById(role.id)
                     ) {
-                        this.set(this.i++, new DNamespaceRoleView(role))
+                        this.set(this.i++, new View(new DNamespaceRoleView(role)))
                     }
                 })
             })
@@ -93,7 +94,7 @@ export class RoleService extends DNamespaceRoleReactiveService {
                 abilities: payload.abilities
             })
 
-            this.set(index, newRole)
+            this.set(index, new View(newRole))
         }
 
         return result.data?.namespacesRolesAssignAbilities ?? undefined
@@ -122,7 +123,7 @@ export class RoleService extends DNamespaceRoleReactiveService {
                 }
             })
 
-            this.set(index, newRole)
+            this.set(index, new View(newRole))
         }
 
         return result.data?.namespacesRolesAssignProjects ?? undefined
@@ -146,7 +147,7 @@ export class RoleService extends DNamespaceRoleReactiveService {
                 name: payload.name
             })
 
-            this.set(index, newRole)
+            this.set(index, new View(newRole))
         }
 
         return result.data?.namespacesRolesUpdate ?? undefined
