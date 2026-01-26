@@ -63,6 +63,8 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
     const projectId: NamespaceProject['id'] = `gid://sagittarius/NamespaceProject/${projectIndex}`
     const flowId: Flow['id'] = `gid://sagittarius/Flow/${flowIndex}`
 
+    if (currentSession === null) router.push("/login")
+
     const user = usePersistentReactiveArrayService<DUserView, UserService>(`dashboard::users::${currentSession?.id}`, (store) => new UserService(graphqlClient, store))
     const organization = usePersistentReactiveArrayService<DOrganizationView, OrganizationService>(`dashboard::organizations::${currentSession?.id}`, (store) => new OrganizationService(graphqlClient, store))
     const member = usePersistentReactiveArrayService<DNamespaceMemberView, MemberService>(`dashboard::members::${currentSession?.id}`, (store) => new MemberService(graphqlClient, store))
@@ -77,16 +79,17 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
     const file = usePersistentReactiveArrayService<FileTabsView, FileTabsService>(`dashboard::files::${flowId}`, FileTabsService, [])
 
 
-    if (currentSession === null) router.push("/login")
 
     const runtimeId = React.useMemo(() => project[1].getById(projectId, {namespaceId})?.primaryRuntime?.id, [projectId, project[0], namespaceId])
 
     React.useEffect(() => {
+        if (!currentSession) return
+
         flow[1].values({namespaceId, projectId})
         functions[1].values({namespaceId, projectId, runtimeId})
         datatype[1].values({namespaceId, projectId, runtimeId})
         flowtype[1].values({namespaceId, projectId, runtimeId})
-    }, [runtimeId, namespaceId, projectId])
+    }, [runtimeId, namespaceId, projectId, currentSession, flow, functions, datatype, flowtype])
 
     return <ContextStoreProvider
         services={[user, organization, member, namespace, runtime, project, role, flow, functions, datatype, flowtype, file]}>
