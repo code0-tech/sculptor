@@ -29,6 +29,7 @@ export const ApplicationBarView: React.FC = () => {
     const [loading, startTransition] = React.useTransition()
 
     const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [userStore, currentSession])
+    const namespaceIndex = React.useMemo(() => currentUser?.namespace?.id?.match(/Namespace\/(\d+)$/)?.[1], [currentUser])
 
     const userMenu = React.useMemo(() => {
 
@@ -47,8 +48,6 @@ export const ApplicationBarView: React.FC = () => {
             })
         }
 
-        const namespaceIndex = currentUser?.namespace?.id?.match(/Namespace\/(\d+)$/)?.[1]
-
         return <DUserMenu userId={currentSession.user?.id!!}>
             <Link href={"/organizations"}>
                 <MenuItem>
@@ -65,7 +64,7 @@ export const ApplicationBarView: React.FC = () => {
                 <IconLogout size={16}/>Logout
             </MenuItem>
         </DUserMenu>
-    }, [currentUser, currentSession])
+    }, [currentUser, currentSession, namespaceIndex])
 
     return <Container>
         <Flex style={{gap: "0.7rem", flexDirection: "column"}} py={0.7} w={"100%"}>
