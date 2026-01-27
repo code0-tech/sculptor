@@ -99,6 +99,7 @@ export const FolderView: React.FC = () => {
     return <>
 
         <DFlowFolderCreateDialog open={createDialogOpen}
+                                 key={flowTypeId}
                                  onOpenChange={(open) => setCreateDialogOpen(open)}
                                  onCreate={createFlow}
                                  flowTypeId={flowTypeId}/>
@@ -110,7 +111,10 @@ export const FolderView: React.FC = () => {
 
         <DLayout layoutGap={0} topContent={
             <Flex style={{gap: "0.35rem"}} align={"center"} justify={"space-between"} p={0.75}>
-                <Button disabled paddingSize={"xxs"} color={"success"}>
+                <Button paddingSize={"xxs"} color={"success"} onClick={() => {
+                    setCreateDialogOpen(true)
+                    setFlowTypeId(undefined)
+                }}>
                     <Text>Create new flow</Text>
                 </Button>
                 <Flex style={{gap: "0.35rem"}}>
