@@ -52,7 +52,7 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
     if (currentSession === null) router.push("/login")
 
     return <ContextStoreProvider services={[user, organization, member, namespace, runtime, project, role]}>
-        <DLayout style={{zIndex: 0}} topContent={
+        <DLayout style={{zIndex: 0}} showLayoutSplitter={false} topContent={
             <>
                 <div style={{background: "rgba(255,2552,255,.1)", borderBottom: "1px solid rgba(255,2552,255,.1)"}}>
                     {bar}
@@ -60,7 +60,7 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
                 </div>
             </>
         }>
-            <Container h={"100%"} pt={1.3} w={"100%"}>
+            <Container h={"100%"} w={"100%"}>
                 {children}
             </Container>
         </DLayout>
