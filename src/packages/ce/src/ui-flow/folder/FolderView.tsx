@@ -16,10 +16,9 @@ import {
     TooltipContent,
     TooltipPortal,
     TooltipTrigger,
-    useService,
-    useStore
+    useService
 } from "@code0-tech/pictor";
-import {IconArrowsMaximize, IconArrowsMinimize, IconCircleDot} from "@tabler/icons-react";
+import {IconArrowsMaximize, IconArrowsMinimize, IconCircleDot, IconPlus} from "@tabler/icons-react";
 import {useParams, useRouter} from "next/navigation";
 import {Flow, FlowType, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {FlowService} from "@edition/flow/Flow.service";
@@ -27,6 +26,7 @@ import {
     DFlowFolderContextMenuGroupData,
     DFlowFolderContextMenuItemData
 } from "@code0-tech/pictor/dist/components/d-flow-folder/DFlowFolderContextMenu";
+import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 
 export const FolderView: React.FC = () => {
 
@@ -111,18 +111,28 @@ export const FolderView: React.FC = () => {
 
         <DLayout layoutGap={0} topContent={
             <Flex style={{gap: "0.35rem"}} align={"center"} justify={"space-between"} p={0.75}>
-                <Button paddingSize={"xxs"} color={"success"} onClick={() => {
-                    setCreateDialogOpen(true)
-                    setFlowTypeId(undefined)
-                }}>
-                    <Text>Create new flow</Text>
-                </Button>
-                <Flex style={{gap: "0.35rem"}}>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button variant={"filled"} paddingSize={"xxs"} onClick={() => {
+                            setCreateDialogOpen(true)
+                            setFlowTypeId(undefined)
+                        }}>
+                            <IconPlus size={13}/>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipPortal>
+                        <TooltipContent side={"bottom"}>
+                            <Text>Add new flow</Text>
+                            <TooltipArrow/>
+                        </TooltipContent>
+                    </TooltipPortal>
+                </Tooltip>
+                <ButtonGroup>
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button variant={"none"} paddingSize={"xxs"}
                                     onClick={() => ref.current?.openActivePath()}>
-                                <IconCircleDot size={16}/>
+                                <IconCircleDot size={13}/>
                             </Button>
                         </TooltipTrigger>
                         <TooltipPortal>
@@ -136,7 +146,7 @@ export const FolderView: React.FC = () => {
                         <TooltipTrigger asChild>
                             <Button variant={"none"} paddingSize={"xxs"}
                                     onClick={() => ref.current?.closeAll()}>
-                                <IconArrowsMinimize size={16}/>
+                                <IconArrowsMinimize size={13}/>
                             </Button>
                         </TooltipTrigger>
                         <TooltipPortal>
@@ -150,7 +160,7 @@ export const FolderView: React.FC = () => {
                         <TooltipTrigger asChild>
                             <Button paddingSize={"xxs"} variant={"none"}
                                     onClick={() => ref.current?.openAll()}>
-                                <IconArrowsMaximize size={16}/>
+                                <IconArrowsMaximize size={13}/>
                             </Button>
                         </TooltipTrigger>
                         <TooltipPortal>
@@ -160,26 +170,24 @@ export const FolderView: React.FC = () => {
                             </TooltipContent>
                         </TooltipPortal>
                     </Tooltip>
-                </Flex>
+                </ButtonGroup>
             </Flex>
         }>
-            <div style={{padding: "0.75rem"}}>
-                <DFlowFolder ref={ref} activeFlowId={flowId}
-                             onSelect={(flow) => {
-                                 const number = flow.id?.match(/Flow\/(\d+)$/)?.[1]
-                                 router.push(`/namespace/${namespaceIndex}/project/${projectIndex}/flow/${number}`)
-                             }}
-                             onCreate={flowTypeId => {
-                                 setCreateDialogOpen(true)
-                                 setFlowTypeId(flowTypeId)
-                             }}
-                             onDelete={contextData => {
-                                 setDeleteDialogOpen(true)
-                                 setContextData(contextData)
-                             }}
-                             namespaceId={`gid://sagittarius/Namespace/${namespaceIndex}`}
-                             projectId={`gid://sagittarius/NamespaceProject/${projectIndex}`}/>
-            </div>
+            <DFlowFolder ref={ref} activeFlowId={flowId}
+                         onSelect={(flow) => {
+                             const number = flow.id?.match(/Flow\/(\d+)$/)?.[1]
+                             router.push(`/namespace/${namespaceIndex}/project/${projectIndex}/flow/${number}`)
+                         }}
+                         onCreate={flowTypeId => {
+                             setCreateDialogOpen(true)
+                             setFlowTypeId(flowTypeId)
+                         }}
+                         onDelete={contextData => {
+                             setDeleteDialogOpen(true)
+                             setContextData(contextData)
+                         }}
+                         namespaceId={`gid://sagittarius/Namespace/${namespaceIndex}`}
+                         projectId={`gid://sagittarius/NamespaceProject/${projectIndex}`}/>
         </DLayout>
     </>
 }
