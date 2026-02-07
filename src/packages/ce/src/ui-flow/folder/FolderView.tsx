@@ -9,6 +9,7 @@ import {
     DFlowFolderHandle,
     DLayout,
     Flex,
+    Spacing,
     Text,
     toast,
     Tooltip,
@@ -109,7 +110,7 @@ export const FolderView: React.FC = () => {
                                  contextData={contextData}
                                  onDelete={deleteFlow}/>
 
-        <DLayout layoutGap={0} topContent={
+        <DLayout layoutGap={"0.7rem"} showLayoutSplitter={false} topContent={
             <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
                 <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"}>
                     <Text size={"md"} hierarchy={"secondary"}>Explorer</Text>
@@ -181,21 +182,21 @@ export const FolderView: React.FC = () => {
                 </Flex>
             </Flex>
         }>
-            <DFlowFolder ref={ref} activeFlowId={flowId}
-                         onSelect={(flow) => {
-                             const number = flow.id?.match(/Flow\/(\d+)$/)?.[1]
-                             router.push(`/namespace/${namespaceIndex}/project/${projectIndex}/flow/${number}`)
-                         }}
-                         onCreate={flowTypeId => {
-                             setCreateDialogOpen(true)
-                             setFlowTypeId(flowTypeId)
-                         }}
-                         onDelete={contextData => {
-                             setDeleteDialogOpen(true)
-                             setContextData(contextData)
-                         }}
-                         namespaceId={`gid://sagittarius/Namespace/${namespaceIndex}`}
-                         projectId={`gid://sagittarius/NamespaceProject/${projectIndex}`}/>
+                <DFlowFolder ref={ref} activeFlowId={flowId}
+                             onSelect={(flow) => {
+                                 const number = flow.id?.match(/Flow\/(\d+)$/)?.[1]
+                                 router.push(`/namespace/${namespaceIndex}/project/${projectIndex}/flow/${number}`)
+                             }}
+                             onCreate={flowTypeId => {
+                                 setCreateDialogOpen(true)
+                                 setFlowTypeId(flowTypeId)
+                             }}
+                             onDelete={contextData => {
+                                 setDeleteDialogOpen(true)
+                                 setContextData(contextData)
+                             }}
+                             namespaceId={`gid://sagittarius/Namespace/${namespaceIndex}`}
+                             projectId={`gid://sagittarius/NamespaceProject/${projectIndex}`}/>
         </DLayout>
     </>
 }
