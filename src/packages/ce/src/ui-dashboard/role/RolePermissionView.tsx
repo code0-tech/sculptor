@@ -226,9 +226,14 @@ export const RolePermissionView: React.FC = () => {
     })
 
     return <TabContent pl={"0.7"} value={"permission"} style={{overflow: "hidden"}}>
-        <Text size={"xl"} hierarchy={"primary"} style={{fontWeight: 600}}>
-            Select from role templates
-        </Text>
+        <Flex align={"center"} justify={"space-between"}>
+            <Text size={"xl"} hierarchy={"primary"}>
+                Select from role templates
+            </Text>
+            <Button color={"success"} onClick={validate}>
+                Save changes
+            </Button>
+        </Flex>
         <Spacing spacing={"xl"}/>
         {React.useMemo(() => {
             return <Row>
@@ -268,19 +273,13 @@ export const RolePermissionView: React.FC = () => {
             </Row>
         }, [initialValues, role])}
         <Spacing spacing={"xl"}/>
-        <Flex align={"center"} justify={"space-between"}>
-            <div>
-                <Text size={"xl"} hierarchy={"primary"} style={{fontWeight: 600}}>Current stored
-                    permissions</Text>
-                <Spacing spacing={"xs"}/>
-                <DNamespaceRolePermissions abilities={role?.abilities!!}/>
-            </div>
-            <Button color={"success"} onClick={validate}>
-                Update role permissions
-            </Button>
-        </Flex>
+        <Text size={"xl"} hierarchy={"primary"}>
+            Current stored permissions
+        </Text>
+        <Spacing spacing={"xxs"}/>
+        <DNamespaceRolePermissions abilities={role?.abilities!!}/>
         <Spacing spacing={"xl"}/>
-        <Card p={1.3}>
+        <Card color={"secondary"}>
             {permissions.map(permissionGroup => {
                 return <CardSection border>
                     <Flex style={{flexDirection: "column", gap: "0.7rem"}}>

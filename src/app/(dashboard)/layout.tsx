@@ -3,16 +3,18 @@
 import React from "react";
 import {useApolloClient} from "@apollo/client/react";
 import {
-    Container,
+    AuroraBackground,
     ContextStoreProvider,
     DLayout,
-    DNamespaceMemberView, DNamespaceProjectView,
+    DNamespaceMemberView,
+    DNamespaceProjectView,
+    DNamespaceRoleView,
     DNamespaceView,
-    DOrganizationView, DRuntimeView,
+    DOrganizationView,
+    DRuntimeView,
     DUserView,
-    ReactiveArrayStore,
-    useUserSession,
-    DNamespaceRoleView
+    Flex,
+    useUserSession
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/User.service";
 import {GraphqlClient} from "@core/util/graphql-client";
@@ -24,8 +26,7 @@ import {usePersistentReactiveArrayService} from "@/hooks/usePersistentReactiveAr
 import {RuntimeService} from "@edition/runtime/Runtime.service";
 import {ProjectService} from "@edition/project/Project.service";
 import {RoleService} from "@edition/role/Role.service";
-import {Spacing} from "@code0-tech/pictor/dist/components/spacing/Spacing";
-import {View} from "@code0-tech/pictor/dist/utils/view";
+import Image from "next/image";
 
 interface ApplicationLayoutProps {
     children: React.ReactNode
@@ -52,17 +53,39 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
     if (currentSession === null) router.push("/login")
 
     return <ContextStoreProvider services={[user, organization, member, namespace, runtime, project, role]}>
-        <DLayout style={{zIndex: 0}} showLayoutSplitter={false} topContent={
-            <>
-                <div style={{background: "rgba(255,2552,255,.1)", borderBottom: "1px solid rgba(255,2552,255,.1)"}}>
-                    {bar}
-                    {tab}
+        <DLayout style={{zIndex: 0}} layoutGap={"0"} showLayoutSplitter={false} leftContent={
+            <Flex p={0.7} pt={1} align={"center"} style={{flexDirection: "column", gap: "0.7rem"}}>
+                <div style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "50%",
+                    transform: "scaleX(-1)",
+                    height: "40%",
+                    zIndex: "-1",
+                }}>
+                    <div style={{
+                        position: "absolute",
+                        top: "0",
+                        left: "0",
+                        width: "100%",
+                        height: "100%",
+                        background: "radial-gradient(circle at top right,rgba(25, 24, 37, 0.25) 0%, rgba(25, 24, 37, 1) 25%)",
+                        zIndex: "1"
+                    }}/>
+                    <AuroraBackground/>
+
                 </div>
-            </>
+                <Image src={"/CodeZero_Logo.png"} alt={"CodeZero Banner"} width={160} height={0}
+                       style={{width: '38px', height: 'auto'}}/>
+                {tab}
+            </Flex>
         }>
-            <Container h={"100%"} w={"100%"}>
-                {children}
-            </Container>
+            <DLayout px={0.7} layoutGap={"0"} topContent={<>{bar}</>}>
+                <DLayout>
+                    <>{children}</>
+                </DLayout>
+            </DLayout>
         </DLayout>
     </ContextStoreProvider>
 }

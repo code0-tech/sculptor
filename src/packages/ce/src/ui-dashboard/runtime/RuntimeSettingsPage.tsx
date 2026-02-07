@@ -4,7 +4,9 @@ import React from "react";
 import {
     Button,
     Card,
-    DLayout,
+    DResizableHandle,
+    DResizablePanel,
+    DResizablePanelGroup,
     Flex,
     Spacing,
     Text,
@@ -18,6 +20,7 @@ import {RuntimeService} from "@edition/runtime/Runtime.service";
 import {notFound, useParams, useRouter} from "next/navigation";
 import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
+import {IconLayoutSidebar} from "@tabler/icons-react";
 
 export const RuntimeSettingsPage: React.FC = () => {
 
@@ -112,49 +115,54 @@ export const RuntimeSettingsPage: React.FC = () => {
     }, [runtime])
 
 
-    return <>
-        <Spacing spacing={"xl"}/>
-        <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
-            <Text size={"lg"} hierarchy={"primary"} display={"block"}>
-                {runtime?.name}
-            </Text>
-            <Text size={"sm"} hierarchy={"tertiary"} display={"block"}>
-                {runtime?.description}
-            </Text>
-        </Flex>
-        <Spacing spacing={"xl"}/>
-        <Tab orientation={"vertical"} defaultValue={"general"}>
-            <DLayout leftContent={
-                <TabList pr={"0.7"}>
-                    <TabTrigger value={"general"} asChild>
-                        <Button paddingSize={"xxs"} variant={"none"}>
-                            <Text size={"md"} hierarchy={"primary"}>General adjustments</Text>
+    return <Tab orientation={"vertical"} defaultValue={"general"} h={"100%"}>
+        <DResizablePanelGroup>
+            <DResizablePanel id={"1"} defaultSize={"20%"} collapsedSize={"0%"}
+                             collapsible minSize={"10%"} style={{textWrap: "nowrap"}}>
+                <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
+                    <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"}>
+                        <Text size={"md"} hierarchy={"secondary"}>Runtime settings</Text>
+
+                        <Button variant={"none"} paddingSize={"xxs"}>
+                            <IconLayoutSidebar size={16}/>
                         </Button>
-                    </TabTrigger>
-                    <TabTrigger value={"access"} asChild>
-                        <Button color={"warning"} paddingSize={"xxs"} variant={"none"}>
-                            <Text size={"md"} hierarchy={"primary"}>How to connect</Text>
-                        </Button>
-                    </TabTrigger>
-                    <TabTrigger value={"delete"} asChild>
-                        <Button color={"error"} paddingSize={"xxs"} variant={"none"}>
-                            <Text size={"md"} hierarchy={"primary"}>Delete runtime forever</Text>
-                        </Button>
-                    </TabTrigger>
-                </TabList>
-            }>
+                    </Flex>
+                    <Text size={"sm"} hierarchy={"tertiary"} style={{textWrap: "wrap"}}>
+                        General settings and restrictions for your Sculptor application. These settings affect all users
+                        and organizations within the application.
+                    </Text>
+                    <TabList>
+                        <TabTrigger value={"general"} w={"100%"} asChild>
+                            <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                <Text size={"md"}>General adjustments</Text>
+                            </Button>
+                        </TabTrigger>
+                        <TabTrigger value={"access"} w={"100%"} asChild>
+                            <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                <Text size={"md"}>How to connect</Text>
+                            </Button>
+                        </TabTrigger>
+                        <TabTrigger value={"delete"} w={"100%"} asChild>
+                            <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                <Text size={"md"}>Delete runtime forever</Text>
+                            </Button>
+                        </TabTrigger>
+                    </TabList>
+                </Flex>
+            </DResizablePanel>
+            <DResizableHandle/>
+            <DResizablePanel id={"2"} color={"primary"} p={1}
+                             style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
                 <>
-                    <TabContent pl={"0.7"} value={"general"}>
+                    <TabContent value={"general"}>
                         <Flex justify={"space-between"} align={"end"}>
-                            <Text size={"xl"} hierarchy={"primary"}>General adjustments</Text>
+                            <Text size={"xl"} hierarchy={"primary"}>General</Text>
                             <Button color={"success"} onClick={validate}>
-                                Update Runtime
+                                Save changes
                             </Button>
                         </Flex>
                         <Spacing spacing={"xl"}/>
-                        <div style={{borderBottom: "1px solid rgba(255,255,255,.1)"}}/>
-                        <Spacing spacing={"xl"}/>
-                        <Card p={1.3}>
+                        <Card color={"secondary"}>
                             <CardSection border>
                                 <Flex justify={"space-between"} align={"center"}>
                                     <Text size={"md"} hierarchy={"primary"}>Name</Text>
@@ -171,12 +179,10 @@ export const RuntimeSettingsPage: React.FC = () => {
                             </CardSection>
                         </Card>
                     </TabContent>
-                    <TabContent pl={"0.7"} value={"access"}>
+                    <TabContent value={"access"}>
                         <Text size={"xl"} hierarchy={"primary"}>How to connect</Text>
                         <Spacing spacing={"xl"}/>
-                        <div style={{borderBottom: "1px solid rgba(255,255,255,.1)"}}/>
-                        <Spacing spacing={"xl"}/>
-                        <Card p={1.3} color={"warning"}>
+                        <Card color={"info"}>
                             <CardSection border>
                                 <Flex justify={"space-between"} align={"center"}>
                                     <Flex style={{gap: ".35rem", flexDirection: "column"}}>
@@ -187,7 +193,7 @@ export const RuntimeSettingsPage: React.FC = () => {
                                     {token ? (
                                         <TextInput value={runtime?.token ?? ""}/>
                                     ) : (
-                                        <Button onClick={rotateToken}>
+                                        <Button variant={"filled"} onClick={rotateToken}>
                                             Generate new token
                                         </Button>
                                     )}
@@ -196,29 +202,26 @@ export const RuntimeSettingsPage: React.FC = () => {
                         </Card>
 
                     </TabContent>
-                    <TabContent pl={"0.7"} value={"delete"}>
+                    <TabContent value={"delete"}>
                         <Flex justify={"space-between"} align={"end"}>
-                            <Text size={"xl"} hierarchy={"primary"}>Delete runtime forever</Text>
+                            <Text size={"xl"} hierarchy={"primary"}>Delete runtime</Text>
                         </Flex>
-                        <Spacing spacing={"xl"}/>
-                        <div style={{borderBottom: "1px solid rgba(255,255,255,.1)"}}/>
                         <Spacing spacing={"xl"}/>
                         <Card p={1.3} color={"error"}>
                             <Flex justify={"space-between"} align={"center"}>
                                 <Flex style={{gap: ".35rem", flexDirection: "column"}}>
-                                    <Text size={"md"} hierarchy={"primary"}>Delete runtime</Text>
-                                    <Text size={"md"} hierarchy={"tertiary"}>
+                                    <Text size={"md"} hierarchy={"primary"}>
                                         This will delete the runtime and cannot be undone.
                                     </Text>
                                 </Flex>
-                                <Button color={"error"} onClick={deleteRuntime}>
-                                    Delete runtime forever
+                                <Button color={"secondary"} variant={"filled"} onClick={deleteRuntime}>
+                                    Delete runtime
                                 </Button>
                             </Flex>
                         </Card>
                     </TabContent>
                 </>
-            </DLayout>
-        </Tab>
-    </>
+            </DResizablePanel>
+        </DResizablePanelGroup>
+    </Tab>
 }

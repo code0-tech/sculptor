@@ -21,11 +21,22 @@ export const RuntimesPage: React.FC = () => {
     }
 
     const router = useRouter()
-    return <>
+    return <div style={{
+        background: "#070514",
+        height: "100%",
+        padding: "1rem",
+        borderTopLeftRadius: "1rem",
+        borderTopRightRadius: "1rem"
+    }}>
         <Flex align={"center"} justify={"space-between"}>
-            <Text size={"xl"} hierarchy={"primary"}>
-                Runtimes
-            </Text>
+            <Flex style={{gap: "0.35rem", flexDirection: "column"}}>
+                <Text size={"xl"} hierarchy={"primary"}>
+                    Runtimes
+                </Text>
+                <Text size={"sm"} hierarchy={"tertiary"}>
+                    Manage runtimes that you have access to. Runtimes are the environments where your applications run.
+                </Text>
+            </Flex>
             <Flex align={"center"} style={{gap: "0.7rem"}}>
                 <Link href={namespaceIndex ? `/namespace/${namespaceIndex}/runtimes/create` : "/runtimes/create"}>
                     <Button color={"success"}>Create runtime</Button>
@@ -33,10 +44,10 @@ export const RuntimesPage: React.FC = () => {
             </Flex>
         </Flex>
         <Spacing spacing={"xl"}/>
-        <DRuntimeList namespaceId={namespaceIndex ? `gid://sagittarius/Namespace/${namespaceIndex}` : undefined}
+        <DRuntimeList color={"secondary"} namespaceId={namespaceIndex ? `gid://sagittarius/Namespace/${namespaceIndex}` : undefined}
                       filter={(runtime) => namespaceIndex ? true : !runtime?.namespace?.id} onSetting={(runtime) => {
             const number = runtime.id?.match(/Runtime\/(\d+)$/)?.[1]
             router.push(namespaceIndex ? `/namespace/${namespaceIndex}/runtimes/${number}/settings` : `/runtimes/${number}/settings`)
         }}/>
-    </>
+    </div>
 }

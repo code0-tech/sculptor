@@ -3,6 +3,7 @@
 import React from "react";
 import {useApolloClient} from "@apollo/client/react";
 import {
+    AuroraBackground,
     ContextStoreProvider,
     DataTypeView,
     DLayout,
@@ -16,9 +17,9 @@ import {
     DResizablePanelGroup,
     DRuntimeView,
     DUserView,
+    Flex,
     FlowTypeView,
     FunctionDefinitionView,
-    ReactiveArrayStore,
     useUserSession
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/User.service";
@@ -39,7 +40,7 @@ import {FlowTypeService} from "@edition/flowtype/FlowTypeService";
 import {FileTabsView} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.view";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
 import {FolderView} from "@edition/ui-flow/folder/FolderView";
-import {View} from "@code0-tech/pictor/dist/utils/view";
+import Image from "next/image";
 
 interface ApplicationLayoutProps {
     children: React.ReactNode
@@ -79,7 +80,6 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
     const file = usePersistentReactiveArrayService<FileTabsView, FileTabsService>(`dashboard::files::${flowId}`, FileTabsService, [])
 
 
-
     const runtimeId = React.useMemo(() => project[1].getById(projectId, {namespaceId})?.primaryRuntime?.id, [projectId, project[0], namespaceId])
 
     React.useEffect(() => {
@@ -93,26 +93,44 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
 
     return <ContextStoreProvider
         services={[user, organization, member, namespace, runtime, project, role, flow, functions, datatype, flowtype, file]}>
-        <DLayout layoutGap={0} style={{zIndex: 0}} topContent={
-            <>
+        <DLayout layoutGap={0} style={{zIndex: 0}} showLayoutSplitter={false} leftContent={
+            <Flex p={0.7} pt={1} align={"center"} style={{flexDirection: "column", gap: "0.7rem"}}>
                 <div style={{
-                    padding: "0 1.3rem",
-                    background: "rgba(255,2552,255,.1)",
-                    borderBottom: "1px solid rgba(255,2552,255,.1)"
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "50%",
+                    transform: "scaleX(-1)",
+                    height: "40%",
+                    zIndex: "-1",
                 }}>
-                    {bar}
-                    {tab}
+                    <div style={{
+                        position: "absolute",
+                        top: "0",
+                        left: "0",
+                        width: "100%",
+                        height: "100%",
+                        background: "radial-gradient(circle at top right,rgba(25, 24, 37, 0.25) 0%, rgba(25, 24, 37, 1) 25%)",
+                        zIndex: "1"
+                    }}/>
+                    <AuroraBackground/>
+
                 </div>
-            </>
+                <Image src={"/CodeZero_Logo.png"} alt={"CodeZero Banner"} width={160} height={0}
+                       style={{width: '38px', height: 'auto'}}/>
+                {tab}
+            </Flex>
         }>
-            <DLayout>
-                <DResizablePanelGroup orientation={"horizontal"}>
-                    <DResizablePanel id={"1"} defaultSize={"25%"}>
-                        <FolderView/>
-                    </DResizablePanel>
-                    <DResizableHandle/>
-                    {children}
-                </DResizablePanelGroup>
+            <DLayout px={0.7} layoutGap={"0"} topContent={<>{bar}</>}>
+                <DLayout>
+                    <DResizablePanelGroup orientation={"horizontal"}>
+                        <DResizablePanel id={"1"} defaultSize={"25%"}>
+                            <FolderView/>
+                        </DResizablePanel>
+                        <DResizableHandle/>
+                        {children}
+                    </DResizablePanelGroup>
+                </DLayout>
             </DLayout>
         </DLayout>
     </ContextStoreProvider>

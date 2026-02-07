@@ -5,19 +5,19 @@ import {useParams} from "next/navigation";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
 import {
     AuroraBackground,
-    Avatar,
     Badge,
     Button,
-    DLayout,
+    DResizableHandle,
+    DResizablePanel,
+    DResizablePanelGroup,
     Flex,
-    Spacing,
     Text,
     useService,
     useStore
 } from "@code0-tech/pictor";
 import {NamespaceService} from "@edition/namespace/Namespace.service";
 import {OrganizationService} from "@edition/organization/Organization.service";
-import {IconFolders, IconServer, IconUserCog, IconUsers} from "@tabler/icons-react";
+import {IconLayoutSidebar} from "@tabler/icons-react";
 import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {UsageView} from "@edition/ui-dashboard/usage/UsageView";
 import {OrganizationUpgradeView} from "@edition/ui-dashboard/organization/OrganizationUpgradeView";
@@ -28,90 +28,67 @@ export const OrganizationSettingsPage: React.FC = () => {
 
     //TODO: add ability check for organization settings access for every settings tab
 
-    const params = useParams()
-    const namespaceService = useService(NamespaceService)
-    const namespaceStore = useStore(NamespaceService)
-    const organizationService = useService(OrganizationService)
-    const organizationStore = useStore(OrganizationService)
+    return <Tab orientation={"vertical"} defaultValue={"general"} h={"100%"}>
+        <DResizablePanelGroup>
+            <DResizablePanel id={"1"} defaultSize={"20%"} collapsedSize={"0%"}
+                             collapsible minSize={"10%"} style={{textWrap: "nowrap"}}>
+                <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
+                    <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"}>
+                        <Text size={"md"} hierarchy={"secondary"}>Organization settings</Text>
 
-    const namespaceIndex = params.namespaceId as any as number
-    const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
-    const namespace = React.useMemo(() => namespaceService.getById(namespaceId), [namespaceStore, namespaceId])
-    const parentOrganization = React.useMemo(() => namespace?.parent?.__typename === "Organization" ? organizationService.getById(namespace?.parent?.id) : null, [organizationStore, namespace])
-
-    return <>
-        <Spacing spacing={"xl"}/>
-        {React.useMemo(() => {
-            return <Flex style={{gap: "0.7rem"}} align={"center"}>
-                <Avatar w={"60px"} bg={"transparent"} identifier={parentOrganization?.name!!}/>
-                <Flex style={{gap: "0.35rem", flexDirection: "column"}}>
-                    <Text size={"xl"} hierarchy={"primary"} display={"block"}>
-                        {parentOrganization?.name}
-                    </Text>
-                    <Flex style={{gap: "0.35rem"}} align={"center"}>
-                        <Badge color={"secondary"} border>
-                            <IconUsers size={16}/>
-                            {namespace?.members?.count}
-                        </Badge>
-                        <Badge color={"secondary"} border>
-                            <IconFolders size={16}/>
-                            {namespace?.projects?.count}
-                        </Badge>
-                        <Badge color={"secondary"} border>
-                            <IconUserCog size={16}/>
-                            {namespace?.roles?.count}
-                        </Badge>
-                        <Badge color={"secondary"} border>
-                            <IconServer size={16}/>
-                            {namespace?.runtimes?.count}
-                        </Badge>
+                        <Button variant={"none"} paddingSize={"xxs"}>
+                            <IconLayoutSidebar size={16}/>
+                        </Button>
                     </Flex>
+                    <Text size={"sm"} hierarchy={"tertiary"} style={{textWrap: "wrap"}}>
+                        General settings and restrictions for your Sculptor application. These settings affect all users
+                        and organizations within the application.
+                    </Text>
+                    <TabList>
+                        <TabTrigger value={"general"} w={"100%"} asChild>
+                            <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                <Text size={"md"} hierarchy={"primary"}>General</Text>
+                            </Button>
+                        </TabTrigger>
+                        <TabTrigger value={"upgrade"} w={"100%"} asChild>
+                            <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                <Text size={"md"} hierarchy={"primary"} display={"flex"} align={"center"}
+                                      style={{gap: "0.35rem"}}>
+                                    Upgrade to Team
+                                </Text>
+                                <AuroraBackground/>
+                            </Button>
+                        </TabTrigger>
+                        <TabTrigger disabled value={"usage"} w={"100%"} asChild>
+                            <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                <Text size={"md"} hierarchy={"primary"}>Runtime usage</Text>
+                            </Button>
+                        </TabTrigger>
+                        <TabTrigger value={"delete"} w={"100%"} asChild>
+                            <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                <Text size={"md"} hierarchy={"primary"}>Delete organization</Text>
+                            </Button>
+                        </TabTrigger>
+                    </TabList>
                 </Flex>
-            </Flex>
-        }, [parentOrganization])}
-        <Spacing spacing={"xl"}/>
-        <Tab orientation={"vertical"} defaultValue={"general"}>
-            <DLayout leftContent={
-                <TabList pr={"0.7"}>
-                    <TabTrigger value={"general"} asChild>
-                        <Button paddingSize={"xxs"} variant={"none"}>
-                            <Text size={"md"} hierarchy={"primary"}>General adjustments</Text>
-                        </Button>
-                    </TabTrigger>
-                    <TabTrigger value={"upgrade"} asChild>
-                        <Button color={"primary"} paddingSize={"xxs"} variant={"none"}>
-                            <Text size={"md"} hierarchy={"primary"} display={"flex"} align={"center"}
-                                  style={{gap: "0.35rem"}}>Upgrade to <Badge color={"info"}>Team</Badge></Text>
-                            <AuroraBackground/>
-                        </Button>
-                    </TabTrigger>
-                    <TabTrigger disabled value={"usage"} asChild>
-                        <Button paddingSize={"xxs"} variant={"none"}>
-                            <Text size={"md"} hierarchy={"primary"}>Runtime usage</Text>
-                        </Button>
-                    </TabTrigger>
-                    <TabTrigger value={"delete"} asChild>
-                        <Button color={"error"} paddingSize={"xxs"} variant={"none"}>
-                            <Text size={"md"} hierarchy={"primary"}>Delete organization forever</Text>
-                        </Button>
-                    </TabTrigger>
-                </TabList>
-            }>
+            </DResizablePanel>
+            <DResizableHandle/>
+            <DResizablePanel id={"2"} color={"primary"} p={1} style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
                 <>
-                    <TabContent pl={"0.7"} value={"general"}>
+                    <TabContent value={"general"}>
                         <OrganizationGeneralSettingsView/>
                     </TabContent>
-                    <TabContent pl={"0.7"} value={"upgrade"}>
+                    <TabContent value={"upgrade"}>
                         <OrganizationUpgradeView/>
                     </TabContent>
-                    <TabContent pl={"0.7"} value={"usage"}>
+                    <TabContent value={"usage"}>
                         <UsageView/>
                     </TabContent>
-                    <TabContent pl={"0.7"} value={"delete"}>
+                    <TabContent value={"delete"}>
                         <OrganizationDeleteView/>
                     </TabContent>
                 </>
-            </DLayout>
-        </Tab>
-    </>
+            </DResizablePanel>
+        </DResizablePanelGroup>
+    </Tab>
 }

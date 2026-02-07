@@ -19,8 +19,17 @@ export const NamespaceOverviewPage: React.FC = () => {
     const namespaceIndexCurrentUser = currentUser?.namespace?.id?.match(/Namespace\/(\d+)$/)?.[1]
     const namespaceId = params.namespaceId as any as string
 
-    return <DLayout leftContent={namespaceIndexCurrentUser == namespaceId ? <NamespaceOverviewLeftView/> : undefined}
+    return <DLayout showLayoutSplitter={false} layoutGap={"0"}
+                    leftContent={namespaceIndexCurrentUser == namespaceId ? <NamespaceOverviewLeftView/> : undefined}
                     rightContent={<NamespaceOverviewRightView/>}>
-        <NamespaceProjectsView/>
+        <div style={{
+            background: "#070514",
+            height: "100%",
+            padding: "1rem",
+            borderTopLeftRadius: "1rem",
+            borderTopRightRadius: "1rem"
+        }}>
+            <NamespaceProjectsView/>
+        </div>
     </DLayout>
 }

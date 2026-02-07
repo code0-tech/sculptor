@@ -58,15 +58,15 @@ export const RoleGeneralAdjustmentView: React.FC = () => {
 
     return <TabContent pl={"0.7"} value={"general"} style={{overflow: "hidden"}}>
         <Flex align={"center"} justify={"space-between"}>
-            <Text size={"xl"} hierarchy={"primary"} style={{fontWeight: 600}}>
-                General adjustments
+            <Text size={"xl"} hierarchy={"primary"}>
+                General
             </Text>
             <Button color={"success"} onClick={validate}>
-                Update general adjustments
+                Save changes
             </Button>
         </Flex>
         <Spacing spacing={"xl"}/>
-        <Card p={1.3}>
+        <Card color={"secondary"}>
             <CardSection border>
                 <Flex justify={"space-between"} align={"center"}>
                     <Text size={"md"} hierarchy={"primary"}>Name</Text>

@@ -1,14 +1,15 @@
 "use client"
 
 import {
+    Avatar,
     Badge,
     Button,
-    Container,
     Flex,
     MenuItem,
     MenuSeparator,
     TextInput,
-    useService, useStore,
+    useService,
+    useStore,
     useUserSession
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/User.service";
@@ -17,7 +18,6 @@ import React from "react";
 import DUserMenu from "@code0-tech/pictor/dist/components/d-user/DUserMenu";
 import Link from "next/link";
 import {IconBuilding, IconFolders, IconInbox, IconLogout, IconSearch} from "@tabler/icons-react";
-import Image from "next/image";
 import {ApplicationBreadcrumbView} from "@edition/ui-dashboard/application/ApplicationBreadcrumbView";
 
 export const ApplicationBarView: React.FC = () => {
@@ -66,23 +66,16 @@ export const ApplicationBarView: React.FC = () => {
         </DUserMenu>
     }, [currentUser, currentSession, namespaceIndex])
 
-    return <Container>
-        <Flex style={{gap: "0.7rem", flexDirection: "column"}} py={0.7} w={"100%"}>
-            <Flex align={"center"} justify={"space-between"}>
-                <Flex align={"center"} style={{gap: "1.3rem"}}>
-                    <Image src={"/CodeZero_Logo.png"} alt={"CodeZero Banner"} width={160} height={0}
-                           style={{width: '38px', height: 'auto'}}/>
-                    <ApplicationBreadcrumbView/>
-                </Flex>
-                <Flex align={"center"} style={{gap: "0.7rem"}}>
-                    <TextInput disabled left={<IconSearch size={16}/>} right={<Badge>⌘K</Badge>} rightType={"icon"}
-                               placeholder={"Search..."}/>
-                    <Button>
-                        <IconInbox size={16}/>
-                    </Button>
-                    {userMenu}
-                </Flex>
-            </Flex>
+    return <Flex py={0.7} align={"center"} justify={"space-between"}>
+        <ApplicationBreadcrumbView/>
+        <Flex align={"center"} style={{gap: ".7rem"}}>
+            <Button disabled variant={"none"} paddingSize={"xs"}>
+                <IconSearch size={16}/>
+            </Button>
+            <Button disabled variant={"none"} paddingSize={"xs"}>
+                <IconInbox size={16}/>
+            </Button>
+            {userMenu}
         </Flex>
-    </Container>
+    </Flex>
 }

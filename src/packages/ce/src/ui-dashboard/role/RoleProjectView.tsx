@@ -77,10 +77,11 @@ export const RoleProjectView: React.FC = () => {
 
     return <TabContent pl={"0.7"} value={"project"} style={{overflow: "hidden"}}>
         <Flex align={"center"} justify={"space-between"}>
-            <Text size={"xl"} hierarchy={"primary"} style={{fontWeight: 600}}>Projects that members can
-                access</Text>
+            <Text size={"xl"} hierarchy={"primary"}>
+                Projects that members can access
+            </Text>
             <Flex align={"center"} style={{gap: ".7rem"}}>
-                <Button color={"success"} onClick={assignProjects}>Update assigned projects</Button>
+                <Button color={"success"} onClick={assignProjects}>Save changes</Button>
                 <DNamespaceProjectMenu namespaceId={namespaceId}
                                        key={String(assignedProjectIds)}
                                        filter={filterProjects}

@@ -55,23 +55,24 @@ export const OrganizationGeneralSettingsView: React.FC = () => {
     })
 
     return <>
-        <Flex justify={"space-between"} align={"end"}>
-            <Text size={"xl"} hierarchy={"primary"}>General adjustments</Text>
+        <Flex justify={"space-between"} align={"center"}>
+            <Text size={"xl"} hierarchy={"primary"}>
+                General
+            </Text>
+            <Button color={"success"} onClick={validate}>
+                Save changes
+            </Button>
         </Flex>
         <Spacing spacing={"xl"}/>
-        <Card p={1.3}>
+        <Card color={"secondary"}>
             <CardSection border>
                 <Flex justify={"space-between"} align={"center"}>
-                    <Text size={"md"} hierarchy={"primary"}>Name</Text>
+                    <Text size={"md"} hierarchy={"primary"}>
+                        Name
+                    </Text>
                     <TextInput {...inputs.getInputProps("name")}/>
                 </Flex>
             </CardSection>
         </Card>
-        <Spacing spacing={"xl"}/>
-        <Flex justify={"end"}>
-            <Button color={"success"} onClick={validate}>
-                Update Organization
-            </Button>
-        </Flex>
     </>
 }

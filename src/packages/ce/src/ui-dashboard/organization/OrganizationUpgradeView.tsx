@@ -21,8 +21,8 @@ export const OrganizationUpgradeView: React.FC = () => {
     const [value, setValue] = React.useState("annually")
 
     return <>
-        <Text size={"xl"} hierarchy={"primary"}>Upgrade to team</Text>
-        <Spacing spacing={"xs"}/>
+        <Text size={"xl"} hierarchy={"primary"}>Upgrade to Team</Text>
+        <Spacing spacing={"xxs"}/>
         <Text size={"md"} hierarchy={"tertiary"}>
             Upgrade your organization to the Team plan to unlock advanced features, enhanced collaboration tools, and
             priority support. Elevate your team's productivity and take advantage of exclusive benefits designed to help
@@ -46,21 +46,18 @@ export const OrganizationUpgradeView: React.FC = () => {
                 </SegmentedControlItem>
             </SegmentedControl>
         </Flex>
-
         <Spacing spacing={"xl"}/>
         <Row>
             <Col lg={4}>
                 <Card>
-                    <Card mt={-1.3} mx={-1.3} color={"primary"} style={{borderWidth: "3px"}}>
-                        <Text size={"xl"} hierarchy={"tertiary"}>Team self-hosted</Text>
-                        <Spacing spacing={"md"}/>
-                        <Flex align={"center"} justify={"space-between"} style={{gap: "1.3rem"}}>
-                            <Text size={"xl"} style={{fontSize: "2rem"}} hierarchy={"primary"}>7,95€</Text>
-                            <Text size={"md"} hierarchy={"tertiary"} style={{textAlign: "right"}}>per member / month billed monthly</Text>
-                        </Flex>
-                        <Spacing spacing={"md"}/>
-                        <Button w={"100%"} color={"primary"}>Get started now</Button>
-                    </Card>
+                    <Text size={"xl"} hierarchy={"tertiary"}>Team self-hosted</Text>
+                    <Spacing spacing={"md"}/>
+                    <Flex align={"center"} justify={"space-between"} style={{gap: "1.3rem"}}>
+                        <Text size={"xl"} style={{fontSize: "2rem"}} hierarchy={"primary"}>7,95€</Text>
+                        <Text size={"md"} hierarchy={"tertiary"} style={{textAlign: "right"}}>per member / month billed monthly</Text>
+                    </Flex>
+                    <Spacing spacing={"md"}/>
+                    <Button w={"100%"} color={"secondary"}>Get started now</Button>
                     <Spacing spacing={"md"}/>
                     <Flex style={{gap: "0.7rem", flexDirection: "column"}}>
                         <Text size={"md"} display={"flex"} align={"center"} style={{gap: "0.7rem"}}>
@@ -88,26 +85,24 @@ export const OrganizationUpgradeView: React.FC = () => {
             </Col>
             <Col lg={4}>
                 <Card color={"secondary"}>
-                    <Card mt={-1.3} mx={-1.3} color={"primary"} style={{borderWidth: "3px"}}>
-                        <Flex align={"center"} justify={"space-between"} style={{gap: "1.3rem"}}>
-                            <Text size={"xl"} hierarchy={"tertiary"}>Team cloud</Text>
-                        </Flex>
-                        <Spacing spacing={"md"}/>
-                        <Flex align={"center"} justify={"space-between"} style={{gap: "1.3rem"}}>
-                            <div style={{position: "relative"}}>
-                                <Text size={"xl"} style={{fontSize: "2rem"}} hierarchy={"primary"}>3,95€</Text>
-                                <Badge pos={"absolute"}
-                                       style={{top: 0, right: 0, transform: "translateX(90%) translateY(90%)"}}
-                                       color={"error"} border>
-                                    <Text size={"sm"} hierarchy={"tertiary"} style={{color: "inherit"}}>-27%</Text>
-                                </Badge>
-                            </div>
-                            <Text size={"md"} hierarchy={"tertiary"} style={{textAlign: "right"}}>per member / month
-                                billed annually</Text>
-                        </Flex>
-                        <Spacing spacing={"md"}/>
-                        <Button w={"100%"} color={"primary"}>Get started now</Button>
-                    </Card>
+                    <Flex align={"center"} justify={"space-between"} style={{gap: "1.3rem"}}>
+                        <Text size={"xl"} hierarchy={"tertiary"}>Team cloud</Text>
+                    </Flex>
+                    <Spacing spacing={"md"}/>
+                    <Flex align={"center"} justify={"space-between"} style={{gap: "1.3rem"}}>
+                        <div style={{position: "relative"}}>
+                            <Text size={"xl"} style={{fontSize: "2rem"}} hierarchy={"primary"}>3,95€</Text>
+                            <Badge pos={"absolute"}
+                                   style={{top: 0, right: 0, transform: "translateX(90%) translateY(90%)"}}
+                                   color={"error"} border>
+                                <Text size={"sm"} hierarchy={"tertiary"} style={{color: "inherit"}}>-27%</Text>
+                            </Badge>
+                        </div>
+                        <Text size={"md"} hierarchy={"tertiary"} style={{textAlign: "right"}}>per member / month
+                            billed annually</Text>
+                    </Flex>
+                    <Spacing spacing={"md"}/>
+                    <Button w={"100%"} color={"tertiary"}>Get started now</Button>
                     <Spacing spacing={"md"}/>
                     <Flex style={{gap: "0.7rem", flexDirection: "column"}}>
                         <Text size={"md"} display={"flex"} align={"center"} style={{gap: "0.7rem"}}>
@@ -136,16 +131,14 @@ export const OrganizationUpgradeView: React.FC = () => {
             </Col>
             <Col lg={4}>
                 <Card>
-                    <Card mt={-1.3} mx={-1.3} color={"primary"} style={{borderWidth: "3px"}}>
-                        <Text size={"xl"} hierarchy={"tertiary"}>Team cloud (pay as you go)</Text>
-                        <Spacing spacing={"md"}/>
-                        <Flex align={"center"} justify={"space-between"} style={{gap: "1.3rem"}}>
-                            <Text size={"xl"} style={{fontSize: "2rem"}} hierarchy={"primary"}>3,95€</Text>
-                            <Text size={"md"} hierarchy={"tertiary"} style={{textAlign: "right"}}>per member / month billed monthly</Text>
-                        </Flex>
-                        <Spacing spacing={"md"}/>
-                        <Button w={"100%"} color={"primary"}>Get started now</Button>
-                    </Card>
+                    <Text size={"xl"} hierarchy={"tertiary"}>Team cloud (pay as you go)</Text>
+                    <Spacing spacing={"md"}/>
+                    <Flex align={"center"} justify={"space-between"} style={{gap: "1.3rem"}}>
+                        <Text size={"xl"} style={{fontSize: "2rem"}} hierarchy={"primary"}>3,95€</Text>
+                        <Text size={"md"} hierarchy={"tertiary"} style={{textAlign: "right"}}>per member / month billed monthly</Text>
+                    </Flex>
+                    <Spacing spacing={"md"}/>
+                    <Button w={"100%"} color={"secondary"}>Get started now</Button>
                     <Spacing spacing={"md"}/>
                     <Flex style={{gap: "0.7rem", flexDirection: "column"}}>
                         <Text size={"md"} display={"flex"} align={"center"} style={{gap: "0.7rem"}}>

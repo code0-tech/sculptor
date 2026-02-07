@@ -26,8 +26,8 @@ export default function Page() {
     const [show, setShow] = React.useState(false);
 
     return <DResizablePanel id={"2"}>
-        <DLayout layoutGap={0} rightContent={
-            <Flex p={0.35} style={{flexDirection: "column", gap: "0.7rem"}}>
+        <DLayout layoutGap={0} showLayoutSplitter={false} rightContent={
+            <Flex pl={0.7} style={{flexDirection: "column", gap: "0.7rem"}}>
                 <Button aria-selected={show} onClick={() => setShow(prevState => !prevState)} variant={"none"}
                         paddingSize={"xs"}>
                     <IconFile size={16}/>
@@ -39,24 +39,15 @@ export default function Page() {
                     <IconMessageChatbot size={16}/>
                 </Button>
             </Flex>
-        } bottomContent={
-            <Flex p={0.35} style={{gap: "0.7rem"}}>
-                <Button variant={"none"} paddingSize={"xs"}>
-                    <Text>Logbook</Text>
-                </Button>
-                <Button variant={"none"} paddingSize={"xs"}>
-                    <Text>Problems</Text>
-                </Button>
-            </Flex>
         }>
             <DResizablePanelGroup orientation={"horizontal"} key={flowIndex}>
-                <DResizablePanel id={"2"}>
+                <DResizablePanel id={"2"} color={"primary"} style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
                     <DFlow flowId={flowId} namespaceId={undefined} projectId={undefined}/>
                 </DResizablePanel>
                 {show && (
                     <>
                         <DResizableHandle/>
-                        <DResizablePanel id={"3"} defaultSize={"25%"}>
+                        <DResizablePanel id={"3"} defaultSize={"25%"} color={"primary"} style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
                             <DFlowTabs flowId={flowId} namespaceId={undefined}
                                        projectId={undefined}/>
                         </DResizablePanel>

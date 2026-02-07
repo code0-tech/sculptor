@@ -13,7 +13,7 @@ export const RolesView: React.FC = () => {
     const namespaceId = params.namespaceId as any as number
 
     const rolesList = React.useMemo(() => {
-        return <DNamespaceRoleList onSetting={(role) => {
+        return <DNamespaceRoleList color={"secondary"} onSetting={(role) => {
             const roleIndex = role.id?.match(/NamespaceRole\/(\d+)$/)?.[1]
             router.push(`/namespace/${namespaceId}/roles/${roleIndex}/settings`)
         }} namespaceId={`gid://sagittarius/Namespace/${namespaceId}`}/>

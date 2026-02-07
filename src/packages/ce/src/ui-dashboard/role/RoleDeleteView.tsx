@@ -36,20 +36,19 @@ export const RoleDeleteView: React.FC = () => {
     }, [])
 
     return <TabContent pl={"0.7"} value={"delete"} style={{overflow: "hidden"}}>
-        <Text size={"xl"} hierarchy={"primary"} style={{fontWeight: 600}}>
+        <Text size={"xl"} hierarchy={"primary"}>
             Delete role
         </Text>
         <Spacing spacing={"xl"}/>
         <Card p={1.3} color={"error"}>
             <Flex justify={"space-between"} align={"center"}>
                 <Flex style={{gap: ".35rem", flexDirection: "column"}}>
-                    <Text size={"md"} hierarchy={"primary"}>Delete role</Text>
-                    <Text size={"md"} hierarchy={"tertiary"}>
+                    <Text size={"md"} hierarchy={"primary"}>
                         This will delete the role and cannot be undone.
                     </Text>
                 </Flex>
-                <Button color={"error"} onClick={deleteRole}>
-                    Delete role forever
+                <Button color={"secondary"} variant={"filled"} onClick={deleteRole}>
+                    Delete role
                 </Button>
             </Flex>
         </Card>

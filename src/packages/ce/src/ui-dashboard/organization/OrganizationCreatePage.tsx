@@ -35,32 +35,34 @@ export const OrganizationCreatePage = () => {
         }
     })
 
-    return <Flex mih={"100%"} miw={"100%"} align={"center"} justify={"center"}>
-        <Col xs={4}>
-            <Text size={"xl"} hierarchy={"primary"} display={"block"}>
-                Create new organization
-            </Text>
-            <Spacing spacing={"xs"}/>
-            <Text size={"md"} hierarchy={"tertiary"} display={"block"}>
-                Organizations are helpfully if managing a group of users and plenty of projects.
-            </Text>
-            <Spacing spacing={"xl"}/>
-            <TextInput required
-                       title={"Name"}
-                       description={"Provide a simple organization name"}
-                       placeholder={"E.g. CodeZero"}
-                       {...inputs.getInputProps("name")}/>
-            <Spacing spacing={"xl"}/>
-            <Flex style={{gap: "0.35rem"}} justify={"space-between"}>
-                <Link href={"/organizations"}>
-                    <Button color={"primary"}>
-                        Go back to organizations
+    return <div style={{background: "#070514", height: "100%", padding: "1rem", borderTopLeftRadius: "1rem"}}>
+        <Flex mih={"100%"} miw={"100%"} align={"center"} justify={"center"}>
+            <Col xs={4}>
+                <Text size={"xl"} hierarchy={"primary"} display={"block"}>
+                    Create new organization
+                </Text>
+                <Spacing spacing={"xs"}/>
+                <Text size={"md"} hierarchy={"tertiary"} display={"block"}>
+                    Organizations are helpfully if managing a group of users and plenty of projects.
+                </Text>
+                <Spacing spacing={"xl"}/>
+                <TextInput required
+                           title={"Name"}
+                           description={"Provide a simple organization name"}
+                           placeholder={"E.g. CodeZero"}
+                           {...inputs.getInputProps("name")}/>
+                <Spacing spacing={"xl"}/>
+                <Flex style={{gap: "0.35rem"}} justify={"space-between"}>
+                    <Link href={"/organizations"}>
+                        <Button color={"primary"}>
+                            Go back to organizations
+                        </Button>
+                    </Link>
+                    <Button color={"success"} onClick={validate}>
+                        Create organization
                     </Button>
-                </Link>
-                <Button color={"success"} onClick={validate}>
-                    Create organization
-                </Button>
-            </Flex>
-        </Col>
-    </Flex>
+                </Flex>
+            </Col>
+        </Flex>
+    </div>
 }

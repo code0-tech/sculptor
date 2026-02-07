@@ -13,7 +13,7 @@ export const NamespaceProjectsView: React.FC = () => {
     const namespaceId = params.namespaceId as any as number
 
     const projectsList = React.useMemo(() => {
-        return <DNamespaceProjectList onSelect={(project) => {
+        return <DNamespaceProjectList color={"secondary"} onSelect={(project) => {
             const number = project.id?.match(/NamespaceProject\/(\d+)$/)?.[1]
             router.push(`/namespace/${namespaceId}/project/${number}`)
         }} namespaceId={`gid://sagittarius/Namespace/${namespaceId}`}/>
@@ -21,7 +21,7 @@ export const NamespaceProjectsView: React.FC = () => {
 
     //TODO: user abilities for project creation within namespace
 
-    return <div style={{padding: "0 1.3rem"}}>
+    return <>
 
         <Flex align={"center"} justify={"space-between"}>
             <Text size={"xl"} hierarchy={"primary"}>
@@ -36,5 +36,5 @@ export const NamespaceProjectsView: React.FC = () => {
         <Spacing spacing={"xl"}/>
         {projectsList}
 
-    </div>
+    </>
 }

@@ -4,5 +4,13 @@ import {NamespaceProjectsView} from "@edition/ui-dashboard/namespace/NamespacePr
 import React from "react";
 
 export const NamespaceProjectsPage: React.FC = () => {
-    return <NamespaceProjectsView/>
+    return <div style={{
+        background: "#070514",
+        height: "100%",
+        padding: "1rem",
+        borderTopLeftRadius: "1rem",
+        borderTopRightRadius: "1rem"
+    }}>
+        <NamespaceProjectsView/>
+    </div>
 }

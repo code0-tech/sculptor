@@ -18,7 +18,7 @@ import {
     TooltipTrigger,
     useService
 } from "@code0-tech/pictor";
-import {IconArrowsMaximize, IconArrowsMinimize, IconCircleDot, IconPlus} from "@tabler/icons-react";
+import {IconArrowsMaximize, IconArrowsMinimize, IconCircleDot, IconLayoutSidebar, IconPlus} from "@tabler/icons-react";
 import {useParams, useRouter} from "next/navigation";
 import {Flow, FlowType, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {FlowService} from "@edition/flow/Flow.service";
@@ -110,67 +110,75 @@ export const FolderView: React.FC = () => {
                                  onDelete={deleteFlow}/>
 
         <DLayout layoutGap={0} topContent={
-            <Flex style={{gap: "0.35rem"}} align={"center"} justify={"space-between"} p={0.75}>
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button variant={"filled"} paddingSize={"xxs"} onClick={() => {
-                            setCreateDialogOpen(true)
-                            setFlowTypeId(undefined)
-                        }}>
-                            <IconPlus size={13}/>
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipPortal>
-                        <TooltipContent side={"bottom"}>
-                            <Text>Add new flow</Text>
-                            <TooltipArrow/>
-                        </TooltipContent>
-                    </TooltipPortal>
-                </Tooltip>
-                <ButtonGroup>
+            <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
+                <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"}>
+                    <Text size={"md"} hierarchy={"secondary"}>Explorer</Text>
+                    <Button variant={"none"} paddingSize={"xxs"}>
+                        <IconLayoutSidebar size={16}/>
+                    </Button>
+                </Flex>
+                <Flex style={{gap: "0.35rem"}} align={"center"} justify={"space-between"}>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button variant={"none"} paddingSize={"xxs"}
-                                    onClick={() => ref.current?.openActivePath()}>
-                                <IconCircleDot size={13}/>
+                            <Button color={"tertiary"} paddingSize={"xxs"} onClick={() => {
+                                setCreateDialogOpen(true)
+                                setFlowTypeId(undefined)
+                            }}>
+                                <IconPlus size={13}/>
                             </Button>
                         </TooltipTrigger>
                         <TooltipPortal>
                             <TooltipContent side={"bottom"}>
-                                <Text>Open active flow</Text>
+                                <Text>Add new flow</Text>
                                 <TooltipArrow/>
                             </TooltipContent>
                         </TooltipPortal>
                     </Tooltip>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button variant={"none"} paddingSize={"xxs"}
-                                    onClick={() => ref.current?.closeAll()}>
-                                <IconArrowsMinimize size={13}/>
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipPortal>
-                            <TooltipContent side={"bottom"}>
-                                <Text>Close all</Text>
-                                <TooltipArrow/>
-                            </TooltipContent>
-                        </TooltipPortal>
-                    </Tooltip>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button paddingSize={"xxs"} variant={"none"}
-                                    onClick={() => ref.current?.openAll()}>
-                                <IconArrowsMaximize size={13}/>
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipPortal>
-                            <TooltipContent side={"bottom"}>
-                                <Text>Open all</Text>
-                                <TooltipArrow/>
-                            </TooltipContent>
-                        </TooltipPortal>
-                    </Tooltip>
-                </ButtonGroup>
+                    <ButtonGroup color={"secondary"} style={{boxShadow: "none"}} p={0}>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button variant={"none"} paddingSize={"xxs"}
+                                        onClick={() => ref.current?.openActivePath()}>
+                                    <IconCircleDot size={13}/>
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipPortal>
+                                <TooltipContent side={"bottom"}>
+                                    <Text>Open active flow</Text>
+                                    <TooltipArrow/>
+                                </TooltipContent>
+                            </TooltipPortal>
+                        </Tooltip>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button variant={"none"} paddingSize={"xxs"}
+                                        onClick={() => ref.current?.closeAll()}>
+                                    <IconArrowsMinimize size={13}/>
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipPortal>
+                                <TooltipContent side={"bottom"}>
+                                    <Text>Close all</Text>
+                                    <TooltipArrow/>
+                                </TooltipContent>
+                            </TooltipPortal>
+                        </Tooltip>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button paddingSize={"xxs"} variant={"none"}
+                                        onClick={() => ref.current?.openAll()}>
+                                    <IconArrowsMaximize size={13}/>
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipPortal>
+                                <TooltipContent side={"bottom"}>
+                                    <Text>Open all</Text>
+                                    <TooltipArrow/>
+                                </TooltipContent>
+                            </TooltipPortal>
+                        </Tooltip>
+                    </ButtonGroup>
+                </Flex>
             </Flex>
         }>
             <DFlowFolder ref={ref} activeFlowId={flowId}

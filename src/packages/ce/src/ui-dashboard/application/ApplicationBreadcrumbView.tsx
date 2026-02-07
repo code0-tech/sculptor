@@ -195,12 +195,13 @@ export const ApplicationBreadcrumbView: React.FC = () => {
     }, [pathSegments, collectionSegments, getSegmentLabel, resolveDestination])
 
     return <Breadcrumb>
+        <Text hierarchy={"tertiary"} onClick={() => router.push("/")}>
+            Home
+        </Text>
         {breadcrumbs.map((crumb, index) => {
-            return crumb.isBadge ? <Badge key={`${crumb.destination}-${index}`} color={"secondary"} border onClick={() => router.push(crumb.destination)}>
-                <Text>
-                    {crumb.label}
-                </Text>
-            </Badge> : <Text key={`${crumb.destination}-${index}`} onClick={() => router.push(crumb.destination)}>
+            return crumb.isBadge ? <Text hierarchy={"tertiary"} onClick={() => router.push(crumb.destination)}>
+                {crumb.label}
+            </Text> : <Text hierarchy={"tertiary"} key={`${crumb.destination}-${index}`} onClick={() => router.push(crumb.destination)}>
                 {crumb.label}
             </Text>
         })}

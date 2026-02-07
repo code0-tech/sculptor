@@ -7,11 +7,11 @@ import {
     DUserInput,
     DUserView,
     Flex,
-    InputSuggestion,
     Spacing,
     Text,
     useForm,
-    useService, useStore
+    useService,
+    useStore
 } from "@code0-tech/pictor";
 import {MemberService} from "@edition/member/Member.service";
 import {useParams, useRouter} from "next/navigation";
@@ -34,7 +34,7 @@ export const MemberAddPage: React.FC = () => {
     const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex as unknown as number}`
 
     const members = React.useMemo(() => memberService.values({namespaceId: namespaceId}), [memberStore, userStore])
-    const formInitialValues = React.useMemo(() => ({ users: null }), [])
+    const formInitialValues = React.useMemo(() => ({users: null}), [])
     const filteredUsers = React.useMemo(() => {
         return (user: DUserView) => {
             return !members.find(m => m.user?.id === user.id)
@@ -65,33 +65,41 @@ export const MemberAddPage: React.FC = () => {
 
     //TODO: user abilities for add user as member within namespace
 
-    return <Flex mih={"100%"} miw={"100%"} align={"center"} justify={"center"}>
-        <Col xs={4}>
-            <Text size={"xl"} hierarchy={"primary"} display={"block"}>
-                Add new members
-            </Text>
-            <Spacing spacing={"xs"}/>
-            <Text size={"md"} hierarchy={"tertiary"} display={"block"}>
-                Global runtimes are shared runtimes that can be used across multiple organizations.
-            </Text>
-            <Spacing spacing={"xl"}/>
-            {/*@ts-ignore*/}
-            <DUserInput title={"Description"}
-                        description={"Provide a simple project description"}
-                        filter={filteredUsers}
-                        validationUsesSyntax
-                        {...inputs.getInputProps("users")}/>
-            <Spacing spacing={"xl"}/>
-            <Flex style={{gap: "0.35rem"}} justify={"space-between"}>
-                <Link href={"/"}>
-                    <Button color={"primary"}>
-                        Go back to members
+    return <div style={{
+        background: "#070514",
+        height: "100%",
+        padding: "1rem",
+        borderTopLeftRadius: "1rem",
+        borderTopRightRadius: "1rem"
+    }}>
+        <Flex mih={"100%"} miw={"100%"} align={"center"} justify={"center"}>
+            <Col xs={4}>
+                <Text size={"xl"} hierarchy={"primary"} display={"block"}>
+                    Add new members
+                </Text>
+                <Spacing spacing={"xs"}/>
+                <Text size={"md"} hierarchy={"tertiary"} display={"block"}>
+                    Global runtimes are shared runtimes that can be used across multiple organizations.
+                </Text>
+                <Spacing spacing={"xl"}/>
+                {/*@ts-ignore*/}
+                <DUserInput title={"Description"}
+                            description={"Provide a simple project description"}
+                            filter={filteredUsers}
+                            validationUsesSyntax
+                            {...inputs.getInputProps("users")}/>
+                <Spacing spacing={"xl"}/>
+                <Flex style={{gap: "0.35rem"}} justify={"space-between"}>
+                    <Link href={"/"}>
+                        <Button color={"primary"}>
+                            Go back to members
+                        </Button>
+                    </Link>
+                    <Button color={"success"} onClick={validate}>
+                        Add members
                     </Button>
-                </Link>
-                <Button color={"success"} onClick={validate}>
-                    Add members
-                </Button>
-            </Flex>
-        </Col>
-    </Flex>
+                </Flex>
+            </Col>
+        </Flex>
+    </div>
 }

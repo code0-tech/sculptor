@@ -5,9 +5,10 @@ import {
     Badge,
     Button,
     Card,
-    DLayout,
+    DResizableHandle,
+    DResizablePanel,
+    DResizablePanelGroup,
     Flex,
-    InputLabel,
     Spacing,
     SwitchInput,
     Text,
@@ -18,7 +19,7 @@ import {
 import {UserService} from "@edition/user/User.service";
 import {notFound} from "next/navigation";
 import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
-import {IconGavel, IconSettings} from "@tabler/icons-react";
+import {IconLayoutSidebar} from "@tabler/icons-react";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import process from "node:process";
 
@@ -32,33 +33,43 @@ export const ApplicationSettingsPage: React.FC = () => {
         notFound()
     }
 
-    return <>
-        <Spacing spacing={"xl"}/>
-        <Tab orientation={"vertical"} defaultValue={"general"}>
-            <DLayout leftContent={
-                <TabList pr={"0.7"}>
-                    <InputLabel>Application</InputLabel>
-                    <TabTrigger value={"general"} asChild>
-                        <Button paddingSize={"xxs"} variant={"none"}>
-                            <IconSettings size={16}/>
-                            <Text size={"md"} hierarchy={"primary"}>General</Text>
+    return <Tab orientation={"vertical"} defaultValue={"general"} h={"100%"}>
+        <DResizablePanelGroup>
+            <DResizablePanel id={"1"} defaultSize={"20%"} collapsedSize={"0%"}
+                             collapsible minSize={"10%"} style={{textWrap: "nowrap"}}>
+                <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
+                    <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"}>
+                        <Text size={"md"} hierarchy={"secondary"}>Application settings</Text>
+
+                        <Button variant={"none"} paddingSize={"xxs"}>
+                            <IconLayoutSidebar size={16}/>
                         </Button>
-                    </TabTrigger>
-                    <TabTrigger value={"restrictions"} asChild>
-                        <Button paddingSize={"xxs"} variant={"none"}>
-                            <IconGavel size={16}/>
-                            <Text size={"md"} hierarchy={"primary"}>Restrictions</Text>
-                        </Button>
-                    </TabTrigger>
-                </TabList>
-            }>
+                    </Flex>
+                    <Text size={"sm"} hierarchy={"tertiary"} style={{textWrap: "wrap"}}>
+                        General settings and restrictions for your Sculptor application. These settings affect all users
+                        and organizations within the application.
+                    </Text>
+                    <TabList>
+                        <TabTrigger value={"general"} w={"100%"} asChild>
+                            <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                <Text size={"md"}>General</Text>
+                            </Button>
+                        </TabTrigger>
+                        <TabTrigger value={"restrictions"} w={"100%"} asChild>
+                            <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                <Text size={"md"}>Restrictions</Text>
+                            </Button>
+                        </TabTrigger>
+                    </TabList>
+                </Flex>
+            </DResizablePanel>
+            <DResizableHandle/>
+            <DResizablePanel id={"2"} color={"primary"} p={1} style={{borderTopLeftRadius: "1rem"}}>
                 <>
-                    <TabContent pl={"0.7"} value={"general"}>
+                    <TabContent value={"general"}>
                         <Text size={"xl"} hierarchy={"primary"}>General</Text>
                         <Spacing spacing={"xl"}/>
-                        <div style={{borderBottom: "1px solid rgba(255,255,255,.1)"}}/>
-                        <Spacing spacing={"xl"}/>
-                        <Card p={1.3}>
+                        <Card color={"secondary"}>
                             <CardSection border>
                                 <Flex justify={"space-between"} align={"center"}>
                                     <Flex style={{gap: ".35rem", flexDirection: "column"}}>
@@ -91,13 +102,11 @@ export const ApplicationSettingsPage: React.FC = () => {
                             </CardSection>
                         </Card>
                     </TabContent>
-                    <TabContent pl={"0.7"} value={"restrictions"}>
+                    <TabContent value={"restrictions"}>
                         <Text size={"xl"} hierarchy={"primary"}>Restrictions</Text>
                         <Spacing spacing={"xl"}/>
-                        <div style={{borderBottom: "1px solid rgba(255,255,255,.1)"}}/>
-                        <Spacing spacing={"xl"}/>
-                        <Flex style={{gap: "1.3rem", flexDirection: "column"}}>
-                            <Card p={1.3}>
+                        <Card color={"secondary"}>
+                            <CardSection border>
                                 <Flex justify={"space-between"} align={"center"}>
                                     <Flex style={{gap: ".35rem", flexDirection: "column"}}>
                                         <Text size={"md"} hierarchy={"primary"}>Organization creation</Text>
@@ -108,11 +117,8 @@ export const ApplicationSettingsPage: React.FC = () => {
                                     </Flex>
                                     <SwitchInput w={"40px"}/>
                                 </Flex>
-                            </Card>
-                            <Spacing spacing={"xxs"}/>
-                            <Text size={"xl"} hierarchy={"primary"}>Danger Zone</Text>
-                            <div style={{borderBottom: "1px solid rgba(255,255,255,.1)"}}/>
-                            <Card color={"error"} p={1.3}>
+                            </CardSection>
+                            <CardSection border>
                                 <Flex justify={"space-between"} align={"center"}>
                                     <Flex style={{gap: ".35rem", flexDirection: "column"}}>
                                         <Text size={"md"} hierarchy={"primary"}>User registration</Text>
@@ -121,12 +127,12 @@ export const ApplicationSettingsPage: React.FC = () => {
                                     </Flex>
                                     <SwitchInput w={"40px"}/>
                                 </Flex>
-                            </Card>
-                        </Flex>
+                            </CardSection>
+                        </Card>
 
                     </TabContent>
                 </>
-            </DLayout>
-        </Tab>
-    </>
+            </DResizablePanel>
+        </DResizablePanelGroup>
+    </Tab>
 }

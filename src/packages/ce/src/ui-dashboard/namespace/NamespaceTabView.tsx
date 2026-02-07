@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react";
-import {Badge, Button, Container, useService, useStore} from "@code0-tech/pictor";
+import {Badge, Button, useService, useStore} from "@code0-tech/pictor";
 import {Tab, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {IconFolders, IconHome, IconServer, IconSettings, IconUserCog, IconUsers} from "@tabler/icons-react";
 import {useParams, usePathname, useRouter} from "next/navigation";
@@ -11,6 +11,7 @@ import {ProjectService} from "@edition/project/Project.service";
 import {RoleService} from "@edition/role/Role.service";
 import {MemberService} from "@edition/member/Member.service";
 import {RuntimeService} from "@edition/runtime/Runtime.service";
+import {hashToColor} from "@code0-tech/pictor/dist/components/d-flow/DFlow.util";
 
 export const NamespaceTabView: React.FC = () => {
 
@@ -49,55 +50,41 @@ export const NamespaceTabView: React.FC = () => {
             //TODO add license check for enterprise features
         ) ? (
             <TabTrigger value={"settings"} asChild>
-                <Button variant={"none"} paddingSize={"xxs"} onClick={() => router.push(`${baseLink}/settings`)}>
-                    <IconSettings size={16}/>
-                    Settings
+                <Button variant={"none"} paddingSize={"xs"} onClick={() => router.push(`${baseLink}/settings`)}>
+                    <IconSettings color={hashToColor("settings")} size={16}/>
                 </Button>
             </TabTrigger>
         ) : null
     }, [namespace, parentOrganization])
 
-    return <Container>
-        <Tab defaultValue={defaultValue}>
-            <TabList>
-                <TabTrigger value={"overview"} asChild>
-                    <Button variant={"none"} paddingSize={"xxs"} onClick={() => router.push(baseLink)}>
-                        <IconHome size={16}/>
-                        Overview
-                    </Button>
-                </TabTrigger>
-                <TabTrigger value={"projects"} asChild>
-                    <Button variant={"none"} paddingSize={"xxs"} onClick={() => router.push(`${baseLink}/projects`)}>
-                        <IconFolders size={16}/>
-                        Projects
-                        <Badge>{projectService.values({namespaceId: `gid://sagittarius/Namespace/${namespaceId}`}).length}</Badge>
-                    </Button>
-                </TabTrigger>
-                <TabTrigger value={"members"} asChild>
-                    <Button variant={"none"} paddingSize={"xxs"} onClick={() => router.push(`${baseLink}/members`)}>
-                        <IconUsers size={16}/>
-                        Members
-                        <Badge>{memberService.values({namespaceId: `gid://sagittarius/Namespace/${namespaceId}`}).length}</Badge>
-                    </Button>
-                </TabTrigger>
-                <TabTrigger value={"roles"} asChild>
-                    <Button variant={"none"} paddingSize={"xxs"} onClick={() => router.push(`${baseLink}/roles`)}>
-                        <IconUserCog size={16}/>
-                        Roles
-                        <Badge>{roleService.values({namespaceId: `gid://sagittarius/Namespace/${namespaceId}`}).length}</Badge>
-                    </Button>
-                </TabTrigger>
-                <TabTrigger value={"runtimes"} asChild>
-                    <Button variant={"none"} paddingSize={"xxs"} onClick={() => router.push(`${baseLink}/runtimes`)}>
-                        <IconServer size={16}/>
-                        Runtimes
-                        {React.useMemo(() => {
-                            return <Badge>{runtimeService.values({namespaceId: `gid://sagittarius/Namespace/${namespaceId}`}).length}</Badge>
-                        }, [runtimeStore, namespaceId])}
-                    </Button>
-                </TabTrigger>
-                {settings}
-            </TabList>
-        </Tab>
-    </Container>
+    return <Tab defaultValue={defaultValue} orientation={"vertical"}>
+        <TabList>
+            <TabTrigger value={"overview"} asChild>
+                <Button variant={"none"} paddingSize={"xs"} onClick={() => router.push(baseLink)}>
+                    <IconHome color={hashToColor("home")} size={16}/>
+                </Button>
+            </TabTrigger>
+            <TabTrigger value={"projects"} asChild>
+                <Button variant={"none"} paddingSize={"xs"} onClick={() => router.push(`${baseLink}/projects`)}>
+                    <IconFolders size={16}/>
+                </Button>
+            </TabTrigger>
+            <TabTrigger value={"members"} asChild>
+                <Button variant={"none"} paddingSize={"xs"} onClick={() => router.push(`${baseLink}/members`)}>
+                    <IconUsers size={16}/>
+                </Button>
+            </TabTrigger>
+            <TabTrigger value={"roles"} asChild>
+                <Button variant={"none"} paddingSize={"xs"} onClick={() => router.push(`${baseLink}/roles`)}>
+                    <IconUserCog size={16}/>
+                </Button>
+            </TabTrigger>
+            <TabTrigger value={"runtimes"} asChild>
+                <Button variant={"none"} paddingSize={"xs"} onClick={() => router.push(`${baseLink}/runtimes`)}>
+                    <IconServer size={16}/>
+                </Button>
+            </TabTrigger>
+            {settings}
+        </TabList>
+    </Tab>
 }

@@ -44,18 +44,17 @@ export const OrganizationDeleteView: React.FC = () => {
 
     return <>
         <Flex justify={"space-between"} align={"end"}>
-            <Text size={"xl"} hierarchy={"primary"}>Delete organization forever</Text>
+            <Text size={"xl"} hierarchy={"primary"}>Delete organization</Text>
         </Flex>
         <Spacing spacing={"xl"}/>
         <Card p={1.3} color={"error"}>
             <Flex justify={"space-between"} align={"center"}>
                 <Flex style={{gap: ".35rem", flexDirection: "column"}}>
-                    <Text size={"md"} hierarchy={"primary"}>Delete organization</Text>
-                    <Text size={"md"} hierarchy={"tertiary"}>
+                    <Text size={"md"} hierarchy={"primary"}>
                         This will delete the organization and cannot be undone.
                     </Text>
                 </Flex>
-                <Button color={"error"} onClick={deleteOrganization}>
+                <Button color={"secondary"} variant={"filled"} onClick={deleteOrganization}>
                     Delete organization forever
                 </Button>
             </Flex>

@@ -1,71 +1,87 @@
 "use client"
 
 import React from "react";
-import type {Namespace, NamespaceRole} from "@code0-tech/sagittarius-graphql-types";
-import {useParams} from "next/navigation";
-import {Button, DLayout, Flex, Spacing, Text, useService, useStore} from "@code0-tech/pictor";
-import {RoleService} from "@edition/role/Role.service";
+import {
+    Button,
+    DResizableHandle,
+    DResizablePanel,
+    DResizablePanelGroup,
+    Flex,
+    ScrollArea,
+    ScrollAreaScrollbar,
+    ScrollAreaThumb,
+    ScrollAreaViewport,
+    Text
+} from "@code0-tech/pictor";
 import {Tab, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {RoleProjectView} from "@edition/ui-dashboard/role/RoleProjectView";
 import {RolePermissionView} from "@edition/ui-dashboard/role/RolePermissionView";
 import {RoleGeneralAdjustmentView} from "@edition/ui-dashboard/role/RoleGeneralAdjustmentView";
 import {RoleDeleteView} from "@edition/ui-dashboard/role/RoleDeleteView";
+import {IconLayoutSidebar} from "@tabler/icons-react";
 
 export const RoleSettingsPage: React.FC = () => {
 
     //TODO: limit tabs based on user abilities for roles
 
-    const params = useParams()
-    const roleService = useService(RoleService)
-    const roleStore = useStore(RoleService)
-
-    const namespaceIndex = params.namespaceId as any as number
-    const roleIndex = params.roleId as any as number
-    const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
-    const roleId: NamespaceRole['id'] = `gid://sagittarius/NamespaceRole/${roleIndex}`
-
-    const role = React.useMemo(() => roleService.getById(roleId, {namespaceId: namespaceId}), [roleStore, roleId, namespaceId])
-
     return <>
-        <Spacing spacing={"xl"}/>
-        <Flex style={{gap: "0.7rem"}} align={"center"}>
-            <Text size={"xl"} hierarchy={"primary"} display={"block"}>
-                {role?.name}
-            </Text>
-        </Flex>
-        <Spacing spacing={"xl"}/>
-        <Tab orientation={"vertical"} defaultValue={"permission"}>
-            <DLayout leftContent={
-                <TabList pr={"0.7"}>
-                    <TabTrigger value={"general"} asChild>
-                        <Button paddingSize={"xxs"} variant={"none"}>
-                            <Text size={"md"} hierarchy={"primary"}>General adjustments</Text>
-                        </Button>
-                    </TabTrigger>
-                    <TabTrigger value={"permission"} asChild>
-                        <Button paddingSize={"xxs"} variant={"none"}>
-                            <Text size={"md"} hierarchy={"primary"}>Permission adjustments</Text>
-                        </Button>
-                    </TabTrigger>
-                    <TabTrigger value={"project"} asChild>
-                        <Button paddingSize={"xxs"} variant={"none"}>
-                            <Text size={"md"} hierarchy={"primary"}>Limit to projects</Text>
-                        </Button>
-                    </TabTrigger>
-                    <TabTrigger value={"delete"} asChild>
-                        <Button color={"error"} paddingSize={"xxs"} variant={"none"}>
-                            <Text size={"md"} hierarchy={"primary"}>Delete role forever</Text>
-                        </Button>
-                    </TabTrigger>
-                </TabList>
-            }>
-                <>
-                    <RoleGeneralAdjustmentView/>
-                    <RolePermissionView/>
-                    <RoleProjectView/>
-                    <RoleDeleteView/>
-                </>
-            </DLayout>
+        <Tab orientation={"vertical"} defaultValue={"general"} h={"100%"}>
+            <DResizablePanelGroup>
+                <DResizablePanel id={"1"} defaultSize={"20%"} collapsedSize={"0%"}
+                                 collapsible minSize={"10%"} style={{textWrap: "nowrap"}}>
+                    <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
+                        <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"}>
+                            <Text size={"md"} hierarchy={"secondary"}>Role settings</Text>
+
+                            <Button variant={"none"} paddingSize={"xxs"}>
+                                <IconLayoutSidebar size={16}/>
+                            </Button>
+                        </Flex>
+                        <Text size={"sm"} hierarchy={"tertiary"} style={{textWrap: "wrap"}}>
+                            General settings and restrictions for your Sculptor application. These settings affect all
+                            users
+                            and organizations within the application.
+                        </Text>
+                        <TabList pr={"0.7"}>
+                            <TabTrigger value={"general"} w={"100%"} asChild>
+                                <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                    <Text size={"md"}>General</Text>
+                                </Button>
+                            </TabTrigger>
+                            <TabTrigger value={"permission"} w={"100%"} asChild>
+                                <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                    <Text size={"md"}>Permissions</Text>
+                                </Button>
+                            </TabTrigger>
+                            <TabTrigger value={"project"} w={"100%"} asChild>
+                                <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                    <Text size={"md"}>Limit to projects</Text>
+                                </Button>
+                            </TabTrigger>
+                            <TabTrigger value={"delete"} w={"100%"} asChild>
+                                <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                    <Text size={"md"}>Delete role</Text>
+                                </Button>
+                            </TabTrigger>
+                        </TabList>
+                    </Flex>
+                </DResizablePanel>
+                <DResizableHandle/>
+                <DResizablePanel id={"2"} color={"primary"} p={1}
+                                 style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
+                    <ScrollArea h={"100%"} w={"100%"} type={"scroll"}>
+                        <ScrollAreaViewport>
+                            <RoleGeneralAdjustmentView/>
+                            <RolePermissionView/>
+                            <RoleProjectView/>
+                            <RoleDeleteView/>
+                        </ScrollAreaViewport>
+                        <ScrollAreaScrollbar orientation={"vertical"}>
+                            <ScrollAreaThumb/>
+                        </ScrollAreaScrollbar>
+                    </ScrollArea>
+                </DResizablePanel>
+            </DResizablePanelGroup>
         </Tab>
     </>
 }

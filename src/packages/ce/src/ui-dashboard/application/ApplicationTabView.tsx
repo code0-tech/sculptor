@@ -8,6 +8,7 @@ import {usePathname, useRouter} from "next/navigation";
 import {UserService} from "@edition/user/User.service";
 import {RuntimeService} from "@edition/runtime/Runtime.service";
 import {OrganizationService} from "@edition/organization/Organization.service";
+import {hashToColor} from "@code0-tech/pictor/dist/components/d-flow/DFlow.util";
 
 export const ApplicationTabView: React.FC = () => {
 
@@ -32,23 +33,18 @@ export const ApplicationTabView: React.FC = () => {
         return currentUser && currentUser.admin ? (
             <>
                 <TabTrigger value={"users"} asChild={true}>
-                    <Button variant={"none"} paddingSize={"xxs"} onClick={() => router.push("/users")}>
+                    <Button variant={"none"} paddingSize={"xs"} onClick={() => router.push("/users")}>
                         <IconUser size={16}/>
-                        Users
-                        <Badge>{userService.values().length}</Badge>
                     </Button>
                 </TabTrigger>
                 <TabTrigger value={"runtimes"} asChild={true}>
-                    <Button variant={"none"} paddingSize={"xxs"} onClick={() => router.push("/runtimes")}>
+                    <Button variant={"none"} paddingSize={"xs"} onClick={() => router.push("/runtimes")}>
                         <IconServer size={16}/>
-                        Runtimes
-                        <Badge>{runtimeService.values().filter(runtime => !runtime.namespace?.id).length}</Badge>
                     </Button>
                 </TabTrigger>
                 <TabTrigger value={"settings"} asChild={true}>
-                    <Button variant={"none"} paddingSize={"xxs"} onClick={() => router.push("/settings")}>
-                        <IconSettings size={16}/>
-                        Settings
+                    <Button variant={"none"} paddingSize={"xs"} onClick={() => router.push("/settings")}>
+                        <IconSettings color={hashToColor("settings")} size={16}/>
                     </Button>
 
                 </TabTrigger>
@@ -56,24 +52,19 @@ export const ApplicationTabView: React.FC = () => {
         ) : null
     }, [currentUser, runtimeStore, organizationStore])
 
-    return <Container>
-        <Tab defaultValue={defaultValue}>
+    return <Tab defaultValue={defaultValue} orientation={"vertical"}>
             <TabList>
                 <TabTrigger value={"overview"} asChild={true}>
-                    <Button variant={"none"} paddingSize={"xxs"} onClick={() => router.push("/")}>
-                        <IconHome size={16}/>
-                        Overview
+                    <Button variant={"none"} paddingSize={"xs"} onClick={() => router.push("/")}>
+                        <IconHome color={hashToColor("home")} size={16}/>
                     </Button>
                 </TabTrigger>
                 <TabTrigger value={"organizations"} asChild={true}>
-                    <Button variant={"none"} paddingSize={"xxs"} onClick={() => router.push("/organizations")}>
+                    <Button variant={"none"} paddingSize={"xs"} onClick={() => router.push("/organizations")}>
                         <IconBuilding size={16}/>
-                        Organizations
-                        <Badge>{organizationService.values().length}</Badge>
                     </Button>
                 </TabTrigger>
                 {adminLinks}
             </TabList>
         </Tab>
-    </Container>
 }

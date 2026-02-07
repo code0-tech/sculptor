@@ -15,7 +15,7 @@ export const MembersView: React.FC = () => {
     const [, startTransition] = React.useTransition()
 
     const membersList = React.useMemo(() => {
-        return <DNamespaceMemberList onAssignRole={(member, roles) => {
+        return <DNamespaceMemberList color={"secondary"} onAssignRole={(member, roles) => {
             startTransition(() => {
                 memberService.memberAssignRoles({
                     memberId: member.id!,
