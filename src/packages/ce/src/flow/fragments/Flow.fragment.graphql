@@ -1,5 +1,3 @@
-#import "../../function/fragments/DataTypeIdentifier.fragment.graphql"
-
 fragment Flow on Flow {
     __typename
     id
@@ -44,12 +42,6 @@ fragment Flow on Flow {
                             id
                             updatedAt
                             createdAt
-                            dataTypeIdentifier {
-                                ...DataTypeIdentifier
-                            }
-                            node
-                            depth
-                            scope
                             nodeFunctionId
                             referencePath {
                                 __typename
