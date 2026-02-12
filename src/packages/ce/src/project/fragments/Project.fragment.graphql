@@ -53,6 +53,7 @@ fragment Project on NamespaceProject {
     primaryRuntime {
         __typename
         ...RuntimeId
+        name
     }
     userAbilities {
         assignProjectRuntimes
