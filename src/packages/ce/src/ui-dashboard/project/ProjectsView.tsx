@@ -28,7 +28,7 @@ import {ProjectService} from "@edition/project/Project.service";
 import {ProjectDataTableFilterInputComponent} from "@edition/ui-dashboard/project/ProjectDataTableFilterInputComponent";
 
 //TODO: user abilities for project creation within namespace
-export const NamespaceProjectsView: React.FC = () => {
+export const ProjectsView: React.FC = () => {
 
     const params = useParams()
     const router = useRouter()
@@ -68,7 +68,7 @@ export const NamespaceProjectsView: React.FC = () => {
             </Flex>
             <ButtonGroup>
                 <Link href={`/namespace/${namespaceId}/projects/create`}>
-                    <Button color={"success"}>Create project</Button>
+                    <Button color={"success"}>Create</Button>
                 </Link>
                 <Menu>
                     <MenuTrigger asChild>

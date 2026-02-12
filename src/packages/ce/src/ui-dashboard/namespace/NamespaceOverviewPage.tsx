@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react";
-import {NamespaceProjectsView} from "@edition/ui-dashboard/namespace/NamespaceProjectsView";
+import {ProjectsView} from "@edition/ui-dashboard/project/ProjectsView";
 import {DLayout, useService, useStore, useUserSession} from "@code0-tech/pictor";
 import {NamespaceOverviewRightView} from "@edition/ui-dashboard/namespace/NamespaceOverviewRightView";
 import {NamespaceOverviewLeftView} from "@edition/ui-dashboard/namespace/NamespaceOverviewLeftView";
@@ -29,7 +29,7 @@ export const NamespaceOverviewPage: React.FC = () => {
             borderTopLeftRadius: "1rem",
             borderTopRightRadius: "1rem"
         }}>
-            <NamespaceProjectsView/>
+            <ProjectsView/>
         </div>
     </DLayout>
 }
