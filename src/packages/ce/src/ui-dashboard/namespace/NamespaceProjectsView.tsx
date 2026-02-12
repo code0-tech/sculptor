@@ -15,7 +15,7 @@ export const NamespaceProjectsView: React.FC = () => {
     const projectsList = React.useMemo(() => {
         return <DNamespaceProjectList color={"secondary"} onSelect={(project) => {
             const number = project.id?.match(/NamespaceProject\/(\d+)$/)?.[1]
-            router.push(`/namespace/${namespaceId}/project/${number}`)
+            router.push(`/namespace/${namespaceId}/project/${number}/flow`)
         }} namespaceId={`gid://sagittarius/Namespace/${namespaceId}`}/>
     }, [namespaceId])
 
