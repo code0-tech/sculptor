@@ -1,59 +1,60 @@
-"use client"
-
-
 import React from "react";
 import {
     Button,
-    Flex,
-    Menu,
-    MenuCheckboxItem,
-    MenuContent,
-    MenuPortal,
-    MenuTrigger,
+    DNamespaceProjectList,
+    Flex, Menu, MenuCheckboxItem, MenuContent, MenuPortal, MenuTrigger,
     Spacing,
-    Text
+    Text,
+    useService,
+    useStore,
+    useUserSession
 } from "@code0-tech/pictor";
+import {UserService} from "@edition/user/User.service";
 import Link from "next/link";
-import {useParams, useRouter} from "next/navigation";
+import {useRouter} from "next/navigation";
 import {ProjectDataTableComponent} from "@edition/ui-dashboard/project/ProjectDataTableComponent";
 import {DataTableFilterProps, DataTableSortProps} from "@code0-tech/pictor/dist/components/data-table/DataTable";
+import {ProjectDataTableFilterInputComponent} from "@edition/ui-dashboard/project/ProjectDataTableFilterInputComponent";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import {IconMinus, IconSortAscending, IconSortDescending} from "@tabler/icons-react";
-import {ProjectDataTableFilterInputComponent} from "@edition/ui-dashboard/project/ProjectDataTableFilterInputComponent";
 
-//TODO: user abilities for project creation within namespace
-export const ProjectsView: React.FC = () => {
+export const PersonalProjectsView: React.FC = () => {
 
-    const params = useParams()
     const router = useRouter()
-    const namespaceId = params.namespaceId as any as number
+    const userSession = useUserSession()
+    const userStore = useStore(UserService)
+    const userService = useService(UserService)
+
+    const currentUser = React.useMemo(() => userService.getById(userSession?.user?.id), [userStore, userSession])
+    const namespaceId = currentUser?.namespace?.id
+    const namespaceIndex = namespaceId?.match(/Namespace\/(\d+)$/)?.[1]
 
     const [filter, setFilter] = React.useState<DataTableFilterProps>({})
     const [sort, setSort] = React.useState<DataTableSortProps>({})
 
     const projectsList = React.useMemo(() => {
-        return <ProjectDataTableComponent namespaceId={`gid://sagittarius/Namespace/${namespaceId}`}
-                                          filter={filter}
-                                          sort={sort}
-                                          onSelect={(project) => {
-                                              const number = project?.id?.match(/NamespaceProject\/(\d+)$/)?.[1]
-                                              router.push(`/namespace/${namespaceId}/project/${number}/flow`)
-                                          }}/>
-    }, [namespaceId, filter, sort])
+        if (!currentUser || !currentUser.namespace) return null
+        return <ProjectDataTableComponent onSelect={(project) => {
+            const number = project?.id?.match(/NamespaceProject\/(\d+)$/)?.[1]
+            router.push(`/namespace/${namespaceId}/project/${number}/flow`)
+        }} namespaceId={currentUser.namespace.id}/>
+
+    }, [currentUser])
 
     return <>
 
         <Flex align={"center"} justify={"space-between"}>
             <Flex style={{gap: "0.35rem", flexDirection: "column"}}>
                 <Text size={"xl"} hierarchy={"primary"}>
-                    Projects
+                    Personal projects
                 </Text>
                 <Text size={"sm"} hierarchy={"tertiary"}>
-                    Manage projects that you belong to. You can create new projects and switch between them.
+                    Projects created in your personal namespace. You can also create organization projects if you are a
+                    member of any organization.
                 </Text>
             </Flex>
             <ButtonGroup>
-                <Link href={`/namespace/${namespaceId}/projects/create`}>
+                <Link href={`/namespace/${namespaceIndex}/projects/create`}>
                     <Button color={"success"}>Create</Button>
                 </Link>
                 <Menu>
@@ -122,11 +123,12 @@ export const ProjectsView: React.FC = () => {
         </Flex>
         <Spacing spacing={"xl"}/>
         <div style={{width: "100%"}}>
-            <ProjectDataTableFilterInputComponent namespaceId={`gid://sagittarius/Namespace/${namespaceId}`}
+            <ProjectDataTableFilterInputComponent namespaceId={currentUser?.namespace?.id}
                                                   onChange={filter => setFilter(filter)}/>
         </div>
         <Spacing spacing={"xl"}/>
         {projectsList}
 
     </>
+
 }

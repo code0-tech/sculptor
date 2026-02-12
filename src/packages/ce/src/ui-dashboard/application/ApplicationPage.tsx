@@ -1,4 +1,4 @@
-import {PersonalProjectsView} from "@edition/ui-dashboard/personal-project/PersonalProjectsView";
+import {PersonalProjectsView} from "@edition/ui-dashboard/project/PersonalProjectsView";
 import {OrganizationsView} from "@edition/ui-dashboard/organization/OrganizationsView";
 import {Spacing} from "@code0-tech/pictor";
 
