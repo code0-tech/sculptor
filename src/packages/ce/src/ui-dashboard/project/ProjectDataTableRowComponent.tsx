@@ -1,9 +1,9 @@
 import React from "react";
 import {NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
-import {Avatar, Badge, Button, DataTableColumn, Flex, Text, useService, useStore} from "@code0-tech/pictor";
+import {Avatar, Badge, DataTableColumn, Flex, Text, useService, useStore} from "@code0-tech/pictor";
 import {ProjectService} from "@edition/project/Project.service";
 import {RuntimeService} from "@edition/runtime/Runtime.service";
-import {IconBinaryTree, IconDotsVertical, IconServer} from "@tabler/icons-react";
+import {IconBinaryTree, IconServer} from "@tabler/icons-react";
 
 export interface ProjectDataTableRowComponentProps {
     projectId: NamespaceProject['id']

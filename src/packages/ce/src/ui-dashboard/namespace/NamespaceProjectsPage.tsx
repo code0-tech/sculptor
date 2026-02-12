@@ -1,6 +1,6 @@
 "use client"
 
-import {NamespaceProjectsView} from "@edition/ui-dashboard/namespace/NamespaceProjectsView";
+import {ProjectsView} from "@edition/ui-dashboard/project/ProjectsView";
 import React from "react";
 
 export const NamespaceProjectsPage: React.FC = () => {
@@ -11,6 +11,6 @@ export const NamespaceProjectsPage: React.FC = () => {
         borderTopLeftRadius: "1rem",
         borderTopRightRadius: "1rem"
     }}>
-        <NamespaceProjectsView/>
+        <ProjectsView/>
     </div>
 }
