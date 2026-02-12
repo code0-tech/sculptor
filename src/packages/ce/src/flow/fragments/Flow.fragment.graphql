@@ -2,7 +2,6 @@ fragment Flow on Flow {
     __typename
     id
     createdAt
-
     name
     nodes (first: $firstNode, after: $afterNode) {
         __typename
