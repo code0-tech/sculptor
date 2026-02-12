@@ -22,7 +22,8 @@ export default function Page() {
 
     const namespaceIndex = params?.namespaceId as any as number
 
-    return <DResizablePanel id={"2"} color={"primary"} style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
+    return <DResizablePanel id={"2"} color={"primary"}
+                            style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
         <ScrollArea h={"100%"} w={"100%"}>
             <ScrollAreaViewport style={{paddingTop: "40vh"}}>
                 <Flex mih={"100%"} miw={"100%"} pos={"relative"} align={"start"}
