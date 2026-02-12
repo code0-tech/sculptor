@@ -1,7 +1,7 @@
 "use client"
 
-import React from "react";
 import {useApolloClient} from "@apollo/client/react";
+import {useParams, useRouter} from "next/navigation";
 import {
     AuroraBackground,
     ContextStoreProvider,
@@ -12,9 +12,6 @@ import {
     DNamespaceRoleView,
     DNamespaceView,
     DOrganizationView,
-    DResizableHandle,
-    DResizablePanel,
-    DResizablePanelGroup,
     DRuntimeView,
     DUserView,
     Flex,
@@ -22,34 +19,30 @@ import {
     FunctionDefinitionView,
     useUserSession
 } from "@code0-tech/pictor";
-import {UserService} from "@edition/user/User.service";
+import React from "react";
 import {GraphqlClient} from "@core/util/graphql-client";
-import {useParams, useRouter} from "next/navigation";
+import {Flow, Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
+import {usePersistentReactiveArrayService} from "@/hooks/usePersistentReactiveArrayService";
+import {UserService} from "@edition/user/User.service";
 import {OrganizationService} from "@edition/organization/Organization.service";
 import {MemberService} from "@edition/member/Member.service";
 import {NamespaceService} from "@edition/namespace/Namespace.service";
-import {usePersistentReactiveArrayService} from "@/hooks/usePersistentReactiveArrayService";
 import {RuntimeService} from "@edition/runtime/Runtime.service";
 import {ProjectService} from "@edition/project/Project.service";
 import {RoleService} from "@edition/role/Role.service";
-import {Flow, Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {FlowService} from "@edition/flow/Flow.service";
 import {FunctionService} from "@edition/function/Function.service";
 import {DatatypeService} from "@edition/datatype/Datatype.service";
 import {FlowTypeService} from "@edition/flowtype/FlowTypeService";
 import {FileTabsView} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.view";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
-import {FolderView} from "@edition/ui-flow/folder/FolderView";
 import Image from "next/image";
 
-interface ApplicationLayoutProps {
+export default function Layout({bar, tab, children}: {
+    bar: React.ReactNode,
+    tab: React.ReactNode,
     children: React.ReactNode
-    bar: React.ReactNode
-    tab: React.ReactNode
-}
-
-const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab}) => {
-
+}) {
     const client = useApolloClient()
     const router = useRouter()
     const params = useParams()
@@ -123,17 +116,11 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
         }>
             <DLayout px={0.7} layoutGap={"0"} topContent={<>{bar}</>}>
                 <DLayout>
-                    <DResizablePanelGroup orientation={"horizontal"}>
-                        <DResizablePanel id={"1"} defaultSize={"25%"}>
-                            <FolderView/>
-                        </DResizablePanel>
-                        <DResizableHandle/>
+                    <>
                         {children}
-                    </DResizablePanelGroup>
+                    </>
                 </DLayout>
             </DLayout>
         </DLayout>
     </ContextStoreProvider>
 }
-
-export default ApplicationLayout
