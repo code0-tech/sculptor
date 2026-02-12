@@ -1,0 +1,20 @@
+#import "../fragments/Project.basic.fragment.graphql"
+mutation projectAssignRuntimes ($namespaceProjectId: NamespaceProjectID!, $runtimeIds: [RuntimeID!]!) {
+    namespacesProjectsAssignRuntimes(input: {
+        namespaceProjectId: $namespaceProjectId,
+        runtimeIds: $runtimeIds
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    ...on ActiveModelError { attribute type }
+                    __typename
+                }
+            }
+        }
+        namespaceProject {
+            ...BasicProject
+        }
+    }
+}
