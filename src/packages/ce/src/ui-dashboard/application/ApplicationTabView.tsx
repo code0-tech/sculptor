@@ -33,17 +33,17 @@ export const ApplicationTabView: React.FC = () => {
         return currentUser && currentUser.admin ? (
             <>
                 <TabTrigger value={"users"} asChild={true}>
-                    <Button variant={"none"} paddingSize={"xs"} onClick={() => router.push("/users")}>
+                    <Button variant={"none"} color={"primary"} paddingSize={"xs"} onClick={() => router.push("/users")}>
                         <IconUser size={16}/>
                     </Button>
                 </TabTrigger>
                 <TabTrigger value={"runtimes"} asChild={true}>
-                    <Button variant={"none"} paddingSize={"xs"} onClick={() => router.push("/runtimes")}>
+                    <Button variant={"none"} color={"primary"} paddingSize={"xs"} onClick={() => router.push("/runtimes")}>
                         <IconServer size={16}/>
                     </Button>
                 </TabTrigger>
                 <TabTrigger value={"settings"} asChild={true}>
-                    <Button variant={"none"} paddingSize={"xs"} onClick={() => router.push("/settings")}>
+                    <Button variant={"none"} color={"primary"} paddingSize={"xs"} onClick={() => router.push("/settings")}>
                         <IconSettings color={hashToColor("settings")} size={16}/>
                     </Button>
 
@@ -55,12 +55,12 @@ export const ApplicationTabView: React.FC = () => {
     return <Tab defaultValue={defaultValue} orientation={"vertical"}>
             <TabList>
                 <TabTrigger value={"overview"} asChild={true}>
-                    <Button variant={"none"} paddingSize={"xs"} onClick={() => router.push("/")}>
+                    <Button variant={"none"} color={"primary"} paddingSize={"xs"} onClick={() => router.push("/")}>
                         <IconHome color={hashToColor("home")} size={16}/>
                     </Button>
                 </TabTrigger>
                 <TabTrigger value={"organizations"} asChild={true}>
-                    <Button variant={"none"} paddingSize={"xs"} onClick={() => router.push("/organizations")}>
+                    <Button variant={"none"} color={"primary"} paddingSize={"xs"} onClick={() => router.push("/organizations")}>
                         <IconBuilding size={16}/>
                     </Button>
                 </TabTrigger>
