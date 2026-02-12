@@ -28,7 +28,7 @@ export const PersonalProjectsView: React.FC = () => {
         if (!currentUser || !currentUser.namespace) return null
         return <DNamespaceProjectList color={"secondary"} onSelect={(project) => {
             const number = project.id?.match(/NamespaceProject\/(\d+)$/)?.[1]
-            router.push(`/namespace/${namespaceIndex}/project/${number}`)
+            router.push(`/namespace/${namespaceIndex}/project/${number}/flow`)
         }} namespaceId={currentUser.namespace.id}/>
 
     }, [currentUser])
@@ -41,7 +41,8 @@ export const PersonalProjectsView: React.FC = () => {
                     Personal projects
                 </Text>
                 <Text size={"sm"} hierarchy={"tertiary"}>
-                    Projects created in your personal namespace. You can also create organization projects if you are a member of any organization.
+                    Projects created in your personal namespace. You can also create organization projects if you are a
+                    member of any organization.
                 </Text>
             </Flex>
             <Flex align={"center"} style={{gap: "0.7rem"}}>
