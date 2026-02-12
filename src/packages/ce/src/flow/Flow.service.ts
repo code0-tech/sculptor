@@ -38,7 +38,7 @@ export class FlowService extends DFlowReactiveService {
 
         const namespaceId = dependencies.namespaceId
         const projectId = dependencies.projectId
-        const filtered = flows.filter(flow => flow)
+        const filtered = flows.filter(flow => flow.project?.id === projectId)
 
         if (filtered.length <= 0) {
             this.client.query<Query>({
