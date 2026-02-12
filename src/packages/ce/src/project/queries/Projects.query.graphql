@@ -8,11 +8,14 @@ query Projects (
 ) {
     namespace(id: $namespaceId) {
         projects (first: $firstProject, after: $afterProject) {
+            __typename
             count
             nodes {
+                __typename
                 ...Project
             }
             pageInfo {
+                __typename
                 endCursor
                 hasNextPage
             }

@@ -1,4 +1,4 @@
-#import "../../runtime/fragments/Runtime.fragment.graphql"
+#import "../../runtime/fragments/Runtime.id.fragment.graphql"
 fragment Project on NamespaceProject {
     __typename
     id
@@ -6,17 +6,53 @@ fragment Project on NamespaceProject {
     description
     createdAt
     updatedAt
+    slug
     namespace {
+        __typename
         id
     }
     flows {
+        __typename
         count
+        nodes {
+            __typename
+            id
+        }
+        pageInfo {
+            __typename
+            endCursor
+            hasNextPage
+        }
     }
     runtimes {
+        __typename
         count
+        nodes {
+            __typename
+            id
+        }
+        pageInfo {
+            __typename
+            endCursor
+            hasNextPage
+        }
+    }
+    roles {
+        __typename
+        count
+        nodes {
+            __typename
+            id
+        }
+        pageInfo {
+            __typename
+            endCursor
+            hasNextPage
+        }
     }
     primaryRuntime {
-        ...Runtime
+        __typename
+        ...RuntimeId
     }
     userAbilities {
         assignProjectRuntimes

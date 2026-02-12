@@ -1,4 +1,4 @@
-#import "../fragments/Project.fragment.graphql"
+#import "../fragments/Project.basic.fragment.graphql"
 mutation projectCreate ($name: String!, $description: String, $namespaceId: NamespaceID!) {
     namespacesProjectsCreate(input: {
         name: $name,
@@ -9,12 +9,13 @@ mutation projectCreate ($name: String!, $description: String, $namespaceId: Name
             ...on Error {
                 errorCode,
                 details {
+                    ...on ActiveModelError { attribute type }
                     __typename
                 }
             }
         }
         namespaceProject {
-            ...Project
+            ...BasicProject
         }
     }
 }
