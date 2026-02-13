@@ -5,6 +5,7 @@ import {Button, DRuntimeList, Flex, Spacing, Text, useService, useStore, useUser
 import Link from "next/link";
 import {notFound, useParams, useRouter} from "next/navigation";
 import {UserService} from "@edition/user/User.service";
+import {RuntimeDataTableComponent} from "@edition/ui-dashboard/runtime/RuntimeDataTableComponent";
 
 export const RuntimesPage: React.FC = () => {
 
@@ -39,14 +40,14 @@ export const RuntimesPage: React.FC = () => {
             </Flex>
             <Flex align={"center"} style={{gap: "0.7rem"}}>
                 <Link href={namespaceIndex ? `/namespace/${namespaceIndex}/runtimes/create` : "/runtimes/create"}>
-                    <Button color={"success"}>Create runtime</Button>
+                    <Button color={"success"}>Create</Button>
                 </Link>
             </Flex>
         </Flex>
         <Spacing spacing={"xl"}/>
-        <DRuntimeList color={"secondary"} namespaceId={namespaceIndex ? `gid://sagittarius/Namespace/${namespaceIndex}` : undefined}
-                      filter={(runtime) => namespaceIndex ? true : !runtime?.namespace?.id} onSetting={(runtime) => {
-            const number = runtime.id?.match(/Runtime\/(\d+)$/)?.[1]
+        <RuntimeDataTableComponent namespaceId={namespaceIndex ? `gid://sagittarius/Namespace/${namespaceIndex}` : undefined}
+                      preFilter={(runtime) => namespaceIndex ? true : !runtime?.namespace?.id} onSelect={(runtime) => {
+            const number = runtime?.id?.match(/Runtime\/(\d+)$/)?.[1]
             router.push(namespaceIndex ? `/namespace/${namespaceIndex}/runtimes/${number}/settings` : `/runtimes/${number}/settings`)
         }}/>
     </div>

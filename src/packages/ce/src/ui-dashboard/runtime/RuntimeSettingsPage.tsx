@@ -134,7 +134,7 @@ export const RuntimeSettingsPage: React.FC = () => {
                     <TabList>
                         <TabTrigger value={"general"} w={"100%"} asChild>
                             <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                <Text size={"md"}>General adjustments</Text>
+                                <Text size={"md"}>General</Text>
                             </Button>
                         </TabTrigger>
                         <TabTrigger value={"access"} w={"100%"} asChild>
@@ -144,7 +144,7 @@ export const RuntimeSettingsPage: React.FC = () => {
                         </TabTrigger>
                         <TabTrigger value={"delete"} w={"100%"} asChild>
                             <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                <Text size={"md"}>Delete runtime forever</Text>
+                                <Text size={"md"}>Delete</Text>
                             </Button>
                         </TabTrigger>
                     </TabList>
@@ -204,7 +204,7 @@ export const RuntimeSettingsPage: React.FC = () => {
                     </TabContent>
                     <TabContent value={"delete"}>
                         <Flex justify={"space-between"} align={"end"}>
-                            <Text size={"xl"} hierarchy={"primary"}>Delete runtime</Text>
+                            <Text size={"xl"} hierarchy={"primary"}>Delete</Text>
                         </Flex>
                         <Spacing spacing={"xl"}/>
                         <Card p={1.3} color={"error"}>
