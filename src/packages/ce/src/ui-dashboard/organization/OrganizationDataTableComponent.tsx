@@ -4,6 +4,7 @@ import {DataTableFilterProps, DataTableSortProps} from "@code0-tech/pictor/dist/
 import {Organization} from "@code0-tech/sagittarius-graphql-types";
 import {OrganizationDataTableRowComponent} from "@edition/ui-dashboard/organization/OrganizationDataTableRowComponent";
 import {OrganizationService} from "@edition/organization/Organization.service";
+import {MemberService} from "@edition/member/Member.service";
 
 export interface OrganizationDataTableComponentProps {
     sort?: DataTableSortProps
@@ -18,10 +19,31 @@ export const OrganizationDataTableComponent: React.FC<OrganizationDataTableCompo
 
     const organizationService = useService(OrganizationService)
     const organizationStore = useStore(OrganizationService)
+    const memberService = useService(MemberService)
+    const memberStore = useStore(MemberService)
 
     const organizations = React.useMemo(
         () => organizationService.values(),
         [organizationStore]
+    )
+
+    const data = React.useMemo(
+        () => organizations.map(
+            o => o.json()
+        ).filter(preFilter).map(o => {
+            const members = memberService.values({namespaceId: o.namespace?.id})
+            const organization: Organization = {
+                ...o,
+                namespace: {
+                    ...o.namespace,
+                    members: {
+                        nodes: members.map(m => m.json()),
+                    }
+                }
+            }
+            return organization
+        }),
+        [organizations, memberStore, preFilter]
     )
 
     return <DataTable filter={filter}
@@ -32,7 +54,7 @@ export const OrganizationDataTableComponent: React.FC<OrganizationDataTableCompo
                           </Text>
                       </DataTableColumn>}
                       onSelect={(item) => item && onSelect?.(item)}
-                      data={organizations.map(p => p.json()).filter(preFilter)}>
+                      data={data}>
         {(organization, index) => {
             return <OrganizationDataTableRowComponent organizationId={organization.id}/>
         }}
