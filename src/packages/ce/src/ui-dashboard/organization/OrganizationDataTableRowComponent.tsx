@@ -12,12 +12,13 @@ import {
     useStore,
     useUserSession
 } from "@code0-tech/pictor";
-import {IconFolders, IconLogout, IconServer, IconUsers} from "@tabler/icons-react";
+import {IconLogout} from "@tabler/icons-react";
 import {OrganizationService} from "@edition/organization/Organization.service";
 import {NamespaceService} from "@edition/namespace/Namespace.service";
 import {MemberService} from "@edition/member/Member.service";
 import {UserService} from "@edition/user/User.service";
 import {hashToColor} from "@code0-tech/pictor/dist/components/d-flow/DFlow.util";
+import {formatDistanceToNow} from "date-fns";
 
 export interface OrganizationDataTableRowComponentProps {
     organizationId: Organization['id']
@@ -32,8 +33,8 @@ export const OrganizationDataTableRowComponent: React.FC<OrganizationDataTableRo
     const organizationStore = useStore(OrganizationService)
     const namespaceStore = useStore(NamespaceService)
     const namespaceService = useService(NamespaceService)
-    const memberStore = useStore(MemberService)
     const memberService = useService(MemberService)
+    const memberStore = useStore(MemberService)
     const userService = useService(UserService)
     const userStore = useStore(UserService)
 
@@ -59,51 +60,66 @@ export const OrganizationDataTableRowComponent: React.FC<OrganizationDataTableRo
         [memberStore, namespace, currentUser]
     )
 
+    const namespaceMembers = React.useMemo(
+        () => memberService.values({namespaceId: namespace?.id}),
+        [memberStore, userStore, namespace]
+    )
+
     return <>
+        <DataTableColumn>
+            <Flex style={{flexDirection: "column", gap: "1rem"}}>
+                <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
+                    <Flex align={"center"} style={{gap: "0.7rem"}}>
+                        <Avatar bg={"transparent"}
+                                color={hashToColor("organization")}
+                                identifier={organization?.name ?? ""}/>
+                        <Text size={"md"} hierarchy={"primary"}>
+                            {organization?.name}
+                        </Text>
+                    </Flex>
+                    <Flex style={{gap: "0.35rem"}}>
+                        {namespaceMembers.map(member => {
+                            return <Badge color={"secondary"}>
+                                <Avatar size={10} identifier={member.user?.username!}/>
+                                <Text>
+                                    @{member.user?.username}
+                                </Text>
+                            </Badge>
+                        })}
+                    </Flex>
+                </Flex>
+                <Text hierarchy={"tertiary"}>
+                    Updated {formatDistanceToNow(organization?.updatedAt!)} ago
+                </Text>
+            </Flex>
+        </DataTableColumn>
         <DataTableColumn>
             <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
                 <Flex align={"center"} style={{gap: "0.7rem"}}>
-                    <Avatar bg={"transparent"}
-                            color={hashToColor("organization")}
-                            identifier={organization?.name ?? ""}/>
-                    <Text size={"md"}>
-                        {organization?.name}
+                    <Text hierarchy={"tertiary"}>
+                        {namespace?.projects?.count ?? 0} {" "}
+                        projects
                     </Text>
-                </Flex>
-                <Flex align={"center"} style={{gap: "0.7rem"}}>
-                    <Badge bg={"transparent"}>
-                        <IconFolders size={13}/>
-                        <Text>
-                            {namespace?.projects?.count ?? 0}
-                        </Text>
-                    </Badge>
-                    <Badge bg={"transparent"}>
-                        <IconUsers size={13}/>
-                        <Text>
-                            {namespace?.members?.count ?? 0}
-                        </Text>
-                    </Badge>
-                    <Badge bg={"transparent"}>
-                        <IconServer size={13}/>
-                        <Text>
-                            {namespace?.runtimes?.count ?? 0}
-                        </Text>
-                    </Badge>
-                    <Text color={"tertiary"}>
-                        Updated at {organization?.updatedAt}
+                    <Text hierarchy={"tertiary"}>
+                        {namespace?.members?.count ?? 0}{" "}
+                        members
+                    </Text>
+                    <Text hierarchy={"tertiary"}>
+                        {namespace?.runtimes?.count ?? 0}{" "}
+                        connected runtimes
                     </Text>
                 </Flex>
             </Flex>
         </DataTableColumn>
-        <DataTableColumn>
-            {onLeave && namespaceMember && namespaceMember.userAbilities?.deleteMember ? (
+        {onLeave && namespaceMember && namespaceMember.userAbilities?.deleteMember ? (
+            <DataTableColumn>
                 <Button variant={"filled"} color={"error"} onClick={(event) => {
                     event.stopPropagation()
                     if (organization) onLeave(organization)
                 }}>
                     <IconLogout size={13}/> Leave
                 </Button>
-            ) : null}
-        </DataTableColumn>
+            </DataTableColumn>
+        ) : null}
     </>
 }
