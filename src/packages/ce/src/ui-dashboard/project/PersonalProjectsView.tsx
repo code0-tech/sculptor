@@ -34,12 +34,12 @@ export const PersonalProjectsView: React.FC = () => {
 
     const projectsList = React.useMemo(() => {
         if (!currentUser || !currentUser.namespace) return null
-        return <ProjectDataTableComponent onSelect={(project) => {
+        return <ProjectDataTableComponent filter={filter} sort={sort} onSelect={(project) => {
             const number = project?.id?.match(/NamespaceProject\/(\d+)$/)?.[1]
-            router.push(`/namespace/${namespaceId}/project/${number}/flow`)
+            router.push(`/namespace/${namespaceIndex}/project/${number}/flow`)
         }} namespaceId={currentUser.namespace.id}/>
 
-    }, [currentUser])
+    }, [currentUser, filter, sort])
 
     return <>
 
