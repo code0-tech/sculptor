@@ -1,14 +1,21 @@
 "use client"
 
-import {Button, DOrganizationList, Flex, Spacing, Text, TextInput} from "@code0-tech/pictor";
-import {IconSearch} from "@tabler/icons-react";
+import {Button, Flex, Spacing, Text} from "@code0-tech/pictor";
 import Link from "next/link";
 import React from "react";
 import {useRouter} from "next/navigation";
+import {OrganizationDataTableComponent} from "@edition/ui-dashboard/organization/OrganizationDataTableComponent";
+import {
+    OrganizationDataTableFilterInputComponent
+} from "@edition/ui-dashboard/organization/OrganizationDataTableFilterInputComponent";
+import {DataTableFilterProps, DataTableSortProps} from "@code0-tech/pictor/dist/components/data-table/DataTable";
 
 export const OrganizationsView = () => {
 
     const router = useRouter()
+
+    const [filter, setFilter] = React.useState<DataTableFilterProps>({})
+    const [sort, setSort] = React.useState<DataTableSortProps>({})
 
     return <>
         <Flex align={"center"} justify={"space-between"}>
@@ -27,9 +34,13 @@ export const OrganizationsView = () => {
             </Flex>
         </Flex>
         <Spacing spacing={"xl"}/>
+        <div style={{width: "100%"}}>
+            <OrganizationDataTableFilterInputComponent onChange={filter => setFilter(filter)}/>
+        </div>
+        <Spacing spacing={"xl"}/>
         {/**TODO: use namespaceId*/}
-        <DOrganizationList color={"secondary"} onSelect={(organization) => {
-            const number = organization.namespace?.id?.match(/Namespace\/(\d+)$/)?.[1]
+        <OrganizationDataTableComponent filter={filter} sort={sort} onSelect={(organization) => {
+            const number = organization?.namespace?.id?.match(/Namespace\/(\d+)$/)?.[1]
             router.push(`/namespace/${number}`)
         }}/>
     </>
