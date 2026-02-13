@@ -4,6 +4,7 @@ import {Avatar, Badge, DataTableColumn, Flex, Text, useService, useStore} from "
 import {ProjectService} from "@edition/project/Project.service";
 import {RuntimeService} from "@edition/runtime/Runtime.service";
 import {IconBinaryTree, IconServer} from "@tabler/icons-react";
+import {hashToColor} from "@code0-tech/pictor/dist/components/d-flow/DFlow.util";
 
 export interface ProjectDataTableRowComponentProps {
     projectId: NamespaceProject['id']
@@ -39,17 +40,20 @@ export const ProjectDataTableRowComponent: React.FC<ProjectDataTableRowComponent
 
     return <>
         <DataTableColumn>
-            <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
-                <Flex align={"center"} style={{gap: "0.7rem"}}>
-                    <Avatar bg={"transparent"}
-                            identifier={project?.name ?? ""}/>
-                    <Text size={"md"}>
-                        {project?.name}
+            <Flex style={{flexDirection: "column", gap: "1rem"}}>
+                <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
+                    <Flex align={"center"} style={{gap: "0.7rem"}}>
+                        <Avatar bg={"transparent"}
+                                color={hashToColor("project")}
+                                identifier={project?.name ?? ""}/>
+                        <Text size={"md"}>
+                            {project?.name}
+                        </Text>
+                    </Flex>
+                    <Text hierarchy={"tertiary"}>
+                        {project?.description}
                     </Text>
                 </Flex>
-                <Text hierarchy={"tertiary"}>
-                    {project?.description}
-                </Text>
                 <Flex align={"center"} style={{gap: "0.7rem"}}>
                     {
                         primaryRuntime && (
