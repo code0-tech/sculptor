@@ -5,6 +5,7 @@ import {ProjectService} from "@edition/project/Project.service";
 import {RuntimeService} from "@edition/runtime/Runtime.service";
 import {IconBinaryTree, IconServer} from "@tabler/icons-react";
 import {hashToColor} from "@code0-tech/pictor/dist/components/d-flow/DFlow.util";
+import {formatDistanceToNow} from "date-fns";
 
 export interface ProjectDataTableRowComponentProps {
     projectId: NamespaceProject['id']
@@ -46,41 +47,29 @@ export const ProjectDataTableRowComponent: React.FC<ProjectDataTableRowComponent
                         <Avatar bg={"transparent"}
                                 color={hashToColor("project")}
                                 identifier={project?.name ?? ""}/>
-                        <Text size={"md"}>
+                        <Text size={"md"} hierarchy={"primary"}>
                             {project?.name}
                         </Text>
                     </Flex>
-                    <Text hierarchy={"tertiary"}>
+                    <Text>
                         {project?.description}
                     </Text>
                 </Flex>
-                <Flex align={"center"} style={{gap: "0.7rem"}}>
-                    {
-                        primaryRuntime && (
-                            <Badge color={"tertiary"}>
-                                <IconServer size={13}/>
-                                <Text>
-                                    {primaryRuntime?.name}
-                                </Text>
-                            </Badge>
-                        )
-                    }
-                    <Badge bg={"transparent"}>
-                        <IconServer size={13}/>
-                        <Text>
-                            {project?.runtimes?.count ?? 0}
-                        </Text>
-                    </Badge>
-                    <Badge bg={"transparent"}>
-                        <IconBinaryTree size={13}/>
-                        <Text>
-                            {project?.flows?.count ?? 0}
-                        </Text>
-                    </Badge>
-                    <Text color={"tertiary"}>
-                        Updated at {project?.updatedAt}
-                    </Text>
-                </Flex>
+                <Text hierarchy={"tertiary"}>
+                    Updated {formatDistanceToNow(project?.updatedAt!)} ago
+                </Text>
+            </Flex>
+        </DataTableColumn>
+        <DataTableColumn>
+            <Flex align={"center"} style={{gap: "0.7rem"}}>
+                <Text hierarchy={"tertiary"}>
+                    {project?.flows?.count ?? 0}{" "}
+                    flows
+                </Text>
+                <Text hierarchy={"tertiary"}>
+                    {project?.runtimes?.count ?? 0}{" "}
+                    assigned runtimes
+                </Text>
             </Flex>
         </DataTableColumn>
     </>
