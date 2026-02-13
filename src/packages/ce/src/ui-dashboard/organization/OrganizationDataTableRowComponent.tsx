@@ -2,7 +2,6 @@ import React from "react";
 import {Organization} from "@code0-tech/sagittarius-graphql-types";
 import {
     Avatar,
-    Badge,
     Button,
     DataTableColumn,
     DOrganizationView,
@@ -67,25 +66,15 @@ export const OrganizationDataTableRowComponent: React.FC<OrganizationDataTableRo
 
     return <>
         <DataTableColumn>
-            <Flex style={{flexDirection: "column", gap: "1rem"}}>
-                <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
-                    <Flex align={"center"} style={{gap: "0.7rem"}}>
-                        <Avatar bg={"transparent"}
-                                color={hashToColor("organization")}
-                                identifier={organization?.name ?? ""}/>
+            <Flex style={{flexDirection: "column", gap: "1.3rem"}}>
+                <Flex align={"center"} style={{gap: "0.7rem"}}>
+                    <Avatar size={32}
+                            color={hashToColor("organization")}
+                            identifier={organization?.name ?? ""}/>
+                    <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
                         <Text size={"md"} hierarchy={"primary"}>
                             {organization?.name}
                         </Text>
-                    </Flex>
-                    <Flex style={{gap: "0.35rem"}}>
-                        {namespaceMembers.map(member => {
-                            return <Badge color={"secondary"}>
-                                <Avatar size={10} identifier={member.user?.username!}/>
-                                <Text>
-                                    @{member.user?.username}
-                                </Text>
-                            </Badge>
-                        })}
                     </Flex>
                 </Flex>
                 <Text hierarchy={"tertiary"}>
