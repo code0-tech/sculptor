@@ -1,6 +1,6 @@
 "use client"
 
-import {OrganizationSettingsPage} from "@edition/ui-dashboard/organization/OrganizationSettingsPage";
+import {OrganizationSettingsPage} from "@edition/organization/pages/OrganizationSettingsPage";
 
 export default function Page() {
     return <OrganizationSettingsPage/>

@@ -1,4 +1,4 @@
-import {RuntimeCreatePage} from "@edition/ui-dashboard/runtime/RuntimeCreatePage";
+import {RuntimeCreatePage} from "@edition/runtime/pages/RuntimeCreatePage";
 
 export default function Page() {
     return <RuntimeCreatePage/>

@@ -1,0 +1,30 @@
+#import "@edition/user/services/fragments/User.id.fragment.graphql"
+#import "@edition/namespace/services/fragments/Namespace.id.fragment.graphql"
+fragment Member on NamespaceMember {
+    id
+    roles (first: $firstRole, after: $afterRole) {
+        count
+        nodes {
+            __typename
+            id
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+
+    }
+    user {
+        ...UserId
+        username
+    }
+    namespace {
+        ...NamespaceId
+    }
+    updatedAt
+    createdAt
+    userAbilities {
+        assignMemberRoles
+        deleteMember
+    }
+}

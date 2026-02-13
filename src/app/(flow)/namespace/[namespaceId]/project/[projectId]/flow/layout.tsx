@@ -2,7 +2,7 @@
 
 import React from "react";
 import {DResizableHandle, DResizablePanel, DResizablePanelGroup} from "@code0-tech/pictor";
-import {FolderView} from "@edition/ui-flow/folder/FolderView";
+import {FolderView} from "@edition/flow/views/FolderView";
 
 interface ApplicationLayoutProps {
     children: React.ReactNode

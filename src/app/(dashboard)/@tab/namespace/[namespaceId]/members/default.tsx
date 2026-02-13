@@ -1,4 +1,4 @@
-import {NamespaceTabView} from "@edition/ui-dashboard/namespace/NamespaceTabView";
+import {NamespaceTabView} from "@edition/namespace/views/NamespaceTabView";
 
 export default function Page() {
     return <NamespaceTabView/>

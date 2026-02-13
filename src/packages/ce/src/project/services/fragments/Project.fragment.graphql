@@ -1,0 +1,65 @@
+#import "@edition/runtime/services/fragments/Runtime.id.fragment.graphql"
+fragment Project on NamespaceProject {
+    __typename
+    id
+    name
+    description
+    createdAt
+    updatedAt
+    slug
+    namespace {
+        __typename
+        id
+    }
+    flows {
+        __typename
+        count
+        nodes {
+            __typename
+            id
+        }
+        pageInfo {
+            __typename
+            endCursor
+            hasNextPage
+        }
+    }
+    runtimes {
+        __typename
+        count
+        nodes {
+            __typename
+            id
+        }
+        pageInfo {
+            __typename
+            endCursor
+            hasNextPage
+        }
+    }
+    roles {
+        __typename
+        count
+        nodes {
+            __typename
+            id
+        }
+        pageInfo {
+            __typename
+            endCursor
+            hasNextPage
+        }
+    }
+    primaryRuntime {
+        __typename
+        ...RuntimeId
+        name
+    }
+    userAbilities {
+        assignProjectRuntimes
+        createFlow
+        deleteNamespaceProject
+        updateNamespaceProject
+        __typename
+    }
+}

@@ -16,16 +16,16 @@ import {
     Flex,
     useUserSession
 } from "@code0-tech/pictor";
-import {UserService} from "@edition/user/User.service";
+import {UserService} from "@edition/user/services/User.service";
 import {GraphqlClient} from "@core/util/graphql-client";
 import {useRouter} from "next/navigation";
-import {OrganizationService} from "@edition/organization/Organization.service";
-import {MemberService} from "@edition/member/Member.service";
-import {NamespaceService} from "@edition/namespace/Namespace.service";
+import {OrganizationService} from "@edition/organization/services/Organization.service";
+import {MemberService} from "@edition/member/services/Member.service";
+import {NamespaceService} from "@edition/namespace/services/Namespace.service";
 import {usePersistentReactiveArrayService} from "@/hooks/usePersistentReactiveArrayService";
-import {RuntimeService} from "@edition/runtime/Runtime.service";
-import {ProjectService} from "@edition/project/Project.service";
-import {RoleService} from "@edition/role/Role.service";
+import {RuntimeService} from "@edition/runtime/services/Runtime.service";
+import {ProjectService} from "@edition/project/services/Project.service";
+import {RoleService} from "@edition/role/services/Role.service";
 import Image from "next/image";
 
 interface ApplicationLayoutProps {

@@ -1,4 +1,4 @@
-import {RuntimeSettingsPage} from "@edition/ui-dashboard/runtime/RuntimeSettingsPage";
+import {RuntimeSettingsPage} from "@edition/runtime/pages/RuntimeSettingsPage";
 
 export default function Page() {
     return <RuntimeSettingsPage/>
