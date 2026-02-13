@@ -30,7 +30,7 @@ export const OrganizationsView = () => {
     const [sort, setSort] = React.useState<DataTableSortProps>({})
 
     return <>
-        <Flex align={"center"} justify={"space-between"}>
+        <Flex align={"center"} style={{gap: "0.35rem"}} justify={"space-between"}>
             <Flex style={{gap: "0.35rem", flexDirection: "column"}}>
                 <Text size={"xl"} hierarchy={"primary"}>
                     Organizations
