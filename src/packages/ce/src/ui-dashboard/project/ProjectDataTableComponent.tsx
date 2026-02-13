@@ -25,7 +25,7 @@ export const ProjectDataTableComponent: React.FC<ProjectDataTableComponentProps>
                       sort={sort}
                       emptyComponent={<DataTableColumn>
                           <Text>
-                              No projects found. Create one to get started.
+                              No role found. Create one to get started.
                           </Text>
                       </DataTableColumn>}
                       onSelect={(item) => item && onSelect?.(item)}
