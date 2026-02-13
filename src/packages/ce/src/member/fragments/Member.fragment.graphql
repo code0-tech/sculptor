@@ -16,6 +16,7 @@ fragment Member on NamespaceMember {
     }
     user {
         ...UserId
+        username
     }
     namespace {
         ...NamespaceId
