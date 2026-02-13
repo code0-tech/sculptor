@@ -1,8 +1,12 @@
 import React from "react";
 import {
     Button,
-    DNamespaceProjectList,
-    Flex, Menu, MenuCheckboxItem, MenuContent, MenuPortal, MenuTrigger,
+    Flex,
+    Menu,
+    MenuCheckboxItem,
+    MenuContent,
+    MenuPortal,
+    MenuTrigger,
     Spacing,
     Text,
     useService,
@@ -43,7 +47,7 @@ export const PersonalProjectsView: React.FC = () => {
 
     return <>
 
-        <Flex align={"center"} justify={"space-between"}>
+        <Flex align={"center"} style={{gap: "0.35rem"}} justify={"space-between"}>
             <Flex style={{gap: "0.35rem", flexDirection: "column"}}>
                 <Text size={"xl"} hierarchy={"primary"}>
                     Personal projects
