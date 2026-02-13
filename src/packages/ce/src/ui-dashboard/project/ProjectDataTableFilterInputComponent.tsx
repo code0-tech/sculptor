@@ -36,7 +36,7 @@ export const ProjectDataTableFilterInputComponent: React.FC<ProjectDataTableFilt
             const runtimeIds = projects.map(p => p.primaryRuntime?.id)
             return runtimeIds.map(id => runtimeService.getById(id)).filter(Boolean)
         },
-        [projects]
+        [projects, runtimeStore]
     )
 
     return <DataTableFilterInput onChange={onChange} filterTokens={[
