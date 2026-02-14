@@ -5,33 +5,13 @@ import {useParams} from "next/navigation";
 import {Button, DNamespaceMemberList, Flex, Spacing, Text, useService, useStore} from "@code0-tech/pictor";
 import Link from "next/link";
 import {MemberService} from "@edition/member/services/Member.service";
+import {MemberDataTableComponent} from "@edition/member/components/MemberDataTableComponent";
 
+//TODO: user abilities for add user as member within namespace
 export const MembersView: React.FC = () => {
 
     const params = useParams()
     const namespaceId = params.namespaceId as any as number
-    const memberService = useService(MemberService)
-    const memberStore = useStore(MemberService)
-    const [, startTransition] = React.useTransition()
-
-    const membersList = React.useMemo(() => {
-        return <DNamespaceMemberList color={"secondary"} onAssignRole={(member, roles) => {
-            startTransition(() => {
-                memberService.memberAssignRoles({
-                    memberId: member.id!,
-                    roleIds: roles.map(r => r.id!)
-                })
-            })
-        }} onRemove={(member) => {
-            startTransition(() => {
-                memberService.memberDelete({
-                    namespaceMemberId: member.id!
-                })
-            })
-        }} namespaceId={`gid://sagittarius/Namespace/${namespaceId}`}/>
-    }, [namespaceId, memberStore])
-
-    //TODO: user abilities for add user as member within namespace
 
     return <>
 
@@ -46,7 +26,7 @@ export const MembersView: React.FC = () => {
             </Flex>
         </Flex>
         <Spacing spacing={"xl"}/>
-        {membersList}
+        <MemberDataTableComponent namespaceId={`gid://sagittarius/Namespace/${namespaceId}`}/>
 
     </>
 
