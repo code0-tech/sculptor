@@ -9,14 +9,14 @@ import {
     Text,
     useService,
     useStore,
-    useUserSession
+    useUserSession,
+    hashToColor
 } from "@code0-tech/pictor";
 import {IconLogout} from "@tabler/icons-react";
 import {OrganizationService} from "@edition/organization/services/Organization.service";
 import {NamespaceService} from "@edition/namespace/services/Namespace.service";
 import {MemberService} from "@edition/member/services/Member.service";
 import {UserService} from "@edition/user/services/User.service";
-import {hashToColor} from "@code0-tech/pictor/dist/components/d-flow/DFlow.util";
 import {formatDistanceToNow} from "date-fns";
 
 export interface OrganizationDataTableRowComponentProps {
@@ -69,7 +69,7 @@ export const OrganizationDataTableRowComponent: React.FC<OrganizationDataTableRo
             <Flex style={{flexDirection: "column", gap: "1.3rem"}}>
                 <Flex align={"center"} style={{gap: "0.7rem"}}>
                     <Avatar size={32}
-                            color={hashToColor("organization")}
+                            color={hashToColor(organization?.name ?? "", 200, 360)}
                             identifier={organization?.name ?? ""}/>
                     <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
                         <Text size={"md"} hierarchy={"primary"}>

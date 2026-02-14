@@ -1,9 +1,8 @@
 import React from "react";
 import {NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
-import {Avatar, DataTableColumn, Flex, Text, useService, useStore} from "@code0-tech/pictor";
+import {Avatar, DataTableColumn, Flex, Text, useService, useStore, hashToColor} from "@code0-tech/pictor";
 import {ProjectService} from "@edition/project/services/Project.service";
 import {RuntimeService} from "@edition/runtime/services/Runtime.service";
-import {hashToColor} from "@code0-tech/pictor/dist/components/d-flow/DFlow.util";
 import {formatDistanceToNow} from "date-fns";
 
 export interface ProjectDataTableRowComponentProps {
@@ -43,7 +42,7 @@ export const ProjectDataTableRowComponent: React.FC<ProjectDataTableRowComponent
             <Flex style={{flexDirection: "column", gap: "1.3rem"}}>
                 <Flex align={"center"} style={{gap: "0.7rem"}}>
                     <Avatar size={32}
-                            color={hashToColor("project")}
+                            color={hashToColor(project?.name ?? "", 0, 180)}
                             identifier={project?.name ?? ""}/>
                     <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
                         <Text size={"md"} hierarchy={"primary"}>
