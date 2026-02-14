@@ -1,6 +1,7 @@
 import {PersonalProjectsView} from "@edition/project/views/PersonalProjectsView";
 import {OrganizationsView} from "@edition/organization/views/OrganizationsView";
 import {
+    AuroraBackground,
     Avatar,
     Badge,
     Card,
@@ -19,6 +20,7 @@ import {
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import React from "react";
+import {OrganizationsTopView} from "@edition/organization/views/OrganizationsTopView";
 
 export const ApplicationPage = () => {
 
@@ -41,32 +43,32 @@ export const ApplicationPage = () => {
                 <Flex style={{gap: "1.3rem"}} align={"center"} ml={0.5}>
                     <div style={{position: "relative"}}>
                         <Avatar size={64}
-                                style={{
-                                    height: "fit-content",
-                                }}
+                                type={"character"}
                                 identifier={currentUser?.username ?? ""}/>
                         <Badge pos={"absolute"} right={"-5px"} bottom={"-10px"}>
                             <Text size={"md"}>👋</Text>
                         </Badge>
                     </div>
                     <div>
-                        <Text hierarchy={"tertiary"} size={"md"}>Welcome back!</Text>
-                        <Text hierarchy={"primary"} style={{fontSize: "2rem"}}>
-                            Hi, @{currentUser?.username ?? "user"}
+                        <Text hierarchy={"primary"} size={"md"}>
+                            Hi, @{currentUser?.username ?? "user"},
                         </Text>
+                        <Text hierarchy={"tertiary"} size={"md"}>let's write some flows</Text>
                     </div>
-
                 </Flex>
                 <Spacing spacing={"xl"}/>
                 <Row>
                     <Col xs={7}>
                         <Card>
+                            <div style={{opacity: 0.2, overflow: "hidden", borderRadius: "inherit"}}>
+                                <AuroraBackground/>
+                            </div>
                             <PersonalProjectsView/>
                         </Card>
                     </Col>
                     <Col xs={5}>
-                        <Card>
-                            <OrganizationsView/>
+                        <Card style={{boxShadow: "none"}}>
+                            <OrganizationsTopView/>
                         </Card>
                     </Col>
                 </Row>

@@ -1,5 +1,16 @@
 import React from "react";
-import {Avatar, Badge, Button, Flex, Spacing, Text, useService, useStore, useUserSession} from "@code0-tech/pictor";
+import {
+    Avatar,
+    Badge,
+    Button,
+    Flex,
+    hashToColor,
+    Spacing,
+    Text,
+    useService,
+    useStore,
+    useUserSession
+} from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import {IconMail, IconSparkles, IconUser, IconUserCog} from "@tabler/icons-react";
 import {OrganizationService} from "@edition/organization/services/Organization.service";
@@ -16,12 +27,16 @@ export const NamespaceOverviewLeftView: React.FC = () => {
     const organizations = React.useMemo(() => organizationService.values(), [organizationStore])
 
     return <Flex pr={0.7} w={"200px"} style={{flexDirection: "column"}}>
-        <Avatar style={{width: "100%"}} identifier={currentUser?.username!!}/>
+        <div style={{position: "relative"}}>
+            <Avatar type={"character"} size={150} identifier={currentUser?.username!!}/>
+            <Badge pos={"absolute"} right={"15%"} bottom={"15%"}>
+                <Text size={"md"}>👋</Text>
+            </Badge>
+        </div>
         <Spacing spacing={"xl"}/>
         <Flex align={"center"} style={{gap: "0.7rem"}}>
             <Flex style={{flexDirection: "column"}}>
                 <Text size={"xl"} hierarchy={"primary"}>{currentUser?.firstname} {currentUser?.lastname} </Text>
-                <Text size={"xs"} hierarchy={"tertiary"}>{currentUser?.email}</Text>
             </Flex>
         </Flex>
         <Spacing spacing={"xl"}/>
@@ -53,7 +68,9 @@ export const NamespaceOverviewLeftView: React.FC = () => {
         <Spacing spacing={"xs"}/>
         <Flex align={"center"} style={{flexWrap: "wrap", gap: ".35rem"}}>
             {organizations.map(organization => {
-                return <Avatar key={organization.id} identifier={organization.name ?? ""}/>
+                return <Avatar key={organization.id}
+                               color={hashToColor(organization?.name ?? "", 200, 360)}
+                               identifier={organization.name ?? ""}/>
             })}
         </Flex>
     </Flex>

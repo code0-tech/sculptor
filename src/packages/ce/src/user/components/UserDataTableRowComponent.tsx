@@ -25,6 +25,7 @@ export const UserDataTableRowComponent: React.FC<UserDataTableRowComponentProps>
             <Flex style={{flexDirection: "column", gap: "1.3rem"}}>
                 <Flex align={"center"} style={{gap: "0.7rem"}}>
                     <Avatar size={32}
+                            type={"character"}
                             identifier={user?.username ?? ""}/>
                     <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
                         <Flex align={"center"} style={{gap: "0.35rem"}}>

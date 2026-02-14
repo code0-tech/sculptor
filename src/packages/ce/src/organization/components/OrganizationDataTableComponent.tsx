@@ -11,11 +11,12 @@ export interface OrganizationDataTableComponentProps {
     filter?: DataTableFilterProps
     preFilter?: (project: Organization, index: number) => boolean
     onSelect?: (item: Organization | undefined) => void
+    minimized?: boolean
 }
 
 export const OrganizationDataTableComponent: React.FC<OrganizationDataTableComponentProps> = (props) => {
 
-    const {sort, filter, preFilter = () => true, onSelect} = props
+    const {sort, filter, preFilter = () => true, onSelect, minimized} = props
 
     const organizationService = useService(OrganizationService)
     const organizationStore = useStore(OrganizationService)
@@ -56,7 +57,7 @@ export const OrganizationDataTableComponent: React.FC<OrganizationDataTableCompo
                       onSelect={(item) => item && onSelect?.(item)}
                       data={data}>
         {(organization, index) => {
-            return <OrganizationDataTableRowComponent organizationId={organization.id}/>
+            return <OrganizationDataTableRowComponent minimized={minimized} organizationId={organization.id}/>
         }}
     </DataTable>
 

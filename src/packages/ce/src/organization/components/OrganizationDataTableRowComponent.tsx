@@ -6,11 +6,11 @@ import {
     DataTableColumn,
     DOrganizationView,
     Flex,
+    hashToColor,
     Text,
     useService,
     useStore,
-    useUserSession,
-    hashToColor
+    useUserSession
 } from "@code0-tech/pictor";
 import {IconLogout} from "@tabler/icons-react";
 import {OrganizationService} from "@edition/organization/services/Organization.service";
@@ -22,11 +22,12 @@ import {formatDistanceToNow} from "date-fns";
 export interface OrganizationDataTableRowComponentProps {
     organizationId: Organization['id']
     onLeave?: (organization: DOrganizationView) => void
+    minimized?: boolean
 }
 
 export const OrganizationDataTableRowComponent: React.FC<OrganizationDataTableRowComponentProps> = (props) => {
 
-    const {organizationId, onLeave} = props
+    const {organizationId, onLeave, minimized} = props
 
     const organizationService = useService(OrganizationService)
     const organizationStore = useStore(OrganizationService)
@@ -77,44 +78,52 @@ export const OrganizationDataTableRowComponent: React.FC<OrganizationDataTableRo
                         </Text>
                     </Flex>
                 </Flex>
-                <Text hierarchy={"tertiary"}>
-                    Updated {formatDistanceToNow(organization?.updatedAt!)} ago
-                </Text>
+                {!minimized && (
+                    <Text hierarchy={"tertiary"}>
+                        Updated {formatDistanceToNow(organization?.updatedAt!)} ago
+                    </Text>
+                )}
+
             </Flex>
         </DataTableColumn>
-        <DataTableColumn>
-            <Flex align={"center"} justify={"end"} style={{gap: "0.7rem"}}>
-                {namespace?.projects?.count ? (
-                    <Text hierarchy={"tertiary"}>
-                        {namespace?.projects?.count ?? 0} {" "}
-                        projects
-                    </Text>
-                ) : null}
+        {!minimized && (
+            <>
+                <DataTableColumn>
+                    <Flex align={"center"} justify={"end"} style={{gap: "0.7rem"}}>
+                        {namespace?.projects?.count ? (
+                            <Text hierarchy={"tertiary"}>
+                                {namespace?.projects?.count ?? 0} {" "}
+                                projects
+                            </Text>
+                        ) : null}
 
-                {namespace?.members?.count ? (
-                    <Text hierarchy={"tertiary"}>
-                        {namespace?.members?.count ?? 0}{" "}
-                        members
-                    </Text>
-                ) : null}
+                        {namespace?.members?.count ? (
+                            <Text hierarchy={"tertiary"}>
+                                {namespace?.members?.count ?? 0}{" "}
+                                members
+                            </Text>
+                        ) : null}
 
-                {namespace?.runtimes?.count ? (
-                    <Text hierarchy={"tertiary"}>
-                        {namespace?.runtimes?.count ?? 0}{" "}
-                        connected runtimes
-                    </Text>
+                        {namespace?.runtimes?.count ? (
+                            <Text hierarchy={"tertiary"}>
+                                {namespace?.runtimes?.count ?? 0}{" "}
+                                connected runtimes
+                            </Text>
+                        ) : null}
+                    </Flex>
+                </DataTableColumn>
+                {onLeave && namespaceMember && namespaceMember.userAbilities?.deleteMember ? (
+                    <DataTableColumn>
+                        <Button variant={"filled"} color={"error"} onClick={(event) => {
+                            event.stopPropagation()
+                            if (organization) onLeave(organization)
+                        }}>
+                            <IconLogout size={13}/> Leave
+                        </Button>
+                    </DataTableColumn>
                 ) : null}
-            </Flex>
-        </DataTableColumn>
-        {onLeave && namespaceMember && namespaceMember.userAbilities?.deleteMember ? (
-            <DataTableColumn>
-                <Button variant={"filled"} color={"error"} onClick={(event) => {
-                    event.stopPropagation()
-                    if (organization) onLeave(organization)
-                }}>
-                    <IconLogout size={13}/> Leave
-                </Button>
-            </DataTableColumn>
-        ) : null}
+            </>
+        )}
+
     </>
 }

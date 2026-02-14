@@ -54,19 +54,18 @@ export const NamespaceOverviewRightView: React.FC = () => {
                 const user = userService.getById(member.user?.id!!)
                 return <Tooltip>
                     <TooltipTrigger asChild>
-                        <Avatar identifier={user?.username ?? ""}/>
+                        <Avatar type={"character"} identifier={user?.username ?? ""}/>
                     </TooltipTrigger>
                     <TooltipPortal>
                         <TooltipContent side={"bottom"} sideOffset={8}>
                             <Flex style={{flexDirection: "column"}}>
                                 <Text size={"md"} hierarchy={"secondary"}>
-                                    {user?.username}
+                                    @{user?.username}
                                 </Text>
                                 <Text size={"xs"} hierarchy={"tertiary"}>
                                     {user?.email}
                                 </Text>
                             </Flex>
-                            <TooltipArrow/>
                         </TooltipContent>
                     </TooltipPortal>
                 </Tooltip>
