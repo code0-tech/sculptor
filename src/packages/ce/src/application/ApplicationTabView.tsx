@@ -44,7 +44,7 @@ export const ApplicationTabView: React.FC = () => {
                 </TabTrigger>
                 <TabTrigger value={"settings"} asChild={true}>
                     <Button variant={"none"} color={"primary"} paddingSize={"xs"} onClick={() => router.push("/settings")}>
-                        <IconSettings color={hashToColor("settings")} size={16}/>
+                        <IconSettings size={16}/>
                     </Button>
 
                 </TabTrigger>
@@ -56,7 +56,7 @@ export const ApplicationTabView: React.FC = () => {
             <TabList>
                 <TabTrigger value={"overview"} asChild={true}>
                     <Button variant={"none"} color={"primary"} paddingSize={"xs"} onClick={() => router.push("/")}>
-                        <IconHome color={hashToColor("home")} size={16}/>
+                        <IconHome size={16}/>
                     </Button>
                 </TabTrigger>
                 <TabTrigger value={"organizations"} asChild={true}>

@@ -24,11 +24,6 @@ export const NamespaceTabView: React.FC = () => {
     const namespaceStore = useStore(NamespaceService)
     const organizationService = useService(OrganizationService)
     const organizationStore = useStore(OrganizationService)
-    const projectService = useService(ProjectService)
-    const roleService = useService(RoleService)
-    const memberService = useService(MemberService)
-    const runtimeService = useService(RuntimeService)
-    const runtimeStore = useStore(RuntimeService)
 
     const namespace = React.useMemo(() => namespaceService.getById(`gid://sagittarius/Namespace/${namespaceId}`), [namespaceStore, namespaceId])
     const parentOrganization = React.useMemo(() => namespace?.parent?.__typename === "Organization" ? organizationService.getById(namespace?.parent?.id) : null, [organizationStore, namespace])
@@ -51,7 +46,7 @@ export const NamespaceTabView: React.FC = () => {
         ) ? (
             <TabTrigger value={"settings"} asChild>
                 <Button variant={"none"} paddingSize={"xs"} onClick={() => router.push(`${baseLink}/settings`)}>
-                    <IconSettings color={hashToColor("settings")} size={16}/>
+                    <IconSettings size={16}/>
                 </Button>
             </TabTrigger>
         ) : null
@@ -61,7 +56,7 @@ export const NamespaceTabView: React.FC = () => {
         <TabList>
             <TabTrigger value={"overview"} asChild>
                 <Button variant={"none"} paddingSize={"xs"} onClick={() => router.push(baseLink)}>
-                    <IconHome color={hashToColor("home")} size={16}/>
+                    <IconHome size={16}/>
                 </Button>
             </TabTrigger>
             <TabTrigger value={"projects"} asChild>
