@@ -1,6 +1,6 @@
 import React from "react";
 import {User} from "@code0-tech/sagittarius-graphql-types";
-import {Avatar, Badge, DataTableColumn, Flex, hashToColor, Text, useService, useStore} from "@code0-tech/pictor";
+import {Avatar, Badge, DataTableColumn, Flex, Text, useService, useStore} from "@code0-tech/pictor";
 import {formatDistanceToNow} from "date-fns";
 import {UserService} from "@edition/user/services/User.service";
 
