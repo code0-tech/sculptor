@@ -77,14 +77,14 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
     )
 
     const primaryRuntime = React.useMemo(
-        () => runtimeService.getById(project?.primaryRuntime?.id),
+        () => runtimeService.values({namespaceId: project?.namespace?.id}).find(runtime => runtime.id == project?.primaryRuntime?.id),
         [project, runtimeStore]
     )
 
-    const flowTypes = primaryRuntime?.id ? React.useMemo(
-        () => flowTypeService.values({runtimeId: primaryRuntime?.id}),
+    const flowTypes = React.useMemo(
+        () => flowTypeService.values({runtimeId: primaryRuntime?.id, projectId: projectId, namespaceId: project?.namespace?.id}),
         [flowTypeStore]
-    ) : []
+    )
 
     const createFlow = React.useCallback((name: string, type: FlowType['id']) => {
         if (!type) return
@@ -139,7 +139,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
             <DialogContent autoFocus showCloseButton
                            title={"Create new flow"}>
                 <Spacing spacing={"xl"}/>
-                {!primaryRuntime?.id ? <>
+                {!primaryRuntime ? <>
                     <Text size={"md"}>
                         You don't have a primary runtime yet, assign and/or create a runtime to be able to create flows.
                     </Text>
