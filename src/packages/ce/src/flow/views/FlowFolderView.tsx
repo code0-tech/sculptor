@@ -28,7 +28,7 @@ import {
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import {FlowCreateDialogComponent} from "@edition/flow/components/FlowCreateDialogComponent";
 
-export const FolderView: React.FC = () => {
+export const FlowFolderView: React.FC = () => {
 
     const router = useRouter()
     const params = useParams()
