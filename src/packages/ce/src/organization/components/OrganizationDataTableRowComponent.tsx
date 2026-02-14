@@ -83,21 +83,27 @@ export const OrganizationDataTableRowComponent: React.FC<OrganizationDataTableRo
             </Flex>
         </DataTableColumn>
         <DataTableColumn>
-            <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
-                <Flex align={"center"} style={{gap: "0.7rem"}}>
+            <Flex align={"center"} justify={"end"} style={{gap: "0.7rem"}}>
+                {namespace?.projects?.count ? (
                     <Text hierarchy={"tertiary"}>
                         {namespace?.projects?.count ?? 0} {" "}
                         projects
                     </Text>
+                ) : null}
+
+                {namespace?.members?.count ? (
                     <Text hierarchy={"tertiary"}>
                         {namespace?.members?.count ?? 0}{" "}
                         members
                     </Text>
+                ) : null}
+
+                {namespace?.runtimes?.count ? (
                     <Text hierarchy={"tertiary"}>
                         {namespace?.runtimes?.count ?? 0}{" "}
                         connected runtimes
                     </Text>
-                </Flex>
+                ) : null}
             </Flex>
         </DataTableColumn>
         {onLeave && namespaceMember && namespaceMember.userAbilities?.deleteMember ? (

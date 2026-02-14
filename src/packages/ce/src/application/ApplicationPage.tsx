@@ -4,8 +4,13 @@ import {
     Avatar,
     Badge,
     Card,
+    Col,
     Flex,
-    ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport,
+    Row,
+    ScrollArea,
+    ScrollAreaScrollbar,
+    ScrollAreaThumb,
+    ScrollAreaViewport,
     Spacing,
     Text,
     useService,
@@ -14,7 +19,6 @@ import {
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import React from "react";
-import {hashToColor} from "@code0-tech/pictor/dist/components/d-flow/DFlow.util";
 
 export const ApplicationPage = () => {
 
@@ -54,14 +58,18 @@ export const ApplicationPage = () => {
 
                 </Flex>
                 <Spacing spacing={"xl"}/>
-                <Flex style={{gap: "1.3rem"}} align={"start"}>
-                    <Card>
-                        <PersonalProjectsView/>
-                    </Card>
-                    <Card>
-                        <OrganizationsView/>
-                    </Card>
-                </Flex>
+                <Row>
+                    <Col xs={7}>
+                        <Card>
+                            <PersonalProjectsView/>
+                        </Card>
+                    </Col>
+                    <Col xs={5}>
+                        <Card>
+                            <OrganizationsView/>
+                        </Card>
+                    </Col>
+                </Row>
                 <Spacing spacing={"xl"}/>
             </ScrollAreaViewport>
             <ScrollAreaScrollbar orientation={"vertical"}>

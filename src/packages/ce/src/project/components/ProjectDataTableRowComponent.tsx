@@ -60,14 +60,18 @@ export const ProjectDataTableRowComponent: React.FC<ProjectDataTableRowComponent
         </DataTableColumn>
         <DataTableColumn>
             <Flex align={"center"} style={{gap: "0.7rem"}}>
-                <Text hierarchy={"tertiary"}>
-                    {project?.flows?.count ?? 0}{" "}
-                    flows
-                </Text>
-                <Text hierarchy={"tertiary"}>
-                    {project?.runtimes?.count ?? 0}{" "}
-                    assigned runtimes
-                </Text>
+                {project?.flows?.count ? (
+                    <Text hierarchy={"tertiary"}>
+                        {project?.flows?.count ?? 0}{" "}
+                        flows
+                    </Text>
+                ) : null}
+                {project?.runtimes?.count ? (
+                    <Text hierarchy={"tertiary"}>
+                        {project?.runtimes?.count ?? 0}{" "}
+                        assigned runtimes
+                    </Text>
+                ) : null}
             </Flex>
         </DataTableColumn>
     </>
