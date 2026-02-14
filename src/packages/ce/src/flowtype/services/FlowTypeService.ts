@@ -16,14 +16,14 @@ export class FlowTypeService extends DFlowTypeReactiveService {
 
     values(dependencies?: DFlowTypeDependencies): FlowTypeView[] {
         const functions = super.values()
-        if (!dependencies?.namespaceId || !dependencies.projectId || !dependencies.runtimeId) return functions
+        if (!dependencies?.runtimeId) return functions
 
         const namespaceId = dependencies.namespaceId
         const projectId = dependencies.projectId
         const runtimeId = dependencies.runtimeId
-        const filtered = functions.filter(flowType => flowType) //TODO: add runtime filter when available
+        const filtered = functions.filter(flowType => flowType.runtime?.id === runtimeId)
 
-        if (filtered.length <= 0) {
+        if (filtered.length <= 0 && namespaceId && projectId) {
             this.client.query<Query>({
                 query: flowTypesQuery,
                 variables: {
