@@ -6,15 +6,23 @@ import Link from "next/link";
 import {notFound, useParams, useRouter} from "next/navigation";
 import {UserService} from "@edition/user/services/User.service";
 import {RuntimeDataTableComponent} from "@edition/runtime/components/RuntimeDataTableComponent";
+import {DataTableFilterProps, DataTableSortProps} from "@code0-tech/pictor/dist/components/data-table/DataTable";
+import {
+    OrganizationDataTableFilterInputComponent
+} from "@edition/organization/components/OrganizationDataTableFilterInputComponent";
+import {RuntimeDataTableFilterInputComponent} from "@edition/runtime/components/RuntimeDataTableFilterInputComponent";
 
 export const RuntimesPage: React.FC = () => {
 
+    const params = useParams()
     const currentSession = useUserSession()
     const userStore = useStore(UserService)
     const userService = useService(UserService)
     const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [userStore, currentSession])
 
-    const params = useParams()
+    const [filter, setFilter] = React.useState<DataTableFilterProps>({})
+    const [sort, setSort] = React.useState<DataTableSortProps>({})
+
     const namespaceIndex = params.namespaceId as any as number
 
     if (!namespaceIndex && currentUser && !currentUser.admin) {
@@ -45,7 +53,11 @@ export const RuntimesPage: React.FC = () => {
             </Flex>
         </Flex>
         <Spacing spacing={"xl"}/>
-        <RuntimeDataTableComponent namespaceId={namespaceIndex ? `gid://sagittarius/Namespace/${namespaceIndex}` : undefined}
+        <div style={{width: "100%"}}>
+            <RuntimeDataTableFilterInputComponent preFilter={(runtime) => namespaceIndex ? true : !runtime?.namespace?.id} namespaceId={namespaceIndex ? `gid://sagittarius/Namespace/${namespaceIndex}` : undefined} onChange={filter => setFilter(filter)}/>
+        </div>
+        <Spacing spacing={"xl"}/>
+        <RuntimeDataTableComponent filter={filter} namespaceId={namespaceIndex ? `gid://sagittarius/Namespace/${namespaceIndex}` : undefined}
                       preFilter={(runtime) => namespaceIndex ? true : !runtime?.namespace?.id} onSelect={(runtime) => {
             const number = runtime?.id?.match(/Runtime\/(\d+)$/)?.[1]
             router.push(namespaceIndex ? `/namespace/${namespaceIndex}/runtimes/${number}/settings` : `/runtimes/${number}/settings`)
