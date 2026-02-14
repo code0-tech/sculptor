@@ -4,6 +4,10 @@ import React from "react";
 import {Button, DUserList, Flex, Spacing, Text, useService, useStore, useUserSession,} from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import {notFound} from "next/navigation";
+import {UserDataTableComponent} from "@edition/user/components/UserDataTableComponent";
+import {DataTableFilterProps, DataTableSortProps} from "@code0-tech/pictor/dist/components/data-table/DataTable";
+import {RuntimeDataTableFilterInputComponent} from "@edition/runtime/components/RuntimeDataTableFilterInputComponent";
+import {UserDataTableFilterInputComponent} from "@edition/user/components/UserDataTableFilterInputComponent";
 
 export const UsersPage: React.FC = () => {
 
@@ -11,6 +15,9 @@ export const UsersPage: React.FC = () => {
     const userStore = useStore(UserService)
     const userService = useService(UserService)
     const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [userStore, currentSession])
+
+    const [filter, setFilter] = React.useState<DataTableFilterProps>({})
+    const [sort, setSort] = React.useState<DataTableSortProps>({})
 
     if (currentUser && !currentUser.admin) {
         notFound()
@@ -31,6 +38,10 @@ export const UsersPage: React.FC = () => {
             </Flex>
         </Flex>
         <Spacing spacing={"xl"}/>
-        <DUserList color={"secondary"}/>
+        <div style={{width: "100%"}}>
+            <UserDataTableFilterInputComponent onChange={filter => setFilter(filter)}/>
+        </div>
+        <Spacing spacing={"xl"}/>
+        <UserDataTableComponent filter={filter}/>
     </div>
 }
