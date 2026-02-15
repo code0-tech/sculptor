@@ -15,11 +15,12 @@ export interface ProjectDataTableComponentProps {
     filter?: DataTableFilterProps
     preFilter?: (project: Runtime, index: number) => boolean
     onSelect?: (item: Runtime | undefined) => void
+    minimized?: boolean
 }
 
 export const RuntimeDataTableComponent: React.FC<ProjectDataTableComponentProps> = (props) => {
 
-    const {namespaceId, sort, filter, preFilter = () => true, onSelect} = props
+    const {namespaceId, sort, filter, preFilter = () => true, onSelect, minimized} = props
 
     const runtimeService = useService(RuntimeService)
     const runtimeStore = useStore(RuntimeService)
@@ -39,7 +40,7 @@ export const RuntimeDataTableComponent: React.FC<ProjectDataTableComponentProps>
                       onSelect={(item) => item && onSelect?.(item)}
                       data={runtimes.map(r => r.json()).filter(preFilter)}>
         {(runtime, index) => {
-            return <RuntimeDataTableRowComponent runtimeId={runtime.id}/>
+            return <RuntimeDataTableRowComponent minimized={minimized} runtimeId={runtime.id}/>
         }}
     </DataTable>
 
