@@ -1,16 +1,17 @@
 import React from "react";
 import {Runtime} from "@code0-tech/sagittarius-graphql-types";
-import {DataTableColumn, Flex, Text, useService, useStore, Badge} from "@code0-tech/pictor";
+import {Badge, DataTableColumn, Flex, Text, useService, useStore} from "@code0-tech/pictor";
 import {RuntimeService} from "@edition/runtime/services/Runtime.service";
 import {formatDistanceToNow} from "date-fns";
 
 export interface ProjectDataTableRowComponentProps {
     runtimeId: Runtime['id']
+    minimized?: boolean
 }
 
 export const RuntimeDataTableRowComponent: React.FC<ProjectDataTableRowComponentProps> = (props) => {
 
-    const {runtimeId} = props
+    const {runtimeId, minimized} = props
 
     const runtimeService = useService(RuntimeService)
     const runtimeStore = useStore(RuntimeService)
@@ -27,13 +28,17 @@ export const RuntimeDataTableRowComponent: React.FC<ProjectDataTableRowComponent
                     <Text size={"md"} hierarchy={"primary"}>
                         {runtime?.name}
                     </Text>
-                    <Text>
-                        {runtime?.description}
-                    </Text>
+                    {!minimized && (
+                        <Text>
+                            {runtime?.description}
+                        </Text>
+                    )}
                 </Flex>
-                <Text hierarchy={"tertiary"}>
-                    Updated {formatDistanceToNow(runtime?.updatedAt!)} ago
-                </Text>
+                {!minimized && (
+                    <Text hierarchy={"tertiary"}>
+                        Updated {formatDistanceToNow(runtime?.updatedAt!)} ago
+                    </Text>
+                )}
             </Flex>
         </DataTableColumn>
         <DataTableColumn>
