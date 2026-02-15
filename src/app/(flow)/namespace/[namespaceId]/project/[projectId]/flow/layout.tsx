@@ -6,11 +6,9 @@ import {FlowFolderView} from "@edition/flow/views/FlowFolderView";
 
 interface ApplicationLayoutProps {
     children: React.ReactNode
-    bar: React.ReactNode
-    tab: React.ReactNode
 }
 
-const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab}) => {
+const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children}) => {
 
     return <DResizablePanelGroup orientation={"horizontal"}>
         <DResizablePanel id={"1"} defaultSize={"25%"}>
