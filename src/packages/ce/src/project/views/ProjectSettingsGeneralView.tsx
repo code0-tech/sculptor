@@ -1,9 +1,20 @@
 "use client"
 
 import React, {startTransition} from "react";
-import {Button, Card, Flex, Spacing, Text, TextInput, useForm, useService, useStore} from "@code0-tech/pictor";
+import {
+    Button,
+    Card,
+    Flex,
+    Spacing,
+    TabContent,
+    Text,
+    TextInput,
+    useForm,
+    useService,
+    useStore,
+    toast
+} from "@code0-tech/pictor";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
-import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {useParams} from "next/navigation";
 import {ProjectService} from "@edition/project/services/Project.service";
 
@@ -24,6 +35,7 @@ export const ProjectSettingsGeneralView: React.FC = () => {
         () => ({
             name: project?.name,
             description: project?.description,
+            slug: project?.slug,
         }),
         [project]
     )
@@ -35,10 +47,27 @@ export const ProjectSettingsGeneralView: React.FC = () => {
                 if (!value) return "Name is required"
                 return null
             },
+            slug: (value) => {
+                if (!value) return "Slug is required"
+                return null
+            }
         },
         onSubmit: (values) => {
             startTransition(() => {
-
+                projectService.projectUpdate({
+                    slug: values.slug,
+                    name: values.name,
+                    description: values.description,
+                    namespaceProjectId: `gid://sagittarius/NamespaceProject/${projectId}`
+                }).then(payload => {
+                    if ((payload?.errors?.length ?? 0) <= 0) {
+                        toast({
+                            title: "The project was successfully deleted.",
+                            color: "success",
+                            dismissible: true,
+                        })
+                    }
+                })
             })
         }
     })
@@ -62,6 +91,12 @@ export const ProjectSettingsGeneralView: React.FC = () => {
                 <Flex justify={"space-between"} align={"center"}>
                     <Text size={"md"} hierarchy={"primary"}>Description</Text>
                     <TextInput {...inputs.getInputProps("description")}/>
+                </Flex>
+            </CardSection>
+            <CardSection border>
+                <Flex justify={"space-between"} align={"center"}>
+                    <Text size={"md"} hierarchy={"primary"}>Slug</Text>
+                    <TextInput {...inputs.getInputProps("slug")}/>
                 </Flex>
             </CardSection>
         </Card>
