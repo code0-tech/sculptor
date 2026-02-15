@@ -46,7 +46,7 @@ export default function Page() {
                 <TooltipTrigger asChild>
                     <TabTrigger value={"settings"} asChild={true}>
                         <Button variant={"none"} paddingSize={"xs"} onClick={() => router.push(`/namespace/${namespaceId}/project/${projectId}/settings`)}>
-                            <IconSettings color={hashToColor("settings")} size={16}/>
+                            <IconSettings size={16}/>
                         </Button>
                     </TabTrigger>
                 </TooltipTrigger>
