@@ -2,14 +2,18 @@
 
 import React, {startTransition} from "react"
 import {
+    Avatar,
     Button,
     Flex,
+    hashToColor,
     Menu,
     MenuContent,
     MenuItem,
     MenuPortal,
+    MenuSeparator,
     MenuTrigger,
     Spacing,
+    Badge,
     Text,
     useService,
     useStore
@@ -20,6 +24,7 @@ import {RuntimeProjectDataTableComponent} from "@edition/runtime/components/Runt
 import {RuntimeService} from "@edition/runtime/services/Runtime.service";
 import {ProjectService} from "@edition/project/services/Project.service";
 import {Runtime} from "@code0-tech/sagittarius-graphql-types";
+import {formatDistanceToNow} from "date-fns";
 
 export const ProjectSettingsRuntimesView: React.FC = () => {
 
@@ -71,17 +76,35 @@ export const ProjectSettingsRuntimesView: React.FC = () => {
                 </MenuTrigger>
                 <MenuPortal>
                     <MenuContent align={"end"} side={"bottom"} sideOffset={8}>
-                        {availableRuntimes.map(runtime => {
-                            return <MenuItem key={runtime.id} onSelect={() => assignRuntime(runtime.id)}>
-                                <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
-                                    <Text size={"md"} hierarchy={"primary"}>
-                                        {runtime?.name}
-                                    </Text>
-                                    <Text>
-                                        {runtime?.description}
-                                    </Text>
-                                </Flex>
-                            </MenuItem>
+                        {availableRuntimes.map((runtime, index) => {
+                            return <>
+                                <MenuItem key={runtime.id} onSelect={() => assignRuntime(runtime.id)}>
+                                    <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
+                                        <Flex align={"center"} style={{gap: "0.7rem"}}>
+                                            <Avatar size={32}
+                                                    color={hashToColor(runtime?.name ?? "", 0, 180)}
+                                                    identifier={runtime?.name ?? ""}/>
+                                            <Flex justify={"space-between"} align={"center"} style={{gap: "0.7rem"}}>
+                                                <Text hierarchy={"primary"}>
+                                                    {runtime?.name}
+                                                </Text>
+                                                <Flex justify={"end"} w={"100%"}>
+                                                    <Badge color={runtime?.status === "CONNECTED" ? "success" : "error"}
+                                                           border>
+                                                        <Text style={{color: "inherit"}}>{runtime?.status}</Text>
+                                                    </Badge>
+                                                </Flex>
+
+                                            </Flex>
+                                        </Flex>
+                                        <Text hierarchy={"tertiary"}>
+                                            Updated {formatDistanceToNow(runtime?.updatedAt!)} ago
+                                        </Text>
+                                    </Flex>
+                                </MenuItem>
+                                {index < availableRuntimes.length - 1 ?
+                                    <MenuSeparator key={`${runtime.id}-separator`}/> : null}
+                            </>
                         })}
                     </MenuContent>
                 </MenuPortal>
