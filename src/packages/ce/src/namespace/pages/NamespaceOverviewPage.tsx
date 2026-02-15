@@ -2,11 +2,11 @@
 
 import React from "react";
 import {ProjectsView} from "@edition/project/views/ProjectsView";
-import {DLayout, useService, useStore, useUserSession} from "@code0-tech/pictor";
-import {NamespaceOverviewRightView} from "@edition/namespace/views/NamespaceOverviewRightView";
-import {NamespaceOverviewLeftView} from "@edition/namespace/views/NamespaceOverviewLeftView";
+import {DLayout, useService, useStore, useUserSession, ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "@code0-tech/pictor";
+import {NamespaceOverviewPersonalLeftView} from "@edition/namespace/views/NamespaceOverviewPersonalLeftView";
 import {useParams} from "next/navigation";
 import {UserService} from "@edition/user/services/User.service";
+import {NamespaceOverviewOrganizationLeftView} from "@edition/namespace/views/NamespaceOverviewOrganizationLeftView";
 
 export const NamespaceOverviewPage: React.FC = () => {
 
@@ -20,8 +20,8 @@ export const NamespaceOverviewPage: React.FC = () => {
     const namespaceId = params.namespaceId as any as string
 
     return <DLayout showLayoutSplitter={false} layoutGap={"0"}
-                    leftContent={namespaceIndexCurrentUser == namespaceId ? <NamespaceOverviewLeftView/> : undefined}
-                    rightContent={<NamespaceOverviewRightView/>}>
+                    leftContent={namespaceIndexCurrentUser == namespaceId ? <NamespaceOverviewPersonalLeftView/> :
+                        <NamespaceOverviewOrganizationLeftView/>}>
         <div style={{
             background: "#070514",
             height: "100%",
@@ -29,7 +29,14 @@ export const NamespaceOverviewPage: React.FC = () => {
             borderTopLeftRadius: "1rem",
             borderTopRightRadius: "1rem"
         }}>
-            <ProjectsView/>
+            <ScrollArea h={"100%"} type={"scroll"}>
+                <ScrollAreaViewport>
+                    <ProjectsView/>
+                </ScrollAreaViewport>
+                <ScrollAreaScrollbar orientation={"vertical"}>
+                    <ScrollAreaThumb/>
+                </ScrollAreaScrollbar>
+            </ScrollArea>
         </div>
     </DLayout>
 }
