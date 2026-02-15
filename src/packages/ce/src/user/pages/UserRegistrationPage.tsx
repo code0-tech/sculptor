@@ -69,10 +69,6 @@ export const UserRegistrationPage: React.FC = () => {
     })
 
     return <>
-        <Image src={"/CodeZero_Logo.png"} alt={"CodeZero Logo"}
-               width={40}
-               height={40}
-               style={{marginBottom: "1.3rem"}}/>
         <Text mb={0.7} size={"lg"} hierarchy={"primary"} display={"block"}>
             Sign up to CodeZero
         </Text>
@@ -94,10 +90,10 @@ export const UserRegistrationPage: React.FC = () => {
         <Button color={"info"} w={"100%"} mb={1.3} onClick={validate}>
             Sign up
         </Button>
-        <Text display={"block"} hierarchy={"tertiary"} size={"md"}>
+        <Text display={"flex"} hierarchy={"tertiary"} size={"md"}>
             Have an account
             <Link href={"/login"}>
-                <Text ml={0.35} hierarchy={"primary"} size={"md"}>
+                <Text ml={0.35} hierarchy={"primary"} display={"flex"} size={"md"}>
                     Log in
                 </Text>
             </Link>
