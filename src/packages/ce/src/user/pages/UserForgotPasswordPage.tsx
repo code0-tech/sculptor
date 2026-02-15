@@ -39,10 +39,6 @@ export const UserForgotPasswordPage: React.FC = () => {
     })
 
     return <>
-        <Image src={"/CodeZero_Logo.png"} alt={"CodeZero Logo"}
-               width={40}
-               height={40}
-               style={{marginBottom: "1.3rem"}}/>
         <Text mb={0.7} size={"lg"} hierarchy={"primary"} display={"block"}>
             Forgot your password?
         </Text>
@@ -54,10 +50,10 @@ export const UserForgotPasswordPage: React.FC = () => {
         <Button color={"info"} w={"100%"} mb={1.3} onClick={validate}>
             Send reset token
         </Button>
-        <Text display={"block"} hierarchy={"tertiary"} size={"md"}>
+        <Text display={"flex"} hierarchy={"tertiary"} size={"md"}>
             Didn't forget your password?
             <Link href={"/login"}>
-                <Text ml={0.35} hierarchy={"primary"} size={"md"}>
+                <Text ml={0.35} hierarchy={"primary"} display={"flex"} size={"md"}>
                     Log in
                 </Text>
             </Link>

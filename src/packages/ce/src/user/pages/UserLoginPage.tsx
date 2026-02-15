@@ -59,11 +59,6 @@ export const UserLoginPage: React.FC = () => {
     })
 
     return <>
-        <Spacing spacing={"xl"}/>
-        <Image src={"/CodeZero_Logo.png"} alt={"CodeZero Logo"}
-               width={40}
-               height={40}
-               style={{marginBottom: "1.3rem"}}/>
         <Text mb={0.7} size={"lg"} hierarchy={"primary"} display={"block"}>
             Login to CodeZero
         </Text>
@@ -80,7 +75,7 @@ export const UserLoginPage: React.FC = () => {
         <div style={{marginBottom: "1.3rem"}}/>
         <PasswordInput placeholder={"Password"} {...inputs.getInputProps("password")}/>
         <div style={{marginBottom: "1.3rem"}}/>
-        <Button color={"info"} w={"100%"} mb={1.3} onClick={validate}>
+        <Button color={"success"} w={"100%"} mb={1.3} onClick={validate}>
             Login
         </Button>
         <Link href={"/password"}>

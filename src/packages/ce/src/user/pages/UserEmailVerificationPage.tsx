@@ -39,10 +39,6 @@ export const UserEmailVerificationPage: React.FC = () => {
     })
 
     return <>
-        <Image src={"/CodeZero_Logo.png"} alt={"CodeZero Logo"}
-               width={40}
-               height={40}
-               style={{marginBottom: "1.3rem"}}/>
         <Text mb={0.7} size={"lg"} hierarchy={"primary"} display={"block"}>
             Verify your email address
         </Text>
@@ -54,10 +50,10 @@ export const UserEmailVerificationPage: React.FC = () => {
         <Button color={"info"} w={"100%"} mb={1.3} onClick={validate}>
             Verify
         </Button>
-        <Text display={"block"} hierarchy={"tertiary"} size={"md"}>
+        <Text display={"flex"} hierarchy={"tertiary"} size={"md"}>
             Don't have an account yet
             <Link href={"/login"}>
-                <Text ml={0.35} hierarchy={"primary"} size={"md"}>
+                <Text ml={0.35} hierarchy={"primary"} display={"flex"} size={"md"}>
                     Log in
                 </Text>
             </Link>
