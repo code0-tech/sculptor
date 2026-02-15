@@ -35,7 +35,7 @@ export const MemberDataTableComponent: React.FC<MemberDataTableComponentProps> =
     const memberService = useService(MemberService)
     const memberStore = useStore(MemberService)
 
-    const users = React.useMemo(
+    const members = React.useMemo(
         () => memberService.values({namespaceId: namespaceId}),
         [memberStore]
     )
@@ -48,7 +48,7 @@ export const MemberDataTableComponent: React.FC<MemberDataTableComponentProps> =
                           </Text>
                       </DataTableColumn>}
                       onSelect={(item) => item && onSelect?.(item)}
-                      data={users.map(u => u.json()).filter(preFilter)}>
+                      data={members.map(u => u.json()).filter(preFilter)}>
         {(member, index) => {
             return <MemberDataTableRowComponent memberId={member.id}/>
         }}

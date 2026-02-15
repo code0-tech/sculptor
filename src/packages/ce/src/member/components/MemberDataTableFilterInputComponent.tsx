@@ -12,101 +12,87 @@ import {DataTableFilterProps} from "@code0-tech/pictor/dist/components/data-tabl
 import {RoleService} from "@edition/role/services/Role.service";
 import {RuntimeService} from "@edition/runtime/services/Runtime.service";
 import {UserService} from "@edition/user/services/User.service";
+import {MemberService} from "@edition/member/services/Member.service";
 
 export interface MemberDataTableFilterInputComponentProps {
+    namespaceId: Namespace['id']
     onChange: (filter: DataTableFilterProps) => void
 }
 
 export const MemberDataTableFilterInputComponent: React.FC<MemberDataTableFilterInputComponentProps> = (props) => {
 
-    const {onChange} = props
+    const {namespaceId, onChange} = props
 
-    const userService = useService(UserService)
-    const userStore = useStore(UserService)
+    const memberService = useService(MemberService)
+    const memberStore = useStore(MemberService)
+    const roleService = useService(RoleService)
+    const roleStore = useStore(RoleService)
 
-    const users = React.useMemo(
-        () => userService.values(),
-        [userStore]
+    const members = React.useMemo(
+        () => memberService.values({namespaceId: namespaceId}),
+        [memberStore]
+    )
+
+    const roles = React.useMemo(
+        () => {
+            const roleIds = members.map(m => m.roles?.nodes?.map(r => r?.id)).flat()
+            return roleIds.map(id => roleService.getById(id)).filter(Boolean)
+        },
+        [roleStore]
     )
 
     return <DataTableFilterInput onChange={onChange} filterTokens={[
         {
             token: "Username",
-            key: "username",
+            key: "user.username",
             operators: ["isOneOf"],
             suggestion: (context, operator, currentValue, applySuggestion) => {
 
                 const split = currentValue.split(",").map(s => s.trim()).filter(Boolean)
 
                 return <DataTableFilterSuggestionMenu context={context}>
-                    {users.map(user => {
+                    {members.map(member => {
 
-                        const isChecked = split.includes(user?.username!)
+                        const isChecked = split.includes(member?.user?.username!)
 
-                        return <MenuCheckboxItem key={user?.username} checked={isChecked} onSelect={e => {
+                        return <MenuCheckboxItem key={member?.user?.username} checked={isChecked} onSelect={e => {
                             e.preventDefault();
                             e.stopPropagation();
                             const updated = isChecked
-                                ? split.filter(name => name !== user?.username)
-                                : [...split, user?.username];
+                                ? split.filter(name => name !== member?.user?.username)
+                                : [...split, member?.user?.username];
                             applySuggestion(updated.join(","), true);
                         }}>
                             {isChecked ? <IconCheck size={13}/> : <IconCheck color={"transparent"} size={13}/>}
-                            @{user?.username}
+                            @{member?.user?.username}
                         </MenuCheckboxItem>
                     })}
                 </DataTableFilterSuggestionMenu>
             }
-        }, {
-            token: "Email",
-            key: "email",
+        },
+        {
+            token: "Roles",
+            key: "roles.nodes.name",
             operators: ["isOneOf"],
             suggestion: (context, operator, currentValue, applySuggestion) => {
 
                 const split = currentValue.split(",").map(s => s.trim()).filter(Boolean)
 
                 return <DataTableFilterSuggestionMenu context={context}>
-                    {users.map(user => {
+                    {roles.map(role => {
 
-                        const isChecked = split.includes(user?.email!)
+                        const isChecked = split.includes(role?.name!)
 
-                        return <MenuCheckboxItem key={user?.email} checked={isChecked} onSelect={e => {
+                        return <MenuCheckboxItem key={role?.name} checked={isChecked} onSelect={e => {
                             e.preventDefault();
                             e.stopPropagation();
                             const updated = isChecked
-                                ? split.filter(name => name !== user?.email)
-                                : [...split, user?.email];
+                                ? split.filter(name => name !== role?.name)
+                                : [...split, role?.name];
                             applySuggestion(updated.join(","), true);
                         }}>
                             {isChecked ? <IconCheck size={13}/> : <IconCheck color={"transparent"} size={13}/>}
-                            {user?.email}
-                        </MenuCheckboxItem>
-                    })}
-                </DataTableFilterSuggestionMenu>
-            }
-        }, {
-            token: "Owner",
-            key: "admin",
-            operators: ["isOneOf"],
-            suggestion: (context, operator, currentValue, applySuggestion) => {
-
-                const split = currentValue.split(",").map(s => s.trim()).filter(Boolean)
-
-                return <DataTableFilterSuggestionMenu context={context}>
-                    {["true", "false"].map(admin => {
-
-                        const isChecked = split.includes(admin)
-
-                        return <MenuCheckboxItem key={admin} checked={isChecked} onSelect={e => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const updated = isChecked
-                                ? split.filter(name => name !== admin)
-                                : [...split, admin];
-                            applySuggestion(updated.join(","), true);
-                        }}>
-                            {isChecked ? <IconCheck size={13}/> : <IconCheck color={"transparent"} size={13}/>}
-                            {admin}
+                            {role?.name}
                         </MenuCheckboxItem>
                     })}
                 </DataTableFilterSuggestionMenu>
