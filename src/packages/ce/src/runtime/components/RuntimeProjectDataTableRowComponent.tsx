@@ -1,10 +1,12 @@
 import React, {startTransition} from "react";
 import {NamespaceProject, Runtime} from "@code0-tech/sagittarius-graphql-types";
 import {
+    Avatar,
     Badge,
     Button,
     DataTableColumn,
     Flex,
+    hashToColor,
     Menu,
     MenuContent,
     MenuItem,
@@ -16,7 +18,7 @@ import {
 } from "@code0-tech/pictor";
 import {RuntimeService} from "@edition/runtime/services/Runtime.service";
 import {formatDistanceToNow} from "date-fns";
-import {IconDotsVertical, IconServerSpark, IconUserCog, IconUserOff, IconX} from "@tabler/icons-react";
+import {IconDotsVertical, IconServerSpark, IconX} from "@tabler/icons-react";
 import {ProjectService} from "@edition/project/services/Project.service";
 
 export interface RuntimeProjectDataTableRowComponentProps {
@@ -66,17 +68,22 @@ export const RuntimeProjectDataTableRowComponent: React.FC<RuntimeProjectDataTab
     return <>
         <DataTableColumn>
             <Flex style={{flexDirection: "column", gap: "1.3rem"}}>
-                <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
-                    <Flex style={{gap: "0.35rem"}}>
-                        <Text size={"md"} hierarchy={"primary"}>
-                            {runtime?.name}
+                <Flex align={"center"} style={{gap: "0.7rem"}}>
+                    <Avatar size={32}
+                            color={hashToColor(runtime?.name ?? "", 0, 180)}
+                            identifier={runtime?.name ?? ""}/>
+                    <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
+                        <Flex style={{gap: "0.35rem"}}>
+                            <Text size={"md"} hierarchy={"primary"}>
+                                {runtime?.name}
+                            </Text>
+                            {project?.primaryRuntime?.id === runtime?.id ?
+                                <Badge color={"secondary"}>Primary</Badge> : null}
+                        </Flex>
+                        <Text>
+                            {runtime?.description}
                         </Text>
-                        {project?.primaryRuntime?.id === runtime?.id ?
-                            <Badge color={"secondary"}>Primary</Badge> : null}
                     </Flex>
-                    <Text>
-                        {runtime?.description}
-                    </Text>
                 </Flex>
                 <Text hierarchy={"tertiary"}>
                     Updated {formatDistanceToNow(runtime?.updatedAt!)} ago
@@ -88,9 +95,9 @@ export const RuntimeProjectDataTableRowComponent: React.FC<RuntimeProjectDataTab
                 <Text style={{color: "inherit"}}>{runtime?.status}</Text>
             </Badge>
         </DataTableColumn>
-        {
-            project?.primaryRuntime?.id !== runtime?.id && (
-                <DataTableColumn>
+        <DataTableColumn>
+            {
+                project?.primaryRuntime?.id !== runtime?.id && (
                     <Menu>
                         <MenuTrigger asChild>
                             <Button color="secondary">
@@ -110,8 +117,8 @@ export const RuntimeProjectDataTableRowComponent: React.FC<RuntimeProjectDataTab
                             </MenuContent>
                         </MenuPortal>
                     </Menu>
-                </DataTableColumn>
-            )
-        }
+                )
+            }
+        </DataTableColumn>
     </>
 }
