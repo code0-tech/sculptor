@@ -20,9 +20,14 @@ export const MembersView: React.FC = () => {
     return <>
 
         <Flex align={"center"} justify={"space-between"}>
-            <Text size={"xl"} hierarchy={"primary"}>
-                Members
-            </Text>
+            <Flex style={{gap: "0.35rem", flexDirection: "column"}}>
+                <Text size={"xl"} hierarchy={"primary"}>
+                    Members
+                </Text>
+                <Text size={"sm"} hierarchy={"tertiary"}>
+                    Manage members that belong to this namespace. You can add new members and manage their permissions.
+                </Text>
+            </Flex>
             <ButtonGroup>
                 <Link href={`/namespace/${namespaceId}/members/add`}>
                     <Button color={"success"}>Add user</Button>
