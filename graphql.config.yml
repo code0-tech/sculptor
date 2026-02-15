@@ -3,4 +3,4 @@ documents: '**/*.graphql'
 extensions:
   endpoints:
     Default GraphQL Endpoint:
-      url: http://localhost:3001/graphql
+      url: http://localhost:3010/graphql

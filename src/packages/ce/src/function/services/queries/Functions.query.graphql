@@ -1,0 +1,29 @@
+#import "../fragments/Function.fragment.graphql"
+
+query Functions (
+    $namespaceId: NamespaceID!
+    $projectId: NamespaceProjectID!
+    $firstFunction: Int!
+    $afterFunction: String
+    $firstDataTypeIdentifier: Int!
+    $afterDataTypeIdentifier: String
+    $firstParameterDefinition: Int!
+    $afterParameterDefinition: String
+) {
+    namespace(id: $namespaceId) {
+        project(id: $projectId) {
+            primaryRuntime {
+                functionDefinitions (first: $firstFunction, after: $afterFunction) {
+                    count
+                    nodes {
+                        ...Function
+                    }
+                    pageInfo {
+                        endCursor
+                        hasNextPage
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,30 @@
+fragment BasicDataType on DataType {
+    __typename
+    id
+    createdAt
+    updatedAt
+    identifier
+    genericKeys
+    variant
+
+
+    name {
+        __typename
+        code
+        content
+    }
+    aliases {
+        __typename
+        code
+        content
+    }
+    displayMessages {
+        __typename
+        code
+        content
+    }
+
+    runtime {
+        id
+    }
+}

@@ -1,0 +1,23 @@
+#import "../fragments/Project.basic.fragment.graphql"
+mutation projectUpdate ($namespaceProjectId: NamespaceProjectID!, $name: String, $description: String, $slug: String, $primaryRuntimeId: RuntimeID) {
+    namespacesProjectsUpdate(input: {
+        namespaceProjectId: $namespaceProjectId
+        name: $name
+        description: $description
+        slug: $slug
+        primaryRuntimeId: $primaryRuntimeId
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    ...on ActiveModelError { attribute type }
+                    __typename
+                }
+            }
+        }
+        namespaceProject {
+            ...BasicProject
+        }
+    }
+}

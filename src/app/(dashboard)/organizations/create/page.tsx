@@ -1,4 +1,4 @@
-import {OrganizationCreatePage} from "@edition/dashboard/organization/OrganizationCreatePage";
+import {OrganizationCreatePage} from "@edition/organization/pages/OrganizationCreatePage";
 
 export default function Page() {
     return <OrganizationCreatePage/>

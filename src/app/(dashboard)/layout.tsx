@@ -3,28 +3,30 @@
 import React from "react";
 import {useApolloClient} from "@apollo/client/react";
 import {
-    Container,
+    AuroraBackground,
     ContextStoreProvider,
     DLayout,
-    DNamespaceMemberView, DNamespaceProjectView,
+    DNamespaceMemberView,
+    DNamespaceProjectView,
+    DNamespaceRoleView,
     DNamespaceView,
-    DOrganizationView, DRuntimeView,
+    DOrganizationView,
+    DRuntimeView,
     DUserView,
-    ReactiveArrayStore,
-    useUserSession,
-    DNamespaceRoleView
+    Flex,
+    useUserSession
 } from "@code0-tech/pictor";
-import {UserService} from "@edition/user/User.service";
+import {UserService} from "@edition/user/services/User.service";
 import {GraphqlClient} from "@core/util/graphql-client";
 import {useRouter} from "next/navigation";
-import {OrganizationService} from "@edition/organization/Organization.service";
-import {MemberService} from "@edition/member/Member.service";
-import {NamespaceService} from "@edition/namespace/Namespace.service";
+import {OrganizationService} from "@edition/organization/services/Organization.service";
+import {MemberService} from "@edition/member/services/Member.service";
+import {NamespaceService} from "@edition/namespace/services/Namespace.service";
 import {usePersistentReactiveArrayService} from "@/hooks/usePersistentReactiveArrayService";
-import {RuntimeService} from "@edition/runtime/Runtime.service";
-import {ProjectService} from "@edition/project/Project.service";
-import {RoleService} from "@edition/role/Role.service";
-import {Spacing} from "@code0-tech/pictor/dist/components/spacing/Spacing";
+import {RuntimeService} from "@edition/runtime/services/Runtime.service";
+import {ProjectService} from "@edition/project/services/Project.service";
+import {RoleService} from "@edition/role/services/Role.service";
+import Image from "next/image";
 
 interface ApplicationLayoutProps {
     children: React.ReactNode
@@ -40,28 +42,50 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
 
     const graphqlClient = React.useMemo(() => new GraphqlClient(client), [client])
 
-    const user = usePersistentReactiveArrayService<DUserView, UserService>(`dashboard::users::${currentSession?.id}`, (store: ReactiveArrayStore<DUserView>) => new UserService(graphqlClient, store))
-    const organization = usePersistentReactiveArrayService<DOrganizationView, OrganizationService>(`dashboard::organizations::${currentSession?.id}`, (store: ReactiveArrayStore<DOrganizationView>) => new OrganizationService(graphqlClient, store))
-    const member = usePersistentReactiveArrayService<DNamespaceMemberView, MemberService>(`dashboard::members::${currentSession?.id}`, (store: ReactiveArrayStore<DNamespaceMemberView>) => new MemberService(graphqlClient, store))
-    const namespace = usePersistentReactiveArrayService<DNamespaceView, NamespaceService>(`dashboard::namespaces::${currentSession?.id}`, (store: ReactiveArrayStore<DNamespaceView>) => new NamespaceService(graphqlClient, store))
-    const runtime = usePersistentReactiveArrayService<DRuntimeView, RuntimeService>(`dashboard::global_runtimes::${currentSession?.id}`, (store: ReactiveArrayStore<DRuntimeView>) => new RuntimeService(graphqlClient, store))
-    const project = usePersistentReactiveArrayService<DNamespaceProjectView, ProjectService>(`dashboard::projects::${currentSession?.id}`, (store: ReactiveArrayStore<DNamespaceProjectView>) => new ProjectService(graphqlClient, store))
-    const role = usePersistentReactiveArrayService<DNamespaceRoleView, RoleService>(`dashboard::roles::${currentSession?.id}`, (store: ReactiveArrayStore<DNamespaceRoleView>) => new RoleService(graphqlClient, store))
+    const user = usePersistentReactiveArrayService<DUserView, UserService>(`dashboard::users::${currentSession?.id}`, (store) => new UserService(graphqlClient, store))
+    const organization = usePersistentReactiveArrayService<DOrganizationView, OrganizationService>(`dashboard::organizations::${currentSession?.id}`, (store) => new OrganizationService(graphqlClient, store))
+    const member = usePersistentReactiveArrayService<DNamespaceMemberView, MemberService>(`dashboard::members::${currentSession?.id}`, (store) => new MemberService(graphqlClient, store))
+    const namespace = usePersistentReactiveArrayService<DNamespaceView, NamespaceService>(`dashboard::namespaces::${currentSession?.id}`, (store) => new NamespaceService(graphqlClient, store))
+    const runtime = usePersistentReactiveArrayService<DRuntimeView, RuntimeService>(`dashboard::global_runtimes::${currentSession?.id}`, (store) => new RuntimeService(graphqlClient, store))
+    const project = usePersistentReactiveArrayService<DNamespaceProjectView, ProjectService>(`dashboard::projects::${currentSession?.id}`, (store) => new ProjectService(graphqlClient, store))
+    const role = usePersistentReactiveArrayService<DNamespaceRoleView, RoleService>(`dashboard::roles::${currentSession?.id}`, (store) => new RoleService(graphqlClient, store))
 
     if (currentSession === null) router.push("/login")
 
     return <ContextStoreProvider services={[user, organization, member, namespace, runtime, project, role]}>
-        <DLayout style={{zIndex: 0}} topContent={
-            <>
-                <div style={{background: "rgba(255,2552,255,.1)", borderBottom: "1px solid rgba(255,2552,255,.1)"}}>
-                    {bar}
-                    {tab}
+        <DLayout style={{zIndex: 0}} layoutGap={"0"} showLayoutSplitter={false} leftContent={
+            <Flex p={0.7} pt={1} align={"center"} style={{flexDirection: "column", gap: "0.7rem"}}>
+                <div style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "50%",
+                    transform: "scaleX(-1)",
+                    height: "40%",
+                    zIndex: "-1",
+                }}>
+                    <div style={{
+                        position: "absolute",
+                        top: "0",
+                        left: "0",
+                        width: "100%",
+                        height: "100%",
+                        background: "radial-gradient(circle at top right,rgba(25, 24, 37, 0.25) 0%, rgba(25, 24, 37, 1) 25%)",
+                        zIndex: "1"
+                    }}/>
+                    <AuroraBackground/>
+
                 </div>
-            </>
+                <Image src={"/CodeZero_Logo.png"} alt={"CodeZero Banner"} width={160} height={0}
+                       style={{width: '38px', height: 'auto'}}/>
+                {tab}
+            </Flex>
         }>
-            <Container h={"100%"} w={"100%"}>
-                {children}
-            </Container>
+            <DLayout px={0.7} layoutGap={"0"} topContent={<>{bar}</>}>
+                <DLayout>
+                    <>{children}</>
+                </DLayout>
+            </DLayout>
         </DLayout>
     </ContextStoreProvider>
 }

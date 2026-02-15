@@ -1,12 +1,13 @@
 "use client"
 
 import {Col, Container, ContextStoreProvider, DFullScreen, DUserView, Flex, Text} from "@code0-tech/pictor";
-import {UserService} from "@edition/user/User.service";
+import {UserService} from "@edition/user/services/User.service";
 import {useApolloClient} from "@apollo/client/react";
 import {GraphqlClient} from "@core/util/graphql-client";
 import Image from "next/image";
 import React from "react";
 import {usePersistentReactiveArrayService} from "@/hooks/usePersistentReactiveArrayService";
+import {View} from "@code0-tech/pictor/dist/utils/view";
 
 export default function AuthLayout({children}: Readonly<{ children: React.ReactNode }>) {
 

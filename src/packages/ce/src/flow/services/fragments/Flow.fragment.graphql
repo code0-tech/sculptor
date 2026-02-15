@@ -1,0 +1,96 @@
+fragment Flow on Flow {
+    __typename
+    id
+    createdAt
+    name
+    nodes (first: $firstNode, after: $afterNode) {
+        __typename
+        nodes {
+            __typename
+            id
+            nextNodeId
+            createdAt
+            updatedAt
+            parameters (first: $firstNodeParameter, after: $afterNodeParameter) {
+                __typename
+                count
+                nodes {
+                    __typename
+                    id
+                    updatedAt
+                    createdAt
+                    parameterDefinition {
+                        __typename
+                        id
+                        identifier
+                        createdAt
+                        updatedAt
+                    }
+                    value {
+                        __typename
+                        ... on LiteralValue {
+                            __typename
+                            value
+                        }
+                        ... on NodeFunctionIdWrapper {
+                            __typename
+                            id
+                        }
+                        ... on ReferenceValue {
+                            __typename
+                            id
+                            updatedAt
+                            createdAt
+                            nodeFunctionId
+                            referencePath {
+                                __typename
+                                id
+                                createdAt
+                                updatedAt
+                                arrayIndex
+                                path
+                            }
+                        }
+                    }
+                }
+                pageInfo {
+                    endCursor
+                    hasNextPage
+                }
+            }
+            functionDefinition {
+                __typename
+                id
+                identifier
+            }
+        }
+    }
+    project {
+        __typename
+        id
+    }
+    settings (first: $firstSetting, after: $afterSetting) {
+        __typename
+        count
+        nodes {
+            __typename
+            id
+            createdAt
+            updatedAt
+            flowSettingIdentifier
+            value
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+    }
+    startingNodeId
+    type {
+        id
+    }
+    updatedAt
+    userAbilities {
+        deleteFlow
+    }
+}

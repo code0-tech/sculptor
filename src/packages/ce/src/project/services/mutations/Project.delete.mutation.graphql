@@ -1,0 +1,19 @@
+#import "../fragments/Project.basic.fragment.graphql"
+mutation projectDelete ($namespaceProjectId: NamespaceProjectID!) {
+    namespacesProjectsDelete(input: {
+        namespaceProjectId: $namespaceProjectId
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    ...on ActiveModelError { attribute type }
+                    __typename
+                }
+            }
+        }
+        namespaceProject {
+            ...BasicProject
+        }
+    }
+}

@@ -1,0 +1,126 @@
+fragment DataTypeIdentifier on DataTypeIdentifier {
+    id
+    createdAt
+    updatedAt
+    genericKey
+    genericType {
+        id
+        updatedAt
+        createdAt
+        genericMappers {
+            id
+            target
+            sourceDataTypeIdentifierIds
+            updatedAt
+            createdAt
+            genericCombinationStrategies {
+                id
+                type
+                createdAt
+                updatedAt
+                __typename
+            }
+            __typename
+        }
+        dataType {
+            identifier
+            id
+            __typename
+        }
+    }
+    dataType {
+        id
+        identifier
+    }
+    __typename
+}
+
+fragment Function on FunctionDefinition {
+    id
+    createdAt
+    updatedAt
+    dataTypeIdentifiers (first: $firstDataTypeIdentifier, after: $afterDataTypeIdentifier) {
+        count
+        nodes {
+            ...DataTypeIdentifier
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+        __typename
+    }
+    aliases {
+        code
+        content
+        __typename
+    }
+    deprecationMessages {
+        code
+        content
+        __typename
+    }
+    descriptions {
+        code
+        content
+        __typename
+    }
+    documentations {
+        code
+        content
+        __typename
+    }
+    genericKeys
+    displayMessages {
+        code
+        content
+        __typename
+    }
+    identifier
+    names {
+        code
+        content
+        __typename
+    }
+    returnType {
+        ...DataTypeIdentifier
+    }
+    parameterDefinitions (first: $firstParameterDefinition, after: $afterParameterDefinition) {
+        nodes {
+            id
+            identifier
+            updatedAt
+            createdAt
+            identifier
+            names {
+                code
+                content
+                __typename
+            }
+            descriptions {
+                code
+                content
+                __typename
+            }
+            documentations {
+                code
+                content
+                __typename
+            }
+            dataTypeIdentifier {
+                ...DataTypeIdentifier
+            }
+            __typename
+        }
+    }
+    #throwsError
+    runtimeFunctionDefinition {
+        id
+        identifier
+        runtime {
+            id
+        }
+        __typename
+    }
+    __typename
+}

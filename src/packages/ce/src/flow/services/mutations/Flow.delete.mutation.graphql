@@ -1,0 +1,19 @@
+#import "../fragments/Flow.basic.fragment.graphql"
+
+mutation flowDelete($flowId: FlowID!) {
+    namespacesProjectsFlowsDelete(input: {
+        flowId: $flowId
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        flow {
+            ...BasicFlow
+        }
+    }
+}

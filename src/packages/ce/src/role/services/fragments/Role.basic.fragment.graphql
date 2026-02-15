@@ -1,0 +1,22 @@
+#import "@edition/namespace/services/fragments/Namespace.id.fragment.graphql"
+fragment RoleBasic on NamespaceRole {
+    __typename
+    id
+    name
+    createdAt
+    updatedAt
+    namespace {
+        ...NamespaceId
+    }
+    assignedProjects {
+        count
+    }
+    abilities
+    userAbilities {
+        __typename
+        assignRoleAbilities
+        assignRoleProjects
+        deleteNamespaceRole
+        updateNamespaceRole
+    }
+}

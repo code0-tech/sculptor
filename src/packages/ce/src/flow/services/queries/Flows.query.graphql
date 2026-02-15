@@ -1,0 +1,40 @@
+#import "../fragments/Flow.fragment.graphql"
+
+query Flows (
+    $namespaceId: NamespaceID!
+    $projectId: NamespaceProjectID!
+    $firstFlow: Int!
+    $afterFlow: String
+    $firstNode: Int!,
+    $afterNode: String,
+    $firstNodeParameter: Int!,
+    $afterNodeParameter: String,
+
+    $firstSetting: Int!,
+    $afterSetting: String,
+
+    #$firstInputDataTypeIdentifier: Int!
+    #$afterInputDataTypeIdentifier: String
+    #$firstInputRule: Int!
+    #$afterInputRule: String
+
+    #$firstReturnDataTypeIdentifier: Int!
+    #$afterReturnDataTypeIdentifier: String
+    #$firstReturnRule: Int!
+    #$afterReturnRule: String
+) {
+    namespace(id: $namespaceId) {
+        project(id: $projectId) {
+            flows (first: $firstFlow, after: $afterFlow) {
+                count
+                nodes {
+                    ...Flow
+                }
+                pageInfo {
+                    endCursor
+                    hasNextPage
+                }
+            }
+        }
+    }
+}

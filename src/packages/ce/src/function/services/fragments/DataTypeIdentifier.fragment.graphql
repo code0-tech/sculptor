@@ -1,0 +1,36 @@
+fragment DataTypeIdentifier on DataTypeIdentifier {
+    id
+    createdAt
+    updatedAt
+    genericKey
+    genericType {
+        id
+        updatedAt
+        createdAt
+        genericMappers {
+            id
+            target
+            sourceDataTypeIdentifierIds
+            updatedAt
+            createdAt
+            genericCombinationStrategies {
+                id
+                type
+                createdAt
+                updatedAt
+                __typename
+            }
+            __typename
+        }
+        dataType {
+            identifier
+            id
+            __typename
+        }
+    }
+    dataType {
+        id
+        identifier
+    }
+    __typename
+}
