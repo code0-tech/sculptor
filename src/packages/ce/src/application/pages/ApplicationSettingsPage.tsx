@@ -128,7 +128,7 @@ export const ApplicationSettingsPage: React.FC = () => {
                                         <Text size={"md"} hierarchy={"primary"}>Sculptor version</Text>
                                         <Text size={"md"} hierarchy={"tertiary"}>Version of this application</Text>
                                     </Flex>
-                                    <Badge color={"info"}>v0.0.0-mvp.1</Badge>
+                                    <Badge color={"info"}>{process.env.NEXT_PUBLIC_SCULPTOR_VERSION}</Badge>
                                 </Flex>
                             </CardSection>
 
@@ -140,7 +140,7 @@ export const ApplicationSettingsPage: React.FC = () => {
                                             library</Text>
                                     </Flex>
                                     <Badge
-                                        color={"info"}>v0.0.0-mvp.10</Badge>
+                                        color={"info"}>{process.env.NEXT_PUBLIC_PICTOR_VERSION}</Badge>
                                 </Flex>
                             </CardSection>
                             <CardSection border>
