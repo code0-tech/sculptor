@@ -35,11 +35,8 @@ try {
 } catch (e) {}
 
 envContent = envContent
-  .replace(/^NEXT_PUBLIC_SCULPTOR_VERSION=.*$/m, '')
-  .replace(/^NEXT_PUBLIC_PICTOR_VERSION=.*$/m, '');
+  .replace(/^NEXT_PUBLIC_SCULPTOR_VERSION=.*$/m, `NEXT_PUBLIC_SCULPTOR_VERSION=${sculptorVersion}`)
+  .replace(/^NEXT_PUBLIC_PICTOR_VERSION=.*$/m, `NEXT_PUBLIC_PICTOR_VERSION=${pictorVersion}`);
 
-envContent += `\nNEXT_PUBLIC_SCULPTOR_VERSION=${sculptorVersion}`;
-envContent += `\nNEXT_PUBLIC_PICTOR_VERSION=${pictorVersion}`;
-
-fs.writeFileSync(envPath, envContent.trim() + '\n', 'utf-8');
+fs.writeFileSync(envPath, envContent.trim(), 'utf-8');
 console.log(`[set-edition] Versions written to .env.local`);
