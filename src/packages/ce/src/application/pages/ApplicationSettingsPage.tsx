@@ -50,12 +50,12 @@ export const ApplicationSettingsPage: React.FC = () => {
 
     const initialValues = React.useMemo(
         () => ({
-            adminStatusVisible: null,
-            organizationCreationRestricted: null,
-            userRegistrationEnabled: null,
-            legalNoticeUrl: null,
-            privacyUrl: null,
-            termsAndConditionsUrl: null,
+            adminStatusVisible: application?.settings?.adminStatusVisible,
+            organizationCreationRestricted: application?.settings?.organizationCreationRestricted,
+            userRegistrationEnabled: application?.settings?.userRegistrationEnabled,
+            legalNoticeUrl: application?.settings?.legalNoticeUrl,
+            privacyUrl: application?.settings?.privacyUrl,
+            termsAndConditionsUrl: application?.settings?.termsAndConditionsUrl,
         }),
         []
     )
