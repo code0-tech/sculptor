@@ -33,14 +33,14 @@ export default function AuthLayout({children}: Readonly<{ children: React.ReactN
                                    width={40}
                                    height={40}/>
                             <Spacing spacing={"xl"}/>
-                            <Text style={{fontSize: "2rem", fontWeight: "600", lineHeight: "1"}}
+                            <Text style={{fontSize: "2rem", fontWeight: "600"}}
                                   hierarchy={"primary"}
-                                  display={"inline-block"}>
+                                  display={"inline"}>
                                 Every great idea starts at zero. {" "}
-                                <Text style={{fontSize: "2rem", fontWeight: "600", lineHeight: "1"}}
-                                      hierarchy={"tertiary"} display={"inline"}>
-                                    Start with CodeZero.
-                                </Text>
+                            </Text>
+                            <Text style={{fontSize: "2rem", fontWeight: "600"}}
+                                  hierarchy={"tertiary"} display={"inline"}>
+                                Start with CodeZero.
                             </Text>
                             <Spacing spacing={"xl"}/>
                             {children}
