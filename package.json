@@ -1,6 +1,6 @@
 {
-  "name": "my-app",
-  "version": "0.1.0",
+  "name": "@code0-tech/sculptor",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
     "predev": "node edition.mjs",
