@@ -27,6 +27,7 @@ import {RuntimeService} from "@edition/runtime/services/Runtime.service";
 import {ProjectService} from "@edition/project/services/Project.service";
 import {RoleService} from "@edition/role/services/Role.service";
 import Image from "next/image";
+import {Application, ApplicationService} from "@edition/application/services/Application.service";
 
 interface ApplicationLayoutProps {
     children: React.ReactNode
@@ -49,10 +50,11 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
     const runtime = usePersistentReactiveArrayService<DRuntimeView, RuntimeService>(`dashboard::global_runtimes::${currentSession?.id}`, (store) => new RuntimeService(graphqlClient, store))
     const project = usePersistentReactiveArrayService<DNamespaceProjectView, ProjectService>(`dashboard::projects::${currentSession?.id}`, (store) => new ProjectService(graphqlClient, store))
     const role = usePersistentReactiveArrayService<DNamespaceRoleView, RoleService>(`dashboard::roles::${currentSession?.id}`, (store) => new RoleService(graphqlClient, store))
+    const application = usePersistentReactiveArrayService<Application, ApplicationService>(`dashboard::application::${currentSession?.id}`, (store) => new ApplicationService(graphqlClient, store))
 
     if (currentSession === null) router.push("/login")
 
-    return <ContextStoreProvider services={[user, organization, member, namespace, runtime, project, role]}>
+    return <ContextStoreProvider services={[user, organization, member, namespace, runtime, project, role, application]}>
         <DLayout style={{zIndex: 0}} layoutGap={"0"} showLayoutSplitter={false} leftContent={
             <Flex p={0.7} pt={1} align={"center"} style={{flexDirection: "column", gap: "0.7rem"}}>
                 <div style={{
