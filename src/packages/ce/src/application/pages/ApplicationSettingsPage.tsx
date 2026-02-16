@@ -53,11 +53,11 @@ export const ApplicationSettingsPage: React.FC = () => {
             adminStatusVisible: application?.settings?.adminStatusVisible,
             organizationCreationRestricted: application?.settings?.organizationCreationRestricted,
             userRegistrationEnabled: application?.settings?.userRegistrationEnabled,
-            legalNoticeUrl: application?.settings?.legalNoticeUrl,
-            privacyUrl: application?.settings?.privacyUrl,
-            termsAndConditionsUrl: application?.settings?.termsAndConditionsUrl,
+            legalNoticeUrl: !!application?.settings?.legalNoticeUrl ? application?.settings?.legalNoticeUrl : null,
+            privacyUrl: !!application?.settings?.privacyUrl ? application?.settings?.privacyUrl : null,
+            termsAndConditionsUrl: !!application?.settings?.termsAndConditionsUrl ? application?.settings?.termsAndConditionsUrl : null,
         }),
-        []
+        [application]
     )
 
     const [inputs, validate] = useForm({
@@ -69,9 +69,9 @@ export const ApplicationSettingsPage: React.FC = () => {
                     adminStatusVisible: values.adminStatusVisible,
                     organizationCreationRestricted: values.organizationCreationRestricted,
                     userRegistrationEnabled: values.userRegistrationEnabled,
-                    legalNoticeUrl: values.legalNoticeUrl,
-                    privacyUrl: values.privacyUrl,
-                    termsAndConditionsUrl: values.termsAndConditionsUrl,
+                    legalNoticeUrl: !!values.legalNoticeUrl ? values.legalNoticeUrl : null,
+                    privacyUrl: !!values.privacyUrl ? values.privacyUrl : null,
+                    termsAndConditionsUrl: !!values.termsAndConditionsUrl ? values.termsAndConditionsUrl : null,
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
                         toast({
@@ -154,7 +154,10 @@ export const ApplicationSettingsPage: React.FC = () => {
                             </CardSection>
                         </Card>
                         <Spacing spacing={"xl"}/>
-                        <Text size={"lg"} hierarchy={"primary"}>Legal url's</Text>
+                        <Flex justify={"space-between"} align={"center"}>
+                            <Text size={"lg"} hierarchy={"primary"}>Legal url's</Text>
+                            <Button color={"success"} onClick={validate}>Save</Button>
+                        </Flex>
                         <Spacing spacing={"xl"}/>
                         <Card color={"secondary"}>
                             <CardSection border>
@@ -184,7 +187,10 @@ export const ApplicationSettingsPage: React.FC = () => {
                         </Card>
                     </TabContent>
                     <TabContent value={"restrictions"}>
-                        <Text size={"xl"} hierarchy={"primary"}>Restrictions</Text>
+                        <Flex justify={"space-between"} align={"center"}>
+                            <Text size={"xl"} hierarchy={"primary"}>Restrictions</Text>
+                            <Button color={"success"} onClick={validate}>Save</Button>
+                        </Flex>
                         <Spacing spacing={"xl"}/>
                         <Card color={"secondary"}>
                             <CardSection border>
