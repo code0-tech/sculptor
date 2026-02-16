@@ -1,4 +1,3 @@
-// scripts/set-edition.mjs
 import fs from "node:fs";
 import path from "node:path";
 
@@ -23,3 +22,24 @@ tsconf.compilerOptions.paths['@edition/*'] = editionImports[edition];
 fs.writeFileSync(tsconfig, JSON.stringify(tsconf, null, 2));
 
 console.log(`[set-edition] current -> ${edition}`);
+
+const pkgPath = path.join(root, 'package.json');
+const envPath = path.join(root, '.env.local');
+const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+const sculptorVersion = pkg.version || '0.0.0';
+const pictorVersion = (pkg.dependencies && pkg.dependencies['@code0-tech/pictor']) || '0.0.0';
+
+let envContent = '';
+try {
+  envContent = fs.readFileSync(envPath, 'utf-8');
+} catch (e) {}
+
+envContent = envContent
+  .replace(/^NEXT_PUBLIC_SCULPTOR_VERSION=.*$/m, '')
+  .replace(/^NEXT_PUBLIC_PICTOR_VERSION=.*$/m, '');
+
+envContent += `\nNEXT_PUBLIC_SCULPTOR_VERSION=${sculptorVersion}`;
+envContent += `\nNEXT_PUBLIC_PICTOR_VERSION=${pictorVersion}`;
+
+fs.writeFileSync(envPath, envContent.trim() + '\n', 'utf-8');
+console.log(`[set-edition] Versions written to .env.local`);
