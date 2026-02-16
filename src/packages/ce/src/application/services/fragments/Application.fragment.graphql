@@ -1,0 +1,29 @@
+fragment Application on Application {
+    __typename
+    metadata {
+        __typename
+        extensions
+        version
+    }
+    legalNoticeUrl
+    privacyUrl
+    termsAndConditionsUrl
+    settings {
+        __typename
+        termsAndConditionsUrl
+        privacyUrl
+        legalNoticeUrl
+        adminStatusVisible
+        organizationCreationRestricted
+        userRegistrationEnabled
+    }
+    userAbilities {
+        __typename
+        createOrganization
+        createRuntime
+        deleteRuntime
+        rotateRuntimeToken
+        updateApplicationSetting
+        updateRuntime
+    }
+}
