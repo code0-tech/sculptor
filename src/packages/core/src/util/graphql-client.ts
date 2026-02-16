@@ -50,7 +50,7 @@ export class GraphqlClient {
                     }
 
                     if (afterVar || firstVar) {
-                        specs.push({ path: nextPath.join("."), afterVar, firstVar });
+                        specs.push({path: nextPath.join("."), afterVar, firstVar});
                     }
 
                     if (sel.selectionSet) visitSelections(sel.selectionSet, nextPath);
@@ -109,7 +109,7 @@ export class GraphqlClient {
             if (!next) break;
 
             // Variablen für die nächste Page
-            const nextVars: Record<string, any> = { ...(options.variables as any) };
+            const nextVars: Record<string, any> = {...(options.variables as any)};
             if (next.afterVar) {
                 nextVars[next.afterVar] = getAt(aggregated, next.path)?.pageInfo?.endCursor;
             }
@@ -136,7 +136,22 @@ export class GraphqlClient {
             setAt(aggregated, next.path, tgt);
         }
 
-        return { ...first, data: aggregated };
+        return {...first, data: aggregated};
+    }
+
+    hasQueryData<TData = unknown, TVariables extends OperationVariables = OperationVariables>(
+        options: ApolloClient.QueryOptions<TData, TVariables>
+    ): boolean {
+        try {
+            const opts: any = {query: options.query};
+            if (options.variables !== undefined) {
+                opts.variables = options.variables;
+            }
+            const data = this._client.readQuery<TData, TVariables>(opts);
+            return !!data;
+        } catch {
+            return false;
+        }
     }
 
 }
