@@ -171,12 +171,22 @@ export default function RootLayout({children}: Readonly<{ children: React.ReactN
         })
     })
 
+    const isBrowser = typeof window !== "undefined";
+    const graphqlUri = isBrowser
+        ? "/graphql"
+        : process.env.NEXT_PUBLIC_SAGITTARIUS_GRAPHQL_URL || "http://localhost:3010/graphql";
+
     /**
      * Apollo Client instance with configured links and cache
      */
     const client = React.useMemo(() => new ApolloClient({
         cache: new InMemoryCache(),
-        link: ApolloLink.from([errorLink, authMiddleware, responseHandlerLink, new HttpLink({uri: "/graphql"})]),
+        link: ApolloLink.from([
+            errorLink,
+            authMiddleware,
+            responseHandlerLink,
+            new HttpLink({uri: graphqlUri})
+        ]),
         defaultOptions: {
             watchQuery: {
                 errorPolicy: "all",
@@ -188,7 +198,7 @@ export default function RootLayout({children}: Readonly<{ children: React.ReactN
                 errorPolicy: "all",
             },
         },
-    }), [authMiddleware])
+    }), [authMiddleware, graphqlUri])
 
     return React.useMemo(() => {
         return <html suppressHydrationWarning>

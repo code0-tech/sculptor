@@ -1,14 +1,8 @@
 import React from "react";
-import {
-    DataTableFilterInput,
-    DataTableFilterSuggestionMenu,
-    MenuCheckboxItem,
-    useService,
-    useStore
-} from "@code0-tech/pictor";
+import {DataTableFilterInput, DataTableFilterSuggestionMenu, MenuCheckboxItem} from "@code0-tech/pictor";
 import {IconCheck} from "@tabler/icons-react";
 import {DataTableFilterProps} from "@code0-tech/pictor/dist/components/data-table/DataTable";
-import {UserService} from "@edition/user/services/User.service";
+import {useUsers} from "@edition/user/hooks/User.hook";
 
 export interface UserDataTableFilterInputComponentProps {
     onChange: (filter: DataTableFilterProps) => void
@@ -18,13 +12,7 @@ export const UserDataTableFilterInputComponent: React.FC<UserDataTableFilterInpu
 
     const {onChange} = props
 
-    const userService = useService(UserService)
-    const userStore = useStore(UserService)
-
-    const users = React.useMemo(
-        () => userService.values(),
-        [userStore]
-    )
+    const users = useUsers()
 
     return <DataTableFilterInput onChange={onChange} filterTokens={[
         {

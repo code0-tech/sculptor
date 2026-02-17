@@ -1,8 +1,8 @@
 import React from "react";
 import {User} from "@code0-tech/sagittarius-graphql-types";
-import {Avatar, Badge, DataTableColumn, Flex, Text, useService, useStore} from "@code0-tech/pictor";
+import {Avatar, Badge, DataTableColumn, Flex, Text} from "@code0-tech/pictor";
 import {formatDistanceToNow} from "date-fns";
-import {UserService} from "@edition/user/services/User.service";
+import {useUserById} from "@edition/user/hooks/User.hook";
 
 export interface UserDataTableRowComponentProps {
     userId: User['id']
@@ -12,13 +12,7 @@ export const UserDataTableRowComponent: React.FC<UserDataTableRowComponentProps>
 
     const {userId} = props
 
-    const userService = useService(UserService)
-    const userStore = useStore(UserService)
-
-    const user = React.useMemo(
-        () => userService.getById(userId),
-        [userStore, userId]
-    )
+    const user = useUserById(userId)
 
     return <>
         <DataTableColumn>

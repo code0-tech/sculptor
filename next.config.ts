@@ -36,7 +36,8 @@ const nextConfig: NextConfig = {
     },
     env: {
         NEXT_PUBLIC_edition: EDITION,
-        NEXT_PUBLIC_pictorVersion: "11"
+        NEXT_PUBLIC_pictorVersion: "11",
+        NEXT_PUBLIC_SAGITTARIUS_GRAPHQL_URL: SAGITTARIUS_GRAPHQL_URL
     },
     reactStrictMode: true,
     reactCompiler: true,

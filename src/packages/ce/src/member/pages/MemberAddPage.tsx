@@ -1,42 +1,30 @@
 "use client"
 
 import React from "react";
-import {
-    Button,
-    Col,
-    DUserInput,
-    DUserView,
-    Flex,
-    Spacing,
-    Text,
-    useForm,
-    useService,
-    useStore
-} from "@code0-tech/pictor";
+import {Button, Col, Flex, Spacing, Text, useForm, useService, useStore} from "@code0-tech/pictor";
 import {MemberService} from "@edition/member/services/Member.service";
 import {useParams, useRouter} from "next/navigation";
-import {Namespace} from "@code0-tech/sagittarius-graphql-types";
+import {Namespace, User} from "@code0-tech/sagittarius-graphql-types";
 import Link from "next/link";
 import {UserService} from "@edition/user/services/User.service";
 import {InputSyntaxSegment} from "@code0-tech/pictor/dist/components/form/Input.syntax.hook";
+import {UserInputComponent} from "@edition/user/components/UserInputComponent";
 
 export const MemberAddPage: React.FC = () => {
 
     const params = useParams()
     const memberService = useService(MemberService)
     const memberStore = useStore(MemberService)
-    const userService = useService(UserService)
-    const userStore = useStore(UserService)
     const router = useRouter()
     const [, startTransition] = React.useTransition()
 
     const namespaceIndex = params?.namespaceId as string
     const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex as unknown as number}`
 
-    const members = React.useMemo(() => memberService.values({namespaceId: namespaceId}), [memberStore, userStore])
+    const members = React.useMemo(() => memberService.values({namespaceId: namespaceId}), [memberStore])
     const formInitialValues = React.useMemo(() => ({users: null}), [])
     const filteredUsers = React.useMemo(() => {
-        return (user: DUserView) => {
+        return (user: User) => {
             return !members.find(m => m.user?.id === user.id)
         }
     }, [members])
@@ -55,7 +43,7 @@ export const MemberAddPage: React.FC = () => {
                 for (const value of values.users!!) {
                     await memberService.memberInvite({
                         namespaceId: namespaceId!!,
-                        userId: (value.value)._id!!
+                        userId: (value.value).id!!
                     })
                 }
                 router.push(`/namespace/${namespaceIndex}/members`)
@@ -83,11 +71,11 @@ export const MemberAddPage: React.FC = () => {
                 </Text>
                 <Spacing spacing={"xl"}/>
                 {/*@ts-ignore*/}
-                <DUserInput title={"Description"}
-                            description={"Provide a simple project description"}
-                            filter={filteredUsers}
-                            validationUsesSyntax
-                            {...inputs.getInputProps("users")}/>
+                <UserInputComponent title={"Description"}
+                                    description={"Provide a simple project description"}
+                                    filter={filteredUsers}
+                                    validationUsesSyntax
+                                    {...inputs.getInputProps("users")}/>
                 <Spacing spacing={"xl"}/>
                 <Flex style={{gap: "0.35rem"}} justify={"space-between"}>
                     <Link href={"/public"}>
