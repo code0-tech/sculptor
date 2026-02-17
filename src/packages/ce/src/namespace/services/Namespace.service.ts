@@ -14,14 +14,9 @@ export class NamespaceService extends DNamespaceReactiveService {
     }
 
     getById(id: Namespace["id"]): DNamespaceView | undefined {
-        if (this.client.hasQueryData({
-            query: namespaceQuery,
-            variables: {
-                id: id
-            },
-        })) return super.getById(id);
+        if (super.getById(id)) return super.getById(id);
 
-        throw this.client.query<Query>({
+        this.client.query<Query>({
             query: namespaceQuery,
             variables: {
                 id: id
@@ -34,6 +29,8 @@ export class NamespaceService extends DNamespaceReactiveService {
                 this.add(new View(new DNamespaceView(data.namespace)))
             }
         })
+
+        return super.getById(id)
     }
 
 }
