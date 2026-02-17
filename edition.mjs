@@ -23,12 +23,12 @@ fs.writeFileSync(tsconfig, JSON.stringify(tsconf, null, 2));
 
 console.log(`[set-edition] current -> ${edition}`);
 
-const pkgPath = path.join(root, 'package.json');
-const envPath = path.join(root, '.env.local');
-const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
-const sculptorVersion = pkg.version || '0.0.0';
-const pictorVersion = (pkg.dependencies && pkg.dependencies['@code0-tech/pictor']) || '0.0.0';
+const lockPath = path.join(root, 'package-lock.json');
+const lock = JSON.parse(fs.readFileSync(lockPath, 'utf-8'));
+const sculptorVersion = (lock.packages && lock.packages[""].version) || '0.0.0';
+const pictorVersion = (lock.packages && lock.packages["node_modules/@code0-tech/pictor"] && lock.packages["node_modules/@code0-tech/pictor"].version) || '0.0.0';
 
+const envPath = path.join(root, '.env.local');
 let envContent = '';
 try {
   envContent = fs.readFileSync(envPath, 'utf-8');
