@@ -1,7 +1,8 @@
 import {useSuspenseQuery} from "@apollo/client/react";
-import {DUserView} from "@code0-tech/pictor";
 import {Query, User} from "@code0-tech/sagittarius-graphql-types";
 import usersQuery from "@edition/user/services/queries/Users.query.graphql";
+import userByIdQuery from "@edition/user/services/queries/User.byId.query.graphql";
+import userByUsernameQuery from "@edition/user/services/queries/User.byUsername.query.graphql";
 
 export const useUsers = (): User[] => {
     const {data} = useSuspenseQuery<Query>(usersQuery)
@@ -9,7 +10,7 @@ export const useUsers = (): User[] => {
 
     const users: User[] = []
     if (data.currentUser) {
-        users.push(new DUserView(data.currentUser))
+        users.push(data.currentUser)
     }
     if (data.users && data.users.nodes) {
         data.users.nodes.forEach((user) => {
@@ -23,11 +24,21 @@ export const useUsers = (): User[] => {
 }
 
 export const useUserById = (id: User['id']): User | undefined => {
-    const users = useUsers()
-    return users.find(u => u.id === id)
+    const {data} = useSuspenseQuery<Query>(userByIdQuery, {
+        variables: {
+            id: id
+        }
+    })
+
+    return data.user!
 }
 
-export const useUserByUsername = (username: string): User | undefined => {
-    const users = useUsers()
-    return users.find(u => u.username === username)
+export const useUserByUsername = (username: User["username"]): User | undefined => {
+    const {data} = useSuspenseQuery<Query>(userByUsernameQuery, {
+        variables: {
+            username: username ?? ""
+        }
+    })
+
+    return data.user!
 }
