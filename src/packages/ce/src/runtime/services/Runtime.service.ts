@@ -36,6 +36,8 @@ export class RuntimeService extends DRuntimeReactiveService {
         return runtime !== undefined
     }
 
+    //TODO: rework to be able to get all runtimes that you can access. If no namespace id is provided just get the global runtiimes
+    // TODO: if namespace id is provided get the runtimes for this namespace and also the global runtimes
     values(dependencies?: DRuntimeDependencies): DRuntimeView[] {
         const runtimes = super.values()
 

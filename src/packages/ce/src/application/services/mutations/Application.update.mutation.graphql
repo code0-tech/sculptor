@@ -1,0 +1,29 @@
+mutation ApplicationUpdate($userRegistrationEnabled: Boolean, $organizationCreationRestricted: Boolean, $adminStatusVisible: Boolean, $termsAndConditionsUrl: String, $privacyUrl: String, $legalNoticeUrl: String) {
+    applicationSettingsUpdate(input: {
+        userRegistrationEnabled: $userRegistrationEnabled
+        organizationCreationRestricted: $organizationCreationRestricted
+        adminStatusVisible: $adminStatusVisible
+        termsAndConditionsUrl: $termsAndConditionsUrl
+        privacyUrl: $privacyUrl
+        legalNoticeUrl: $legalNoticeUrl
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    ...on ActiveModelError { attribute type }
+                    __typename
+                }
+            }
+        }
+        applicationSettings {
+            __typename
+            termsAndConditionsUrl
+            privacyUrl
+            legalNoticeUrl
+            adminStatusVisible
+            organizationCreationRestricted
+            userRegistrationEnabled
+        }
+    }
+}
