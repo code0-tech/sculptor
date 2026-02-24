@@ -2,7 +2,7 @@ stages:
   - build
 
 .node:
-  image: node:24.13.1
+  image: node:24.14.0
   before_script:
     - npm ci
 
