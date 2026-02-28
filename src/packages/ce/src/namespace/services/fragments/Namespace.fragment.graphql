@@ -8,9 +8,6 @@ fragment Namespace on Namespace {
     roles {
         count
     }
-    namespaceLicenses {
-        count
-    }
     members {
         count
     }
@@ -19,9 +16,6 @@ fragment Namespace on Namespace {
     }
     runtimes {
         count
-    }
-    currentNamespaceLicense {
-        id
     }
     parent {
         __typename
@@ -33,7 +27,6 @@ fragment Namespace on Namespace {
         }
     }
     userAbilities {
-        createNamespaceLicense
         createNamespaceProject
         createNamespaceRole
         createRuntime
