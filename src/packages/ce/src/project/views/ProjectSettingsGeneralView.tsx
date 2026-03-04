@@ -2,6 +2,7 @@
 
 import React, {startTransition} from "react";
 import {
+    Badge,
     Button,
     Card,
     Flex,
@@ -9,10 +10,10 @@ import {
     TabContent,
     Text,
     TextInput,
+    toast,
     useForm,
     useService,
-    useStore,
-    toast
+    useStore
 } from "@code0-tech/pictor";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {useParams} from "next/navigation";
@@ -49,6 +50,8 @@ export const ProjectSettingsGeneralView: React.FC = () => {
             },
             slug: (value) => {
                 if (!value) return "Slug is required"
+                if (value.length < 3) return "Slug needs to be at least 3 characters"
+                if (value.length > 50) return "Slug needs to be less than 50 characters"
                 return null
             }
         },
@@ -95,7 +98,23 @@ export const ProjectSettingsGeneralView: React.FC = () => {
             </CardSection>
             <CardSection border>
                 <Flex justify={"space-between"} align={"center"}>
-                    <Text size={"md"} hierarchy={"primary"}>Slug</Text>
+                    <Flex style={{gap: ".35rem", flexDirection: "column"}}>
+                        <Text size={"md"} hierarchy={"primary"}>Slug</Text>
+                        <Text size={"md"} hierarchy={"tertiary"}>
+                            A slug is used as a prefix for calls to a specific flow inside a project e.g. {" "}
+                            <Badge>
+                                <Badge color={"info"} ml={-0.2}>
+                                    <Text size={"md"} hierarchy={"tertiary"}>
+                                        /{project?.slug}
+                                    </Text>
+                                </Badge>
+                                <Text size={"md"} hierarchy={"tertiary"}>
+                                    /your-flow-slug
+                                </Text>
+                            </Badge>.
+                            This is only effective for flow types using a slug as an identifier.
+                        </Text>
+                    </Flex>
                     <TextInput {...inputs.getInputProps("slug")}/>
                 </Flex>
             </CardSection>
