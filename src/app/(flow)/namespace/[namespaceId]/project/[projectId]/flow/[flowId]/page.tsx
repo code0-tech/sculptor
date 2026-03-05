@@ -16,6 +16,7 @@ import {IconDatabase, IconFile, IconMessageChatbot} from "@tabler/icons-react";
 import {useParams} from "next/navigation";
 import {Flow} from "@code0-tech/sagittarius-graphql-types";
 import {FlowBuilderComponent} from "@edition/flow/components/FlowBuilderComponent";
+import {FunctionFiles} from "@edition/function/components/FunctionFiles";
 
 export default function Page() {
 
@@ -49,7 +50,7 @@ export default function Page() {
                     <>
                         <DResizableHandle/>
                         <DResizablePanel id={"3"} defaultSize={"25%"} color={"primary"} style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
-                            <DFlowTabs flowId={flowId} namespaceId={undefined}
+                            <FunctionFiles flowId={flowId} namespaceId={undefined}
                                        projectId={undefined}/>
                         </DResizablePanel>
                     </>

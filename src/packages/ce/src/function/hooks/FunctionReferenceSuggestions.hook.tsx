@@ -12,7 +12,7 @@ import {
     ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
 import {useService, useStore} from "@code0-tech/pictor";
-import {DFlowSuggestion, DFlowSuggestionType} from "@edition/function/components/FunctionSuggestion.view";
+import {FunctionSuggestion, FunctionSuggestionType} from "@edition/function/components/FunctionSuggestion.view";
 import {
     isMatchingType,
     replaceGenericKeysInType,
@@ -47,7 +47,7 @@ export const useReferenceSuggestions = (
     nodeId?: NodeFunction['id'],
     dataTypeIdentifier?: DataTypeIdentifier,
     genericKeys: string[] = []
-): DFlowSuggestion[] => {
+): FunctionSuggestion[] => {
     const dataTypeService = useService(DatatypeService)
     const dataTypeStore = useStore(DatatypeService)
     const flowService = useService(FlowService)
@@ -93,7 +93,7 @@ export const useReferenceSuggestions = (
 
             return [{
                 path: [],
-                type: DFlowSuggestionType.REF_OBJECT,
+                type: FunctionSuggestionType.REF_OBJECT,
                 displayText: [`${value.depth}-${value.scope}-${value.node || ''}-${value.referencePath?.map(path => path.path).join(".") ?? ""}`],
                 value: value as ReferenceValue,
             }]

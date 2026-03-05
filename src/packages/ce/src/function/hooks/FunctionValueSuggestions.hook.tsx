@@ -4,12 +4,13 @@ import type {
     DataTypeRulesItemOfCollectionConfig,
     DataTypeRulesNumberRangeConfig
 } from "@code0-tech/sagittarius-graphql-types";
-import {DFlowSuggestion, DFlowSuggestionType} from "@edition/function/components/FunctionSuggestion.view";
-import {DFlowDataTypeReactiveService, useService, useStore} from "@code0-tech/pictor";
+import {FunctionSuggestion, FunctionSuggestionType} from "@edition/function/components/FunctionSuggestion.view";
+import {useService, useStore} from "@code0-tech/pictor";
+import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 
-export const useValueSuggestions = (dataTypeIdentifier?: DataTypeIdentifier): DFlowSuggestion[] => {
-    const dataTypeService = useService(DFlowDataTypeReactiveService)
-    const dataTypeStore = useStore(DFlowDataTypeReactiveService)
+export const useValueSuggestions = (dataTypeIdentifier?: DataTypeIdentifier): FunctionSuggestion[] => {
+    const dataTypeService = useService(DatatypeService)
+    const dataTypeStore = useStore(DatatypeService)
 
     const dataType = React.useMemo(() => (
         dataTypeIdentifier ? dataTypeService?.getDataType(dataTypeIdentifier) : undefined
@@ -18,13 +19,13 @@ export const useValueSuggestions = (dataTypeIdentifier?: DataTypeIdentifier): DF
     return React.useMemo(() => {
         if (!dataType) return []
 
-        const suggestions: DFlowSuggestion[] = []
+        const suggestions: FunctionSuggestion[] = []
         dataType.rules?.nodes?.forEach(rule => {
             if (rule?.variant === "ITEM_OF_COLLECTION") {
                 (rule.config as DataTypeRulesItemOfCollectionConfig)!!.items?.forEach(value => {
                     suggestions.push({
                         path: [],
-                        type: DFlowSuggestionType.VALUE,
+                        type: FunctionSuggestionType.VALUE,
                         displayText: [value.toString()],
                         value: {
                             __typename: "LiteralValue",
@@ -40,7 +41,7 @@ export const useValueSuggestions = (dataTypeIdentifier?: DataTypeIdentifier): DF
                 for (let i = config.from; i <= config.to; i += ((config.steps ?? 1) <= 0 ? 1 : (config.steps ?? 1))) {
                     suggestions.push({
                         path: [],
-                        type: DFlowSuggestionType.VALUE,
+                        type: FunctionSuggestionType.VALUE,
                         displayText: [i.toString() ?? ""],
                         value: {
                             __typename: "LiteralValue",

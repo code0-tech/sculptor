@@ -1,10 +1,10 @@
 import React from "react";
 import type {DataTypeIdentifier} from "@code0-tech/sagittarius-graphql-types";
 import {useService, useStore} from "@code0-tech/pictor";
-import {DFlowSuggestion, DFlowSuggestionType} from "@edition/function/components/FunctionSuggestion.view";
+import {FunctionSuggestion, FunctionSuggestionType} from "@edition/function/components/FunctionSuggestion.view";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 
-export const useDataTypeSuggestions = (dataTypeIdentifier?: DataTypeIdentifier): DFlowSuggestion[] => {
+export const useDataTypeSuggestions = (dataTypeIdentifier?: DataTypeIdentifier): FunctionSuggestion[] => {
     const dataTypeService = useService(DatatypeService)
     const dataTypeStore = useStore(DatatypeService)
 
@@ -18,7 +18,7 @@ export const useDataTypeSuggestions = (dataTypeIdentifier?: DataTypeIdentifier):
 
         return dataTypeService.values().map(nextDataType => ({
             path: [],
-            type: DFlowSuggestionType.DATA_TYPE,
+            type: FunctionSuggestionType.DATA_TYPE,
             displayText: [nextDataType.name!![0]?.content!],
             /*@ts-ignore*/
             value: nextDataType.json,

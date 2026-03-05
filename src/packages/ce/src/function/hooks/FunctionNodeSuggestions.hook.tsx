@@ -5,7 +5,7 @@ import type {
     NodeFunction,
     ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
-import {DFlowSuggestion, DFlowSuggestionType} from "@edition/function/components/FunctionSuggestion.view";
+import {FunctionSuggestion, FunctionSuggestionType} from "@edition/function/components/FunctionSuggestion.view";
 import {useService, useStore} from "@code0-tech/pictor";
 import {isMatchingType, replaceGenericsAndSortType, resolveType} from "@edition/flow/utils/generics";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
@@ -14,7 +14,7 @@ import {FunctionService} from "@edition/function/services/Function.service";
 export const useFunctionSuggestions = (
     dataTypeIdentifier?: DataTypeIdentifier,
     genericKeys: string[] = []
-): DFlowSuggestion[] => {
+): FunctionSuggestion[] => {
     const dataTypeService = useService(DatatypeService)
     const functionService = useService(FunctionService)
     const dataTypeStore = useStore(DatatypeService)
@@ -72,7 +72,7 @@ export const useFunctionSuggestions = (
 
             return {
                 path: [],
-                type: DFlowSuggestionType.FUNCTION,
+                type: FunctionSuggestionType.FUNCTION,
                 displayText: [funcDefinition.names!![0]?.content as string],
                 value: nodeFunctionSuggestion,
             }

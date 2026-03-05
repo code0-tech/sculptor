@@ -8,7 +8,6 @@ import {usePathname, useRouter} from "next/navigation";
 import {UserService} from "@edition/user/services/User.service";
 import {RuntimeService} from "@edition/runtime/services/Runtime.service";
 import {OrganizationService} from "@edition/organization/services/Organization.service";
-import {hashToColor} from "@code0-tech/pictor/dist/components/d-flow/DFlow.util";
 
 export const ApplicationTabView: React.FC = () => {
 

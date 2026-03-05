@@ -1,6 +1,6 @@
-@use "../../styles/variables";
-@use "../../styles/helpers";
-@use "../../styles/box";
+@use "@core/style/helpers";
+@use "@core/style/box";
+@use "@core/style/variables";
 
 .d-flow-node {
   border: 1px solid helpers.borderColor();

@@ -1,5 +1,5 @@
 import React from "react";
-import {DFlowSuggestion} from "./FunctionSuggestion.view";
+import {FunctionSuggestion} from "./FunctionSuggestion.view";
 import {toInputSuggestions} from "./FunctionSuggestionMenu.util";
 import {FunctionSuggestionSearchBar} from "./FunctionSuggestionSearchBar";
 import {
@@ -13,8 +13,8 @@ import {
 
 export interface FunctionSuggestionMenuProps {
     triggerContent: React.ReactNode
-    suggestions?: DFlowSuggestion[]
-    onSuggestionSelect?: (suggestion: DFlowSuggestion) => void
+    suggestions?: FunctionSuggestion[]
+    onSuggestionSelect?: (suggestion: FunctionSuggestion) => void
 }
 
 export const FunctionSuggestionMenu: React.FC<FunctionSuggestionMenuProps> = (props) => {
@@ -63,7 +63,7 @@ export const FunctionSuggestionMenu: React.FC<FunctionSuggestionMenuProps> = (pr
                         ref={menuRef}
                         suggestions={toInputSuggestions(stateSuggestions)}
                         onSuggestionSelect={(suggestion) => {
-                            onSuggestionSelect(suggestion.valueData as DFlowSuggestion)
+                            onSuggestionSelect(suggestion.valueData as FunctionSuggestion)
                         }}
                     />
                 </Card>

@@ -10,7 +10,7 @@ import {FlowTypeService} from "@edition/flowtype/services/FlowTypeService";
 import {useSuggestions} from "@edition/function/hooks/FunctionSuggestion.hook";
 import {FunctionSuggestionMenuFooter} from "@edition/function/components/FunctionSuggestionMenuFooter";
 import {toInputSuggestions} from "@edition/function/components/FunctionSuggestionMenu.util";
-import {DFlowSuggestion} from "@edition/function/components/FunctionSuggestion.view";
+import {FunctionSuggestion} from "@edition/function/components/FunctionSuggestion.view";
 
 export type DataTypeTextInputProps = DataTypeInputProps
 
@@ -175,7 +175,7 @@ export const DataTypeTextInput: React.FC<DataTypeTextInputProps> = (props) => {
                       enforceUniqueSuggestions
                       validationUsesSyntax
                       transformSyntax={transformSyntax}
-                      suggestions={rest.suggestions ? rest.suggestions : toInputSuggestions(suggestions as DFlowSuggestion[])}
+                      suggestions={rest.suggestions ? rest.suggestions : toInputSuggestions(suggestions as FunctionSuggestion[])}
                       {...rest}
 
     />

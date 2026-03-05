@@ -4,7 +4,7 @@ import type {
     ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
 
-export enum DFlowSuggestionType {
+export enum FunctionSuggestionType {
     REF_OBJECT,
     VALUE,
     FUNCTION,
@@ -12,10 +12,10 @@ export enum DFlowSuggestionType {
     DATA_TYPE,
 }
 
-export interface DFlowSuggestion {
+export interface FunctionSuggestion {
 
     displayText: string[]
     path: number[]
     value: LiteralValue | ReferenceValue | NodeFunction
-    type: DFlowSuggestionType
+    type: FunctionSuggestionType
 }

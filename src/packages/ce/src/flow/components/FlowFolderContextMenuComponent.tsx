@@ -14,7 +14,8 @@ import {
     ContextMenuSubTrigger,
     ContextMenuTrigger
 } from "@code0-tech/pictor/dist/components/context-menu/ContextMenu";
-import {DFlowTypeReactiveService, Flex, Text, useService, useStore} from "@code0-tech/pictor";
+import {Flex, Text, useService, useStore} from "@code0-tech/pictor";
+import {FlowTypeService} from "@edition/flowtype/services/FlowTypeService";
 
 export interface FlowFolderContextMenuComponentGroupData {
     name: string
@@ -37,8 +38,8 @@ export const FlowFolderContextMenuComponent: React.FC<FlowFolderContextMenuCompo
 
     const {children} = props
 
-    const flowTypeService = useService(DFlowTypeReactiveService)
-    const flowTypeStore = useStore(DFlowTypeReactiveService)
+    const flowTypeService = useService(FlowTypeService)
+    const flowTypeStore = useStore(FlowTypeService)
 
     const flowTypes = React.useMemo(() => flowTypeService.values(), [flowTypeStore])
 

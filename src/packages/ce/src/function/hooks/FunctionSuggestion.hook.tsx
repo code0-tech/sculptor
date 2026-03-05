@@ -5,7 +5,7 @@ import {useReferenceSuggestions} from "./FunctionReferenceSuggestions.hook";
 import {useFunctionSuggestions} from "./FunctionNodeSuggestions.hook";
 import {useDataTypeSuggestions} from "./FunctionDataTypeSuggestions.hook";
 import {useService, useStore} from "@code0-tech/pictor";
-import {DFlowSuggestion} from "@edition/function/components/FunctionSuggestion.view";
+import {FunctionSuggestion} from "@edition/function/components/FunctionSuggestion.view";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 
@@ -16,7 +16,7 @@ export const useSuggestions = (
     flowId: Flow['id'],
     nodeId?: NodeFunction['id'],
     parameterId?: NodeParameter['id']
-): DFlowSuggestion[] => {
+): FunctionSuggestion[] => {
 
     const functionService = useService(FunctionService)
     const functionStore = useStore(FunctionService)

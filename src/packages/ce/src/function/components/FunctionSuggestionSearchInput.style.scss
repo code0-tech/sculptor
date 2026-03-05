@@ -1,5 +1,6 @@
-@use "../../styles/variables";
-@use "../../styles/helpers";
+@use "@core/style/helpers";
+@use "@core/style/box";
+@use "@core/style/variables";
 
 .d-flow-suggestion-search-input {
   border: none !important;

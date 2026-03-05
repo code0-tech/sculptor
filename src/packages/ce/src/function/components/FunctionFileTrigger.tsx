@@ -4,7 +4,7 @@ import {
     useService
 } from "@code0-tech/pictor";
 import {Flow, LiteralValue, NodeParameterValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
-import {DFlowSuggestion} from "@edition/function/components/FunctionSuggestion.view";
+import {FunctionSuggestion} from "@edition/function/components/FunctionSuggestion.view";
 import {useValueSuggestions} from "@edition/function/hooks/FunctionValueSuggestions.hook";
 import {useDataTypeSuggestions} from "@edition/function/hooks/FunctionDataTypeSuggestions.hook";
 import {DFlowInputDataType} from "@code0-tech/pictor/dist/components/d-flow-input/DFlowInputDataType";
@@ -29,7 +29,7 @@ export const FunctionFileTrigger: React.FC<FunctionFileTriggerProps> = (props) =
 
     const definition = flowTypeService.getById(instance.type?.id!!)
 
-    const suggestionsById: Record<string, DFlowSuggestion[]> = {}
+    const suggestionsById: Record<string, FunctionSuggestion[]> = {}
     definition?.flowTypeSettings?.forEach(settingDefinition => {
         const dataTypeIdentifier = {dataType: settingDefinition.dataType}
         const valueSuggestions = useValueSuggestions(dataTypeIdentifier)

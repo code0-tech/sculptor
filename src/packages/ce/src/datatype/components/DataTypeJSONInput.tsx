@@ -10,15 +10,20 @@ import {useSuggestions} from "@edition/function/hooks/FunctionSuggestion.hook";
 import {
     Button,
     Card,
-    DFlowDataTypeReactiveService,
-    DFlowFunctionReactiveService,
-    DFlowReactiveService, Flex, InputDescription, InputLabel, InputMessage, Text,
+    Flex,
+    InputDescription,
+    InputLabel,
+    InputMessage,
+    Text,
     useService,
     useStore
 } from "@code0-tech/pictor";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import {FunctionSuggestionMenu} from "@edition/function/components/FunctionSuggestionMenu";
 import {DataTypeJSONInputEditDialog} from "@edition/datatype/components/DataTypeJSONInputEditDialog";
+import {FlowService} from "@edition/flow/services/Flow.service";
+import {DatatypeService} from "@edition/datatype/services/Datatype.service";
+import {FunctionService} from "@edition/function/services/Function.service";
 
 export interface EditableJSONEntry {
     key: string
@@ -33,12 +38,12 @@ export const DataTypeJSONInput: React.FC<DataTypeJSONInputProps> = (props) => {
 
     const {flowId, nodeId, parameterId, title, description, formValidation, onChange} = props
 
-    const flowService = useService(DFlowReactiveService)
-    const flowStore = useStore(DFlowReactiveService)
-    const dataTypeService = useService(DFlowDataTypeReactiveService)
-    const dataTypeStore = useStore(DFlowDataTypeReactiveService)
-    const functionService = useService(DFlowFunctionReactiveService)
-    const functionStore = useStore(DFlowFunctionReactiveService)
+    const flowService = useService(FlowService)
+    const flowStore = useStore(FlowService)
+    const dataTypeService = useService(DatatypeService)
+    const dataTypeStore = useStore(DatatypeService)
+    const functionService = useService(FunctionService)
+    const functionStore = useStore(FunctionService)
 
     const node = React.useMemo(
         () => flowService.getNodeById(flowId, nodeId),
@@ -117,10 +122,10 @@ export const DataTypeJSONInput: React.FC<DataTypeJSONInputProps> = (props) => {
                         <FunctionSuggestionMenu suggestions={suggestions}
                                                 onSuggestionSelect={suggestion => setValue(suggestion.value)}
                                                 triggerContent={<Button paddingSize="xxs" variant="filled"
-                                                                     color="secondary"
-                                                                     onClick={() => setEditDialogOpen(true)}>
-                                                 <IconAlignLeft size={13}/>
-                                             </Button>}/>
+                                                                        color="secondary"
+                                                                        onClick={() => setEditDialogOpen(true)}>
+                                                    <IconAlignLeft size={13}/>
+                                                </Button>}/>
                         <Button paddingSize="xxs" variant="filled" color="secondary"
                                 onClick={() => setEditDialogOpen(true)}>
                             <IconEdit size={13}/>
