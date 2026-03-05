@@ -1,13 +1,10 @@
 import React from "react";
 import {Panel, useReactFlow, useViewport} from "@xyflow/react";
-import {ButtonGroup} from "../button-group/ButtonGroup";
-import {Button} from "../button/Button";
 import {IconFocusCentered, IconMinus, IconPlus} from "@tabler/icons-react";
-import {Badge} from "../badge/Badge";
-import {Flex} from "../flex/Flex";
-import {Text} from "../text/Text";
+import {Badge, Button, Flex, Text} from "@code0-tech/pictor";
+import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 
-export const FlowPanelSize: React.FC = () => {
+export const FlowPanelSizeComponent: React.FC = () => {
 
     const viewport = useViewport();
     const reactFlow = useReactFlow();

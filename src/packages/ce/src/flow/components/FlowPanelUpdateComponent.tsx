@@ -1,24 +1,31 @@
 import React from "react";
 import {IconCloudCheck, IconCloudUpload} from "@tabler/icons-react";
 import {Panel} from "@xyflow/react";
-import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
-import {Text} from "../text/Text";
 import {Flow} from "@code0-tech/sagittarius-graphql-types";
-import {useService, useStore} from "../../utils";
-import {DFlowReactiveService} from "../d-flow";
-import {Badge} from "../badge/Badge";
-import {Button} from "../button/Button";
+import {
+    Badge,
+    Button,
+    Text,
+    Tooltip,
+    TooltipArrow,
+    TooltipContent,
+    TooltipPortal,
+    TooltipTrigger,
+    useService,
+    useStore
+} from "@code0-tech/pictor";
+import {FlowService} from "@edition/flow/services/Flow.service";
 
-export interface DFlowPanelUpdateProps {
+export interface FlowPanelUpdateComponentProps {
     flowId: Flow['id']
 }
 
-export const FlowPanelUpdate: React.FC<DFlowPanelUpdateProps> = (props) => {
+export const FlowPanelUpdateComponent: React.FC<FlowPanelUpdateComponentProps> = (props) => {
 
     const {flowId} = props
 
-    const flowService = useService(DFlowReactiveService)
-    const flowStore = useStore(DFlowReactiveService)
+    const flowService = useService(FlowService)
+    const flowStore = useStore(FlowService)
     const [loading, startTransition] = React.useTransition()
 
     const flow = React.useMemo(() => flowService.getById(flowId), [flowId, flowStore])
@@ -106,9 +113,12 @@ const formatTimeAgo = (input: Date | number | string) => {
     const DAY = 24 * HOUR
     const YEAR = 365 * DAY
 
-    const years = Math.floor(diff / YEAR); diff %= YEAR
-    const days = Math.floor(diff / DAY); diff %= DAY
-    const hours = Math.floor(diff / HOUR); diff %= HOUR
+    const years = Math.floor(diff / YEAR);
+    diff %= YEAR
+    const days = Math.floor(diff / DAY);
+    diff %= DAY
+    const hours = Math.floor(diff / HOUR);
+    diff %= HOUR
     const minutes = Math.floor(diff / MIN)
 
     const parts = [

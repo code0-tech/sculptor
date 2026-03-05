@@ -13,24 +13,21 @@ import {
 } from "@xyflow/react";
 import React from "react";
 import '@xyflow/react/dist/style.css';
-import "./FlowBuilder.style.scss"
-import {FlowBuilderEdge} from "./FlowBuilderEdge";
+import "./FlowBuilderComponent.style.scss"
+import {FlowBuilderEdgeComponent} from "./FlowBuilderEdgeComponent";
 import {Flow, type Namespace, type NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {LineWobble} from 'ldrs/react'
 import 'ldrs/react/LineWobble.css'
 import {useFlowNodes} from "@edition/flow/hooks/Flow.nodes.hook";
-import {
-    Code0ComponentProps, DFlowPanelControl,
-    DFlowPanelLayout,
-    DFlowPanelSize, DFlowValidation,
-    mergeCode0Props,
-    Spacing, Text
-} from "@code0-tech/pictor";
+import {Code0ComponentProps, mergeCode0Props, Spacing, Text} from "@code0-tech/pictor";
 import {DFlowNodeDefaultCard} from "@edition/function/components/DFlowNodeDefaultCard";
 import {DFlowNodeGroupCard} from "@edition/function/components/DFlowNodeGroupCard";
 import {DFlowNodeTriggerCard} from "@edition/function/components/DFlowNodeTriggerCard";
-import {DFlowPanelUpdate} from "@code0-tech/pictor/dist/components/d-flow-panel/DFlowPanelUpdate";
 import {useEdges} from "@edition/flow/hooks/Flow.edges.hook";
+import {FlowPanelSizeComponent} from "@edition/flow/components/FlowPanelSizeComponent";
+import {FlowPanelLayoutComponent} from "@edition/flow/components/FlowPanelLayoutComponent";
+import {FlowPanelControlComponent} from "@edition/flow/components/FlowPanelControlComponent";
+import {FlowPanelUpdateComponent} from "@edition/flow/components/FlowPanelUpdateComponent";
 
 /**
  * Dynamically layouts a tree of nodes and their parameter nodes for a flow-based editor.
@@ -43,7 +40,7 @@ import {useEdges} from "@edition/flow/hooks/Flow.edges.hook";
  * @returns An object containing the new positioned nodes and the unchanged edges.
  */
 const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
-    if (!dirtyIds || dirtyIds.size === 0) return { nodes }
+    if (!dirtyIds || dirtyIds.size === 0) return {nodes}
 
     /* Konstanten */
     const V = 50;          // vertical gap Node ↕ Node
@@ -112,7 +109,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         const styleH = typeof n.style?.height === "number" ? (n.style.height as number) : undefined
         const mw = n.measured?.width && n.measured.width > 0 ? n.measured.width : undefined
         const mh = n.measured?.height && n.measured.height > 0 ? n.measured.height : undefined
-        baseSizes.set(n.id, { w: styleW ?? mw ?? 200, h: styleH ?? mh ?? 80 })
+        baseSizes.set(n.id, {w: styleW ?? mw ?? 200, h: styleH ?? mh ?? 80})
     }
 
     const getStyleW = (n: Node) => styleWH.get(n.id)?.width
@@ -134,7 +131,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         const sw = getStyleW(n)
         const sh = getStyleH(n)
         if (sw !== undefined && sh !== undefined) {
-            const s = { w: sw, h: sh }
+            const s = {w: sw, h: sh}
             sizeCache.set(n.id, s)
             return s
         }
@@ -153,7 +150,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         }
         stackH += V * Math.max(0, count - 1)
 
-        const g = { w: wMax + 2 * PAD, h: (count ? stackH : 0) + 2 * PAD }
+        const g = {w: wMax + 2 * PAD, h: (count ? stackH : 0) + 2 * PAD}
         sizeCache.set(n.id, g)
         return g
     }
@@ -204,15 +201,15 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                 bottom?: number
             }
 
-            const stack: Frame[] = [{ node: root, cx, cy, phase: 0 }]
+            const stack: Frame[] = [{node: root, cx, cy, phase: 0}]
             let returnBottom = 0
 
             while (stack.length) {
                 const f = stack[stack.length - 1]
                 switch (f.phase) {
                     case 0: {
-                        relCenter.set(f.node.id, { x: f.cx, y: f.cy })
-                        const { w, h } = size(f.node)
+                        relCenter.set(f.node.id, {x: f.cx, y: f.cy})
+                        const {w, h} = size(f.node)
                         f.w = w
                         f.h = h
 
@@ -259,7 +256,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
 
                             f.childKey = key
                             f.childPs = ps
-                            stack.push({ node: p, cx: px, cy: pcy, phase: 0 })
+                            stack.push({node: p, cx: px, cy: pcy, phase: 0})
                             f.phase = 10
                         } else {
                             f.bottom = Math.max(f.cy + f.h! / 2, f.rightBottom!)
@@ -312,7 +309,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                             const gcy = f.gy! + gs.h / 2
                             f.gx! += gs.w + H
 
-                            stack.push({ node: g, cx: gcx, cy: gcy, phase: 0 })
+                            stack.push({node: g, cx: gcx, cy: gcy, phase: 0})
                             f.childPs = gs
                             f.phase = 30
                         } else {
@@ -353,7 +350,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                             const ks = size(k)
                             const ky = f.curY! + ks.h / 2
 
-                            stack.push({ node: k, cx: f.cx, cy: ky, phase: 0 })
+                            stack.push({node: k, cx: f.cx, cy: ky, phase: 0})
                             f.childPs = ks
                             f.phase = 50
                         } else {
@@ -399,9 +396,9 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         // rel (Center) → absTL_initial (global Top-Left)
         const absTL_initial = new Map<string, Pos>()
         for (const n of nodes) {
-            const { w, h } = size(n)
+            const {w, h} = size(n)
             const c = relCenter.get(n.id)!
-            absTL_initial.set(n.id, { x: c.x - w / 2, y: c.y - h / 2 })
+            absTL_initial.set(n.id, {x: c.x - w / 2, y: c.y - h / 2})
         }
 
         // initial posTL setzen (in RF-Koordinaten, relativ zu Parent)
@@ -418,7 +415,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
 
             const prev = posTL.get(n.id)
             if (!prev || Math.abs(prev.x - px) > EPS || Math.abs(prev.y - py) > EPS) {
-                posTL.set(n.id, { x: px, y: py })
+                posTL.set(n.id, {x: px, y: py})
                 changed = true
             }
         }
@@ -443,7 +440,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
             const sw = typeof n.style?.width === "number" ? (n.style.width as number) : undefined
             const sh = typeof n.style?.height === "number" ? (n.style.height as number) : undefined
             const s = baseSizes.get(n.id)!
-            return { w: sw ?? s.w, h: sh ?? s.h }
+            return {w: sw ?? s.w, h: sh ?? s.h}
         }
 
         for (const g of groups) {
@@ -456,9 +453,9 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                 // minimal group size
                 const gw = getStyleW(g) ?? (typeof g.style?.width === "number" ? (g.style.width as number) : 2 * PAD)
                 const gh = getStyleH(g) ?? (typeof g.style?.height === "number" ? (g.style.height as number) : 2 * PAD)
-                styleWH.set(g.id, { width: gw, height: gh })
-                measuredWH.set(g.id, { width: gw, height: gh })
-                baseSizes.set(g.id, { w: gw, h: gh })
+                styleWH.set(g.id, {width: gw, height: gh})
+                measuredWH.set(g.id, {width: gw, height: gh})
+                baseSizes.set(g.id, {w: gw, h: gh})
                 continue
             }
 
@@ -486,7 +483,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                     const ny = p.y - dy
 
                     if (Math.abs(p.x - nx) > EPS || Math.abs(p.y - ny) > EPS) {
-                        posTL.set(k.id, { x: nx, y: ny })
+                        posTL.set(k.id, {x: nx, y: ny})
                         changed = true
                     }
                 }
@@ -500,9 +497,9 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
 
             if (Math.abs(newW - oldW) > EPS || Math.abs(newH - oldH) > EPS) changed = true
 
-            styleWH.set(g.id, { width: newW, height: newH })
-            measuredWH.set(g.id, { width: newW, height: newH })
-            baseSizes.set(g.id, { w: newW, h: newH })
+            styleWH.set(g.id, {width: newW, height: newH})
+            measuredWH.set(g.id, {width: newW, height: newH})
+            baseSizes.set(g.id, {w: newW, h: newH})
         }
 
         // Größen-Cache invalidieren (Group-Styles haben sich ggf. geändert)
@@ -516,7 +513,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
             const s = size(n)
             const c = relCenter.get(n.id)!
             absCenterAfter.set(n.id, c)
-            absTL_after.set(n.id, { x: c.x - s.w / 2, y: c.y - s.h / 2 })
+            absTL_after.set(n.id, {x: c.x - s.w / 2, y: c.y - s.h / 2})
         }
 
         // Param-Group-Row nach Bounding sauber zentrieren
@@ -545,13 +542,13 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
 
             for (let i = 0; i < ordered.length; i++) {
                 const g = ordered[i]
-                const containerTL = g.parentId ? absTL_after.get(g.parentId)! : { x: 0, y: 0 }
+                const containerTL = g.parentId ? absTL_after.get(g.parentId)! : {x: 0, y: 0}
                 const cur = posTL.get(g.id)!
                 const nx = gx - containerTL.x
                 const ny = cur.y
 
                 if (Math.abs(cur.x - nx) > EPS || Math.abs(cur.y - ny) > EPS) {
-                    posTL.set(g.id, { x: nx, y: ny })
+                    posTL.set(g.id, {x: nx, y: ny})
                     changed = true
                 }
                 gx += widths[i] + H
@@ -571,12 +568,12 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         let isChanged = false
 
         if (nextP) {
-            const op = n.position ?? { x: 0, y: 0 }
+            const op = n.position ?? {x: 0, y: 0}
             if (Math.abs(op.x - nextP.x) > EPS || Math.abs(op.y - nextP.y) > EPS) isChanged = true
         }
 
         if (nextM) {
-            const om = n.measured ?? ({ width: 0, height: 0 } as any)
+            const om = n.measured ?? ({width: 0, height: 0} as any)
             if (Math.abs((om as any).width - nextM.width) > EPS || Math.abs((om as any).height - nextM.height) > EPS) isChanged = true
         }
 
@@ -591,14 +588,14 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         return {
             ...n,
             position: nextP ?? n.position,
-            measured: nextM ? ({ ...(n.measured as any), width: nextM.width, height: nextM.height } as any) : n.measured,
+            measured: nextM ? ({...(n.measured as any), width: nextM.width, height: nextM.height} as any) : n.measured,
             style: nextS
-                ? ({ ...(n.style as any), width: nextS.width, height: nextS.height } as any)
+                ? ({...(n.style as any), width: nextS.width, height: nextS.height} as any)
                 : n.style,
         } as Node
     })
 
-    return { nodes: out }
+    return {nodes: out}
 }
 
 const getCachedLayoutElements = React.cache(getLayoutElements)
@@ -609,7 +606,7 @@ export interface FlowBuilderProps extends Code0ComponentProps {
     projectId: NamespaceProject['id']
 }
 
-export const FlowBuilder: React.FC<FlowBuilderProps> = (props) => {
+export const FlowBuilderComponent: React.FC<FlowBuilderProps> = (props) => {
     return <ReactFlowProvider>
         <InternalFlowBuilder {...props}/>
     </ReactFlowProvider>
@@ -625,7 +622,7 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
     }), [])
 
     const edgeTypes = React.useMemo(() => ({
-        default: FlowBuilderEdge,
+        default: FlowBuilderEdgeComponent,
     }), [])
 
     const initialNodes = useFlowNodes(flowId, namespaceId, projectId)
@@ -770,11 +767,10 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
             {showTree ? (
                 <>
                     <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .05)" gap={8} size={2}/>
-                    <DFlowPanelSize/>
-                    <DFlowPanelLayout/>
-                    <DFlowValidation flowId={"gid://sagittarius/Flow/1"}/>
-                    <DFlowPanelControl flowId={flowId}/>
-                    <DFlowPanelUpdate flowId={flowId}/>
+                    <FlowPanelSizeComponent/>
+                    <FlowPanelLayoutComponent/>
+                    <FlowPanelControlComponent flowId={flowId}/>
+                    <FlowPanelUpdateComponent flowId={flowId}/>
                 </>
             ) : null}
         </ReactFlow>

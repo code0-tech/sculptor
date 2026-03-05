@@ -1,34 +1,42 @@
 "use client"
 
-import "./DFlowFolder.style.scss"
+import "./FlowFolderComponent.style.scss"
 import React from "react"
-import {Code0Component, mergeCode0Props, useService, useStore} from "../../utils"
 import {IconFile, IconFolderFilled, IconFolderOpen} from "@tabler/icons-react"
 import type {Flow, FlowType, Namespace, NamespaceProject, Scalars} from "@code0-tech/sagittarius-graphql-types"
-import {DFlowReactiveService} from "../d-flow"
-import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea"
-import {Flex} from "../flex/Flex"
-import {Text} from "../text/Text"
 import {
-    DFlowFolderContextMenu,
-    DFlowFolderContextMenuGroupData,
-    DFlowFolderContextMenuItemData
-} from "./DFlowFolderContextMenu";
-import {hashToColor} from "../d-flow/DFlow.util";
+    FlowFolderContextMenuComponent,
+    FlowFolderContextMenuComponentGroupData,
+    FlowFolderContextMenuComponentItemData
+} from "./FlowFolderContextMenuComponent";
 import {HoverCard, HoverCardContent, HoverCardPortal, HoverCardTrigger} from "@radix-ui/react-hover-card";
+import {
+    Code0Component,
+    Flex,
+    hashToColor,
+    mergeCode0Props,
+    ScrollArea,
+    ScrollAreaScrollbar,
+    ScrollAreaThumb,
+    ScrollAreaViewport,
+    Text,
+    useService,
+    useStore
+} from "@code0-tech/pictor";
+import {FlowService} from "@edition/flow/services/Flow.service";
 
 
-export interface DFlowFolderProps {
+export interface FlowFolderComponentProps {
     activeFlowId: Scalars["FlowID"]["output"]
     namespaceId: Namespace['id']
     projectId: NamespaceProject['id']
-    onRename?: (contextData: DFlowFolderContextMenuGroupData | DFlowFolderContextMenuItemData) => void
-    onDelete?: (contextData: DFlowFolderContextMenuGroupData | DFlowFolderContextMenuItemData) => void
+    onRename?: (contextData: FlowFolderContextMenuComponentGroupData | FlowFolderContextMenuComponentItemData) => void
+    onDelete?: (contextData: FlowFolderContextMenuComponentGroupData | FlowFolderContextMenuComponentItemData) => void
     onCreate?: (type: FlowType['id']) => void
     onSelect?: (flow: Flow) => void
 }
 
-export type DFlowFolderHandle = {
+export type FlowFolderComponentHandle = {
     openAll: () => void
     closeAll: () => void
     openActivePath: () => void
@@ -36,26 +44,26 @@ export type DFlowFolderHandle = {
 
 type OpenMode = "default" | "allOpen" | "allClosed" | "activePath"
 
-export interface DFlowFolderGroupProps extends DFlowFolderProps, Omit<Code0Component<HTMLDivElement>, "onSelect"> {
+export interface FlowFolderComponentGroupProps extends FlowFolderComponentProps, Omit<Code0Component<HTMLDivElement>, "onSelect"> {
     name: string
-    children: React.ReactElement<DFlowFolderItemProps> | React.ReactElement<DFlowFolderItemProps>[] | React.ReactElement<DFlowFolderGroupProps> | React.ReactElement<DFlowFolderGroupProps>[]
+    children: React.ReactElement<FlowFolderComponentItemProps> | React.ReactElement<FlowFolderComponentItemProps>[] | React.ReactElement<FlowFolderComponentGroupProps> | React.ReactElement<FlowFolderComponentGroupProps>[]
     defaultOpen?: boolean
     flows: Flow[]
 }
 
-export interface DFlowFolderItemProps extends DFlowFolderProps, Omit<Code0Component<HTMLDivElement>, "onSelect"> {
+export interface FlowFolderComponentItemProps extends FlowFolderComponentProps, Omit<Code0Component<HTMLDivElement>, "onSelect"> {
     name: string
     path: string
     active?: boolean
     flow: Flow
 }
 
-export const DFlowFolder = React.forwardRef<DFlowFolderHandle, DFlowFolderProps>((props, ref) => {
+export const FlowFolderComponent = React.forwardRef<FlowFolderComponentHandle, FlowFolderComponentProps>((props, ref) => {
 
     const {activeFlowId, namespaceId, projectId} = props
 
-    const flowService = useService(DFlowReactiveService)
-    const flowStore = useStore(DFlowReactiveService)
+    const flowService = useService(FlowService)
+    const flowStore = useStore(FlowService)
 
     type TreeNode = {
         name: string
@@ -215,11 +223,11 @@ export const DFlowFolder = React.forwardRef<DFlowFolderHandle, DFlowFolderProps>
     return (
         <ScrollArea h={"100%"} type={"scroll"}>
             <ScrollAreaViewport asChild>
-                <DFlowFolderContextMenu {...props}>
+                <FlowFolderContextMenuComponent {...props}>
                     <div className="d-folder__root">
                         {renderChildren(tree.children)}
                     </div>
-                </DFlowFolderContextMenu>
+                </FlowFolderContextMenuComponent>
             </ScrollAreaViewport>
             <ScrollAreaScrollbar orientation={"vertical"}>
                 <ScrollAreaThumb/>
@@ -229,7 +237,7 @@ export const DFlowFolder = React.forwardRef<DFlowFolderHandle, DFlowFolderProps>
 
 })
 
-export const DFlowFolderGroup: React.FC<DFlowFolderGroupProps> = (props) => {
+export const DFlowFolderGroup: React.FC<FlowFolderComponentGroupProps> = (props) => {
 
     const {
         name,
@@ -248,7 +256,7 @@ export const DFlowFolderGroup: React.FC<DFlowFolderGroupProps> = (props) => {
     const contextMenuProps = {onCreate, onDelete, onRename, activeFlowId, namespaceId, projectId}
 
     return <>
-        <DFlowFolderContextMenu contextData={{
+        <FlowFolderContextMenuComponent contextData={{
             name: name,
             flow: flows,
             type: "folder"
@@ -259,14 +267,14 @@ export const DFlowFolderGroup: React.FC<DFlowFolderGroupProps> = (props) => {
                     <Text>{name}</Text>
                 </Flex>
             </div>
-        </DFlowFolderContextMenu>
+        </FlowFolderContextMenuComponent>
         <div className={"d-folder__content"}>
             {open ? children : null}
         </div>
     </>
 }
 
-export const DFlowFolderItem: React.FC<DFlowFolderItemProps> = (props) => {
+export const DFlowFolderItem: React.FC<FlowFolderComponentItemProps> = (props) => {
 
     const {
         name,
@@ -304,7 +312,7 @@ export const DFlowFolderItem: React.FC<DFlowFolderItemProps> = (props) => {
 
     const contextMenuProps = {onCreate, onDelete, onRename, activeFlowId, namespaceId, projectId}
 
-    return <DFlowFolderContextMenu contextData={{
+    return <FlowFolderContextMenuComponent contextData={{
         name: path,
         flow: flow,
         type: "item"
@@ -334,7 +342,7 @@ export const DFlowFolderItem: React.FC<DFlowFolderItemProps> = (props) => {
                 </HoverCardPortal>
             </HoverCard>
         </div>
-    </DFlowFolderContextMenu>
+    </FlowFolderContextMenuComponent>
 
 }
 

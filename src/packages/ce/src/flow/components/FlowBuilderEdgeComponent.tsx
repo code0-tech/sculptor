@@ -14,7 +14,7 @@ export interface FlowBuilderEdgeDataProps extends Code0Component<HTMLDivElement>
 // @ts-ignore
 export type FlowBuilderEdgeProps = EdgeProps<Edge<FlowBuilderEdgeDataProps>>
 
-export const FlowBuilderEdge: React.FC<FlowBuilderEdgeProps> = memo((props) => {
+export const FlowBuilderEdgeComponent: React.FC<FlowBuilderEdgeProps> = memo((props) => {
     const {
         sourceX,
         sourceY,

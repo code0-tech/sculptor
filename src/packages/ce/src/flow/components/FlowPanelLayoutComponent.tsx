@@ -1,15 +1,20 @@
 import React from "react";
-import {SegmentedControl, SegmentedControlItem} from "../segmented-control/SegmentedControl";
 import {IconLayout, IconLayoutDistributeHorizontal, IconLayoutDistributeVertical} from "@tabler/icons-react";
 import {Panel} from "@xyflow/react";
-import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
-import {Text} from "../text/Text";
+import {
+    SegmentedControl,
+    SegmentedControlItem, Text,
+    Tooltip,
+    TooltipContent,
+    TooltipPortal,
+    TooltipTrigger
+} from "@code0-tech/pictor";
 
-export interface DFlowPanelLayoutProps {
+export interface FlowPanelLayoutComponentProps {
 
 }
 
-export const FlowPanelLayout: React.FC<DFlowPanelLayoutProps> = (props) => {
+export const FlowPanelLayoutComponent: React.FC<FlowPanelLayoutComponentProps> = (props) => {
 
     const {} = props
 

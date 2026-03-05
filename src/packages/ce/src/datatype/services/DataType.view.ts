@@ -3,7 +3,7 @@ import {
     DataTypeRuleConnection,
     DataTypeVariant, Maybe, Runtime, Scalars, Translation,
 } from "@code0-tech/sagittarius-graphql-types";
-import {attachDataTypeIdentifiers, resolveDataTypeIdentifiers} from "@edition/flow/components/FlowBuilder.util";
+import {attachDataTypeIdentifiers, resolveDataTypeIdentifiers} from "@edition/flow/components/FlowBuilderComponent.util";
 
 
 export class DataTypeView {

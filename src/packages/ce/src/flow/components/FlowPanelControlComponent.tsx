@@ -1,21 +1,27 @@
 import React from "react";
-import {ButtonGroup} from "../button-group/ButtonGroup";
-import {Button} from "../button/Button";
-import {Panel} from "@xyflow/react";
-import {useService, useStore} from "../../utils";
-import {FileTabsService} from "../file-tabs/FileTabs.service";
-import {DFlowReactiveService} from "../d-flow";
 import {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
-import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
-import {Text} from "../text/Text";
-import {DFlowSuggestionMenu} from "../d-flow-suggestion/DFlowSuggestionMenu";
-import {useSuggestions} from "../d-flow-suggestion/DFlowSuggestion.hook";
+import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
+import {
+    Button,
+    Text,
+    Tooltip,
+    TooltipContent,
+    TooltipPortal,
+    TooltipTrigger,
+    useService,
+    useStore
+} from "@code0-tech/pictor";
+import {useSuggestions} from "@edition/function/hooks/DFlowSuggestion.hook";
+import {Panel} from "@xyflow/react";
+import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
+import {DFlowSuggestionMenu} from "@edition/function/components/DFlowSuggestionMenu";
+import {FlowService} from "@edition/flow/services/Flow.service";
 
-export interface DFlowPanelControlProps {
+export interface FlowPanelControlComponentProps {
     flowId: Flow['id']
 }
 
-export const FlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
+export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps> = (props) => {
 
     //props
     const {flowId} = props
@@ -23,8 +29,8 @@ export const FlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
     //services and stores
     const fileTabsService = useService(FileTabsService)
     const fileTabsStore = useStore(FileTabsService)
-    const flowService = useService(DFlowReactiveService)
-    const flowStore = useStore(DFlowReactiveService)
+    const flowService = useService(FlowService)
+    const flowStore = useStore(FlowService)
     const [, startTransition] = React.useTransition()
 
     //memoized values

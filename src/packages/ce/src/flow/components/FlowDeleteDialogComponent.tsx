@@ -1,20 +1,29 @@
-import {Dialog, DialogClose, DialogContent, DialogOverlay, DialogPortal} from "../dialog/Dialog";
-import {Text} from "../text/Text";
-import {Badge} from "../badge/Badge";
-import {Flex} from "../flex/Flex";
-import {Button} from "../button/Button";
 import React from "react";
-import {DFlowFolderContextMenuGroupData, DFlowFolderContextMenuItemData} from "./DFlowFolderContextMenu";
+import {
+    FlowFolderContextMenuComponentGroupData,
+    FlowFolderContextMenuComponentItemData
+} from "./FlowFolderContextMenuComponent";
 import {Flow} from "@code0-tech/sagittarius-graphql-types";
+import {
+    Badge,
+    Button,
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogOverlay,
+    DialogPortal,
+    Flex,
+    Text
+} from "@code0-tech/pictor";
 
-export interface DFlowFolderDeleteDialogProps {
+export interface FlowDeleteDialogComponentProps {
     open?: boolean
     onOpenChange?: (open: boolean) => void
-    contextData: DFlowFolderContextMenuGroupData | DFlowFolderContextMenuItemData
+    contextData: FlowFolderContextMenuComponentGroupData | FlowFolderContextMenuComponentItemData
     onDelete?: (flow: Flow) => void
 }
 
-export const DFlowFolderDeleteDialog: React.FC<DFlowFolderDeleteDialogProps> = (props) => {
+export const FlowDeleteDialogComponent: React.FC<FlowDeleteDialogComponentProps> = (props) => {
 
     const {open} = props
 

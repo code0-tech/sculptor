@@ -1,5 +1,7 @@
-import {DFlowFolderProps} from "./DFlowFolder";
+import {FlowFolderComponentProps} from "./FlowFolderComponent";
 import React from "react";
+import {IconChevronRight, IconEdit, IconTrash} from "@tabler/icons-react";
+import {Flow} from "@code0-tech/sagittarius-graphql-types";
 import {
     ContextMenu,
     ContextMenuContent,
@@ -11,32 +13,27 @@ import {
     ContextMenuSubContent,
     ContextMenuSubTrigger,
     ContextMenuTrigger
-} from "../context-menu/ContextMenu";
-import {Flex} from "../flex/Flex";
-import {Text} from "../text/Text";
-import {IconChevronRight, IconEdit, IconTrash} from "@tabler/icons-react";
-import {useService, useStore} from "../../utils";
-import {DFlowTypeReactiveService} from "../d-flow-type";
-import {Flow} from "@code0-tech/sagittarius-graphql-types";
+} from "@code0-tech/pictor/dist/components/context-menu/ContextMenu";
+import {DFlowTypeReactiveService, Flex, Text, useService, useStore} from "@code0-tech/pictor";
 
-export interface DFlowFolderContextMenuGroupData {
+export interface FlowFolderContextMenuComponentGroupData {
     name: string
     flow: Flow[]
     type: "folder"
 }
 
-export interface DFlowFolderContextMenuItemData {
+export interface FlowFolderContextMenuComponentItemData {
     name: string
     flow: Flow
     type: "item"
 }
 
-export interface DFlowFolderContextMenuProps extends DFlowFolderProps {
+export interface FlowFolderContextMenuComponentProps extends FlowFolderComponentProps {
     children: React.ReactNode
-    contextData?: DFlowFolderContextMenuGroupData | DFlowFolderContextMenuItemData
+    contextData?: FlowFolderContextMenuComponentGroupData | FlowFolderContextMenuComponentItemData
 }
 
-export const DFlowFolderContextMenu: React.FC<DFlowFolderContextMenuProps> = (props) => {
+export const FlowFolderContextMenuComponent: React.FC<FlowFolderContextMenuComponentProps> = (props) => {
 
     const {children} = props
 

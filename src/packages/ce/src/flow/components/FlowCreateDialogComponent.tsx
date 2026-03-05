@@ -82,7 +82,11 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
     )
 
     const flowTypes = React.useMemo(
-        () => flowTypeService.values({runtimeId: primaryRuntime?.id, projectId: projectId, namespaceId: project?.namespace?.id}),
+        () => flowTypeService.values({
+            runtimeId: primaryRuntime?.id,
+            projectId: projectId,
+            namespaceId: project?.namespace?.id
+        }),
         [flowTypeStore]
     )
 
