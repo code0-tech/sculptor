@@ -87,13 +87,13 @@ export const ProjectSettingsGeneralView: React.FC = () => {
             <CardSection border>
                 <Flex justify={"space-between"} align={"center"}>
                     <Text size={"md"} hierarchy={"primary"}>Name</Text>
-                    <TextInput {...inputs.getInputProps("name")}/>
+                    <TextInput miw={"200px"} {...inputs.getInputProps("name")}/>
                 </Flex>
             </CardSection>
             <CardSection border>
                 <Flex justify={"space-between"} align={"center"}>
                     <Text size={"md"} hierarchy={"primary"}>Description</Text>
-                    <TextInput {...inputs.getInputProps("description")}/>
+                    <TextInput miw={"200px"} {...inputs.getInputProps("description")}/>
                 </Flex>
             </CardSection>
             <CardSection border>
@@ -101,21 +101,10 @@ export const ProjectSettingsGeneralView: React.FC = () => {
                     <Flex style={{gap: ".35rem", flexDirection: "column"}}>
                         <Text size={"md"} hierarchy={"primary"}>Slug</Text>
                         <Text size={"md"} hierarchy={"tertiary"}>
-                            A slug is used as a prefix for calls to a specific flow inside a project e.g. {" "}
-                            <Badge>
-                                <Badge color={"info"} ml={-0.2}>
-                                    <Text size={"md"} hierarchy={"tertiary"}>
-                                        /{project?.slug}
-                                    </Text>
-                                </Badge>
-                                <Text size={"md"} hierarchy={"tertiary"}>
-                                    /your-flow-slug
-                                </Text>
-                            </Badge>.
-                            This is only effective for flow types using a slug as an identifier.
+                            Think of this as your project’s unique nickname in a web address. It helps distinguish this project from others when using URL-based connections (like REST flows).
                         </Text>
                     </Flex>
-                    <TextInput {...inputs.getInputProps("slug")}/>
+                    <TextInput miw={"200px"} {...inputs.getInputProps("slug")}/>
                 </Flex>
             </CardSection>
         </Card>
