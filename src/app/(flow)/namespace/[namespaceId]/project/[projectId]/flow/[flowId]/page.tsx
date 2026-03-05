@@ -15,6 +15,7 @@ import React from "react";
 import {IconDatabase, IconFile, IconMessageChatbot} from "@tabler/icons-react";
 import {useParams} from "next/navigation";
 import {Flow} from "@code0-tech/sagittarius-graphql-types";
+import {FlowBuilderComponent} from "@edition/flow/components/FlowBuilderComponent";
 
 export default function Page() {
 
@@ -42,7 +43,7 @@ export default function Page() {
         }>
             <DResizablePanelGroup orientation={"horizontal"} key={flowIndex}>
                 <DResizablePanel id={"2"} color={"primary"} style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
-                    <DFlow flowId={flowId} namespaceId={undefined} projectId={undefined}/>
+                    <FlowBuilderComponent flowId={flowId} namespaceId={undefined} projectId={undefined}/>
                 </DResizablePanel>
                 {show && (
                     <>

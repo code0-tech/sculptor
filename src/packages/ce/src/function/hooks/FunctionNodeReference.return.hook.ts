@@ -1,22 +1,18 @@
-import {
-    DataTypeIdentifier,
-    Flow, FlowType,
-    NodeFunction,
-    ReferenceValue
-} from "@code0-tech/sagittarius-graphql-types";
-import {DFlowFunctionReactiveService, FunctionDefinitionView} from "../d-flow-function";
-import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
+import {DataTypeIdentifier, FlowType, NodeFunction, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
+import {DatatypeService} from "@edition/datatype/services/Datatype.service";
+import {FunctionService} from "@edition/function/services/Function.service";
+import {FunctionDefinitionView} from "@code0-tech/pictor";
 import {
     replaceGenericKeysInType,
-    resolveType,
     resolveGenericKeys,
+    resolveType,
     targetForGenericKey
-} from "../../utils/generics";
+} from "@edition/flow/utils/generics";
 
 export const getReferenceType = (
     reference: ReferenceValue,
-    dataTypeService: DFlowDataTypeReactiveService,
-    functionService: DFlowFunctionReactiveService,
+    dataTypeService: DatatypeService,
+    functionService: FunctionService,
     functionDefinition?: FunctionDefinitionView,
     node?: NodeFunction,
     flowType?: FlowType
@@ -136,7 +132,7 @@ export const getReferenceType = (
 
     if (typeIdentifier && reference.referencePath && reference.referencePath.length > 0) {
         const filteredPath = reference.referencePath
-            .map(p => ({ path: typeof p.path === 'string' ? p.path : undefined }))
+            .map(p => ({path: typeof p.path === 'string' ? p.path : undefined}))
             .filter(p => !!p.path) as { path: string }[];
         if (filteredPath.length !== reference.referencePath.length) return typeIdentifier ? resolveType(typeIdentifier, dataTypeService) : undefined;
         const resolved = resolveReferencePath(typeIdentifier, filteredPath);

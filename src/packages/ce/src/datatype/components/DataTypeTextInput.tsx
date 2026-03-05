@@ -7,10 +7,10 @@ import {InputSyntaxSegment, MenuItem, Text, TextInput, useService} from "@code0-
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowTypeService";
-import {useSuggestions} from "@edition/function/hooks/DFlowSuggestion.hook";
-import {DFlowSuggestionMenuFooter} from "@edition/function/components/DFlowSuggestionMenuFooter";
-import {toInputSuggestions} from "@edition/function/components/DFlowSuggestionMenu.util";
-import {DFlowSuggestion} from "@edition/function/components/DFlowSuggestion.view";
+import {useSuggestions} from "@edition/function/hooks/FunctionSuggestion.hook";
+import {FunctionSuggestionMenuFooter} from "@edition/function/components/FunctionSuggestionMenuFooter";
+import {toInputSuggestions} from "@edition/function/components/FunctionSuggestionMenu.util";
+import {DFlowSuggestion} from "@edition/function/components/FunctionSuggestion.view";
 
 export type DataTypeTextInputProps = DataTypeInputProps
 
@@ -170,7 +170,7 @@ export const DataTypeTextInput: React.FC<DataTypeTextInputProps> = (props) => {
     }, [functionService, flowService])
 
     return <TextInput suggestionsEmptyState={<MenuItem><Text>No suggestion found</Text></MenuItem>}
-                      suggestionsFooter={<DFlowSuggestionMenuFooter/>}
+                      suggestionsFooter={<FunctionSuggestionMenuFooter/>}
                       filterSuggestionsByLastToken
                       enforceUniqueSuggestions
                       validationUsesSyntax

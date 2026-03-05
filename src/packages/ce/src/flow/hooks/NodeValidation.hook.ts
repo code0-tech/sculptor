@@ -21,8 +21,8 @@ import {
     useStore,
     ValidationResult
 } from "@code0-tech/pictor";
-import {useReturnType} from "@edition/function/hooks/DFlowFunction.return.hook";
-import {getReferenceType} from "@edition/function/hooks/DFlowNodeReference.return.hook";
+import {useReturnType} from "@edition/function/hooks/Function.return.hook";
+import {getReferenceType} from "@edition/function/hooks/FunctionNodeReference.return.hook";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowTypeService";

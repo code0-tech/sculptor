@@ -1,15 +1,4 @@
 import React from "react";
-import {useService, useStore} from "../../utils";
-import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
-import {DFlowSuggestion, DFlowSuggestionType} from "./DFlowSuggestion.view";
-import {
-    isMatchingType,
-    replaceGenericKeysInType,
-    replaceGenericsAndSortType,
-    resolveGenericKeys,
-    resolveType,
-    targetForGenericKey
-} from "../../utils/generics";
 import {
     DataType,
     DataTypeIdentifier,
@@ -22,10 +11,21 @@ import {
     NodeParameterValue,
     ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
-import {DFlowFunctionReactiveService} from "../d-flow-function";
-import {DFlowReactiveService} from "../d-flow";
-import {useReturnType} from "../d-flow-function/DFlowFunction.return.hook";
-import {DFlowTypeReactiveService} from "../d-flow-type";
+import {useService, useStore} from "@code0-tech/pictor";
+import {DFlowSuggestion, DFlowSuggestionType} from "@edition/function/components/FunctionSuggestion.view";
+import {
+    isMatchingType,
+    replaceGenericKeysInType,
+    replaceGenericsAndSortType,
+    resolveGenericKeys,
+    resolveType,
+    targetForGenericKey
+} from "@edition/flow/utils/generics";
+import {useReturnType} from "@edition/function/hooks/Function.return.hook";
+import {DatatypeService} from "@edition/datatype/services/Datatype.service";
+import {FlowService} from "@edition/flow/services/Flow.service";
+import {FunctionService} from "@edition/function/services/Function.service";
+import {FlowTypeService} from "@edition/flowtype/services/FlowTypeService";
 
 interface ExtendedReferenceValue extends ReferenceValue {
     inputTypeIdentifier?: string
@@ -48,10 +48,10 @@ export const useReferenceSuggestions = (
     dataTypeIdentifier?: DataTypeIdentifier,
     genericKeys: string[] = []
 ): DFlowSuggestion[] => {
-    const dataTypeService = useService(DFlowDataTypeReactiveService)
-    const dataTypeStore = useStore(DFlowDataTypeReactiveService)
-    const flowService = useService(DFlowReactiveService)
-    const flowStore = useStore(DFlowReactiveService)
+    const dataTypeService = useService(DatatypeService)
+    const dataTypeStore = useStore(DatatypeService)
+    const flowService = useService(FlowService)
+    const flowStore = useStore(FlowService)
 
     const nodeContexts = useNodeContext(flowId)
     const nodeContext = React.useMemo(() => (
@@ -118,13 +118,13 @@ export const useReferenceSuggestions = (
  */
 const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
 
-    const dataTypeService = useService(DFlowDataTypeReactiveService)
-    const dataTypeStore = useStore(DFlowDataTypeReactiveService)
-    const functionService = useService(DFlowFunctionReactiveService)
-    const flowService = useService(DFlowReactiveService)
-    const flowStore = useStore(DFlowReactiveService)
-    const flowTypeService = useService(DFlowTypeReactiveService)
-    const flowTypeStore = useStore(DFlowTypeReactiveService)
+    const dataTypeService = useService(DatatypeService)
+    const dataTypeStore = useStore(DatatypeService)
+    const functionService = useService(FunctionService)
+    const flowService = useService(FlowService)
+    const flowStore = useStore(FlowService)
+    const flowTypeService = useService(FlowTypeService)
+    const flowTypeStore = useStore(FlowTypeService)
 
     const flow = React.useMemo(
         () => flowService.getById(flowId),
@@ -231,7 +231,7 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
     ].flat()
 }
 
-const referenceExtraction = (nodeContext: ReferenceValueContext, dataTypeIdentifier: DataTypeIdentifier, dataTypeService: DFlowDataTypeReactiveService): ExtendedReferenceValue[] => {
+const referenceExtraction = (nodeContext: ReferenceValueContext, dataTypeIdentifier: DataTypeIdentifier, dataTypeService: DatatypeService): ExtendedReferenceValue[] => {
 
     const dataType: Maybe<DataType> | undefined = dataTypeIdentifier.dataType ? dataTypeService.getDataType(dataTypeIdentifier) : dataTypeIdentifier.genericType?.dataType
     if (!dataType) return []
@@ -268,13 +268,13 @@ const referenceExtraction = (nodeContext: ReferenceValueContext, dataTypeIdentif
 const useNodeContext = (
     flowId: Flow['id']
 ): ReferenceValueContext[] => {
-    const dataTypeService = useService(DFlowDataTypeReactiveService);
-    const flowService = useService(DFlowReactiveService);
-    const functionService = useService(DFlowFunctionReactiveService);
+    const dataTypeService = useService(DatatypeService);
+    const flowService = useService(FlowService);
+    const functionService = useService(FunctionService);
 
-    const flowStore = useStore(DFlowReactiveService);
-    const functionStore = useStore(DFlowFunctionReactiveService);
-    const dataTypeStore = useStore(DFlowDataTypeReactiveService);
+    const flowStore = useStore(FlowService);
+    const functionStore = useStore(FunctionService);
+    const dataTypeStore = useStore(DatatypeService);
 
     const flow = React.useMemo(() => flowService.getById(flowId), [flowId, flowStore]);
 

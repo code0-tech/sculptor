@@ -6,7 +6,7 @@ import {DataTypeInputProps} from "./DataTypeInput";
 import {LiteralValue, NodeFunction, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
 import {DataTypeInputNodeBadge} from "./DataTypeInputNodeBadge";
 import {DataTypeInputReferenceBadge} from "./DataTypeInputReferenceBadge";
-import {useSuggestions} from "@edition/function/hooks/DFlowSuggestion.hook";
+import {useSuggestions} from "@edition/function/hooks/FunctionSuggestion.hook";
 import {
     Button,
     Card,
@@ -17,7 +17,7 @@ import {
     useStore
 } from "@code0-tech/pictor";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
-import {DFlowSuggestionMenu} from "@edition/function/components/DFlowSuggestionMenu";
+import {FunctionSuggestionMenu} from "@edition/function/components/FunctionSuggestionMenu";
 import {DataTypeJSONInputEditDialog} from "@edition/datatype/components/DataTypeJSONInputEditDialog";
 
 export interface EditableJSONEntry {
@@ -114,9 +114,9 @@ export const DataTypeJSONInput: React.FC<DataTypeJSONInputProps> = (props) => {
                         <Text>{"Object"}</Text>
                     </Flex>
                     <ButtonGroup color={"primary"}>
-                        <DFlowSuggestionMenu suggestions={suggestions}
-                                             onSuggestionSelect={suggestion => setValue(suggestion.value)}
-                                             triggerContent={<Button paddingSize="xxs" variant="filled"
+                        <FunctionSuggestionMenu suggestions={suggestions}
+                                                onSuggestionSelect={suggestion => setValue(suggestion.value)}
+                                                triggerContent={<Button paddingSize="xxs" variant="filled"
                                                                      color="secondary"
                                                                      onClick={() => setEditDialogOpen(true)}>
                                                  <IconAlignLeft size={13}/>

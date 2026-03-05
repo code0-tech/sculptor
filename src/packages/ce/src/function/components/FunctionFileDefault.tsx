@@ -1,9 +1,5 @@
 import React from "react";
-import {useForm} from "../form";
-import {Flex} from "../flex/Flex";
-import {useService, useStore} from "../../utils";
-import {DFlowFunctionReactiveService, ParameterDefinitionView} from "../d-flow-function";
-import {DFlowReactiveService} from "../d-flow";
+import {Flex, InputSyntaxSegment, ParameterDefinitionView, useForm, useService, useStore} from "@code0-tech/pictor";
 import {
     Flow,
     LiteralValue,
@@ -12,24 +8,25 @@ import {
     ReferenceValue,
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
-import {InputSyntaxSegment} from "../form";
-import {useNodeValidation} from "../d-flow-validation/DNodeValidation.hook";
-import {FileTabsService} from "../file-tabs/FileTabs.service";
-import {DFlowInput} from "../d-flow-input/DFlowInput";
+import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
+import {useNodeValidation} from "@edition/flow/hooks/NodeValidation.hook";
+import {DFlowInput} from "@code0-tech/pictor/dist/components/d-flow-input/DFlowInput";
+import {FunctionService} from "@edition/function/services/Function.service";
+import {FlowService} from "@edition/flow/services/Flow.service";
 
-export interface DFlowTabDefaultProps {
+export interface FunctionFileDefaultProps {
     node: NodeFunction
     flowId: Flow['id']
 }
 
-export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
+export const FunctionFileDefault: React.FC<FunctionFileDefaultProps> = (props) => {
 
     const {node, flowId} = props
 
-    const functionService = useService(DFlowFunctionReactiveService)
-    const functionStore = useStore(DFlowFunctionReactiveService)
-    const flowService = useService(DFlowReactiveService)
-    const flowStore = useStore(DFlowReactiveService)
+    const functionService = useService(FunctionService)
+    const functionStore = useStore(FunctionService)
+    const flowService = useService(FlowService)
+    const flowStore = useStore(FlowService)
     const fileTabsService = useService(FileTabsService)
     const validation = useNodeValidation(node.id, flowId)
 

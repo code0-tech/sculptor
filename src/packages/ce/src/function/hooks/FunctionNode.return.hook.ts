@@ -1,20 +1,20 @@
-import {replaceGenericKeysInType, resolveGenericKeys} from "../../utils/generics";
 import type {DataTypeIdentifier, Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
-import {useService, useStore} from "../../utils";
-import {DFlowFunctionReactiveService} from "../d-flow-function";
-import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
-import {DFlowReactiveService} from "../d-flow";
 import React from "react";
+import {useService, useStore} from "@code0-tech/pictor";
+import {replaceGenericKeysInType, resolveGenericKeys} from "@edition/flow/utils/generics";
+import {FlowService} from "@edition/flow/services/Flow.service";
+import {FunctionService} from "@edition/function/services/Function.service";
+import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 
 export const useReturnTypes = (
     flowId: Flow['id']
 ): Map<NodeFunction['id'], DataTypeIdentifier | null> => {
 
-    const flowService = useService(DFlowReactiveService)
-    const flowStore = useStore(DFlowReactiveService)
-    const functionService = useService(DFlowFunctionReactiveService)
-    const functionStore = useStore(DFlowFunctionReactiveService)
-    const dataTypeService = useService(DFlowDataTypeReactiveService)
+    const flowService = useService(FlowService)
+    const flowStore = useStore(FlowService)
+    const functionService = useService(FunctionService)
+    const functionStore = useStore(FunctionService)
+    const dataTypeService = useService(DatatypeService)
 
     return React.useMemo(() => {
         const flow = flowService.getById(flowId)
@@ -25,8 +25,8 @@ export const useReturnTypes = (
 
 export function getReturnTypesForFlow(
     flow: Flow,
-    functionService: DFlowFunctionReactiveService,
-    dataTypeService: DFlowDataTypeReactiveService
+    functionService: FunctionService,
+    dataTypeService: DatatypeService
 ): Map<NodeFunction['id'], DataTypeIdentifier | null> {
     const nodes = flow?.nodes?.nodes;
     const result = new Map<NodeFunction['id'], DataTypeIdentifier | null>();

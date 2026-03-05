@@ -1,29 +1,25 @@
 import React, {memo} from "react";
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore} from "@xyflow/react";
-import {Text} from "../text/Text";
-import {useService, useStore as usePictorStore} from "../../utils/contextStore";
-import {FileTabsService} from "../file-tabs/FileTabs.service";
-import {Card} from "../card/Card";
-import {Flex} from "../flex/Flex";
+import {Badge, Card, Flex, Text, useService, useStore as usePictorStore} from "@code0-tech/pictor";
+import {FunctionNodeProps} from "@edition/function/components/FunctionNodeComponent";
+import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
+import {FlowTypeService} from "@edition/flowtype/services/FlowTypeService";
+import {FlowService} from "@edition/flow/services/Flow.service";
 import {IconBolt} from "@tabler/icons-react";
-import {DFlowTabTrigger} from "../d-flow-file/DFlowTabTrigger";
-import {DFlowTypeReactiveService} from "../d-flow-type";
-import {Badge} from "../badge/Badge";
-import {DFlowNodeProps} from "./DFlowNode";
-import {DFlowReactiveService} from "../d-flow";
+import {DFlowTabTrigger} from "@code0-tech/pictor/dist/components/d-flow-file/DFlowTabTrigger";
 
 
-export type DFlowNodeTriggerCardProps = NodeProps<Node<DFlowNodeProps>>
+export type FunctionNodeTriggerProps = NodeProps<Node<FunctionNodeProps>>
 
-export const DFlowNodeTriggerCard: React.FC<DFlowNodeTriggerCardProps> = memo((props) => {
+export const FunctionNodeTrigger: React.FC<FunctionNodeTriggerProps> = memo((props) => {
 
     const {data, id} = props
     const fileTabsService = useService(FileTabsService)
     const flowInstance = useReactFlow()
-    const flowTypeService = useService(DFlowTypeReactiveService)
-    const flowTypeStore = usePictorStore(DFlowTypeReactiveService)
-    const flowService = useService(DFlowReactiveService)
-    const flowStore = usePictorStore(DFlowReactiveService)
+    const flowTypeService = useService(FlowTypeService)
+    const flowTypeStore = usePictorStore(FlowTypeService)
+    const flowService = useService(FlowService)
+    const flowStore = usePictorStore(FlowService)
 
     const flow = React.useMemo(() => flowService.getById(data.flowId), [flowStore, data])
     const definition = React.useMemo(() => flow ? flowTypeService.getById(flow.type?.id) : undefined, [flowTypeStore, flow])

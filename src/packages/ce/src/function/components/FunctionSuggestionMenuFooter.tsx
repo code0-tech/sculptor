@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import {MenuLabel} from "../menu/Menu";
 import {
     IconArrowsShuffle,
     IconBulb,
@@ -10,11 +9,9 @@ import {
     IconCornerDownLeft,
     IconFileFunctionFilled
 } from "@tabler/icons-react";
-import {Text} from "../text/Text";
-import {Flex} from "../flex/Flex";
-import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
+import {Flex, MenuLabel, Text, Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from "@code0-tech/pictor";
 
-export const DFlowSuggestionMenuFooter: React.FC = () => {
+export const FunctionSuggestionMenuFooter: React.FC = () => {
     return <MenuLabel>
         <Flex w={"100%"} justify={"space-between"}>
             <Flex align={"center"} style={{gap: ".35rem"}}>Press <IconCornerDownLeft size={12}/> to insert</Flex>

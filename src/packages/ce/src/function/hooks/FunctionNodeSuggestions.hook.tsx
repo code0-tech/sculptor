@@ -1,24 +1,24 @@
 import React from "react";
-import {useService, useStore} from "../../utils";
-import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
-import {DFlowSuggestion, DFlowSuggestionType} from "./DFlowSuggestion.view";
-import {DFlowFunctionReactiveService} from "../d-flow-function";
-import {isMatchingType, replaceGenericsAndSortType, resolveType} from "../../utils/generics";
 import type {
     DataTypeIdentifier,
     LiteralValue,
     NodeFunction,
     ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
+import {DFlowSuggestion, DFlowSuggestionType} from "@edition/function/components/FunctionSuggestion.view";
+import {useService, useStore} from "@code0-tech/pictor";
+import {isMatchingType, replaceGenericsAndSortType, resolveType} from "@edition/flow/utils/generics";
+import {DatatypeService} from "@edition/datatype/services/Datatype.service";
+import {FunctionService} from "@edition/function/services/Function.service";
 
 export const useFunctionSuggestions = (
     dataTypeIdentifier?: DataTypeIdentifier,
     genericKeys: string[] = []
 ): DFlowSuggestion[] => {
-    const dataTypeService = useService(DFlowDataTypeReactiveService)
-    const functionService = useService(DFlowFunctionReactiveService)
-    const dataTypeStore = useStore(DFlowDataTypeReactiveService)
-    const functionStore = useStore(DFlowFunctionReactiveService)
+    const dataTypeService = useService(DatatypeService)
+    const functionService = useService(FunctionService)
+    const dataTypeStore = useStore(DatatypeService)
+    const functionStore = useStore(FunctionService)
 
     const dataType = React.useMemo(() => (
         dataTypeIdentifier ? dataTypeService?.getDataType(dataTypeIdentifier) : undefined

@@ -1,33 +1,42 @@
-import {useService, useStore} from "../../utils";
-import {FileTabsService} from "../file-tabs/FileTabs.service";
-import {FileTabs, FileTabsContent, FileTabsList, FileTabsTrigger} from "../file-tabs/FileTabs";
 import React from "react";
-import {Menu, MenuContent, MenuItem, MenuLabel, MenuPortal, MenuSeparator, MenuTrigger} from "../menu/Menu";
-import {Button} from "../button/Button";
+import {Flow, Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
+import {
+    Button,
+    DLayout,
+    Menu, MenuContent, MenuItem, MenuLabel, MenuPortal, MenuSeparator,
+    MenuTrigger,
+    useService,
+    useStore
+} from "@code0-tech/pictor";
+import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
+import {FileTabsView} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.view";
+import {
+    FileTabs,
+    FileTabsContent,
+    FileTabsList,
+    FileTabsTrigger
+} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs";
+import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import {IconDotsVertical, IconPlus} from "@tabler/icons-react";
-import {FileTabsView} from "../file-tabs/FileTabs.view";
-import {DLayout} from "../d-layout/DLayout";
-import {ButtonGroup} from "../button-group/ButtonGroup";
-import {Flow, type Namespace, type NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
-import {DFlowReactiveService} from "../d-flow";
-import {DFlowTypeReactiveService} from "../d-flow-type";
+import {FlowService} from "@edition/flow/services/Flow.service";
+import {FlowTypeService} from "@edition/flowtype/services/FlowTypeService";
 
-export interface DFlowTabsProps {
+export interface FunctionFilesProps {
     flowId: Flow['id']
     namespaceId: Namespace['id']
     projectId: NamespaceProject['id']
 }
 
-export const DFlowTabs: React.FC<DFlowTabsProps> = (props) => {
+export const FunctionFiles: React.FC<FunctionFilesProps> = (props) => {
 
     const {flowId, namespaceId, projectId} = props
 
     const fileTabsService = useService(FileTabsService)
     const fileTabsStore = useStore(FileTabsService)
-    const flowService = useService(DFlowReactiveService)
-    const flowStore = useStore(DFlowReactiveService)
-    const flowTypeService = useService(DFlowTypeReactiveService)
-    const flowTypeStore = useStore(DFlowTypeReactiveService)
+    const flowService = useService(FlowService)
+    const flowStore = useStore(FlowService)
+    const flowTypeService = useService(FlowTypeService)
+    const flowTypeStore = useStore(FlowTypeService)
     const id = React.useId()
 
     const flow = React.useMemo(() => flowService.getById(flowId, {namespaceId, projectId}), [flowStore])

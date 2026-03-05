@@ -1,26 +1,26 @@
-import {underlineBySeverity} from "../../utils";
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore} from "@xyflow/react";
 import React, {CSSProperties, memo} from "react";
-import {Card} from "../card/Card";
-import "./DFlowNode.style.scss";
-import {Flex} from "../flex/Flex";
+import "./FunctionNode.style.scss";
+import {FunctionNodeProps} from "./FunctionNodeComponent";
+import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
+import {
+    Badge, Card,
+    Flex, Text, underlineBySeverity,
+    useService,
+    useStore as usePictorStore
+} from "@code0-tech/pictor";
+import {useNodeValidation} from "@edition/flow/hooks/NodeValidation.hook";
+import {DFlowInputLiteralBadge} from "@code0-tech/pictor/dist/components/d-flow-input/DFlowInputLiteralBadge";
+import {DFlowInputReferenceBadge} from "@code0-tech/pictor/dist/components/d-flow-input/DFlowInputReferenceBadge";
+import {DFlowInputNodeBadge} from "@code0-tech/pictor/dist/components/d-flow-input/DFlowInputNodeBadge";
 import {IconNote} from "@tabler/icons-react";
-import {Text} from "../text/Text";
-import {useService, useStore as usePictorStore} from "../../utils/contextStore";
-import {DFlowFunctionReactiveService} from "../d-flow-function";
-import {useNodeValidation} from "../d-flow-validation/DNodeValidation.hook";
-import {DFlowReactiveService} from "../d-flow";
-import {FileTabsService} from "../file-tabs/FileTabs.service";
-import {DFlowTabDefault} from "../d-flow-file/DFlowTabDefault";
-import {Badge} from "../badge/Badge";
-import {DFlowInputLiteralBadge} from "../d-flow-input/DFlowInputLiteralBadge";
-import {DFlowInputReferenceBadge} from "../d-flow-input/DFlowInputReferenceBadge";
-import {DFlowInputNodeBadge} from "../d-flow-input/DFlowInputNodeBadge";
-import {DFlowNodeProps} from "./DFlowNode";
+import {DFlowTabDefault} from "@code0-tech/pictor/dist/components/d-flow-file/DFlowTabDefault";
+import {FlowService} from "@edition/flow/services/Flow.service";
+import {FunctionService} from "@edition/function/services/Function.service";
 
-export type DFlowNodeDefaultCardProps = NodeProps<Node<DFlowNodeProps>>
+export type FunctionNodeDefaultProps = NodeProps<Node<FunctionNodeProps>>
 
-export const DFlowNodeDefaultCard: React.FC<DFlowNodeDefaultCardProps> = memo((props) => {
+export const FunctionNodeDefault: React.FC<FunctionNodeDefaultProps> = memo((props) => {
     const {data, id, width = 0, height = 0} = props
 
     const viewportWidth = useStore(s => s.width);
@@ -28,10 +28,10 @@ export const DFlowNodeDefaultCard: React.FC<DFlowNodeDefaultCardProps> = memo((p
     const flowInstance = useReactFlow()
     const fileTabsService = useService(FileTabsService)
     const fileTabsStore = usePictorStore(FileTabsService)
-    const flowService = useService(DFlowReactiveService)
-    const flowStore = usePictorStore(DFlowReactiveService)
-    const functionService = useService(DFlowFunctionReactiveService)
-    const functionStore = usePictorStore(DFlowFunctionReactiveService)
+    const flowService = useService(FlowService)
+    const flowStore = usePictorStore(FlowService)
+    const functionService = useService(FunctionService)
+    const functionStore = usePictorStore(FunctionService)
 
     const node = React.useMemo(() => flowService.getNodeById(data.flowId, data.nodeId), [flowStore, data])
     const definition = React.useMemo(() => node ? functionService.getById(node.functionDefinition?.id!!) : undefined, [functionStore, data, node])

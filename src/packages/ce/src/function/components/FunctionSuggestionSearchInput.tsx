@@ -1,16 +1,16 @@
-import {InputProps, Input} from "../form";
 import React, {RefObject} from "react";
-import {Button} from "../button/Button";
 import {IconX} from "@tabler/icons-react";
-import "./DFlowSuggestionSearchInput.style.scss"
-import {clearInputElement} from "../form/Input.utils";
+import "./FunctionSuggestionSearchInput.style.scss"
+import {clearInputElement} from "@code0-tech/pictor/dist/components/form/Input.utils";
+import {Button, Input, InputProps} from "@code0-tech/pictor";
 
-interface DFlowSuggestionSearchInputProps extends Omit<InputProps<string | null>, "wrapperComponent" | "type"> {
+interface FunctionSuggestionSearchInputProps extends Omit<InputProps<string | null>, "wrapperComponent" | "type"> {
     //defaults to false
     clearable?: boolean
 }
 
-export const DFlowSuggestionSearchInput: React.ForwardRefExoticComponent<DFlowSuggestionSearchInputProps> = React.forwardRef((props, ref: RefObject<HTMLElement>) => {
+//@ts-ignore
+export const FunctionSuggestionSearchInput: React.ForwardRefExoticComponent<FunctionSuggestionSearchInputProps> = React.forwardRef((props, ref: RefObject<HTMLElement>) => {
     ref = ref || React.useRef<HTMLElement>(null)
 
     const {

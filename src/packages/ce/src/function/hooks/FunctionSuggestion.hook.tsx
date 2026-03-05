@@ -1,13 +1,13 @@
-import {useService, useStore} from "../../utils";
-import {DFlowSuggestion} from "./DFlowSuggestion.view";
-import {DFlowFunctionReactiveService} from "../d-flow-function";
-import {DFlowReactiveService} from "../d-flow";
 import React from "react";
 import type {Flow, NodeFunction, NodeParameter,} from "@code0-tech/sagittarius-graphql-types";
-import {useValueSuggestions} from "./DFlowValueSuggestions.hook";
-import {useReferenceSuggestions} from "./DFlowReferenceSuggestions.hook";
-import {useFunctionSuggestions} from "./DFlowFunctionSuggestions.hook";
-import {useDataTypeSuggestions} from "./DFlowDataTypeSuggestions.hook";
+import {useValueSuggestions} from "./FunctionValueSuggestions.hook";
+import {useReferenceSuggestions} from "./FunctionReferenceSuggestions.hook";
+import {useFunctionSuggestions} from "./FunctionNodeSuggestions.hook";
+import {useDataTypeSuggestions} from "./FunctionDataTypeSuggestions.hook";
+import {useService, useStore} from "@code0-tech/pictor";
+import {DFlowSuggestion} from "@edition/function/components/FunctionSuggestion.view";
+import {FunctionService} from "@edition/function/services/Function.service";
+import {FlowService} from "@edition/flow/services/Flow.service";
 
 //TODO: deep type search
 //TODO: calculate FUNCTION_COMBINATION deepness max 2
@@ -18,10 +18,10 @@ export const useSuggestions = (
     parameterId?: NodeParameter['id']
 ): DFlowSuggestion[] => {
 
-    const functionService = useService(DFlowFunctionReactiveService)
-    const functionStore = useStore(DFlowFunctionReactiveService)
-    const flowService = useService(DFlowReactiveService)
-    const flowStore = useStore(DFlowReactiveService)
+    const functionService = useService(FunctionService)
+    const functionStore = useStore(FunctionService)
+    const flowService = useService(FlowService)
+    const flowStore = useStore(FlowService)
 
     const node = React.useMemo(() => (flowService.getNodeById(flowId, nodeId)), [flowId, flowStore, nodeId])
     const functionDefinition = React.useMemo(() => (node?.functionDefinition?.id ? functionService.getById(node.functionDefinition.id) : undefined), [functionStore, node?.functionDefinition?.id])

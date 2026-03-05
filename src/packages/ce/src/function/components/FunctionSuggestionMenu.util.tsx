@@ -1,8 +1,7 @@
-import {DFlowSuggestion, DFlowSuggestionType} from "./DFlowSuggestion.view";
-import {InputSuggestion} from "../form";
+import {DFlowSuggestion, DFlowSuggestionType} from "./FunctionSuggestion.view";
 import React from "react";
 import {IconCircleDot, IconCirclesRelation, IconFileFunctionFilled} from "@tabler/icons-react";
-import {Text} from "../text/Text";
+import {InputSuggestion, Text} from "@code0-tech/pictor";
 
 export const toInputSuggestions = (suggestions: DFlowSuggestion[]): InputSuggestion[] => {
 

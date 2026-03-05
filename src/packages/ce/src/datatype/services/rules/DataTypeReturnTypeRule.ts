@@ -13,7 +13,7 @@ import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {useDataTypeValidation} from "@edition/flow/hooks/DataTypeValidation.hook";
 import {useValueValidation} from "@edition/flow/hooks/ValueValidation.hook";
-import {useReturnType} from "@edition/function/hooks/DFlowFunction.return.hook";
+import {useReturnType} from "@edition/function/hooks/Function.return.hook";
 
 //TODO: simple use useReturnType function
 @staticImplements<DataTypeRule>()

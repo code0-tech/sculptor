@@ -1,11 +1,11 @@
 import React, {memo} from "react";
 import {Handle, Node, NodeProps, Position} from "@xyflow/react";
-import {Card} from "../card/Card";
-import {DFlowNodeProps} from "./DFlowNode";
+import {FunctionNodeProps} from "./FunctionNodeComponent";
+import {Card} from "@code0-tech/pictor";
 
-export type DFlowNodeGroupCardProps = NodeProps<Node<DFlowNodeProps>>
+export type FunctionNodeGroupProps = NodeProps<Node<FunctionNodeProps>>
 
-export const DFlowNodeGroupCard: React.FC<DFlowNodeGroupCardProps> = memo((props) => {
+export const FunctionNodeGroup: React.FC<FunctionNodeGroupProps> = memo((props) => {
 
     const {data, id} = props
 

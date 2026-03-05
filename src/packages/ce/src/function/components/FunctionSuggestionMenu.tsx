@@ -1,26 +1,28 @@
-import {Menu, MenuPortal, MenuSeparator, MenuTrigger} from "../menu/Menu";
 import React from "react";
-import {DFlowSuggestion} from "./DFlowSuggestion.view";
-import {DFlowSuggestionMenuFooter} from "./DFlowSuggestionMenuFooter";
+import {DFlowSuggestion} from "./FunctionSuggestion.view";
+import {toInputSuggestions} from "./FunctionSuggestionMenu.util";
+import {FunctionSuggestionSearchBar} from "./FunctionSuggestionSearchBar";
 import {
-    InputSuggestionMenuContent,
-    InputSuggestionMenuContentItems,
-    InputSuggestionMenuContentItemsHandle
-} from "../form";
-import {toInputSuggestions} from "./DFlowSuggestionMenu.util";
-import {DFlowSuggestionMenuSearchBar} from "./DFlowSuggestionMenuSearchBar";
-import {useStoreApi} from "@xyflow/react";
-import {Card} from "../card/Card";
+    Card,
+    InputSuggestionMenuContent, InputSuggestionMenuContentItems,
+    InputSuggestionMenuContentItemsHandle,
+    Menu,
+    MenuPortal,
+    MenuTrigger
+} from "@code0-tech/pictor";
 
-export interface DFlowSuggestionMenuProps {
+export interface FunctionSuggestionMenuProps {
     triggerContent: React.ReactNode
     suggestions?: DFlowSuggestion[]
     onSuggestionSelect?: (suggestion: DFlowSuggestion) => void
 }
 
-export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = (props) => {
+export const FunctionSuggestionMenu: React.FC<FunctionSuggestionMenuProps> = (props) => {
 
-    const {suggestions = [], triggerContent, onSuggestionSelect = () => {}} = props
+    const {
+        suggestions = [], triggerContent, onSuggestionSelect = () => {
+        }
+    } = props
 
     const menuRef = React.useRef<InputSuggestionMenuContentItemsHandle | null>(null); // Ref to suggestion list
     const [stateSuggestions, setStateSuggestions] = React.useState(suggestions)
@@ -35,7 +37,7 @@ export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = (props) =
         </MenuTrigger>
         <MenuPortal>
             <InputSuggestionMenuContent align={"center"} color={"secondary"}>
-                <DFlowSuggestionMenuSearchBar onType={event => {
+                <FunctionSuggestionSearchBar onType={event => {
 
                     if (event.key === "ArrowDown") {
                         event.preventDefault();

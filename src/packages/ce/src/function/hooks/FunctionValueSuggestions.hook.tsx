@@ -1,12 +1,11 @@
 import React from "react";
-import {useService, useStore} from "../../utils";
-import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
-import {DFlowSuggestion, DFlowSuggestionType} from "./DFlowSuggestion.view";
 import type {
     DataTypeIdentifier,
     DataTypeRulesItemOfCollectionConfig,
     DataTypeRulesNumberRangeConfig
 } from "@code0-tech/sagittarius-graphql-types";
+import {DFlowSuggestion, DFlowSuggestionType} from "@edition/function/components/FunctionSuggestion.view";
+import {DFlowDataTypeReactiveService, useService, useStore} from "@code0-tech/pictor";
 
 export const useValueSuggestions = (dataTypeIdentifier?: DataTypeIdentifier): DFlowSuggestion[] => {
     const dataTypeService = useService(DFlowDataTypeReactiveService)

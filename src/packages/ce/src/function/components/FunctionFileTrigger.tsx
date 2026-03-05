@@ -1,28 +1,30 @@
 import React from "react";
-import {useService} from "../../utils";
-import {DFlowReactiveService} from "../d-flow";
-import {Flex} from "../flex/Flex";
-import {DFlowTypeReactiveService} from "../d-flow-type";
-import {DFlowSuggestion} from "../d-flow-suggestion";
-import {useValueSuggestions} from "../d-flow-suggestion/DFlowValueSuggestions.hook";
-import {useDataTypeSuggestions} from "../d-flow-suggestion/DFlowDataTypeSuggestions.hook";
-import {toInputSuggestions} from "../d-flow-suggestion/DFlowSuggestionMenu.util";
-import {DataType, DataTypeRulesVariant, Flow, NodeParameterValue, LiteralValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
-import {DFlowInputDefault} from "../d-flow-input/DFlowInputDefault";
-import {DFlowInputDataType} from "../d-flow-input/DataTypeTypeInput";
-import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
+import {
+    Flex,
+    useService
+} from "@code0-tech/pictor";
+import {Flow, LiteralValue, NodeParameterValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import {DFlowSuggestion} from "@edition/function/components/FunctionSuggestion.view";
+import {useValueSuggestions} from "@edition/function/hooks/FunctionValueSuggestions.hook";
+import {useDataTypeSuggestions} from "@edition/function/hooks/FunctionDataTypeSuggestions.hook";
+import {DFlowInputDataType} from "@code0-tech/pictor/dist/components/d-flow-input/DFlowInputDataType";
+import {DFlowInputDefault} from "@code0-tech/pictor/dist/components/d-flow-input/DFlowInputDefault";
+import {toInputSuggestions} from "@edition/function/components/FunctionSuggestionMenu.util";
+import {FlowTypeService} from "@edition/flowtype/services/FlowTypeService";
+import {FlowService} from "@edition/flow/services/Flow.service";
+import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 
-export interface DFlowTabTriggerProps {
+export interface FunctionFileTriggerProps {
     instance: Flow
 }
 
-export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
+export const FunctionFileTrigger: React.FC<FunctionFileTriggerProps> = (props) => {
 
     const {instance} = props
 
-    const flowTypeService = useService(DFlowTypeReactiveService)
-    const flowService = useService(DFlowReactiveService)
-    const dataTypeService = useService(DFlowDataTypeReactiveService)
+    const flowTypeService = useService(FlowTypeService)
+    const flowService = useService(FlowService)
+    const dataTypeService = useService(DatatypeService)
     const [, startTransition] = React.useTransition()
 
     const definition = flowTypeService.getById(instance.type?.id!!)

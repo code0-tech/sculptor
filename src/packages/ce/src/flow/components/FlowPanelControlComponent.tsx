@@ -11,10 +11,10 @@ import {
     useService,
     useStore
 } from "@code0-tech/pictor";
-import {useSuggestions} from "@edition/function/hooks/DFlowSuggestion.hook";
+import {useSuggestions} from "@edition/function/hooks/FunctionSuggestion.hook";
 import {Panel} from "@xyflow/react";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
-import {DFlowSuggestionMenu} from "@edition/function/components/DFlowSuggestionMenu";
+import {FunctionSuggestionMenu} from "@edition/function/components/FunctionSuggestionMenu";
 import {FlowService} from "@edition/flow/services/Flow.service";
 
 export interface FlowPanelControlComponentProps {
@@ -85,9 +85,9 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                     </TooltipContent>
                 </TooltipPortal>
             </Tooltip>
-            <DFlowSuggestionMenu suggestions={result}
-                                 onSuggestionSelect={addNodeToFlow}
-                                 triggerContent={
+            <FunctionSuggestionMenu suggestions={result}
+                                    onSuggestionSelect={addNodeToFlow}
+                                    triggerContent={
                                      <Button disabled={!activeTab}
                                              paddingSize={"xxs"}
                                              variant={"filled"}
