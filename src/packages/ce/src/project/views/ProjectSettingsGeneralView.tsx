@@ -9,10 +9,10 @@ import {
     TabContent,
     Text,
     TextInput,
+    toast,
     useForm,
     useService,
-    useStore,
-    toast
+    useStore
 } from "@code0-tech/pictor";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {useParams} from "next/navigation";
@@ -49,6 +49,8 @@ export const ProjectSettingsGeneralView: React.FC = () => {
             },
             slug: (value) => {
                 if (!value) return "Slug is required"
+                if (value.length < 3) return "Slug needs to be at least 3 characters"
+                if (value.length > 50) return "Slug needs to be less than 50 characters"
                 return null
             }
         },
@@ -84,19 +86,25 @@ export const ProjectSettingsGeneralView: React.FC = () => {
             <CardSection border>
                 <Flex justify={"space-between"} align={"center"}>
                     <Text size={"md"} hierarchy={"primary"}>Name</Text>
-                    <TextInput {...inputs.getInputProps("name")}/>
+                    <TextInput miw={"200px"} {...inputs.getInputProps("name")}/>
                 </Flex>
             </CardSection>
             <CardSection border>
                 <Flex justify={"space-between"} align={"center"}>
                     <Text size={"md"} hierarchy={"primary"}>Description</Text>
-                    <TextInput {...inputs.getInputProps("description")}/>
+                    <TextInput miw={"200px"} {...inputs.getInputProps("description")}/>
                 </Flex>
             </CardSection>
             <CardSection border>
                 <Flex justify={"space-between"} align={"center"}>
-                    <Text size={"md"} hierarchy={"primary"}>Slug</Text>
-                    <TextInput {...inputs.getInputProps("slug")}/>
+                    <Flex style={{gap: ".35rem", flexDirection: "column"}}>
+                        <Text size={"md"} hierarchy={"primary"}>Slug</Text>
+                        <Text size={"md"} hierarchy={"tertiary"}>
+                            Think of this as your project’s unique nickname in a web address. It helps distinguish this
+                            project from others when using URL-based connections (like REST flows).
+                        </Text>
+                    </Flex>
+                    <TextInput miw={"200px"} {...inputs.getInputProps("slug")}/>
                 </Flex>
             </CardSection>
         </Card>

@@ -1,7 +1,6 @@
+"use client"
+
 import {Tab, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
-
-"use clients"
-
 import React from "react";
 import {Button, DResizableHandle, DResizablePanel, DResizablePanelGroup, Flex, Text} from "@code0-tech/pictor";
 import {IconLayoutSidebar} from "@tabler/icons-react";
