@@ -2,7 +2,6 @@
 
 import React, {startTransition} from "react";
 import {
-    Badge,
     Button,
     Card,
     Flex,
@@ -101,7 +100,8 @@ export const ProjectSettingsGeneralView: React.FC = () => {
                     <Flex style={{gap: ".35rem", flexDirection: "column"}}>
                         <Text size={"md"} hierarchy={"primary"}>Slug</Text>
                         <Text size={"md"} hierarchy={"tertiary"}>
-                            Think of this as your project’s unique nickname in a web address. It helps distinguish this project from others when using URL-based connections (like REST flows).
+                            Think of this as your project’s unique nickname in a web address. It helps distinguish this
+                            project from others when using URL-based connections (like REST flows).
                         </Text>
                     </Flex>
                     <TextInput miw={"200px"} {...inputs.getInputProps("slug")}/>
