@@ -7,12 +7,12 @@ import {Flow, LiteralValue, NodeParameterValue, Scalars} from "@code0-tech/sagit
 import {FunctionSuggestion} from "@edition/function/components/FunctionSuggestion.view";
 import {useValueSuggestions} from "@edition/function/hooks/FunctionValueSuggestions.hook";
 import {useDataTypeSuggestions} from "@edition/function/hooks/FunctionDataTypeSuggestions.hook";
-import {DFlowInputDataType} from "@code0-tech/pictor/dist/components/d-flow-input/DFlowInputDataType";
-import {DFlowInputDefault} from "@code0-tech/pictor/dist/components/d-flow-input/DFlowInputDefault";
 import {toInputSuggestions} from "@edition/function/components/FunctionSuggestionMenu.util";
 import {FlowTypeService} from "@edition/flowtype/services/FlowTypeService";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
+import {DataTypeTextInput} from "@edition/datatype/components/DataTypeTextInput";
+import {DataTypeTypeInput} from "@edition/datatype/components/DataTypeTypeInput";
 
 export interface FunctionFileTriggerProps {
     instance: Flow
@@ -60,7 +60,7 @@ export const FunctionFileTrigger: React.FC<FunctionFileTriggerProps> = (props) =
     })
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
-        {definition?.inputType ? <DFlowInputDataType
+        {definition?.inputType ? <DataTypeTypeInput
             initialValue={testDataType || undefined}
             label={"Test Data Type"}
             description={"Data type used for testing"}
@@ -102,7 +102,7 @@ export const FunctionFileTrigger: React.FC<FunctionFileTriggerProps> = (props) =
             }
 
             return <div>
-                <DFlowInputDefault flowId={undefined}
+                <DataTypeTextInput flowId={undefined}
                                    nodeId={undefined}
                                    parameterId={undefined}
                                    title={title}

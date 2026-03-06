@@ -18,14 +18,14 @@ import {IconArrowsMaximize, IconArrowsMinimize, IconCircleDot, IconLayoutSidebar
 import {useParams, useRouter} from "next/navigation";
 import {Flow, FlowType} from "@code0-tech/sagittarius-graphql-types";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import {
-    DFlowFolderContextMenuGroupData,
-    DFlowFolderContextMenuItemData
-} from "@code0-tech/pictor/dist/components/d-flow-folder/DFlowFolderContextMenu";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import {FlowCreateDialogComponent} from "@edition/flow/components/FlowCreateDialogComponent";
 import {FlowFolderComponent, FlowFolderComponentHandle} from "@edition/flow/components/FlowFolderComponent";
 import {FlowDeleteDialogComponent} from "@edition/flow/components/FlowDeleteDialogComponent";
+import {
+    FlowFolderContextMenuComponentGroupData,
+    FlowFolderContextMenuComponentItemData
+} from "@edition/flow/components/FlowFolderContextMenuComponent";
 
 export const FlowFolderView: React.FC = () => {
 
@@ -45,7 +45,7 @@ export const FlowFolderView: React.FC = () => {
     const [flowTypeId, setFlowTypeId] = React.useState<FlowType['id']>(undefined)
 
     const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
-    const [contextData, setContextData] = React.useState<DFlowFolderContextMenuGroupData | DFlowFolderContextMenuItemData>({
+    const [contextData, setContextData] = React.useState<FlowFolderContextMenuComponentGroupData | FlowFolderContextMenuComponentItemData>({
         flow: [],
         name: "",
         type: "folder"

@@ -6,7 +6,7 @@ import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/File
 import {FlowTypeService} from "@edition/flowtype/services/FlowTypeService";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {IconBolt} from "@tabler/icons-react";
-import {DFlowTabTrigger} from "@code0-tech/pictor/dist/components/d-flow-file/DFlowTabTrigger";
+import {FunctionFileTrigger} from "@edition/function/components/FunctionFileTrigger";
 
 
 export type FunctionNodeTriggerProps = NodeProps<Node<FunctionNodeProps>>
@@ -39,7 +39,7 @@ export const FunctionNodeTrigger: React.FC<FunctionNodeTriggerProps> = memo((pro
                 <IconBolt size={12}/>
                 <Text size={"sm"}>{definition?.names!![0]?.content}</Text>
             </>,
-            content: <DFlowTabTrigger instance={flow}/>,
+            content: <FunctionFileTrigger instance={flow}/>,
             show: true
         })
     }, [definition, data.instance, fileTabsService, flow])

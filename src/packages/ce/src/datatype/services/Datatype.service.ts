@@ -1,10 +1,4 @@
-import {
-    DataTypeView,
-    DFlowDataTypeDependencies,
-    DFlowDataTypeReactiveService,
-    ReactiveArrayService,
-    ReactiveArrayStore
-} from "@code0-tech/pictor";
+import {DFlowDataTypeDependencies, ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor";
 import {GraphqlClient} from "@core/util/graphql-client";
 import {
     DataType,
@@ -27,8 +21,9 @@ import {useValueValidation} from "@edition/flow/hooks/ValueValidation.hook";
 import {findReturnNode} from "@edition/datatype/services/rules/DataTypeReturnTypeRule";
 import {md5} from "js-md5";
 import {resolveType} from "@edition/flow/utils/generics";
+import {DataTypeView} from "@edition/datatype/services/DataType.view";
 
-export class DatatypeService extends DFlowDataTypeReactiveService {
+export class DatatypeService extends ReactiveArrayService<DataTypeView, DFlowDataTypeDependencies> {
 
     private readonly client: GraphqlClient
     private i = 0

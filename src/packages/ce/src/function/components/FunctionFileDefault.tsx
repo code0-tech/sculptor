@@ -13,6 +13,7 @@ import {useNodeValidation} from "@edition/flow/hooks/NodeValidation.hook";
 import {DFlowInput} from "@code0-tech/pictor/dist/components/d-flow-input/DFlowInput";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
+import {DataTypeInput} from "@edition/datatype/components/DataTypeInput";
 
 export interface FunctionFileDefaultProps {
     node: NodeFunction
@@ -135,7 +136,7 @@ export const FunctionFileDefault: React.FC<FunctionFileDefaultProps> = (props) =
 
             return <div>
                 {/*@ts-ignore*/}
-                <DFlowInput flowId={flowId}
+                <DataTypeInput flowId={flowId}
                             nodeId={node.id}
                             parameterId={parameter.id}
                             title={title}

@@ -10,13 +10,13 @@ import {
     useStore as usePictorStore
 } from "@code0-tech/pictor";
 import {useNodeValidation} from "@edition/flow/hooks/NodeValidation.hook";
-import {DFlowInputLiteralBadge} from "@code0-tech/pictor/dist/components/d-flow-input/DFlowInputLiteralBadge";
-import {DFlowInputReferenceBadge} from "@code0-tech/pictor/dist/components/d-flow-input/DFlowInputReferenceBadge";
-import {DFlowInputNodeBadge} from "@code0-tech/pictor/dist/components/d-flow-input/DFlowInputNodeBadge";
 import {IconNote} from "@tabler/icons-react";
-import {DFlowTabDefault} from "@code0-tech/pictor/dist/components/d-flow-file/DFlowTabDefault";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
+import {DataTypeInputLiteralBadge} from "@edition/datatype/components/DataTypeInputLiteralBadge";
+import {DataTypeInputReferenceBadge} from "@edition/datatype/components/DataTypeInputReferenceBadge";
+import {DataTypeInputNodeBadge} from "@edition/datatype/components/DataTypeInputNodeBadge";
+import {FunctionFileDefault} from "@edition/function/components/FunctionFileDefault";
 
 export type FunctionNodeDefaultProps = NodeProps<Node<FunctionNodeProps>>
 
@@ -81,15 +81,15 @@ export const FunctionNodeDefault: React.FC<FunctionNodeDefaultProps> = memo((pro
             switch (param?.value?.__typename) {
                 case "LiteralValue":
                     return <div style={{...decorationStyle, display: "inline-block"}}>
-                        <DFlowInputLiteralBadge value={param.value}/>
+                        <DataTypeInputLiteralBadge value={param.value}/>
                     </div>
                 case "ReferenceValue":
                     return <div style={{...decorationStyle, display: "inline-block"}}>
-                        <DFlowInputReferenceBadge flowId={props.data.flowId} value={param.value}/>
+                        <DataTypeInputReferenceBadge flowId={props.data.flowId} value={param.value}/>
                     </div>
                 case "NodeFunctionIdWrapper":
                     return <div style={{...decorationStyle, display: "inline-block"}}>
-                        <DFlowInputNodeBadge value={param.value} flowId={props.data.flowId}/>
+                        <DataTypeInputNodeBadge value={param.value} flowId={props.data.flowId}/>
                         <Handle
                             key={param?.id}
                             type={"target"}
@@ -119,7 +119,7 @@ export const FunctionNodeDefault: React.FC<FunctionNodeDefaultProps> = memo((pro
                 <IconNote color={data.color} size={12}/>
                 <Text size={"sm"}>{definition?.names!![0]?.content}</Text>
             </>,
-            content: <DFlowTabDefault flowId={props.data.flowId} node={node}/>
+            content: <FunctionFileDefault flowId={props.data.flowId} node={node}/>
         })
     }, [node?.id, definition, data])
 
