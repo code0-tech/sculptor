@@ -1,15 +1,15 @@
 import {
     DFlowFunctionDependencies,
-    DFlowFunctionReactiveService,
-    FunctionDefinitionView,
+    ReactiveArrayService,
     ReactiveArrayStore
 } from "@code0-tech/pictor";
 import {GraphqlClient} from "@core/util/graphql-client";
 import {FunctionDefinition, Query} from "@code0-tech/sagittarius-graphql-types";
 import functionsQuery from "@edition/function/services/queries/Functions.query.graphql";
 import {View} from "@code0-tech/pictor/dist/utils/view";
+import {FunctionDefinitionView} from "@edition/function/services/Function.view";
 
-export class FunctionService extends DFlowFunctionReactiveService {
+export class FunctionService extends ReactiveArrayService<FunctionDefinitionView, DFlowFunctionDependencies> {
 
     private readonly client: GraphqlClient
     private i = 0
@@ -60,6 +60,10 @@ export class FunctionService extends DFlowFunctionReactiveService {
     hasById(id: FunctionDefinition["id"]): boolean {
         const functionD = super.values().find(f => f.id === id)
         return functionD !== undefined
+    }
+
+    getById(id: FunctionDefinition['id'], dependencies?: DFlowFunctionDependencies): FunctionDefinitionView | undefined {
+        return this.values(dependencies).find(functionDefinition => functionDefinition.id === id)
     }
 
 }
