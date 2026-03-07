@@ -19,7 +19,7 @@ import {
     useStore
 } from "@code0-tech/pictor";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
-import {FunctionSuggestionMenu} from "@edition/function/components/FunctionSuggestionMenu";
+import {FunctionSuggestionMenuComponent} from "@edition/function/components/suggestion/FunctionSuggestionMenuComponent";
 import {DataTypeJSONInputEditDialogComponent} from "@edition/datatype/components/inputs/json/DataTypeJSONInputEditDialogComponent";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
@@ -119,9 +119,9 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                         <Text>{"Object"}</Text>
                     </Flex>
                     <ButtonGroup color={"primary"}>
-                        <FunctionSuggestionMenu suggestions={suggestions}
-                                                onSuggestionSelect={suggestion => setValue(suggestion.value)}
-                                                triggerContent={<Button paddingSize="xxs" variant="filled"
+                        <FunctionSuggestionMenuComponent suggestions={suggestions}
+                                                         onSuggestionSelect={suggestion => setValue(suggestion.value)}
+                                                         triggerContent={<Button paddingSize="xxs" variant="filled"
                                                                         color="secondary"
                                                                         onClick={() => setEditDialogOpen(true)}>
                                                     <IconAlignLeft size={13}/>

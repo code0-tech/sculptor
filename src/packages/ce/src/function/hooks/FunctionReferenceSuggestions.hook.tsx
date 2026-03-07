@@ -12,7 +12,7 @@ import {
     ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
 import {useService, useStore} from "@code0-tech/pictor";
-import {FunctionSuggestion, FunctionSuggestionType} from "@edition/function/components/FunctionSuggestion.view";
+import {FunctionSuggestion, FunctionSuggestionType} from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
 import {
     isMatchingType,
     replaceGenericKeysInType,

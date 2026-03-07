@@ -4,7 +4,7 @@ import type {
     DataTypeRulesItemOfCollectionConfig,
     DataTypeRulesNumberRangeConfig
 } from "@code0-tech/sagittarius-graphql-types";
-import {FunctionSuggestion, FunctionSuggestionType} from "@edition/function/components/FunctionSuggestion.view";
+import {FunctionSuggestion, FunctionSuggestionType} from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
 import {useService, useStore} from "@code0-tech/pictor";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 

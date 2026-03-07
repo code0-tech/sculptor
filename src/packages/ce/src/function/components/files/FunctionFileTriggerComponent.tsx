@@ -4,21 +4,21 @@ import {
     useService
 } from "@code0-tech/pictor";
 import {Flow, LiteralValue, NodeParameterValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
-import {FunctionSuggestion} from "@edition/function/components/FunctionSuggestion.view";
+import {FunctionSuggestion} from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
 import {useValueSuggestions} from "@edition/function/hooks/FunctionValueSuggestions.hook";
 import {useDataTypeSuggestions} from "@edition/function/hooks/FunctionDataTypeSuggestions.hook";
-import {toInputSuggestions} from "@edition/function/components/FunctionSuggestionMenu.util";
+import {toInputSuggestions} from "@edition/function/components/suggestion/FunctionSuggestionMenu.util";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {DataTypeTextInputComponent} from "@edition/datatype/components/inputs/text/DataTypeTextInputComponent";
 import {DataTypeTypeInputComponent} from "@edition/datatype/components/inputs/type/DataTypeTypeInputComponent";
 
-export interface FunctionFileTriggerProps {
+export interface FunctionFileTriggerComponentProps {
     instance: Flow
 }
 
-export const FunctionFileTrigger: React.FC<FunctionFileTriggerProps> = (props) => {
+export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponentProps> = (props) => {
 
     const {instance} = props
 

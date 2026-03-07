@@ -15,12 +15,12 @@ import {FlowService} from "@edition/flow/services/Flow.service";
 import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent";
 import {ParameterDefinitionView} from "@edition/function/services/Function.view";
 
-export interface FunctionFileDefaultProps {
+export interface FunctionFileDefaultComponentProps {
     node: NodeFunction
     flowId: Flow['id']
 }
 
-export const FunctionFileDefault: React.FC<FunctionFileDefaultProps> = (props) => {
+export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponentProps> = (props) => {
 
     const {node, flowId} = props
 

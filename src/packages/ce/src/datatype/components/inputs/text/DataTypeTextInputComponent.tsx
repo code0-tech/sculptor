@@ -8,9 +8,9 @@ import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {useSuggestions} from "@edition/function/hooks/FunctionSuggestion.hook";
-import {FunctionSuggestionMenuFooter} from "@edition/function/components/FunctionSuggestionMenuFooter";
-import {toInputSuggestions} from "@edition/function/components/FunctionSuggestionMenu.util";
-import {FunctionSuggestion} from "@edition/function/components/FunctionSuggestion.view";
+import {FunctionSuggestionMenuFooterComponent} from "@edition/function/components/suggestion/FunctionSuggestionMenuFooterComponent";
+import {toInputSuggestions} from "@edition/function/components/suggestion/FunctionSuggestionMenu.util";
+import {FunctionSuggestion} from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
 
 export type DataTypeTextInputComponentProps = DataTypeInputComponentProps
 
@@ -170,7 +170,7 @@ export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProp
     }, [functionService, flowService])
 
     return <TextInput suggestionsEmptyState={<MenuItem><Text>No suggestion found</Text></MenuItem>}
-                      suggestionsFooter={<FunctionSuggestionMenuFooter/>}
+                      suggestionsFooter={<FunctionSuggestionMenuFooterComponent/>}
                       filterSuggestionsByLastToken
                       enforceUniqueSuggestions
                       validationUsesSyntax

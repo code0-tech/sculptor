@@ -20,9 +20,9 @@ import {LineWobble} from 'ldrs/react'
 import 'ldrs/react/LineWobble.css'
 import {useFlowNodes} from "@edition/flow/hooks/Flow.nodes.hook";
 import {Code0ComponentProps, mergeCode0Props, Spacing, Text} from "@code0-tech/pictor";
-import {FunctionNodeDefault} from "@edition/function/components/FunctionNodeDefault";
-import {FunctionNodeGroup} from "@edition/function/components/FunctionNodeGroup";
-import {FunctionNodeTrigger} from "@edition/function/components/FunctionNodeTrigger";
+import {FunctionNodeDefaultComponent} from "@edition/function/components/nodes/FunctionNodeDefaultComponent";
+import {FunctionNodeGroupComponent} from "@edition/function/components/nodes/FunctionNodeGroupComponent";
+import {FunctionNodeTriggerComponent} from "@edition/function/components/nodes/FunctionNodeTriggerComponent";
 import {useEdges} from "@edition/flow/hooks/Flow.edges.hook";
 import {FlowPanelSizeComponent} from "@edition/flow/components/panels/FlowPanelSizeComponent";
 import {FlowPanelLayoutComponent} from "@edition/flow/components/panels/FlowPanelLayoutComponent";
@@ -616,9 +616,9 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
     const {flowId, namespaceId, projectId, ...rest} = props
 
     const nodeTypes = React.useMemo(() => ({
-        default: FunctionNodeDefault,
-        group: FunctionNodeGroup,
-        trigger: FunctionNodeTrigger,
+        default: FunctionNodeDefaultComponent,
+        group: FunctionNodeGroupComponent,
+        trigger: FunctionNodeTriggerComponent,
     }), [])
 
     const edgeTypes = React.useMemo(() => ({

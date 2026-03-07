@@ -4,13 +4,13 @@ import "./FunctionSuggestionSearchInput.style.scss"
 import {clearInputElement} from "@code0-tech/pictor/dist/components/form/Input.utils";
 import {Button, Input, InputProps} from "@code0-tech/pictor";
 
-interface FunctionSuggestionSearchInputProps extends Omit<InputProps<string | null>, "wrapperComponent" | "type"> {
+interface FunctionSuggestionSearchInputComponentProps extends Omit<InputProps<string | null>, "wrapperComponent" | "type"> {
     //defaults to false
     clearable?: boolean
 }
 
 //@ts-ignore
-export const FunctionSuggestionSearchInput: React.ForwardRefExoticComponent<FunctionSuggestionSearchInputProps> = React.forwardRef((props, ref: RefObject<HTMLElement>) => {
+export const FunctionSuggestionSearchInputComponent: React.ForwardRefExoticComponent<FunctionSuggestionSearchInputComponentProps> = React.forwardRef((props, ref: RefObject<HTMLElement>) => {
     ref = ref || React.useRef<HTMLElement>(null)
 
     const {

@@ -14,7 +14,7 @@ import {
 import {useSuggestions} from "@edition/function/hooks/FunctionSuggestion.hook";
 import {Panel} from "@xyflow/react";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
-import {FunctionSuggestionMenu} from "@edition/function/components/FunctionSuggestionMenu";
+import {FunctionSuggestionMenuComponent} from "@edition/function/components/suggestion/FunctionSuggestionMenuComponent";
 import {FlowService} from "@edition/flow/services/Flow.service";
 
 export interface FlowPanelControlComponentProps {
@@ -85,9 +85,9 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                     </TooltipContent>
                 </TooltipPortal>
             </Tooltip>
-            <FunctionSuggestionMenu suggestions={result}
-                                    onSuggestionSelect={addNodeToFlow}
-                                    triggerContent={
+            <FunctionSuggestionMenuComponent suggestions={result}
+                                             onSuggestionSelect={addNodeToFlow}
+                                             triggerContent={
                                      <Button disabled={!activeTab}
                                              paddingSize={"xxs"}
                                              variant={"filled"}

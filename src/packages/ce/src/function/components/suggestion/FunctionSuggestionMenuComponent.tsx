@@ -1,7 +1,7 @@
 import React from "react";
-import {FunctionSuggestion} from "./FunctionSuggestion.view";
+import {FunctionSuggestion} from "./FunctionSuggestionComponent.view";
 import {toInputSuggestions} from "./FunctionSuggestionMenu.util";
-import {FunctionSuggestionSearchBar} from "./FunctionSuggestionSearchBar";
+import {FunctionSuggestionSearchBarComponent} from "./FunctionSuggestionSearchBarComponent";
 import {
     Card,
     InputSuggestionMenuContent, InputSuggestionMenuContentItems,
@@ -11,13 +11,13 @@ import {
     MenuTrigger
 } from "@code0-tech/pictor";
 
-export interface FunctionSuggestionMenuProps {
+export interface FunctionSuggestionMenuComponentProps {
     triggerContent: React.ReactNode
     suggestions?: FunctionSuggestion[]
     onSuggestionSelect?: (suggestion: FunctionSuggestion) => void
 }
 
-export const FunctionSuggestionMenu: React.FC<FunctionSuggestionMenuProps> = (props) => {
+export const FunctionSuggestionMenuComponent: React.FC<FunctionSuggestionMenuComponentProps> = (props) => {
 
     const {
         suggestions = [], triggerContent, onSuggestionSelect = () => {
@@ -37,7 +37,7 @@ export const FunctionSuggestionMenu: React.FC<FunctionSuggestionMenuProps> = (pr
         </MenuTrigger>
         <MenuPortal>
             <InputSuggestionMenuContent align={"center"} color={"secondary"}>
-                <FunctionSuggestionSearchBar onType={event => {
+                <FunctionSuggestionSearchBarComponent onType={event => {
 
                     if (event.key === "ArrowDown") {
                         event.preventDefault();

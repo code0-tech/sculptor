@@ -11,7 +11,7 @@ import {
 } from "@tabler/icons-react";
 import {Flex, MenuLabel, Text, Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from "@code0-tech/pictor";
 
-export const FunctionSuggestionMenuFooter: React.FC = () => {
+export const FunctionSuggestionMenuFooterComponent: React.FC = () => {
     return <MenuLabel>
         <Flex w={"100%"} justify={"space-between"}>
             <Flex align={"center"} style={{gap: ".35rem"}}>Press <IconCornerDownLeft size={12}/> to insert</Flex>

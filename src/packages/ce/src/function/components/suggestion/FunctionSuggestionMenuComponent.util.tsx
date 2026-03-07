@@ -1,4 +1,4 @@
-import {FunctionSuggestion, FunctionSuggestionType} from "./FunctionSuggestion.view";
+import {FunctionSuggestion, FunctionSuggestionType} from "./FunctionSuggestionComponent.view";
 import React from "react";
 import {IconCircleDot, IconCirclesRelation, IconFileFunctionFilled} from "@tabler/icons-react";
 import {InputSuggestion, Text} from "@code0-tech/pictor";

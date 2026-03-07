@@ -21,13 +21,13 @@ import {FlowService} from "@edition/flow/services/Flow.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 
-export interface FunctionFilesProps {
+export interface FunctionFilesComponentProps {
     flowId: Flow['id']
     namespaceId: Namespace['id']
     projectId: NamespaceProject['id']
 }
 
-export const FunctionFiles: React.FC<FunctionFilesProps> = (props) => {
+export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (props) => {
 
     const {flowId, namespaceId, projectId} = props
 

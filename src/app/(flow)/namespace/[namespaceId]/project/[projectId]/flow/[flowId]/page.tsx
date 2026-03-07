@@ -9,7 +9,7 @@ import {IconDatabase, IconFile, IconMessageChatbot} from "@tabler/icons-react";
 import {useParams} from "next/navigation";
 import {Flow} from "@code0-tech/sagittarius-graphql-types";
 import {FlowBuilderComponent} from "@edition/flow/components/builder/FlowBuilderComponent";
-import {FunctionFiles} from "@edition/function/components/FunctionFiles";
+import {FunctionFilesComponent} from "@edition/function/components/files/FunctionFilesComponent";
 import {
     ResizableHandle,
     ResizablePanel,
@@ -49,8 +49,8 @@ export default function Page() {
                     <>
                         <ResizableHandle/>
                         <ResizablePanel id={"3"} defaultSize={"25%"} color={"primary"} style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
-                            <FunctionFiles flowId={flowId} namespaceId={undefined}
-                                       projectId={undefined}/>
+                            <FunctionFilesComponent flowId={flowId} namespaceId={undefined}
+                                                    projectId={undefined}/>
                         </ResizablePanel>
                     </>
                 )}

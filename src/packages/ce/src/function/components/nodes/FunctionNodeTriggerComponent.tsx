@@ -1,17 +1,17 @@
 import React, {memo} from "react";
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore} from "@xyflow/react";
 import {Badge, Card, Flex, Text, useService, useStore as usePictorStore} from "@code0-tech/pictor";
-import {FunctionNodeProps} from "@edition/function/components/FunctionNodeComponent";
+import {FunctionNodeComponentProps} from "@edition/function/components/nodes/FunctionNodeComponent";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {IconBolt} from "@tabler/icons-react";
-import {FunctionFileTrigger} from "@edition/function/components/FunctionFileTrigger";
+import {FunctionFileTriggerComponent} from "@edition/function/components/files/FunctionFileTriggerComponent";
 
 
-export type FunctionNodeTriggerProps = NodeProps<Node<FunctionNodeProps>>
+export type FunctionNodeTriggerComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
 
-export const FunctionNodeTrigger: React.FC<FunctionNodeTriggerProps> = memo((props) => {
+export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponentProps> = memo((props) => {
 
     const {data, id} = props
     const fileTabsService = useService(FileTabsService)
@@ -39,7 +39,7 @@ export const FunctionNodeTrigger: React.FC<FunctionNodeTriggerProps> = memo((pro
                 <IconBolt size={12}/>
                 <Text size={"sm"}>{definition?.names!![0]?.content}</Text>
             </>,
-            content: <FunctionFileTrigger instance={flow}/>,
+            content: <FunctionFileTriggerComponent instance={flow}/>,
             show: true
         })
     }, [definition, data.instance, fileTabsService, flow])

@@ -1,7 +1,7 @@
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore} from "@xyflow/react";
 import React, {CSSProperties, memo} from "react";
-import "./FunctionNode.style.scss";
-import {FunctionNodeProps} from "./FunctionNodeComponent";
+import "./FunctionNodeComponent.style.scss";
+import {FunctionNodeComponentProps} from "./FunctionNodeComponent";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
 import {
     Badge, Card,
@@ -16,11 +16,11 @@ import {FunctionService} from "@edition/function/services/Function.service";
 import {LiteralBadgeComponent} from "@edition/datatype/components/badges/LiteralBadgeComponent";
 import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
 import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeComponent";
-import {FunctionFileDefault} from "@edition/function/components/FunctionFileDefault";
+import {FunctionFileDefaultComponent} from "@edition/function/components/files/FunctionFileDefaultComponent";
 
-export type FunctionNodeDefaultProps = NodeProps<Node<FunctionNodeProps>>
+export type FunctionNodeDefaultComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
 
-export const FunctionNodeDefault: React.FC<FunctionNodeDefaultProps> = memo((props) => {
+export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponentProps> = memo((props) => {
     const {data, id, width = 0, height = 0} = props
 
     const viewportWidth = useStore(s => s.width);
@@ -119,7 +119,7 @@ export const FunctionNodeDefault: React.FC<FunctionNodeDefaultProps> = memo((pro
                 <IconNote color={data.color} size={12}/>
                 <Text size={"sm"}>{definition?.names!![0]?.content}</Text>
             </>,
-            content: <FunctionFileDefault flowId={props.data.flowId} node={node}/>
+            content: <FunctionFileDefaultComponent flowId={props.data.flowId} node={node}/>
         })
     }, [node?.id, definition, data])
 

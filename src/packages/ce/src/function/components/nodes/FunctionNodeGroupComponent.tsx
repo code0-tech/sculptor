@@ -1,11 +1,11 @@
 import React, {memo} from "react";
 import {Handle, Node, NodeProps, Position} from "@xyflow/react";
-import {FunctionNodeProps} from "./FunctionNodeComponent";
+import {FunctionNodeComponentProps} from "./FunctionNodeComponent";
 import {Card} from "@code0-tech/pictor";
 
-export type FunctionNodeGroupProps = NodeProps<Node<FunctionNodeProps>>
+export type FunctionNodeGroupComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
 
-export const FunctionNodeGroup: React.FC<FunctionNodeGroupProps> = memo((props) => {
+export const FunctionNodeGroupComponent: React.FC<FunctionNodeGroupComponentProps> = memo((props) => {
 
     const {data, id} = props
 
