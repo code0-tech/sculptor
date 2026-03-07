@@ -1,6 +1,6 @@
 import React from "react";
 import {FunctionSuggestion} from "./FunctionSuggestionComponent.view";
-import {toInputSuggestions} from "./FunctionSuggestionMenu.util";
+import {toInputSuggestions} from "./FunctionSuggestionMenuComponent.util";
 import {FunctionSuggestionSearchBarComponent} from "./FunctionSuggestionSearchBarComponent";
 import {
     Card,

@@ -7,7 +7,7 @@ import {Flow, LiteralValue, NodeParameterValue, Scalars} from "@code0-tech/sagit
 import {FunctionSuggestion} from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
 import {useValueSuggestions} from "@edition/function/hooks/FunctionValueSuggestions.hook";
 import {useDataTypeSuggestions} from "@edition/function/hooks/FunctionDataTypeSuggestions.hook";
-import {toInputSuggestions} from "@edition/function/components/suggestion/FunctionSuggestionMenu.util";
+import {toInputSuggestions} from "@edition/function/components/suggestion/FunctionSuggestionMenuComponent.util";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";

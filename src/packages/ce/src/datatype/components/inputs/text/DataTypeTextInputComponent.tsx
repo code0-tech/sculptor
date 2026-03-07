@@ -9,7 +9,7 @@ import {FlowService} from "@edition/flow/services/Flow.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {useSuggestions} from "@edition/function/hooks/FunctionSuggestion.hook";
 import {FunctionSuggestionMenuFooterComponent} from "@edition/function/components/suggestion/FunctionSuggestionMenuFooterComponent";
-import {toInputSuggestions} from "@edition/function/components/suggestion/FunctionSuggestionMenu.util";
+import {toInputSuggestions} from "@edition/function/components/suggestion/FunctionSuggestionMenuComponent.util";
 import {FunctionSuggestion} from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
 
 export type DataTypeTextInputComponentProps = DataTypeInputComponentProps
