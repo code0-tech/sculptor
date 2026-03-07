@@ -1,7 +1,5 @@
 import {
-    DNamespaceProjectReactiveService,
-    DNamespaceProjectView,
-    DProjectDependencies,
+    DProjectDependencies, ReactiveArrayService,
     ReactiveArrayStore
 } from "@code0-tech/pictor";
 import {
@@ -24,8 +22,9 @@ import projectDeleteMutation from "./mutations/Project.delete.mutation.graphql"
 import projectUpdateMutation from "./mutations/Project.update.mutation.graphql"
 import projectAssignRuntimesMutation from "./mutations/Project.assignRuntimes.mutation.graphql"
 import {View} from "@code0-tech/pictor/dist/utils/view";
+import {DNamespaceProjectView} from "@edition/project/services/Project.view";
 
-export class ProjectService extends DNamespaceProjectReactiveService {
+export class ProjectService extends ReactiveArrayService<DNamespaceProjectView, DProjectDependencies> {
 
     private readonly client: GraphqlClient
     private i = 0;
@@ -70,6 +69,10 @@ export class ProjectService extends DNamespaceProjectReactiveService {
     hasById(id: NamespaceProject["id"]): boolean {
         const project = super.values().find(p => p.id === id)
         return project !== undefined
+    }
+
+    getById(id: NamespaceProject['id'], dependencies?: DProjectDependencies): DNamespaceProjectView | undefined {
+        return super.values(dependencies).find(project => project && project.id === id)
     }
 
     async projectAssignRuntimes(payload: NamespacesProjectsAssignRuntimesInput): Promise<NamespacesProjectsAssignRuntimesPayload | undefined> {
