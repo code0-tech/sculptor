@@ -1,6 +1,6 @@
-import {DRoleDependencies, ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor"
+import {ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor"
 import {
-    Mutation,
+    Mutation, Namespace,
     NamespaceRole,
     NamespacesRolesAssignAbilitiesInput,
     NamespacesRolesAssignAbilitiesPayload,
@@ -23,7 +23,11 @@ import roleAssignProjectsMutation from "@edition/role/services/mutations/Role.as
 import {View} from "@code0-tech/pictor/dist/utils/view";
 import {DNamespaceRoleView} from "@edition/role/services/Role.view";
 
-export class RoleService extends ReactiveArrayService<DNamespaceRoleView, DRoleDependencies> {
+export type RoleDependencies = {
+    namespaceId: Namespace['id']
+}
+
+export class RoleService extends ReactiveArrayService<DNamespaceRoleView, RoleDependencies> {
 
     private readonly client: GraphqlClient
     private i = 0;
@@ -33,7 +37,7 @@ export class RoleService extends ReactiveArrayService<DNamespaceRoleView, DRoleD
         this.client = client
     }
 
-    values(dependencies: DRoleDependencies): DNamespaceRoleView[] {
+    values(dependencies: RoleDependencies): DNamespaceRoleView[] {
         const roles = super.values()
         if (!dependencies?.namespaceId) return roles
 
@@ -72,7 +76,7 @@ export class RoleService extends ReactiveArrayService<DNamespaceRoleView, DRoleD
         return role !== undefined
     }
 
-    getById(id: NamespaceRole['id'], dependencies?: DRoleDependencies): DNamespaceRoleView | undefined {
+    getById(id: NamespaceRole['id'], dependencies?: RoleDependencies): DNamespaceRoleView | undefined {
         return super.values(dependencies).find(role => role && role.id === id);
     }
 

@@ -1,9 +1,9 @@
 import {
-    DProjectDependencies, ReactiveArrayService,
+    ReactiveArrayService,
     ReactiveArrayStore
 } from "@code0-tech/pictor";
 import {
-    Mutation,
+    Mutation, Namespace,
     NamespaceProject,
     NamespacesProjectsAssignRuntimesInput,
     NamespacesProjectsAssignRuntimesPayload,
@@ -24,7 +24,11 @@ import projectAssignRuntimesMutation from "./mutations/Project.assignRuntimes.mu
 import {View} from "@code0-tech/pictor/dist/utils/view";
 import {DNamespaceProjectView} from "@edition/project/services/Project.view";
 
-export class ProjectService extends ReactiveArrayService<DNamespaceProjectView, DProjectDependencies> {
+export type ProjectDependencies = {
+    namespaceId: Namespace['id']
+}
+
+export class ProjectService extends ReactiveArrayService<DNamespaceProjectView, ProjectDependencies> {
 
     private readonly client: GraphqlClient
     private i = 0;
@@ -34,7 +38,7 @@ export class ProjectService extends ReactiveArrayService<DNamespaceProjectView, 
         this.client = client
     }
 
-    values(dependencies: DProjectDependencies): DNamespaceProjectView[] {
+    values(dependencies: ProjectDependencies): DNamespaceProjectView[] {
         const projects = super.values()
         if (!dependencies?.namespaceId) return projects
 
@@ -71,7 +75,7 @@ export class ProjectService extends ReactiveArrayService<DNamespaceProjectView, 
         return project !== undefined
     }
 
-    getById(id: NamespaceProject['id'], dependencies?: DProjectDependencies): DNamespaceProjectView | undefined {
+    getById(id: NamespaceProject['id'], dependencies?: ProjectDependencies): DNamespaceProjectView | undefined {
         return this.values(dependencies!).find(project => project && project.id === id)
     }
 

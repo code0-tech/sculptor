@@ -1,15 +1,20 @@
 import {
-    DFlowTypeDependencies,
     ReactiveArrayService,
     ReactiveArrayStore
 } from "@code0-tech/pictor";
 import {GraphqlClient} from "@core/util/graphql-client";
-import {FlowType, Query} from "@code0-tech/sagittarius-graphql-types";
+import {FlowType, Namespace, NamespaceProject, Query, Runtime} from "@code0-tech/sagittarius-graphql-types";
 import flowTypesQuery from "@edition/flowtype/services/queries/FlowTypes.query.graphql"
 import {View} from "@code0-tech/pictor/dist/utils/view";
 import {FlowTypeView} from "@edition/flowtype/services/FlowType.view";
 
-export class FlowTypeService extends ReactiveArrayService<FlowTypeView, DFlowTypeDependencies> {
+export type FlowTypeDependencies = {
+    namespaceId?: Namespace['id']
+    projectId?: NamespaceProject['id']
+    runtimeId?: Runtime['id']
+}
+
+export class FlowTypeService extends ReactiveArrayService<FlowTypeView, FlowTypeDependencies> {
 
     private readonly client: GraphqlClient
     private i = 0
@@ -19,7 +24,7 @@ export class FlowTypeService extends ReactiveArrayService<FlowTypeView, DFlowTyp
         this.client = client
     }
 
-    values(dependencies?: DFlowTypeDependencies): FlowTypeView[] {
+    values(dependencies?: FlowTypeDependencies): FlowTypeView[] {
         const functions = super.values()
         if (!dependencies?.runtimeId) return functions
 
@@ -66,7 +71,7 @@ export class FlowTypeService extends ReactiveArrayService<FlowTypeView, DFlowTyp
         return flowType !== undefined
     }
 
-    getById(id: FlowType['id'], dependencies?: DFlowTypeDependencies): FlowTypeView | undefined {
+    getById(id: FlowType['id'], dependencies?: FlowTypeDependencies): FlowTypeView | undefined {
         return this.values(dependencies).find(value => value.id === id);
     }
 

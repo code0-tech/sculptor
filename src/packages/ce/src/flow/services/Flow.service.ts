@@ -1,10 +1,10 @@
-import {DFlowDependencies, ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor";
+import {ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor";
 import {
     FlowInput,
     FlowSetting,
     LiteralValue,
     Maybe,
-    Mutation,
+    Mutation, Namespace, NamespaceProject,
     NamespacesProjectsFlowsCreateInput,
     NamespacesProjectsFlowsCreatePayload,
     NamespacesProjectsFlowsDeleteInput,
@@ -28,8 +28,12 @@ import flowUpdateMutation from "@edition/flow/services/mutations/Flow.update.mut
 import {View} from "@code0-tech/pictor/dist/utils/view";
 import {Flow} from "@edition/flow/services/Flow.view";
 
+export type FlowDependencies = {
+    namespaceId: Namespace['id']
+    projectId: NamespaceProject['id']
+}
 
-export class FlowService extends ReactiveArrayService<Flow, DFlowDependencies> {
+export class FlowService extends ReactiveArrayService<Flow, FlowDependencies> {
 
     private readonly client: GraphqlClient
     private flowUpdateQueue: Array<Flow["id"]>
@@ -42,7 +46,7 @@ export class FlowService extends ReactiveArrayService<Flow, DFlowDependencies> {
         this.i = 0
     }
 
-    values(dependencies?: DFlowDependencies): Flow[] {
+    values(dependencies?: FlowDependencies): Flow[] {
         const flows = super.values()
         if (!dependencies?.namespaceId || !dependencies.projectId) return flows
 
@@ -97,7 +101,7 @@ export class FlowService extends ReactiveArrayService<Flow, DFlowDependencies> {
         return flow !== undefined
     }
 
-    getById(id: Flow['id'], dependencies?: DFlowDependencies): Flow | undefined {
+    getById(id: Flow['id'], dependencies?: FlowDependencies): Flow | undefined {
         return this.values(dependencies).find(value => value.id === id);
     }
 

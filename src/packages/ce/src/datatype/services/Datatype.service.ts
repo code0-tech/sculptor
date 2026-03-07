@@ -1,4 +1,4 @@
-import {DFlowDataTypeDependencies, ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor";
+import {ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor";
 import {GraphqlClient} from "@core/util/graphql-client";
 import {
     DataType,
@@ -10,10 +10,10 @@ import {
     Flow,
     GenericMapper,
     LiteralValue,
-    Maybe,
+    Maybe, Namespace, NamespaceProject,
     NodeFunctionIdWrapper,
     NodeParameterValue,
-    Query
+    Query, Runtime
 } from "@code0-tech/sagittarius-graphql-types";
 import dataTypeQuery from "@edition/datatype/services/queries/DataTypes.query.graphql"
 import {View} from "@code0-tech/pictor/dist/utils/view";
@@ -23,7 +23,13 @@ import {md5} from "js-md5";
 import {resolveType} from "@edition/flow/utils/generics";
 import {DataTypeView} from "@edition/datatype/services/DataType.view";
 
-export class DatatypeService extends ReactiveArrayService<DataTypeView, DFlowDataTypeDependencies> {
+export type DataTypeDependencies = {
+    namespaceId: Namespace['id']
+    projectId: NamespaceProject['id']
+    runtimeId: Runtime['id']
+}
+
+export class DatatypeService extends ReactiveArrayService<DataTypeView, DataTypeDependencies> {
 
     private readonly client: GraphqlClient
     private i = 0
@@ -33,7 +39,7 @@ export class DatatypeService extends ReactiveArrayService<DataTypeView, DFlowDat
         this.client = client
     }
 
-    values(dependencies?: DFlowDataTypeDependencies): DataTypeView[] {
+    values(dependencies?: DataTypeDependencies): DataTypeView[] {
         const dataTypes = super.values()
         if (!dependencies?.namespaceId || !dependencies.projectId || !dependencies.runtimeId) return dataTypes
 
@@ -76,7 +82,7 @@ export class DatatypeService extends ReactiveArrayService<DataTypeView, DFlowDat
         return dataType !== undefined
     }
 
-    getDataType(type: DataTypeIdentifier, dependencies?: DFlowDataTypeDependencies): DataTypeView | undefined {
+    getDataType(type: DataTypeIdentifier, dependencies?: DataTypeDependencies): DataTypeView | undefined {
         if (!type) return undefined
         if ((type as DataTypeIdentifier).genericKey) return undefined
         const dataType = type.dataType ?? type.genericType?.dataType
@@ -92,7 +98,7 @@ export class DatatypeService extends ReactiveArrayService<DataTypeView, DFlowDat
         });
     }
 
-    getDataTypeFromValue(value: NodeParameterValue, flow?: Flow, dependencies?: DFlowDataTypeDependencies): DataTypeView | undefined {
+    getDataTypeFromValue(value: NodeParameterValue, flow?: Flow, dependencies?: DataTypeDependencies): DataTypeView | undefined {
 
         if (!value) return undefined
 
@@ -114,7 +120,7 @@ export class DatatypeService extends ReactiveArrayService<DataTypeView, DFlowDat
 
     }
 
-    getValueFromType(dataTypeIdentifier: DataTypeIdentifier, flow?: Flow, dependencies?: DFlowDataTypeDependencies): LiteralValue | undefined {
+    getValueFromType(dataTypeIdentifier: DataTypeIdentifier, flow?: Flow, dependencies?: DataTypeDependencies): LiteralValue | undefined {
         const type = this.getDataType(dataTypeIdentifier, dependencies)
         if (!type) return undefined
 
@@ -194,7 +200,7 @@ export class DatatypeService extends ReactiveArrayService<DataTypeView, DFlowDat
         }
     }
 
-    getTypeFromValue(value: NodeParameterValue, flow?: Flow, dependencies?: DFlowDataTypeDependencies): Maybe<DataTypeIdentifier> | undefined {
+    getTypeFromValue(value: NodeParameterValue, flow?: Flow, dependencies?: DataTypeDependencies): Maybe<DataTypeIdentifier> | undefined {
 
         if (!value) return undefined
 
@@ -328,7 +334,7 @@ export class DatatypeService extends ReactiveArrayService<DataTypeView, DFlowDat
 
     }
 
-    hasDataTypes(types: DataTypeIdentifier[], dependencies?: DFlowDataTypeDependencies): boolean {
+    hasDataTypes(types: DataTypeIdentifier[], dependencies?: DataTypeDependencies): boolean {
         return types.every(type => {
             return this.values(dependencies).find(value => {
                 return value.id === (type.genericType?.dataType?.id ?? type.dataType?.id)

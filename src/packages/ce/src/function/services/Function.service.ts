@@ -1,15 +1,20 @@
 import {
-    DFlowFunctionDependencies,
     ReactiveArrayService,
     ReactiveArrayStore
 } from "@code0-tech/pictor";
 import {GraphqlClient} from "@core/util/graphql-client";
-import {FunctionDefinition, Query} from "@code0-tech/sagittarius-graphql-types";
+import {FunctionDefinition, Namespace, NamespaceProject, Query, Runtime} from "@code0-tech/sagittarius-graphql-types";
 import functionsQuery from "@edition/function/services/queries/Functions.query.graphql";
 import {View} from "@code0-tech/pictor/dist/utils/view";
 import {FunctionDefinitionView} from "@edition/function/services/Function.view";
 
-export class FunctionService extends ReactiveArrayService<FunctionDefinitionView, DFlowFunctionDependencies> {
+export type FunctionDependencies = {
+    namespaceId: Namespace['id']
+    projectId: NamespaceProject['id']
+    runtimeId: Runtime['id']
+}
+
+export class FunctionService extends ReactiveArrayService<FunctionDefinitionView, FunctionDependencies> {
 
     private readonly client: GraphqlClient
     private i = 0
@@ -19,7 +24,7 @@ export class FunctionService extends ReactiveArrayService<FunctionDefinitionView
         this.client = client
     }
 
-    values(dependencies?: DFlowFunctionDependencies): FunctionDefinitionView[] {
+    values(dependencies?: FunctionDependencies): FunctionDefinitionView[] {
         const functions = super.values()
         if (!dependencies?.namespaceId || !dependencies.projectId || !dependencies.runtimeId) return functions
 
@@ -62,7 +67,7 @@ export class FunctionService extends ReactiveArrayService<FunctionDefinitionView
         return functionD !== undefined
     }
 
-    getById(id: FunctionDefinition['id'], dependencies?: DFlowFunctionDependencies): FunctionDefinitionView | undefined {
+    getById(id: FunctionDefinition['id'], dependencies?: FunctionDependencies): FunctionDefinitionView | undefined {
         return this.values(dependencies).find(functionDefinition => functionDefinition.id === id)
     }
 

@@ -1,5 +1,5 @@
 import {
-    DMemberDependencies, ReactiveArrayService,
+    ReactiveArrayService,
     ReactiveArrayStore
 } from "@code0-tech/pictor"
 import {
@@ -21,7 +21,11 @@ import memberInviteMutation from "./mutations/Member.invite.mutation.graphql"
 import {View} from "@code0-tech/pictor/dist/utils/view";
 import {DNamespaceMemberView} from "@edition/member/services/Member.view";
 
-export class MemberService extends ReactiveArrayService<DNamespaceMemberView, DMemberDependencies> {
+export type MemberDependencies = {
+    namespaceId: Namespace['id']
+}
+
+export class MemberService extends ReactiveArrayService<DNamespaceMemberView, MemberDependencies> {
 
     private readonly client: GraphqlClient
     private i = 0
@@ -31,7 +35,7 @@ export class MemberService extends ReactiveArrayService<DNamespaceMemberView, DM
         this.client = client
     }
 
-    values(dependencies?: DMemberDependencies): DNamespaceMemberView[] {
+    values(dependencies?: MemberDependencies): DNamespaceMemberView[] {
         const members = super.values()
         if (!dependencies?.namespaceId) return members
 
@@ -66,7 +70,7 @@ export class MemberService extends ReactiveArrayService<DNamespaceMemberView, DM
         return member !== undefined
     }
 
-    getById(id: NamespaceMember['id'], dependencies?: DMemberDependencies): DNamespaceMemberView | undefined {
+    getById(id: NamespaceMember['id'], dependencies?: MemberDependencies): DNamespaceMemberView | undefined {
         return this.values(dependencies).find(member => member && member.id === id);
     }
 
