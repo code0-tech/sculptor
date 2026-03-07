@@ -2,12 +2,13 @@
 
 import React from "react";
 import {Tab, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
-import {Badge, Button, Container, useService, useStore, useUserSession} from "@code0-tech/pictor";
+import {Button, useService, useStore} from "@code0-tech/pictor";
 import {IconBuilding, IconHome, IconServer, IconSettings, IconUser} from "@tabler/icons-react";
 import {usePathname, useRouter} from "next/navigation";
 import {UserService} from "@edition/user/services/User.service";
 import {RuntimeService} from "@edition/runtime/services/Runtime.service";
 import {OrganizationService} from "@edition/organization/services/Organization.service";
+import {useUserSession} from "@edition/user/hooks/User.session.hook";
 
 export const ApplicationTabView: React.FC = () => {
 
@@ -37,12 +38,14 @@ export const ApplicationTabView: React.FC = () => {
                     </Button>
                 </TabTrigger>
                 <TabTrigger value={"runtimes"} asChild={true}>
-                    <Button variant={"none"} color={"primary"} paddingSize={"xs"} onClick={() => router.push("/runtimes")}>
+                    <Button variant={"none"} color={"primary"} paddingSize={"xs"}
+                            onClick={() => router.push("/runtimes")}>
                         <IconServer size={16}/>
                     </Button>
                 </TabTrigger>
                 <TabTrigger value={"settings"} asChild={true}>
-                    <Button variant={"none"} color={"primary"} paddingSize={"xs"} onClick={() => router.push("/settings")}>
+                    <Button variant={"none"} color={"primary"} paddingSize={"xs"}
+                            onClick={() => router.push("/settings")}>
                         <IconSettings size={16}/>
                     </Button>
 
@@ -52,18 +55,19 @@ export const ApplicationTabView: React.FC = () => {
     }, [currentUser, runtimeStore, organizationStore])
 
     return <Tab defaultValue={defaultValue} orientation={"vertical"}>
-            <TabList>
-                <TabTrigger value={"overview"} asChild={true}>
-                    <Button variant={"none"} color={"primary"} paddingSize={"xs"} onClick={() => router.push("/")}>
-                        <IconHome size={16}/>
-                    </Button>
-                </TabTrigger>
-                <TabTrigger value={"organizations"} asChild={true}>
-                    <Button variant={"none"} color={"primary"} paddingSize={"xs"} onClick={() => router.push("/organizations")}>
-                        <IconBuilding size={16}/>
-                    </Button>
-                </TabTrigger>
-                {adminLinks}
-            </TabList>
-        </Tab>
+        <TabList>
+            <TabTrigger value={"overview"} asChild={true}>
+                <Button variant={"none"} color={"primary"} paddingSize={"xs"} onClick={() => router.push("/")}>
+                    <IconHome size={16}/>
+                </Button>
+            </TabTrigger>
+            <TabTrigger value={"organizations"} asChild={true}>
+                <Button variant={"none"} color={"primary"} paddingSize={"xs"}
+                        onClick={() => router.push("/organizations")}>
+                    <IconBuilding size={16}/>
+                </Button>
+            </TabTrigger>
+            {adminLinks}
+        </TabList>
+    </Tab>
 }

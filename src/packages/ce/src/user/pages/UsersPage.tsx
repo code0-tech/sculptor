@@ -1,14 +1,27 @@
 "use client"
 
 import React from "react";
-import {Button, ButtonGroup, Flex, Spacing, Text, useService, useStore, useUserSession, Menu, MenuTrigger, MenuPortal, MenuContent, MenuCheckboxItem} from "@code0-tech/pictor";
+import {
+    Button,
+    ButtonGroup,
+    Flex,
+    Menu,
+    MenuCheckboxItem,
+    MenuContent,
+    MenuPortal,
+    MenuTrigger,
+    Spacing,
+    Text,
+    useService,
+    useStore
+} from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import {notFound} from "next/navigation";
 import {UserDataTableComponent} from "@edition/user/components/UserDataTableComponent";
 import {DataTableFilterProps, DataTableSortProps} from "@code0-tech/pictor/dist/components/data-table/DataTable";
 import {UserDataTableFilterInputComponent} from "@edition/user/components/UserDataTableFilterInputComponent";
-import Link from "next/link";
 import {IconMinus, IconSortAscending, IconSortDescending} from "@tabler/icons-react";
+import {useUserSession} from "@edition/user/hooks/User.session.hook";
 
 export const UsersPage: React.FC = () => {
 

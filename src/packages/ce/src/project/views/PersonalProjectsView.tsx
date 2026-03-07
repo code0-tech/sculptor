@@ -10,8 +10,7 @@ import {
     Spacing,
     Text,
     useService,
-    useStore,
-    useUserSession
+    useStore
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import Link from "next/link";
@@ -21,6 +20,7 @@ import {DataTableFilterProps, DataTableSortProps} from "@code0-tech/pictor/dist/
 import {ProjectDataTableFilterInputComponent} from "@edition/project/components/ProjectDataTableFilterInputComponent";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import {IconMinus, IconSortAscending, IconSortDescending} from "@tabler/icons-react";
+import {useUserSession} from "@edition/user/hooks/User.session.hook";
 
 export const PersonalProjectsView: React.FC = () => {
 

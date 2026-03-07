@@ -15,8 +15,7 @@ import {
     toast,
     useForm,
     useService,
-    useStore,
-    useUserSession
+    useStore
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import {notFound} from "next/navigation";
@@ -24,6 +23,7 @@ import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/comp
 import {IconLayoutSidebar} from "@tabler/icons-react";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {ApplicationService} from "@edition/application/services/Application.service";
+import {useUserSession} from "@edition/user/hooks/User.session.hook";
 
 export const ApplicationSettingsPage: React.FC = () => {
 

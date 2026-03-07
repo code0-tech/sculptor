@@ -15,12 +15,12 @@ import {
     Spacing,
     Text,
     useService,
-    useStore,
-    useUserSession
+    useStore
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import React from "react";
 import {OrganizationsTopView} from "@edition/organization/views/OrganizationsTopView";
+import {useUserSession} from "@edition/user/hooks/User.session.hook";
 
 export const ApplicationPage = () => {
 

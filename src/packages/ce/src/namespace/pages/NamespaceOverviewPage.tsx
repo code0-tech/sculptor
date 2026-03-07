@@ -2,11 +2,12 @@
 
 import React from "react";
 import {ProjectsView} from "@edition/project/views/ProjectsView";
-import {DLayout, useService, useStore, useUserSession, ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "@code0-tech/pictor";
+import {DLayout, useService, useStore, ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "@code0-tech/pictor";
 import {NamespaceOverviewPersonalLeftView} from "@edition/namespace/views/NamespaceOverviewPersonalLeftView";
 import {useParams} from "next/navigation";
 import {UserService} from "@edition/user/services/User.service";
 import {NamespaceOverviewOrganizationLeftView} from "@edition/namespace/views/NamespaceOverviewOrganizationLeftView";
+import {useUserSession} from "@edition/user/hooks/User.session.hook";
 
 export const NamespaceOverviewPage: React.FC = () => {
 

@@ -17,8 +17,7 @@ import {
     TooltipPortal,
     TooltipTrigger,
     useService,
-    useStore,
-    useUserSession
+    useStore
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import {IconMail, IconSparkles, IconUser, IconUserCog} from "@tabler/icons-react";
@@ -26,6 +25,7 @@ import {OrganizationService} from "@edition/organization/services/Organization.s
 import Link from "next/link";
 import {useParams} from "next/navigation";
 import {MemberService} from "@edition/member/services/Member.service";
+import {useUserSession} from "@edition/user/hooks/User.session.hook";
 
 export const NamespaceOverviewPersonalLeftView: React.FC = () => {
 

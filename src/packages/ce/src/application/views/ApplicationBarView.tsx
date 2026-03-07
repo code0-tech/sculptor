@@ -1,6 +1,6 @@
 "use client"
 
-import {Button, Flex, MenuItem, MenuSeparator, useService, useStore, useUserSession} from "@code0-tech/pictor";
+import {Button, Flex, MenuItem, MenuSeparator, useService, useStore} from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import {useRouter} from "next/navigation";
 import React from "react";
@@ -8,6 +8,7 @@ import Link from "next/link";
 import {IconBuilding, IconFolders, IconInbox, IconLogout, IconSearch} from "@tabler/icons-react";
 import {ApplicationBreadcrumbView} from "@edition/application/views/ApplicationBreadcrumbView";
 import UserMenuComponent from "@edition/user/components/UserMenuComponent";
+import {useUserSession} from "@edition/user/hooks/User.session.hook";
 
 export const ApplicationBarView: React.FC = () => {
 
