@@ -2,16 +2,21 @@
 
 import {Tab, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import React from "react";
-import {Button, DResizableHandle, DResizablePanel, DResizablePanelGroup, Flex, Text} from "@code0-tech/pictor";
+import {Button, Flex, Text} from "@code0-tech/pictor";
 import {IconLayoutSidebar} from "@tabler/icons-react";
 import {ProjectSettingsGeneralView} from "@edition/project/views/ProjectSettingsGeneralView";
 import {ProjectSettingsRuntimesView} from "@edition/project/views/ProjectSettingsRuntimesView";
 import {ProjectSettingsDeleteView} from "@edition/project/views/ProjectSettingsDeleteView";
+import {
+    ResizableHandle,
+    ResizablePanel,
+    ResizablePanelGroup
+} from "@code0-tech/pictor/dist/components/resizable/Resizable";
 
 export const ProjectSettingsPage: React.FC = () => {
     return <Tab orientation={"vertical"} defaultValue={"general"} h={"100%"}>
-        <DResizablePanelGroup>
-            <DResizablePanel id={"1"} defaultSize={"20%"} collapsedSize={"0%"}
+        <ResizablePanelGroup>
+            <ResizablePanel id={"1"} defaultSize={"20%"} collapsedSize={"0%"}
                              collapsible minSize={"10%"} style={{textWrap: "nowrap"}}>
                 <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
                     <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"}>
@@ -43,16 +48,16 @@ export const ProjectSettingsPage: React.FC = () => {
                         </TabTrigger>
                     </TabList>
                 </Flex>
-            </DResizablePanel>
-            <DResizableHandle/>
-            <DResizablePanel id={"2"} color={"primary"} p={1}
+            </ResizablePanel>
+            <ResizableHandle/>
+            <ResizablePanel id={"2"} color={"primary"} p={1}
                              style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
                 <>
                     <ProjectSettingsGeneralView/>
                     <ProjectSettingsRuntimesView/>
                     <ProjectSettingsDeleteView/>
                 </>
-            </DResizablePanel>
-        </DResizablePanelGroup>
+            </ResizablePanel>
+        </ResizablePanelGroup>
     </Tab>
 }

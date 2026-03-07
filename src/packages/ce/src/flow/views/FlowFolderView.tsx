@@ -3,7 +3,6 @@
 import React from "react";
 import {
     Button,
-    DLayout,
     Flex,
     Text,
     toast,
@@ -26,6 +25,7 @@ import {
     FlowFolderContextMenuComponentGroupData,
     FlowFolderContextMenuComponentItemData
 } from "@edition/flow/components/FlowFolderContextMenuComponent";
+import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 
 export const FlowFolderView: React.FC = () => {
 
@@ -80,7 +80,7 @@ export const FlowFolderView: React.FC = () => {
                                    contextData={contextData}
                                    onDelete={deleteFlow}/>
 
-        <DLayout layoutGap={"0.7rem"} showLayoutSplitter={false} topContent={
+        <Layout layoutGap={"0.7rem"} showLayoutSplitter={false} topContent={
             <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
                 <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"}>
                     <Text size={"md"} hierarchy={"secondary"}>Explorer</Text>
@@ -167,6 +167,6 @@ export const FlowFolderView: React.FC = () => {
                                  }}
                                  namespaceId={`gid://sagittarius/Namespace/${namespaceIndex}`}
                                  projectId={`gid://sagittarius/NamespaceProject/${projectIndex}`}/>
-        </DLayout>
+        </Layout>
     </>
 }

@@ -5,9 +5,7 @@ import {useParams, useRouter} from "next/navigation";
 import {
     AuroraBackground,
     ContextStoreProvider,
-    DLayout,
     Flex,
-    useUserSession
 } from "@code0-tech/pictor";
 import React from "react";
 import {GraphqlClient} from "@core/util/graphql-client";
@@ -37,8 +35,10 @@ import {DNamespaceRoleView} from "@edition/role/services/Role.view";
 import {FunctionDefinitionView} from "@edition/function/services/Function.view";
 import {DataTypeView} from "@edition/datatype/services/DataType.view";
 import {FlowTypeView} from "@edition/flowtype/services/FlowType.view";
+import {useUserSession} from "@edition/user/hooks/User.session.hook";
+import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 
-export default function Layout({bar, tab, children}: {
+export default function FlowLayout({bar, tab, children}: {
     bar: React.ReactNode,
     tab: React.ReactNode,
     children: React.ReactNode
@@ -86,7 +86,7 @@ export default function Layout({bar, tab, children}: {
 
     return <ContextStoreProvider
         services={[user, organization, member, namespace, runtime, project, role, flow, functions, datatype, flowtype, file]}>
-        <DLayout layoutGap={0} style={{zIndex: 0}} showLayoutSplitter={false} leftContent={
+        <Layout layoutGap={0} style={{zIndex: 0}} showLayoutSplitter={false} leftContent={
             <Flex p={0.7} pt={1} align={"center"} style={{flexDirection: "column", gap: "0.7rem"}}>
                 <div style={{
                     position: "absolute",
@@ -114,13 +114,13 @@ export default function Layout({bar, tab, children}: {
                 {tab}
             </Flex>
         }>
-            <DLayout px={0.7} layoutGap={"0"} topContent={<>{bar}</>}>
-                <DLayout>
+            <Layout px={0.7} layoutGap={"0"} topContent={<>{bar}</>}>
+                <Layout>
                     <>
                         {children}
                     </>
-                </DLayout>
-            </DLayout>
-        </DLayout>
+                </Layout>
+            </Layout>
+        </Layout>
     </ContextStoreProvider>
 }

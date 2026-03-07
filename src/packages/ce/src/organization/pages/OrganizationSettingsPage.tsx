@@ -1,37 +1,27 @@
 "use client"
 
 import React from "react";
-import {useParams} from "next/navigation";
-import {Namespace} from "@code0-tech/sagittarius-graphql-types";
-import {
-    AuroraBackground,
-    Badge,
-    Button,
-    DResizableHandle,
-    DResizablePanel,
-    DResizablePanelGroup,
-    Flex,
-    Text,
-    useService,
-    useStore
-} from "@code0-tech/pictor";
-import {NamespaceService} from "@edition/namespace/services/Namespace.service";
-import {OrganizationService} from "@edition/organization/services/Organization.service";
+import {AuroraBackground, Button, Flex, Text} from "@code0-tech/pictor";
 import {IconLayoutSidebar} from "@tabler/icons-react";
 import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {UsageView} from "@edition/runtime/views/UsageView";
 import {OrganizationUpgradeView} from "@edition/organization/views/OrganizationUpgradeView";
 import {OrganizationDeleteView} from "@edition/organization/views/OrganizationDeleteView";
 import {OrganizationGeneralSettingsView} from "@edition/organization/views/OrganizationGeneralSettingsView";
+import {
+    ResizableHandle,
+    ResizablePanel,
+    ResizablePanelGroup
+} from "@code0-tech/pictor/dist/components/resizable/Resizable";
 
 export const OrganizationSettingsPage: React.FC = () => {
 
     //TODO: add ability check for organization settings access for every settings tab
 
     return <Tab orientation={"vertical"} defaultValue={"general"} h={"100%"}>
-        <DResizablePanelGroup>
-            <DResizablePanel id={"1"} defaultSize={"20%"} collapsedSize={"0%"}
-                             collapsible minSize={"10%"} style={{textWrap: "nowrap"}}>
+        <ResizablePanelGroup>
+            <ResizablePanel id={"1"} defaultSize={"20%"} collapsedSize={"0%"}
+                            collapsible minSize={"10%"} style={{textWrap: "nowrap"}}>
                 <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
                     <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"}>
                         <Text size={"md"} hierarchy={"secondary"}>Organization settings</Text>
@@ -71,9 +61,10 @@ export const OrganizationSettingsPage: React.FC = () => {
                         </TabTrigger>
                     </TabList>
                 </Flex>
-            </DResizablePanel>
-            <DResizableHandle/>
-            <DResizablePanel id={"2"} color={"primary"} p={1} style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
+            </ResizablePanel>
+            <ResizableHandle/>
+            <ResizablePanel id={"2"} color={"primary"} p={1}
+                            style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
                 <>
                     <TabContent value={"general"}>
                         <OrganizationGeneralSettingsView/>
@@ -88,7 +79,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                         <OrganizationDeleteView/>
                     </TabContent>
                 </>
-            </DResizablePanel>
-        </DResizablePanelGroup>
+            </ResizablePanel>
+        </ResizablePanelGroup>
     </Tab>
 }

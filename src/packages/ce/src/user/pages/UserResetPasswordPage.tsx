@@ -4,7 +4,6 @@ import React from "react";
 import {Alert, Button, PasswordInput, Spacing, Text, TextInput, useForm, useService} from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import Link from "next/link";
-import Image from "next/image";
 import {useRouter, useSearchParams} from "next/navigation";
 
 export const UserResetPasswordPage: React.FC = () => {
@@ -59,7 +58,8 @@ export const UserResetPasswordPage: React.FC = () => {
         </Text>
         {query.has("passwordReset") ? (
             <>
-                <Alert color={"success"}>If your email address exists, you received an email with a token to reset your password.</Alert>
+                <Alert color={"success"}>If your email address exists, you received an email with a token to reset your
+                    password.</Alert>
                 <Spacing spacing={"xl"}/>
             </>
         ) : null}

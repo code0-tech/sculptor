@@ -5,7 +5,7 @@ import {hashToColor, useService, useStore} from "@code0-tech/pictor";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
-import {DFlowNodeProps} from "@code0-tech/pictor/dist/components/d-flow-node/DFlowNode";
+import {FunctionNodeProps} from "@edition/function/components/FunctionNodeComponent";
 
 const packageNodes = new Map<string, string>([
     ['std', 'default'],
@@ -108,7 +108,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
         if (functionStore.length <= 0) return []
         if (dataTypeStore.length <= 0) return []
 
-        const nodes: Node<DFlowNodeProps>[] = [];
+        const nodes: Node<FunctionNodeProps>[] = [];
         const visited = new Set<string>();
 
         let groupCounter = 0;

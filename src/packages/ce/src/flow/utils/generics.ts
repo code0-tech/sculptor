@@ -12,9 +12,9 @@ import type {
     NodeParameterValue
 } from "@code0-tech/sagittarius-graphql-types";
 import {useReturnType} from "@edition/function/hooks/Function.return.hook";
-import {FunctionDefinitionView} from "@code0-tech/pictor";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FunctionService} from "@edition/function/services/Function.service";
+import {FunctionDefinitionView} from "@edition/function/services/Function.view";
 
 const GENERIC_PLACEHOLDER = "GENERIC";
 

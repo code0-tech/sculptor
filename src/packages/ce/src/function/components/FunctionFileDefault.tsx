@@ -1,5 +1,5 @@
 import React from "react";
-import {Flex, InputSyntaxSegment, ParameterDefinitionView, useForm, useService, useStore} from "@code0-tech/pictor";
+import {Flex, InputSyntaxSegment, useForm, useService, useStore} from "@code0-tech/pictor";
 import {
     Flow,
     LiteralValue,
@@ -10,10 +10,10 @@ import {
 } from "@code0-tech/sagittarius-graphql-types";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
 import {useNodeValidation} from "@edition/flow/hooks/NodeValidation.hook";
-import {DFlowInput} from "@code0-tech/pictor/dist/components/d-flow-input/DFlowInput";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DataTypeInput} from "@edition/datatype/components/DataTypeInput";
+import {ParameterDefinitionView} from "@edition/function/services/Function.view";
 
 export interface FunctionFileDefaultProps {
     node: NodeFunction

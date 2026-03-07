@@ -13,10 +13,6 @@ import {
     DialogOverlay,
     DialogPortal,
     DialogTitle,
-    DLayout,
-    DResizableHandle,
-    DResizablePanel,
-    DResizablePanelGroup,
     Flex,
     hashToColor,
     ScrollArea,
@@ -30,6 +26,12 @@ import {
 } from "@code0-tech/pictor";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {Editor, EditorTokenHighlights} from "@code0-tech/pictor/dist/components/editor/Editor";
+import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
+import {
+    ResizableHandle,
+    ResizablePanel,
+    ResizablePanelGroup
+} from "@code0-tech/pictor/dist/components/resizable/Resizable";
 
 export interface DataTypeTypeInputEditDialogProps {
     dataTypeIdentifier: DataTypeIdentifier
@@ -128,7 +130,7 @@ export const DataTypeTypeInputEditDialog: React.FC<DataTypeTypeInputEditDialogPr
                 padding: "2px",
             }}>
                 <DialogTitle/>
-                <DLayout layoutGap={0} showLayoutSplitter={false}
+                <Layout layoutGap={0} showLayoutSplitter={false}
                          topContent={<Flex style={{gap: ".7rem"}} p={0.7} justify={"space-between"}
                                            align={"center"}>
                              <Text>
@@ -140,8 +142,8 @@ export const DataTypeTypeInputEditDialog: React.FC<DataTypeTypeInputEditDialogPr
                                  </Button>
                              </DialogClose>
                          </Flex>}>
-                    <DResizablePanelGroup style={{borderRadius: "1rem"}}>
-                        <DResizablePanel color={"primary"}>
+                    <ResizablePanelGroup style={{borderRadius: "1rem"}}>
+                        <ResizablePanel color={"primary"}>
                             <ScrollArea h={"100%"} w={"100%"} type={"scroll"}>
                                 <ScrollAreaViewport px={1}>
                                     <Spacing spacing={"md"}/>
@@ -155,9 +157,9 @@ export const DataTypeTypeInputEditDialog: React.FC<DataTypeTypeInputEditDialogPr
                                     <ScrollAreaThumb/>
                                 </ScrollAreaScrollbar>
                             </ScrollArea>
-                        </DResizablePanel>
-                        <DResizableHandle/>
-                        <DResizablePanel color={"primary"}>
+                        </ResizablePanel>
+                        <ResizableHandle/>
+                        <ResizablePanel color={"primary"}>
                             <Editor suggestions={suggestions} tokenHighlights={myRenderMap} language={"json"}
                                     initialValue={editorValue?.value} onChange={value => {
                                 const dataTypeIdentifier = dataTypeService.getTypeFromValue({
@@ -167,9 +169,9 @@ export const DataTypeTypeInputEditDialog: React.FC<DataTypeTypeInputEditDialogPr
                                 onDataTypeChange?.(dataTypeIdentifier!)
                                 setDataTypeIdentifier(dataTypeIdentifier!)
                             }}/>
-                        </DResizablePanel>
-                    </DResizablePanelGroup>
-                </DLayout>
+                        </ResizablePanel>
+                    </ResizablePanelGroup>
+                </Layout>
             </DialogContent>
         </DialogPortal>
     </Dialog>

@@ -3,19 +3,19 @@
 import React from "react";
 import {
     Button,
-    EmailInput, emailValidation,
+    EmailInput,
+    emailValidation,
     Flex,
     PasswordInput,
-    setUserSession,
     Text,
     TextInput,
     useForm,
     useService
 } from "@code0-tech/pictor";
-import Image from "next/image";
 import Link from "next/link";
 import {UserService} from "@edition/user/services/User.service";
 import {useRouter} from "next/navigation";
+import {setUserSession} from "@edition/user/hooks/User.session.hook";
 
 export const UserRegistrationPage: React.FC = () => {
 

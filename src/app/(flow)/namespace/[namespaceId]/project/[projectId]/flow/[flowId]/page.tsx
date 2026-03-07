@@ -2,14 +2,7 @@
 
 import {
     Button,
-    DFlow,
-    DFlowTabs,
-    DLayout,
-    DResizableHandle,
-    DResizablePanel,
-    DResizablePanelGroup,
     Flex,
-    Text
 } from "@code0-tech/pictor";
 import React from "react";
 import {IconDatabase, IconFile, IconMessageChatbot} from "@tabler/icons-react";
@@ -17,6 +10,12 @@ import {useParams} from "next/navigation";
 import {Flow} from "@code0-tech/sagittarius-graphql-types";
 import {FlowBuilderComponent} from "@edition/flow/components/FlowBuilderComponent";
 import {FunctionFiles} from "@edition/function/components/FunctionFiles";
+import {
+    ResizableHandle,
+    ResizablePanel,
+    ResizablePanelGroup
+} from "@code0-tech/pictor/dist/components/resizable/Resizable";
+import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 
 export default function Page() {
 
@@ -27,8 +26,8 @@ export default function Page() {
 
     const [show, setShow] = React.useState(false);
 
-    return <DResizablePanel id={"2"}>
-        <DLayout layoutGap={0} showLayoutSplitter={false} rightContent={
+    return <ResizablePanel id={"2"}>
+        <Layout layoutGap={0} showLayoutSplitter={false} rightContent={
             <Flex pl={0.7} style={{flexDirection: "column", gap: "0.7rem"}}>
                 <Button aria-selected={show} onClick={() => setShow(prevState => !prevState)} variant={"none"}
                         paddingSize={"xs"}>
@@ -42,20 +41,20 @@ export default function Page() {
                 </Button>
             </Flex>
         }>
-            <DResizablePanelGroup orientation={"horizontal"} key={flowIndex}>
-                <DResizablePanel id={"2"} color={"primary"} style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
+            <ResizablePanelGroup orientation={"horizontal"} key={flowIndex}>
+                <ResizablePanel id={"2"} color={"primary"} style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
                     <FlowBuilderComponent flowId={flowId} namespaceId={undefined} projectId={undefined}/>
-                </DResizablePanel>
+                </ResizablePanel>
                 {show && (
                     <>
-                        <DResizableHandle/>
-                        <DResizablePanel id={"3"} defaultSize={"25%"} color={"primary"} style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
+                        <ResizableHandle/>
+                        <ResizablePanel id={"3"} defaultSize={"25%"} color={"primary"} style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
                             <FunctionFiles flowId={flowId} namespaceId={undefined}
                                        projectId={undefined}/>
-                        </DResizablePanel>
+                        </ResizablePanel>
                     </>
                 )}
-            </DResizablePanelGroup>
-        </DLayout>
-    </DResizablePanel>
+            </ResizablePanelGroup>
+        </Layout>
+    </ResizablePanel>
 }

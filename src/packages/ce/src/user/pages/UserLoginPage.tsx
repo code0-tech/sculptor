@@ -7,16 +7,15 @@ import {
     EmailInput,
     emailValidation,
     PasswordInput,
-    setUserSession,
     Spacing,
     Text,
     useForm,
     useService
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
-import Image from "next/image";
 import Link from "next/link";
 import {useRouter, useSearchParams} from "next/navigation";
+import {setUserSession} from "@edition/user/hooks/User.session.hook";
 
 export const UserLoginPage: React.FC = () => {
 

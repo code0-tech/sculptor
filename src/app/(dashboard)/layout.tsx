@@ -5,16 +5,7 @@ import {useApolloClient} from "@apollo/client/react";
 import {
     AuroraBackground,
     ContextStoreProvider,
-    DLayout,
-    DNamespaceMemberView,
-    DNamespaceProjectView,
-    DNamespaceRoleView,
-    DNamespaceView,
-    DOrganizationView,
-    DRuntimeView,
-    DUserView,
-    Flex,
-    useUserSession
+    Flex
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import {GraphqlClient} from "@core/util/graphql-client";
@@ -28,6 +19,15 @@ import {ProjectService} from "@edition/project/services/Project.service";
 import {RoleService} from "@edition/role/services/Role.service";
 import Image from "next/image";
 import {Application, ApplicationService} from "@edition/application/services/Application.service";
+import {useUserSession} from "@edition/user/hooks/User.session.hook";
+import {DUserView} from "@edition/user/services/User.view";
+import {DOrganizationView} from "@edition/organization/services/Organization.view";
+import {DNamespaceMemberView} from "@edition/member/services/Member.view";
+import {DNamespaceView} from "@edition/namespace/services/Namespace.view";
+import {DRuntimeView} from "@edition/runtime/services/Runtime.view";
+import {DNamespaceProjectView} from "@edition/project/services/Project.view";
+import {DNamespaceRoleView} from "@edition/role/services/Role.view";
+import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 
 interface ApplicationLayoutProps {
     children: React.ReactNode
@@ -55,7 +55,7 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
     if (currentSession === null) router.push("/login")
 
     return <ContextStoreProvider services={[user, organization, member, namespace, runtime, project, role, application]}>
-        <DLayout style={{zIndex: 0}} layoutGap={"0"} showLayoutSplitter={false} leftContent={
+        <Layout style={{zIndex: 0}} layoutGap={"0"} showLayoutSplitter={false} leftContent={
             <Flex p={0.7} pt={1} align={"center"} style={{flexDirection: "column", gap: "0.7rem"}}>
                 <div style={{
                     position: "absolute",
@@ -83,12 +83,12 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
                 {tab}
             </Flex>
         }>
-            <DLayout px={0.7} layoutGap={"0"} topContent={<>{bar}</>}>
-                <DLayout>
+            <Layout px={0.7} layoutGap={"0"} topContent={<>{bar}</>}>
+                <Layout>
                     <>{children}</>
-                </DLayout>
-            </DLayout>
-        </DLayout>
+                </Layout>
+            </Layout>
+        </Layout>
     </ContextStoreProvider>
 }
 

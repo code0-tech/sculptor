@@ -5,8 +5,6 @@ import {
     Col,
     Container,
     ContextStoreProvider,
-    DFullScreen,
-    DUserView,
     Flex, Spacing,
     Text
 } from "@code0-tech/pictor";
@@ -16,6 +14,8 @@ import {GraphqlClient} from "@core/util/graphql-client";
 import Image from "next/image";
 import React from "react";
 import {usePersistentReactiveArrayService} from "@/hooks/usePersistentReactiveArrayService";
+import {DUserView} from "@edition/user/services/User.view";
+import {FullScreen} from "@code0-tech/pictor/dist/components/fullscreen/FullScreen";
 
 export default function AuthLayout({children}: Readonly<{ children: React.ReactNode }>) {
 
@@ -23,7 +23,7 @@ export default function AuthLayout({children}: Readonly<{ children: React.ReactN
     const [store, service] = usePersistentReactiveArrayService<DUserView, UserService>("auth-users", (store) => new UserService(new GraphqlClient(client), store))
 
     return (
-        <DFullScreen>
+        <FullScreen>
             <AuroraBackground/>
             <ContextStoreProvider services={[[store, service]]}>
                 <Container h={"100%"} w={"100%"}>
@@ -61,6 +61,6 @@ export default function AuthLayout({children}: Readonly<{ children: React.ReactN
                 </Flex>
             </div>
 
-        </DFullScreen>
+        </FullScreen>
     );
 }

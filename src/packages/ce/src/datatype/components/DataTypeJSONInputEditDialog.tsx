@@ -9,11 +9,16 @@ import {
     DialogContent,
     DialogOverlay,
     DialogPortal,
-    DLayout, DResizableHandle, DResizablePanel, DResizablePanelGroup,
     Flex, ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport, Spacing, Text
 } from "@code0-tech/pictor";
 import {IconX} from "@tabler/icons-react";
 import {Editor} from "@code0-tech/pictor/dist/components/editor/Editor";
+import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
+import {
+    ResizableHandle,
+    ResizablePanel,
+    ResizablePanelGroup
+} from "@code0-tech/pictor/dist/components/resizable/Resizable";
 
 export interface DataTypeJSONInputEditDialogProps {
     open: boolean
@@ -128,7 +133,7 @@ export const DataTypeJSONInputEditDialog: React.FC<DataTypeJSONInputEditDialogPr
                         e.preventDefault()
                     }
                 }} w={"75%"} h={"75%"} style={{padding: "2px"}}>
-                    <DLayout layoutGap={0} showLayoutSplitter={false}
+                    <Layout layoutGap={0} showLayoutSplitter={false}
                              topContent={
                                  <Flex style={{gap: ".7rem"}} p={0.7} justify={"space-between"} align={"center"}>
                                      <Text>{entry?.key ?? "Edit Object"}</Text>
@@ -139,8 +144,8 @@ export const DataTypeJSONInputEditDialog: React.FC<DataTypeJSONInputEditDialogPr
                                      </DialogClose>
                                  </Flex>
                              }>
-                        <DResizablePanelGroup style={{borderRadius: "1rem"}}>
-                            <DResizablePanel color="primary">
+                        <ResizablePanelGroup style={{borderRadius: "1rem"}}>
+                            <ResizablePanel color="primary">
                                 <ScrollArea h="100%" w="100%" type="scroll">
                                     <ScrollAreaViewport px={1}>
                                         <Spacing spacing="md"/>
@@ -161,9 +166,9 @@ export const DataTypeJSONInputEditDialog: React.FC<DataTypeJSONInputEditDialogPr
                                         <ScrollAreaThumb/>
                                     </ScrollAreaScrollbar>
                                 </ScrollArea>
-                            </DResizablePanel>
-                            <DResizableHandle/>
-                            <DResizablePanel color="primary">
+                            </ResizablePanel>
+                            <ResizableHandle/>
+                            <ResizablePanel color="primary">
                                 <Editor
                                     suggestions={suggestions}
                                     tokenHighlights={tokenHighlights}
@@ -171,9 +176,9 @@ export const DataTypeJSONInputEditDialog: React.FC<DataTypeJSONInputEditDialogPr
                                     initialValue={editorValue}
                                     onChange={handleEditorChange}
                                 />
-                            </DResizablePanel>
-                        </DResizablePanelGroup>
-                    </DLayout>
+                            </ResizablePanel>
+                        </ResizablePanelGroup>
+                    </Layout>
                 </DialogContent>
             </DialogPortal>
         </Dialog>

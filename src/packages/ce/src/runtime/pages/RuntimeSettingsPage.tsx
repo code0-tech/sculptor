@@ -4,9 +4,6 @@ import React from "react";
 import {
     Button,
     Card,
-    DResizableHandle,
-    DResizablePanel,
-    DResizablePanelGroup,
     Flex,
     Spacing,
     Text,
@@ -21,6 +18,11 @@ import {notFound, useParams, useRouter} from "next/navigation";
 import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {IconLayoutSidebar} from "@tabler/icons-react";
+import {
+    ResizableHandle,
+    ResizablePanel,
+    ResizablePanelGroup
+} from "@code0-tech/pictor/dist/components/resizable/Resizable";
 
 export const RuntimeSettingsPage: React.FC = () => {
 
@@ -116,8 +118,8 @@ export const RuntimeSettingsPage: React.FC = () => {
 
 
     return <Tab orientation={"vertical"} defaultValue={"general"} h={"100%"}>
-        <DResizablePanelGroup>
-            <DResizablePanel id={"1"} defaultSize={"20%"} collapsedSize={"0%"}
+        <ResizablePanelGroup>
+            <ResizablePanel id={"1"} defaultSize={"20%"} collapsedSize={"0%"}
                              collapsible minSize={"10%"} style={{textWrap: "nowrap"}}>
                 <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
                     <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"}>
@@ -149,9 +151,9 @@ export const RuntimeSettingsPage: React.FC = () => {
                         </TabTrigger>
                     </TabList>
                 </Flex>
-            </DResizablePanel>
-            <DResizableHandle/>
-            <DResizablePanel id={"2"} color={"primary"} p={1}
+            </ResizablePanel>
+            <ResizableHandle/>
+            <ResizablePanel id={"2"} color={"primary"} p={1}
                              style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
                 <>
                     <TabContent value={"general"}>
@@ -221,7 +223,7 @@ export const RuntimeSettingsPage: React.FC = () => {
                         </Card>
                     </TabContent>
                 </>
-            </DResizablePanel>
-        </DResizablePanelGroup>
+            </ResizablePanel>
+        </ResizablePanelGroup>
     </Tab>
 }

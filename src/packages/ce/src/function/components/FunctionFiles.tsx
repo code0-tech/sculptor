@@ -2,7 +2,6 @@ import React from "react";
 import {Flow, Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {
     Button,
-    DLayout,
     Menu, MenuContent, MenuItem, MenuLabel, MenuPortal, MenuSeparator,
     MenuTrigger,
     useService,
@@ -20,6 +19,7 @@ import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/Butto
 import {IconDotsVertical, IconPlus} from "@tabler/icons-react";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
+import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 
 export interface FunctionFilesProps {
     flowId: Flow['id']
@@ -83,7 +83,7 @@ export const FunctionFiles: React.FC<FunctionFilesProps> = (props) => {
                 fileTabsService.activateTab(value);
             }}
         >
-            <DLayout layoutGap={"0"} topContent={<FileTabsList
+            <Layout layoutGap={"0"} topContent={<FileTabsList
                 controls={
                     <ButtonGroup color={"primary"} p={0} style={{boxShadow: "none"}}>
                         <Menu>
@@ -165,7 +165,7 @@ export const FunctionFiles: React.FC<FunctionFilesProps> = (props) => {
                         </FileTabsContent>
                     ))}
                 </>
-            </DLayout>
+            </Layout>
         </FileTabs>
     );
 

@@ -3,9 +3,6 @@
 import React from "react";
 import {
     Button,
-    DResizableHandle,
-    DResizablePanel,
-    DResizablePanelGroup,
     Flex,
     ScrollArea,
     ScrollAreaScrollbar,
@@ -19,6 +16,11 @@ import {RolePermissionView} from "@edition/role/views/RolePermissionView";
 import {RoleGeneralAdjustmentView} from "@edition/role/views/RoleGeneralAdjustmentView";
 import {RoleDeleteView} from "@edition/role/views/RoleDeleteView";
 import {IconLayoutSidebar} from "@tabler/icons-react";
+import {
+    ResizableHandle,
+    ResizablePanel,
+    ResizablePanelGroup
+} from "@code0-tech/pictor/dist/components/resizable/Resizable";
 
 export const RoleSettingsPage: React.FC = () => {
 
@@ -26,8 +28,8 @@ export const RoleSettingsPage: React.FC = () => {
 
     return <>
         <Tab orientation={"vertical"} defaultValue={"general"} h={"100%"}>
-            <DResizablePanelGroup>
-                <DResizablePanel id={"1"} defaultSize={"20%"} collapsedSize={"0%"}
+            <ResizablePanelGroup>
+                <ResizablePanel id={"1"} defaultSize={"20%"} collapsedSize={"0%"}
                                  collapsible minSize={"10%"} style={{textWrap: "nowrap"}}>
                     <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
                         <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"}>
@@ -65,9 +67,9 @@ export const RoleSettingsPage: React.FC = () => {
                             </TabTrigger>
                         </TabList>
                     </Flex>
-                </DResizablePanel>
-                <DResizableHandle/>
-                <DResizablePanel id={"2"} color={"primary"} p={1}
+                </ResizablePanel>
+                <ResizableHandle/>
+                <ResizablePanel id={"2"} color={"primary"} p={1}
                                  style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
                     <ScrollArea h={"100%"} w={"100%"} type={"scroll"}>
                         <ScrollAreaViewport>
@@ -80,8 +82,8 @@ export const RoleSettingsPage: React.FC = () => {
                             <ScrollAreaThumb/>
                         </ScrollAreaScrollbar>
                     </ScrollArea>
-                </DResizablePanel>
-            </DResizablePanelGroup>
+                </ResizablePanel>
+            </ResizablePanelGroup>
         </Tab>
     </>
 }

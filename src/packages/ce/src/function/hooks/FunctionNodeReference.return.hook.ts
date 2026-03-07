@@ -1,13 +1,13 @@
 import {DataTypeIdentifier, FlowType, NodeFunction, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FunctionService} from "@edition/function/services/Function.service";
-import {FunctionDefinitionView} from "@code0-tech/pictor";
 import {
     replaceGenericKeysInType,
     resolveGenericKeys,
     resolveType,
     targetForGenericKey
 } from "@edition/flow/utils/generics";
+import {FunctionDefinitionView} from "@edition/function/services/Function.view";
 
 export const getReferenceType = (
     reference: ReferenceValue,

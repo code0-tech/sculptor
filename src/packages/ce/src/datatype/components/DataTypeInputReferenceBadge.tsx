@@ -2,7 +2,9 @@ import {Flow, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
 import {DataTypeInputNodeBadge} from "./DataTypeInputNodeBadge";
 import {IconVariable} from "@tabler/icons-react";
-import {Badge, BadgeType, Flex, FlowTypeView, FunctionDefinitionView, Text} from "@code0-tech/pictor";
+import {Badge, BadgeType, Flex, Text} from "@code0-tech/pictor";
+import {FunctionDefinitionView} from "@edition/function/services/Function.view";
+import {FlowTypeView} from "@edition/flowtype/services/FlowType.view";
 
 export interface DataTypeInputReferenceBadgeProps extends Omit<BadgeType, 'value' | 'children'> {
     value: ReferenceValue
