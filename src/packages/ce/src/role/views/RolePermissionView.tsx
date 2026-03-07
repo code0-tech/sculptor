@@ -183,7 +183,11 @@ export const RolePermissionView: React.FC = () => {
     const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
     const roleId: NamespaceRole['id'] = `gid://sagittarius/NamespaceRole/${roleIndex}`
 
-    const role = React.useMemo(() => roleService.getById(roleId, {namespaceId: namespaceId}), [roleStore, roleId, namespaceId])
+    const role = React.useMemo(
+        () => roleService.getById(roleId, {namespaceId: namespaceId}),
+        [roleStore, roleId, namespaceId]
+    )
+
     const roleAbilities = React.useMemo(() => {
         return {
             ...permissions.reduce((acc, group) => {

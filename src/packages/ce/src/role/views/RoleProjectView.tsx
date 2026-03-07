@@ -1,26 +1,15 @@
 "use client"
 
-import {
-    Alert,
-    Button,
-    Card,
-    DNamespaceProjectView,
-    Flex,
-    Spacing,
-    Text,
-    toast,
-    useService,
-    useStore
-} from "@code0-tech/pictor";
-import DNamespaceProjectMenu from "@code0-tech/pictor/dist/components/d-project/DNamespaceProjectMenu";
-import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
-import {DNamespaceProjectContent} from "@code0-tech/pictor/dist/components/d-project/DNamespaceProjectContent";
-import {IconTrash} from "@tabler/icons-react";
+import {Alert, Button, DataTableColumn, Flex, Spacing, Text, toast, useService, useStore} from "@code0-tech/pictor";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import React from "react";
 import {useParams} from "next/navigation";
 import {RoleService} from "@edition/role/services/Role.service";
-import type {Namespace, NamespaceRole, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import type {Namespace, NamespaceProject, NamespaceRole, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import {ProjectDataTableComponent} from "@edition/project/components/ProjectDataTableComponent";
+import {ProjectMenuComponent} from "@edition/project/components/ProjectMenuComponent";
+import {DNamespaceProjectView} from "@edition/project/services/Project.view";
+import {IconTrash} from "@tabler/icons-react";
 
 export const RoleProjectView: React.FC = () => {
 
@@ -71,8 +60,12 @@ export const RoleProjectView: React.FC = () => {
         })
     }
 
-    const filterProjects = React.useCallback((project: DNamespaceProjectView) => {
+    const filterNotAssignedProjects = React.useCallback((project: DNamespaceProjectView) => {
         return !assignedProjectIds.find(projectId => projectId == project.id!!)
+    }, [assignedProjectIds])
+
+    const filterAssignedProjects = React.useCallback((project: NamespaceProject) => {
+        return !!assignedProjectIds.find(projectId => projectId == project.id!!)
     }, [assignedProjectIds])
 
     return <TabContent pl={"0.7"} value={"project"} style={{overflow: "hidden"}}>
@@ -82,12 +75,12 @@ export const RoleProjectView: React.FC = () => {
             </Text>
             <Flex align={"center"} style={{gap: ".7rem"}}>
                 <Button color={"success"} onClick={assignProjects}>Save changes</Button>
-                <DNamespaceProjectMenu namespaceId={namespaceId}
-                                       key={String(assignedProjectIds)}
-                                       filter={filterProjects}
-                                       onProjectSelect={(project) => addAssignedProject(project.id!!)}>
+                <ProjectMenuComponent namespaceId={namespaceId}
+                                      key={String(assignedProjectIds)}
+                                      filter={filterNotAssignedProjects}
+                                      onProjectSelect={(project) => addAssignedProject(project.id!!)}>
                     <Button>Add project</Button>
-                </DNamespaceProjectMenu>
+                </ProjectMenuComponent>
             </Flex>
         </Flex>
 
@@ -100,18 +93,18 @@ export const RoleProjectView: React.FC = () => {
                 </Text>
             </Alert>
         ) : (
-            <Card>
-                {assignedProjectIds.map(projectId => {
-                    return <CardSection key={projectId} border>
-                        <Flex align={"center"} style={{gap: "1.3rem"}} justify={"space-between"}>
-                            <DNamespaceProjectContent minimized projectId={projectId}/>
-                            <Button color={"error"} variant={"filled"} onClick={() => removeAssignedProject(projectId)}>
+            <>
+                <ProjectDataTableComponent additionalColumns={(project, index) => {
+                    return [
+                        <DataTableColumn>
+                            <Button color={"error"} variant={"none"}
+                                    onClick={() => removeAssignedProject(project?.id!)}>
                                 <IconTrash size={16}/>
                             </Button>
-                        </Flex>
-                    </CardSection>
-                })}
-            </Card>
+                        </DataTableColumn>
+                    ]
+                }} namespaceId={namespaceId} preFilter={filterAssignedProjects}/>
+            </>
         )}
     </TabContent>
 }

@@ -77,7 +77,7 @@ export class RoleService extends ReactiveArrayService<DNamespaceRoleView, RoleDe
     }
 
     getById(id: NamespaceRole['id'], dependencies?: RoleDependencies): DNamespaceRoleView | undefined {
-        return super.values(dependencies).find(role => role && role.id === id);
+        return this.values(dependencies!).find(role => role && role.id === id);
     }
 
     async roleAssignAbilities(payload: NamespacesRolesAssignAbilitiesInput): Promise<NamespacesRolesAssignAbilitiesPayload | undefined> {

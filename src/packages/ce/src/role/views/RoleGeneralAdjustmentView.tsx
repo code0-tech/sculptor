@@ -20,13 +20,16 @@ export const RoleGeneralAdjustmentView: React.FC = () => {
     const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
     const roleId: NamespaceRole['id'] = `gid://sagittarius/NamespaceRole/${roleIndex}`
 
-    const role = React.useMemo(() => roleService.getById(roleId, {namespaceId: namespaceId}), [roleStore, roleId, namespaceId])
+    const role = React.useMemo(
+        () => roleService.getById(roleId, {namespaceId: namespaceId}),
+        [roleStore, roleId, namespaceId]
+    )
 
     const initialValues = React.useMemo(() => {
         return {
             name: role?.name,
         }
-    }, [])
+    }, [role])
 
     const [inputs, validate] = useForm({
         initialValues: initialValues,
