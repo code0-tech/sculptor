@@ -13,9 +13,9 @@ import {useNodeValidation} from "@edition/flow/hooks/NodeValidation.hook";
 import {IconNote} from "@tabler/icons-react";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
-import {DataTypeInputLiteralBadge} from "@edition/datatype/components/DataTypeInputLiteralBadge";
-import {DataTypeInputReferenceBadge} from "@edition/datatype/components/DataTypeInputReferenceBadge";
-import {DataTypeInputNodeBadge} from "@edition/datatype/components/DataTypeInputNodeBadge";
+import {LiteralBadgeComponent} from "@edition/datatype/components/badges/LiteralBadgeComponent";
+import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
+import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeComponent";
 import {FunctionFileDefault} from "@edition/function/components/FunctionFileDefault";
 
 export type FunctionNodeDefaultProps = NodeProps<Node<FunctionNodeProps>>
@@ -81,15 +81,15 @@ export const FunctionNodeDefault: React.FC<FunctionNodeDefaultProps> = memo((pro
             switch (param?.value?.__typename) {
                 case "LiteralValue":
                     return <div style={{...decorationStyle, display: "inline-block"}}>
-                        <DataTypeInputLiteralBadge value={param.value}/>
+                        <LiteralBadgeComponent value={param.value}/>
                     </div>
                 case "ReferenceValue":
                     return <div style={{...decorationStyle, display: "inline-block"}}>
-                        <DataTypeInputReferenceBadge flowId={props.data.flowId} value={param.value}/>
+                        <ReferenceBadgeComponent flowId={props.data.flowId} value={param.value}/>
                     </div>
                 case "NodeFunctionIdWrapper":
                     return <div style={{...decorationStyle, display: "inline-block"}}>
-                        <DataTypeInputNodeBadge value={param.value} flowId={props.data.flowId}/>
+                        <NodeBadgeComponent value={param.value} flowId={props.data.flowId}/>
                         <Handle
                             key={param?.id}
                             type={"target"}

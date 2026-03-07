@@ -1,10 +1,10 @@
-import {EditableJSONEntry} from "./DataTypeJSONInput"
+import {EditableJSONEntry} from "./DataTypeJSONInputComponent"
 import React from "react"
 import {IconChevronDown, IconChevronUp} from "@tabler/icons-react"
 import {LiteralValue} from "@code0-tech/sagittarius-graphql-types"
 import {Badge, Flex, hashToColor, Text} from "@code0-tech/pictor";
 
-export interface DataTypeJSONInputTreeProps {
+export interface DataTypeJSONInputTreeComponentProps {
     object: LiteralValue
     parentKey?: string
     isRoot?: boolean
@@ -17,7 +17,7 @@ export interface DataTypeJSONInputTreeProps {
     parentColor?: string
 }
 
-export const DataTypeJSONInputTree: React.FC<DataTypeJSONInputTreeProps> = (props) => {
+export const DataTypeJSONInputTreeComponent: React.FC<DataTypeJSONInputTreeComponentProps> = (props) => {
     const {
         object,
         parentKey,
@@ -126,7 +126,7 @@ export const DataTypeJSONInputTree: React.FC<DataTypeJSONInputTreeProps> = (prop
                 </Flex>
             )
             const childTree = isCollapsable && !isCollapsed ? (
-                <DataTypeJSONInputTree
+                <DataTypeJSONInputTreeComponent
                     object={val as LiteralValue}
                     parentKey={key}
                     isRoot={false}

@@ -14,13 +14,13 @@ import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FunctionDefinitionView} from "@edition/function/services/Function.view";
 import {FlowTypeView} from "@edition/flowtype/services/FlowType.view";
 
-export interface DataTypeInputNodeBadgeProps extends Omit<BadgeType, 'value' | 'children'> {
+export interface NodeBadgeComponentProps extends Omit<BadgeType, 'value' | 'children'> {
     value: NodeFunction | NodeFunctionIdWrapper
     flowId: Flow['id']
     definition?: FunctionDefinitionView | FlowTypeView
 }
 
-export const DataTypeInputNodeBadge: React.FC<DataTypeInputNodeBadgeProps> = (props) => {
+export const NodeBadgeComponent: React.FC<NodeBadgeComponentProps> = (props) => {
 
     const {value, flowId, definition, ...rest} = props
 

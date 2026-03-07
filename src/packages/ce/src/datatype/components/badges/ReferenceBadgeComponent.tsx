@@ -1,24 +1,24 @@
 import {Flow, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
-import {DataTypeInputNodeBadge} from "./DataTypeInputNodeBadge";
+import {NodeBadgeComponent} from "./NodeBadgeComponent";
 import {IconVariable} from "@tabler/icons-react";
 import {Badge, BadgeType, Flex, Text} from "@code0-tech/pictor";
 import {FunctionDefinitionView} from "@edition/function/services/Function.view";
 import {FlowTypeView} from "@edition/flowtype/services/FlowType.view";
 
-export interface DataTypeInputReferenceBadgeProps extends Omit<BadgeType, 'value' | 'children'> {
+export interface ReferenceBadgeComponentProps extends Omit<BadgeType, 'value' | 'children'> {
     value: ReferenceValue
     flowId: Flow['id']
     definition?: FunctionDefinitionView | FlowTypeView
 }
 
-export const DataTypeInputReferenceBadge: React.FC<DataTypeInputReferenceBadgeProps> = (props) => {
+export const ReferenceBadgeComponent: React.FC<ReferenceBadgeComponentProps> = (props) => {
 
     const {value, flowId, definition, ...rest} = props
     const content = React.useMemo(() => {
         if (flowId) {
             return <Flex align={"center"} display={"inline-flex"}>
-                <DataTypeInputNodeBadge definition={definition} value={{
+                <NodeBadgeComponent definition={definition} value={{
                     id: value.nodeFunctionId,
                     __typename: "NodeFunctionIdWrapper"
                 }} flowId={flowId}/>

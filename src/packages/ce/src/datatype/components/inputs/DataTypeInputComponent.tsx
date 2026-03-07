@@ -1,13 +1,13 @@
 import {Flow, NodeFunction, NodeParameter} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
-import {DataTypeTextInput} from "./DataTypeTextInput";
-import {DataTypeJSONInput} from "./DataTypeJSONInput";
+import {DataTypeTextInputComponent} from "./text/DataTypeTextInputComponent";
+import {DataTypeJSONInputComponent} from "./json/DataTypeJSONInputComponent";
 import {InputProps, useService, useStore} from "@code0-tech/pictor";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 
-export interface DataTypeInputProps extends Omit<InputProps<any | null>, "wrapperComponent" | "type"> {
+export interface DataTypeInputComponentProps extends Omit<InputProps<any | null>, "wrapperComponent" | "type"> {
     flowId: Flow['id']
     nodeId: NodeFunction['id']
     parameterId: NodeParameter['id']
@@ -15,7 +15,7 @@ export interface DataTypeInputProps extends Omit<InputProps<any | null>, "wrappe
     onClear?: (event: React.MouseEvent<HTMLButtonElement>) => void
 }
 
-export const DataTypeInput: React.FC<DataTypeInputProps> = (props) => {
+export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (props) => {
 
     const {flowId, nodeId, parameterId, ...rest} = props
 
@@ -54,14 +54,14 @@ export const DataTypeInput: React.FC<DataTypeInputProps> = (props) => {
     switch (dataType?.variant) {
         case "ARRAY":
         case "OBJECT":
-            return <DataTypeJSONInput
+            return <DataTypeJSONInputComponent
                 flowId={flowId}
                 nodeId={nodeId}
                 parameterId={parameterId}
                 {...rest}
             />
         default:
-            return <DataTypeTextInput
+            return <DataTypeTextInputComponent
                 flowId={flowId}
                 nodeId={nodeId}
                 parameterId={parameterId}

@@ -1,7 +1,7 @@
 import React from "react"
-import {DataTypeJSONInputTree} from "./DataTypeJSONInputTree";
+import {DataTypeJSONInputTreeComponent} from "./DataTypeJSONInputTreeComponent";
 import {LiteralValue} from "@code0-tech/sagittarius-graphql-types";
-import {EditableJSONEntry} from "@edition/datatype/components/DataTypeJSONInput";
+import {EditableJSONEntry} from "@edition/datatype/components/inputs/json/DataTypeJSONInputComponent";
 import {
     Button,
     Dialog,
@@ -20,7 +20,7 @@ import {
     ResizablePanelGroup
 } from "@code0-tech/pictor/dist/components/resizable/Resizable";
 
-export interface DataTypeJSONInputEditDialogProps {
+export interface DataTypeJSONInputEditDialogComponentProps {
     open: boolean
     entry: EditableJSONEntry | null
     value: LiteralValue | null
@@ -69,7 +69,7 @@ function setValueAtPath(obj: LiteralValue | null, path: string[], value: unknown
     }
 }
 
-export const DataTypeJSONInputEditDialog: React.FC<DataTypeJSONInputEditDialogProps> = (props) => {
+export const DataTypeJSONInputEditDialogComponent: React.FC<DataTypeJSONInputEditDialogComponentProps> = (props) => {
     const {
         open,
         entry,
@@ -149,7 +149,7 @@ export const DataTypeJSONInputEditDialog: React.FC<DataTypeJSONInputEditDialogPr
                                 <ScrollArea h="100%" w="100%" type="scroll">
                                     <ScrollAreaViewport px={1}>
                                         <Spacing spacing="md"/>
-                                        <DataTypeJSONInputTree
+                                        <DataTypeJSONInputTreeComponent
                                             object={editedObject!}
                                             onEntryClick={handleEntryClick}
                                             collapsedState={collapsedState}

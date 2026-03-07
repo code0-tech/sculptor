@@ -1,11 +1,11 @@
 import React from "react"
 import {IconAlignLeft, IconEdit, IconX} from "@tabler/icons-react"
-import "./DataTypeTypeInput.style.scss"
-import {DataTypeJSONInputTree} from "./DataTypeJSONInputTree";
-import {DataTypeInputProps} from "./DataTypeInput";
+import "../type/DataTypeTypeInputComponent.style.scss"
+import {DataTypeJSONInputTreeComponent} from "./DataTypeJSONInputTreeComponent";
+import {DataTypeInputComponentProps} from "../DataTypeInputComponent";
 import {LiteralValue, NodeFunction, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
-import {DataTypeInputNodeBadge} from "./DataTypeInputNodeBadge";
-import {DataTypeInputReferenceBadge} from "./DataTypeInputReferenceBadge";
+import {NodeBadgeComponent} from "../../badges/NodeBadgeComponent";
+import {ReferenceBadgeComponent} from "../../badges/ReferenceBadgeComponent";
 import {useSuggestions} from "@edition/function/hooks/FunctionSuggestion.hook";
 import {
     Button,
@@ -20,7 +20,7 @@ import {
 } from "@code0-tech/pictor";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import {FunctionSuggestionMenu} from "@edition/function/components/FunctionSuggestionMenu";
-import {DataTypeJSONInputEditDialog} from "@edition/datatype/components/DataTypeJSONInputEditDialog";
+import {DataTypeJSONInputEditDialogComponent} from "@edition/datatype/components/inputs/json/DataTypeJSONInputEditDialogComponent";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FunctionService} from "@edition/function/services/Function.service";
@@ -31,9 +31,9 @@ export interface EditableJSONEntry {
     path: string[]
 }
 
-export type DataTypeJSONInputProps = DataTypeInputProps
+export type DataTypeJSONInputComponentProps = DataTypeInputComponentProps
 
-export const DataTypeJSONInput: React.FC<DataTypeJSONInputProps> = (props) => {
+export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProps> = (props) => {
 
 
     const {flowId, nodeId, parameterId, title, description, formValidation, onChange} = props
@@ -102,7 +102,7 @@ export const DataTypeJSONInput: React.FC<DataTypeJSONInputProps> = (props) => {
     return (
         <>
             {value?.__typename === "LiteralValue" && (
-                <DataTypeJSONInputEditDialog
+                <DataTypeJSONInputEditDialogComponent
                     key={String(editDialogOpen)}
                     open={editDialogOpen}
                     entry={editEntry}
@@ -138,11 +138,11 @@ export const DataTypeJSONInput: React.FC<DataTypeJSONInputProps> = (props) => {
                 </Flex>
                 <Card paddingSize="xs" mt={0.7} mb={-0.55} mx={-0.55}>
                     {value?.__typename === "NodeFunction" || value?.__typename === "NodeFunctionIdWrapper" ? (
-                        <DataTypeInputNodeBadge value={value} flowId={flowId}/>
+                        <NodeBadgeComponent value={value} flowId={flowId}/>
                     ) : value?.__typename === "ReferenceValue" ? (
-                        <DataTypeInputReferenceBadge value={value} flowId={flowId}/>
+                        <ReferenceBadgeComponent value={value} flowId={flowId}/>
                     ) : (
-                        <DataTypeJSONInputTree
+                        <DataTypeJSONInputTreeComponent
                             object={value as any}
                             onEntryClick={handleEntryClick}
                             collapsedState={collapsedState}

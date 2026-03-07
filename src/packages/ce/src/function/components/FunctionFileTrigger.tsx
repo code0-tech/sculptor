@@ -11,8 +11,8 @@ import {toInputSuggestions} from "@edition/function/components/FunctionSuggestio
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
-import {DataTypeTextInput} from "@edition/datatype/components/DataTypeTextInput";
-import {DataTypeTypeInput} from "@edition/datatype/components/DataTypeTypeInput";
+import {DataTypeTextInputComponent} from "@edition/datatype/components/inputs/text/DataTypeTextInputComponent";
+import {DataTypeTypeInputComponent} from "@edition/datatype/components/inputs/type/DataTypeTypeInputComponent";
 
 export interface FunctionFileTriggerProps {
     instance: Flow
@@ -60,7 +60,7 @@ export const FunctionFileTrigger: React.FC<FunctionFileTriggerProps> = (props) =
     })
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
-        {definition?.inputType ? <DataTypeTypeInput
+        {definition?.inputType ? <DataTypeTypeInputComponent
             initialValue={testDataType || undefined}
             label={"Test Data Type"}
             description={"Data type used for testing"}
@@ -102,20 +102,20 @@ export const FunctionFileTrigger: React.FC<FunctionFileTriggerProps> = (props) =
             }
 
             return <div>
-                <DataTypeTextInput flowId={undefined}
-                                   nodeId={undefined}
-                                   parameterId={undefined}
-                                   title={title}
-                                   description={description}
-                                   clearable
-                                   key={settingDefinition.identifier}
-                                   defaultValue={defaultValue}
-                                   onBlur={submitValueEvent}
-                                   onClear={submitValueEvent}
-                                   onSuggestionSelect={(suggestion) => {
+                <DataTypeTextInputComponent flowId={undefined}
+                                            nodeId={undefined}
+                                            parameterId={undefined}
+                                            title={title}
+                                            description={description}
+                                            clearable
+                                            key={settingDefinition.identifier}
+                                            defaultValue={defaultValue}
+                                            onBlur={submitValueEvent}
+                                            onClear={submitValueEvent}
+                                            onSuggestionSelect={(suggestion) => {
                                        submitValue(suggestion.value)
                                    }}
-                                   suggestions={toInputSuggestions(result)}
+                                            suggestions={toInputSuggestions(result)}
                 />
             </div>
         })}

@@ -1,6 +1,6 @@
 import React from "react";
 import {DataTypeIdentifier, LiteralValue} from "@code0-tech/sagittarius-graphql-types";
-import {DFlowInputDataTypeRuleTree} from "./DataTypeTypeInput";
+import {DataTypeTypeInputRuleTreeComponent} from "./DataTypeTypeInputComponent";
 import {CompletionContext, CompletionResult} from "@codemirror/autocomplete";
 import {syntaxTree} from "@codemirror/language";
 import {IconX} from "@tabler/icons-react";
@@ -33,14 +33,14 @@ import {
     ResizablePanelGroup
 } from "@code0-tech/pictor/dist/components/resizable/Resizable";
 
-export interface DataTypeTypeInputEditDialogProps {
+export interface DataTypeTypeInputEditDialogComponentProps {
     dataTypeIdentifier: DataTypeIdentifier
     open?: boolean
     onOpenChange?: (open: boolean) => void
     onDataTypeChange?: (dataTypeIdentifier: DataTypeIdentifier) => void
 }
 
-export const DataTypeTypeInputEditDialog: React.FC<DataTypeTypeInputEditDialogProps> = (props) => {
+export const DataTypeTypeInputEditDialogComponent: React.FC<DataTypeTypeInputEditDialogComponentProps> = (props) => {
 
     const {open, onOpenChange, onDataTypeChange} = props
 
@@ -120,7 +120,7 @@ export const DataTypeTypeInputEditDialog: React.FC<DataTypeTypeInputEditDialogPr
     return <Dialog open={editOpen} onOpenChange={(open) => onOpenChange?.(open)}>
         <DialogPortal>
             <DialogOverlay/>
-            <DialogContent aria-describedby={"DataTypeTypeInputEditDialog"} onPointerDownOutside={(e) => {
+            <DialogContent aria-describedby={"DataTypeTypeInputEditDialogComponent"} onPointerDownOutside={(e) => {
                 const target = e.target as HTMLElement;
 
                 if (target.closest("[data-slot=resizable-handle]") || target.closest("[data-slot=resizable-panel]")) {
@@ -147,7 +147,7 @@ export const DataTypeTypeInputEditDialog: React.FC<DataTypeTypeInputEditDialogPr
                             <ScrollArea h={"100%"} w={"100%"} type={"scroll"}>
                                 <ScrollAreaViewport px={1}>
                                     <Spacing spacing={"md"}/>
-                                    <DFlowInputDataTypeRuleTree dataTypeIdentifier={dataTypeIdentifier}/>
+                                    <DataTypeTypeInputRuleTreeComponent dataTypeIdentifier={dataTypeIdentifier}/>
                                     <Spacing spacing={"md"}/>
                                 </ScrollAreaViewport>
                                 <ScrollAreaScrollbar orientation={"vertical"}>

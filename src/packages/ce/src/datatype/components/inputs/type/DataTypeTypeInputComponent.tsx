@@ -6,8 +6,8 @@ import {
 } from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
 import {IconEdit} from "@tabler/icons-react";
-import "./DataTypeTypeInput.style.scss"
-import {DataTypeTypeInputEditDialog} from "./DataTypeTypeInputEditDialog";
+import "./DataTypeTypeInputComponent.style.scss"
+import {DataTypeTypeInputEditDialogComponent} from "./DataTypeTypeInputEditDialogComponent";
 import {
     Badge,
     Button,
@@ -23,19 +23,19 @@ import {
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 
-export interface DataTypeTypeInputProps extends ValidationProps<DataTypeIdentifier> {
+export interface DataTypeTypeInputComponentProps extends ValidationProps<DataTypeIdentifier> {
     onChange?: (value: DataTypeIdentifier | null) => void
     description?: string
     label?: string
 }
 
-export interface DataTypeTypeInputRuleTreeProps {
+export interface DataTypeTypeInputRuleTreeComponentProps {
     dataTypeIdentifier: DataTypeIdentifier
     parentRule?: Maybe<DataTypeRule>
     isRoot?: boolean
 }
 
-export const DataTypeTypeInput: React.FC<DataTypeTypeInputProps> = (props) => {
+export const DataTypeTypeInputComponent: React.FC<DataTypeTypeInputComponentProps> = (props) => {
 
     const {initialValue, defaultValue, value, label, description} = props
     const initValue = value ?? initialValue ?? defaultValue ?? null
@@ -50,10 +50,10 @@ export const DataTypeTypeInput: React.FC<DataTypeTypeInputProps> = (props) => {
     }, [dataTypeStore, initValue])
 
     return <div>
-        <DataTypeTypeInputEditDialog dataTypeIdentifier={initValue!}
-                                     open={editOpen}
-                                     onDataTypeChange={props.onChange}
-                                     onOpenChange={open => setEditOpen(open)}/>
+        <DataTypeTypeInputEditDialogComponent dataTypeIdentifier={initValue!}
+                                              open={editOpen}
+                                              onDataTypeChange={props.onChange}
+                                              onOpenChange={open => setEditOpen(open)}/>
         <InputLabel>{label}</InputLabel>
         <InputDescription>{description}</InputDescription>
         <Card color={"secondary"} paddingSize={"xs"}>
@@ -70,13 +70,13 @@ export const DataTypeTypeInput: React.FC<DataTypeTypeInputProps> = (props) => {
                 </Flex>
             </Flex>
             <Card paddingSize={"xs"} mt={0.7} mb={-0.55} mx={-0.55}>
-                <DFlowInputDataTypeRuleTree dataTypeIdentifier={initValue!}/>
+                <DataTypeTypeInputRuleTreeComponent dataTypeIdentifier={initValue!}/>
             </Card>
         </Card>
     </div>
 }
 
-export const DFlowInputDataTypeRuleTree: React.FC<DataTypeTypeInputRuleTreeProps> = (props) => {
+export const DataTypeTypeInputRuleTreeComponent: React.FC<DataTypeTypeInputRuleTreeComponentProps> = (props) => {
     const {dataTypeIdentifier, parentRule, isRoot = !parentRule} = props
 
     const dataTypeService = useService(DatatypeService)
@@ -114,7 +114,7 @@ export const DFlowInputDataTypeRuleTree: React.FC<DataTypeTypeInputRuleTreeProps
                 const childId = resolveChildIdentifier(rawChildId)
 
                 if (rule?.variant === "PARENT_TYPE" && childId) {
-                    return <DFlowInputDataTypeRuleTree
+                    return <DataTypeTypeInputRuleTreeComponent
                         key={key}
                         dataTypeIdentifier={childId}
                         parentRule={rule}
@@ -162,7 +162,7 @@ export const DFlowInputDataTypeRuleTree: React.FC<DataTypeTypeInputRuleTreeProps
                     )
                 }
 
-                const childTree = <DFlowInputDataTypeRuleTree dataTypeIdentifier={childId} parentRule={rule}/>
+                const childTree = <DataTypeTypeInputRuleTreeComponent dataTypeIdentifier={childId} parentRule={rule}/>
 
                 if (isRoot) return <CardSection key={key} border> {label} {childTree} </CardSection>
 

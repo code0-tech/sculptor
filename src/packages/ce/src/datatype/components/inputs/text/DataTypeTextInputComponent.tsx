@@ -1,8 +1,8 @@
 import React from "react";
 import {ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
-import {DataTypeInputNodeBadge} from "./DataTypeInputNodeBadge";
-import {DataTypeInputReferenceBadge} from "./DataTypeInputReferenceBadge";
-import {DataTypeInputProps} from "./DataTypeInput";
+import {NodeBadgeComponent} from "../../badges/NodeBadgeComponent";
+import {ReferenceBadgeComponent} from "../../badges/ReferenceBadgeComponent";
+import {DataTypeInputComponentProps} from "../DataTypeInputComponent";
 import {InputSyntaxSegment, MenuItem, Text, TextInput, useService} from "@code0-tech/pictor";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
@@ -12,7 +12,7 @@ import {FunctionSuggestionMenuFooter} from "@edition/function/components/Functio
 import {toInputSuggestions} from "@edition/function/components/FunctionSuggestionMenu.util";
 import {FunctionSuggestion} from "@edition/function/components/FunctionSuggestion.view";
 
-export type DataTypeTextInputProps = DataTypeInputProps
+export type DataTypeTextInputComponentProps = DataTypeInputComponentProps
 
 export const splitTextAndObjects = (input: string) => {
     const result: (string | Record<string, any>)[] = []
@@ -93,7 +93,7 @@ export const splitTextAndObjects = (input: string) => {
     return result
 }
 
-export const DataTypeTextInput: React.FC<DataTypeTextInputProps> = (props) => {
+export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProps> = (props) => {
 
     const {flowId, nodeId, parameterId, ...rest} = props
 
@@ -147,8 +147,8 @@ export const DataTypeTextInput: React.FC<DataTypeTextInputProps> = (props) => {
             if (value?.__typename === "NodeFunctionIdWrapper" || value?.__typename === "NodeFunction") {
                 const node = value?.__typename === "NodeFunction" ? value : flowService.getNodeById(flowId, value.id)
                 return buildBlockSegment(
-                    <DataTypeInputNodeBadge value={value} flowId={flowId}
-                                            definition={functionService.getById(node?.functionDefinition.id)}/>,
+                    <NodeBadgeComponent value={value} flowId={flowId}
+                                        definition={functionService.getById(node?.functionDefinition.id)}/>,
                     value
                 )
             }
@@ -156,7 +156,7 @@ export const DataTypeTextInput: React.FC<DataTypeTextInputProps> = (props) => {
             if (value?.__typename === "ReferenceValue") {
                 const node = (value as ReferenceValue).nodeFunctionId === "gid://sagittarius/NodeFunction/-1" ? flowTypeService.getById(flow?.type?.id) : functionService.getById(flowService.getNodeById(flowId, (value as ReferenceValue).nodeFunctionId)?.functionDefinition?.id)
                 return buildBlockSegment(
-                    <DataTypeInputReferenceBadge flowId={flowId} definition={node} value={value}/>,
+                    <ReferenceBadgeComponent flowId={flowId} definition={node} value={value}/>,
                     value
                 )
             }

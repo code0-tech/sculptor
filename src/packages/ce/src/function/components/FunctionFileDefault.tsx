@@ -12,7 +12,7 @@ import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/File
 import {useNodeValidation} from "@edition/flow/hooks/NodeValidation.hook";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import {DataTypeInput} from "@edition/datatype/components/DataTypeInput";
+import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent";
 import {ParameterDefinitionView} from "@edition/function/services/Function.view";
 
 export interface FunctionFileDefaultProps {
@@ -136,17 +136,17 @@ export const FunctionFileDefault: React.FC<FunctionFileDefaultProps> = (props) =
 
             return <div>
                 {/*@ts-ignore*/}
-                <DataTypeInput flowId={flowId}
-                            nodeId={node.id}
-                            parameterId={parameter.id}
-                            title={title}
-                            description={description}
-                            clearable
-                            onChange={() => {
+                <DataTypeInputComponent flowId={flowId}
+                                        nodeId={node.id}
+                                        parameterId={parameter.id}
+                                        title={title}
+                                        description={description}
+                                        clearable
+                                        onChange={() => {
                                 changedParameters.current.add(parameter.id!!)
                                 validate()
                             }}
-                            {...inputs.getInputProps(parameter.id!!)}
+                                        {...inputs.getInputProps(parameter.id!!)}
                 />
             </div>
         })}
