@@ -1,6 +1,6 @@
-import {DRuntimeDependencies, ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor";
+import {ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor";
 import {
-    Mutation,
+    Mutation, Namespace,
     Query,
     Runtime,
     RuntimesCreateInput,
@@ -22,7 +22,11 @@ import rotateTokenRuntimeMutation from "./mutations/Runtime.rotateToken.mutation
 import {View} from "@code0-tech/pictor/dist/utils/view";
 import {DRuntimeView} from "@edition/runtime/services/Runtime.view";
 
-export class RuntimeService extends ReactiveArrayService<DRuntimeView, DRuntimeDependencies> {
+export type RuntimeDependencies = {
+    namespaceId: Namespace['id']
+}
+
+export class RuntimeService extends ReactiveArrayService<DRuntimeView, RuntimeDependencies> {
 
     private readonly client: GraphqlClient
     private i = 0
@@ -43,7 +47,7 @@ export class RuntimeService extends ReactiveArrayService<DRuntimeView, DRuntimeD
 
     //TODO: rework to be able to get all runtimes that you can access. If no namespace id is provided just get the global runtiimes
     // TODO: if namespace id is provided get the runtimes for this namespace and also the global runtimes
-    values(dependencies?: DRuntimeDependencies): DRuntimeView[] {
+    values(dependencies?: RuntimeDependencies): DRuntimeView[] {
         const runtimes = super.values()
 
         if (!dependencies?.namespaceId) {
