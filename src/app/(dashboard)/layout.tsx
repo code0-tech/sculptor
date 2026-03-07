@@ -5,16 +5,7 @@ import {useApolloClient} from "@apollo/client/react";
 import {
     AuroraBackground,
     ContextStoreProvider,
-    DLayout,
-    DNamespaceMemberView,
-    DNamespaceProjectView,
-    DNamespaceRoleView,
-    DNamespaceView,
-    DOrganizationView,
-    DRuntimeView,
-    DUserView,
-    Flex,
-    useUserSession
+    Flex
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import {GraphqlClient} from "@core/util/graphql-client";
@@ -28,6 +19,15 @@ import {ProjectService} from "@edition/project/services/Project.service";
 import {RoleService} from "@edition/role/services/Role.service";
 import Image from "next/image";
 import {Application, ApplicationService} from "@edition/application/services/Application.service";
+import {useUserSession} from "@edition/user/hooks/User.session.hook";
+import {UserView} from "@edition/user/services/User.view";
+import {OrganizationView} from "@edition/organization/services/Organization.view";
+import {MemberView} from "@edition/member/services/Member.view";
+import {NamespaceView} from "@edition/namespace/services/Namespace.view";
+import {RuntimeView} from "@edition/runtime/services/Runtime.view";
+import {ProjectView} from "@edition/project/services/Project.view";
+import {RoleView} from "@edition/role/services/Role.view";
+import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 
 interface ApplicationLayoutProps {
     children: React.ReactNode
@@ -43,19 +43,19 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
 
     const graphqlClient = React.useMemo(() => new GraphqlClient(client), [client])
 
-    const user = usePersistentReactiveArrayService<DUserView, UserService>(`dashboard::users::${currentSession?.id}`, (store) => new UserService(graphqlClient, store))
-    const organization = usePersistentReactiveArrayService<DOrganizationView, OrganizationService>(`dashboard::organizations::${currentSession?.id}`, (store) => new OrganizationService(graphqlClient, store))
-    const member = usePersistentReactiveArrayService<DNamespaceMemberView, MemberService>(`dashboard::members::${currentSession?.id}`, (store) => new MemberService(graphqlClient, store))
-    const namespace = usePersistentReactiveArrayService<DNamespaceView, NamespaceService>(`dashboard::namespaces::${currentSession?.id}`, (store) => new NamespaceService(graphqlClient, store))
-    const runtime = usePersistentReactiveArrayService<DRuntimeView, RuntimeService>(`dashboard::global_runtimes::${currentSession?.id}`, (store) => new RuntimeService(graphqlClient, store))
-    const project = usePersistentReactiveArrayService<DNamespaceProjectView, ProjectService>(`dashboard::projects::${currentSession?.id}`, (store) => new ProjectService(graphqlClient, store))
-    const role = usePersistentReactiveArrayService<DNamespaceRoleView, RoleService>(`dashboard::roles::${currentSession?.id}`, (store) => new RoleService(graphqlClient, store))
+    const user = usePersistentReactiveArrayService<UserView, UserService>(`dashboard::users::${currentSession?.id}`, (store) => new UserService(graphqlClient, store))
+    const organization = usePersistentReactiveArrayService<OrganizationView, OrganizationService>(`dashboard::organizations::${currentSession?.id}`, (store) => new OrganizationService(graphqlClient, store))
+    const member = usePersistentReactiveArrayService<MemberView, MemberService>(`dashboard::members::${currentSession?.id}`, (store) => new MemberService(graphqlClient, store))
+    const namespace = usePersistentReactiveArrayService<NamespaceView, NamespaceService>(`dashboard::namespaces::${currentSession?.id}`, (store) => new NamespaceService(graphqlClient, store))
+    const runtime = usePersistentReactiveArrayService<RuntimeView, RuntimeService>(`dashboard::global_runtimes::${currentSession?.id}`, (store) => new RuntimeService(graphqlClient, store))
+    const project = usePersistentReactiveArrayService<ProjectView, ProjectService>(`dashboard::projects::${currentSession?.id}`, (store) => new ProjectService(graphqlClient, store))
+    const role = usePersistentReactiveArrayService<RoleView, RoleService>(`dashboard::roles::${currentSession?.id}`, (store) => new RoleService(graphqlClient, store))
     const application = usePersistentReactiveArrayService<Application, ApplicationService>(`dashboard::application::${currentSession?.id}`, (store) => new ApplicationService(graphqlClient, store))
 
     if (currentSession === null) router.push("/login")
 
     return <ContextStoreProvider services={[user, organization, member, namespace, runtime, project, role, application]}>
-        <DLayout style={{zIndex: 0}} layoutGap={"0"} showLayoutSplitter={false} leftContent={
+        <Layout style={{zIndex: 0}} layoutGap={"0"} showLayoutSplitter={false} leftContent={
             <Flex p={0.7} pt={1} align={"center"} style={{flexDirection: "column", gap: "0.7rem"}}>
                 <div style={{
                     position: "absolute",
@@ -83,12 +83,12 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
                 {tab}
             </Flex>
         }>
-            <DLayout px={0.7} layoutGap={"0"} topContent={<>{bar}</>}>
-                <DLayout>
+            <Layout px={0.7} layoutGap={"0"} topContent={<>{bar}</>}>
+                <Layout>
                     <>{children}</>
-                </DLayout>
-            </DLayout>
-        </DLayout>
+                </Layout>
+            </Layout>
+        </Layout>
     </ContextStoreProvider>
 }
 

@@ -2,11 +2,13 @@
 
 import React from "react";
 import {ProjectsView} from "@edition/project/views/ProjectsView";
-import {DLayout, useService, useStore, useUserSession, ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "@code0-tech/pictor";
+import {useService, useStore, ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "@code0-tech/pictor";
 import {NamespaceOverviewPersonalLeftView} from "@edition/namespace/views/NamespaceOverviewPersonalLeftView";
 import {useParams} from "next/navigation";
 import {UserService} from "@edition/user/services/User.service";
 import {NamespaceOverviewOrganizationLeftView} from "@edition/namespace/views/NamespaceOverviewOrganizationLeftView";
+import {useUserSession} from "@edition/user/hooks/User.session.hook";
+import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 
 export const NamespaceOverviewPage: React.FC = () => {
 
@@ -19,7 +21,7 @@ export const NamespaceOverviewPage: React.FC = () => {
     const namespaceIndexCurrentUser = currentUser?.namespace?.id?.match(/Namespace\/(\d+)$/)?.[1]
     const namespaceId = params.namespaceId as any as string
 
-    return <DLayout showLayoutSplitter={false} layoutGap={"0"}
+    return <Layout showLayoutSplitter={false} layoutGap={"0"}
                     leftContent={namespaceIndexCurrentUser == namespaceId ? <NamespaceOverviewPersonalLeftView/> :
                         <NamespaceOverviewOrganizationLeftView/>}>
         <div style={{
@@ -38,5 +40,5 @@ export const NamespaceOverviewPage: React.FC = () => {
                 </ScrollAreaScrollbar>
             </ScrollArea>
         </div>
-    </DLayout>
+    </Layout>
 }

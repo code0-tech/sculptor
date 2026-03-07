@@ -5,9 +5,6 @@ import {
     Badge,
     Button,
     Card,
-    DResizableHandle,
-    DResizablePanel,
-    DResizablePanelGroup,
     Flex,
     Spacing,
     SwitchInput,
@@ -15,8 +12,7 @@ import {
     toast,
     useForm,
     useService,
-    useStore,
-    useUserSession
+    useStore
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import {notFound} from "next/navigation";
@@ -24,6 +20,12 @@ import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/comp
 import {IconLayoutSidebar} from "@tabler/icons-react";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {ApplicationService} from "@edition/application/services/Application.service";
+import {useUserSession} from "@edition/user/hooks/User.session.hook";
+import {
+    ResizableHandle,
+    ResizablePanel,
+    ResizablePanelGroup
+} from "@code0-tech/pictor/dist/components/resizable/Resizable";
 
 export const ApplicationSettingsPage: React.FC = () => {
 
@@ -86,8 +88,8 @@ export const ApplicationSettingsPage: React.FC = () => {
     })
 
     return <Tab orientation={"vertical"} defaultValue={"general"} h={"100%"}>
-        <DResizablePanelGroup>
-            <DResizablePanel id={"1"} defaultSize={"20%"} collapsedSize={"0%"}
+        <ResizablePanelGroup>
+            <ResizablePanel id={"1"} defaultSize={"20%"} collapsedSize={"0%"}
                              collapsible minSize={"10%"} style={{textWrap: "nowrap"}}>
                 <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
                     <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"}>
@@ -114,9 +116,9 @@ export const ApplicationSettingsPage: React.FC = () => {
                         </TabTrigger>
                     </TabList>
                 </Flex>
-            </DResizablePanel>
-            <DResizableHandle/>
-            <DResizablePanel id={"2"} color={"primary"} p={1} style={{borderTopLeftRadius: "1rem"}}>
+            </ResizablePanel>
+            <ResizableHandle/>
+            <ResizablePanel id={"2"} color={"primary"} p={1} style={{borderTopLeftRadius: "1rem"}}>
                 <>
                     <TabContent value={"general"}>
                         <Text size={"xl"} hierarchy={"primary"}>General</Text>
@@ -231,7 +233,7 @@ export const ApplicationSettingsPage: React.FC = () => {
 
                     </TabContent>
                 </>
-            </DResizablePanel>
-        </DResizablePanelGroup>
+            </ResizablePanel>
+        </ResizablePanelGroup>
     </Tab>
 }

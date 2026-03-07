@@ -1,20 +1,21 @@
-import {DNamespaceReactiveService, DNamespaceView, ReactiveArrayStore} from "@code0-tech/pictor";
+import {ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor";
 import {GraphqlClient} from "@core/util/graphql-client";
 import {Namespace, Query} from "@code0-tech/sagittarius-graphql-types";
 import namespaceQuery from "./queries/Namespace.query.graphql";
 import {View} from "@code0-tech/pictor/dist/utils/view";
+import {NamespaceView} from "@edition/namespace/services/Namespace.view";
 
-export class NamespaceService extends DNamespaceReactiveService {
+export class NamespaceService extends ReactiveArrayService<NamespaceView> {
 
     private readonly client: GraphqlClient
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<DNamespaceView>>) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<NamespaceView>>) {
         super(store);
         this.client = client
     }
 
-    getById(id: Namespace["id"]): DNamespaceView | undefined {
-        if (super.getById(id)) return super.getById(id);
+    getById(id: Namespace["id"]): NamespaceView | undefined {
+        if (this.values().find(namespace => namespace && namespace.id === id)) return this.values().find(namespace => namespace && namespace.id === id)
         this.client.query<Query>({
             query: namespaceQuery,
             variables: {
@@ -25,11 +26,11 @@ export class NamespaceService extends DNamespaceReactiveService {
             if (!data) return
 
             if (data.namespace) {
-                this.add(new View(new DNamespaceView(data.namespace)))
+                this.add(new View(new NamespaceView(data.namespace)))
             }
         })
 
-        return super.getById(id);
+        return this.values().find(namespace => namespace && namespace.id === id)
     }
 
 }

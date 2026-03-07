@@ -1,8 +1,12 @@
 "use client"
 
 import React from "react";
-import {DResizableHandle, DResizablePanel, DResizablePanelGroup} from "@code0-tech/pictor";
 import {FlowFolderView} from "@edition/flow/views/FlowFolderView";
+import {
+    ResizableHandle,
+    ResizablePanel,
+    ResizablePanelGroup
+} from "@code0-tech/pictor/dist/components/resizable/Resizable";
 
 interface ApplicationLayoutProps {
     children: React.ReactNode
@@ -10,13 +14,13 @@ interface ApplicationLayoutProps {
 
 const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children}) => {
 
-    return <DResizablePanelGroup orientation={"horizontal"}>
-        <DResizablePanel id={"1"} defaultSize={"25%"}>
+    return <ResizablePanelGroup orientation={"horizontal"}>
+        <ResizablePanel id={"1"} defaultSize={"25%"}>
             <FlowFolderView/>
-        </DResizablePanel>
-        <DResizableHandle/>
+        </ResizablePanel>
+        <ResizableHandle/>
         {children}
-    </DResizablePanelGroup>
+    </ResizablePanelGroup>
 }
 
 export default ApplicationLayout

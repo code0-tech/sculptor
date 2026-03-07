@@ -1,17 +1,12 @@
 "use client"
 
 import React from "react";
-import {Badge, Button, useService, useStore} from "@code0-tech/pictor";
+import {Button, useService, useStore} from "@code0-tech/pictor";
 import {Tab, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {IconFolders, IconHome, IconServer, IconSettings, IconUserCog, IconUsers} from "@tabler/icons-react";
 import {useParams, usePathname, useRouter} from "next/navigation";
 import {NamespaceService} from "@edition/namespace/services/Namespace.service";
 import {OrganizationService} from "@edition/organization/services/Organization.service";
-import {ProjectService} from "@edition/project/services/Project.service";
-import {RoleService} from "@edition/role/services/Role.service";
-import {MemberService} from "@edition/member/services/Member.service";
-import {RuntimeService} from "@edition/runtime/services/Runtime.service";
-import {hashToColor} from "@code0-tech/pictor/dist/components/d-flow/DFlow.util";
 
 export const NamespaceTabView: React.FC = () => {
 

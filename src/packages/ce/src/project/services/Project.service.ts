@@ -1,11 +1,9 @@
 import {
-    DNamespaceProjectReactiveService,
-    DNamespaceProjectView,
-    DProjectDependencies,
+    ReactiveArrayService,
     ReactiveArrayStore
 } from "@code0-tech/pictor";
 import {
-    Mutation,
+    Mutation, Namespace,
     NamespaceProject,
     NamespacesProjectsAssignRuntimesInput,
     NamespacesProjectsAssignRuntimesPayload,
@@ -24,18 +22,23 @@ import projectDeleteMutation from "./mutations/Project.delete.mutation.graphql"
 import projectUpdateMutation from "./mutations/Project.update.mutation.graphql"
 import projectAssignRuntimesMutation from "./mutations/Project.assignRuntimes.mutation.graphql"
 import {View} from "@code0-tech/pictor/dist/utils/view";
+import {ProjectView} from "@edition/project/services/Project.view";
 
-export class ProjectService extends DNamespaceProjectReactiveService {
+export type ProjectDependencies = {
+    namespaceId: Namespace['id']
+}
+
+export class ProjectService extends ReactiveArrayService<ProjectView, ProjectDependencies> {
 
     private readonly client: GraphqlClient
     private i = 0;
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<DNamespaceProjectView>>) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<ProjectView>>) {
         super(store);
         this.client = client
     }
 
-    values(dependencies: DProjectDependencies): DNamespaceProjectView[] {
+    values(dependencies: ProjectDependencies): ProjectView[] {
         const projects = super.values()
         if (!dependencies?.namespaceId) return projects
 
@@ -58,7 +61,7 @@ export class ProjectService extends DNamespaceProjectReactiveService {
                         project.namespace?.id === namespaceId &&
                         !this.hasById(project.id)
                     ) {
-                        this.set(this.i++, new View(new DNamespaceProjectView(project)))
+                        this.set(this.i++, new View(new ProjectView(project)))
                     }
                 })
             })
@@ -70,6 +73,10 @@ export class ProjectService extends DNamespaceProjectReactiveService {
     hasById(id: NamespaceProject["id"]): boolean {
         const project = super.values().find(p => p.id === id)
         return project !== undefined
+    }
+
+    getById(id: NamespaceProject['id'], dependencies?: ProjectDependencies): ProjectView | undefined {
+        return this.values(dependencies!).find(project => project && project.id === id)
     }
 
     async projectAssignRuntimes(payload: NamespacesProjectsAssignRuntimesInput): Promise<NamespacesProjectsAssignRuntimesPayload | undefined> {
@@ -84,7 +91,7 @@ export class ProjectService extends DNamespaceProjectReactiveService {
             const project = result.data.namespacesProjectsAssignRuntimes.namespaceProject
             const index = this.values({namespaceId: project?.namespace?.id}).findIndex(o => o.id === project.id)
             const projectStored = this.values({namespaceId: project?.namespace?.id}).find(o => o.id === project.id)
-            this.set(index, new View(new DNamespaceProjectView({
+            this.set(index, new View(new ProjectView({
                 ...projectStored?.json(),
                 runtimes: {
                     count: payload.runtimeIds.length,
@@ -108,7 +115,7 @@ export class ProjectService extends DNamespaceProjectReactiveService {
         if (result.data && result.data.namespacesProjectsCreate && result.data.namespacesProjectsCreate.namespaceProject) {
             const project = result.data.namespacesProjectsCreate.namespaceProject
             if (!this.hasById(project.id)) {
-                this.add(new View(new DNamespaceProjectView(project)))
+                this.add(new View(new ProjectView(project)))
             }
         }
 
@@ -145,7 +152,7 @@ export class ProjectService extends DNamespaceProjectReactiveService {
             const project = result.data.namespacesProjectsUpdate.namespaceProject
             const index = this.values({namespaceId: project?.namespace?.id}).findIndex(o => o.id === project.id)
             const projectStored = this.values({namespaceId: project?.namespace?.id}).find(o => o.id === project.id)
-            this.set(index, new View(new DNamespaceProjectView({
+            this.set(index, new View(new ProjectView({
                 ...projectStored?.json(),
                 ...(payload.name ? {name: payload.name} : {}),
                 ...(payload.description ? {description: payload.description} : {}),

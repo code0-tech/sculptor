@@ -1,11 +1,6 @@
+import {ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor"
 import {
-    DNamespaceRoleReactiveService,
-    DNamespaceRoleView,
-    DRoleDependencies,
-    ReactiveArrayStore
-} from "@code0-tech/pictor"
-import {
-    Mutation,
+    Mutation, Namespace,
     NamespaceRole,
     NamespacesRolesAssignAbilitiesInput,
     NamespacesRolesAssignAbilitiesPayload,
@@ -16,7 +11,7 @@ import {
     NamespacesRolesDeleteInput,
     NamespacesRolesDeletePayload,
     NamespacesRolesUpdateInput,
-    NamespacesRolesUpdatePayload, OrganizationsDeleteInput,
+    NamespacesRolesUpdatePayload,
     Query
 } from "@code0-tech/sagittarius-graphql-types"
 import {GraphqlClient} from "@core/util/graphql-client";
@@ -26,18 +21,23 @@ import roleDeleteMutation from "@edition/role/services/mutations/Role.delete.mut
 import roleAssignAbilitiesMutation from "@edition/role/services/mutations/Role.assignAbilities.mutation.graphql";
 import roleAssignProjectsMutation from "@edition/role/services/mutations/Role.assignProjects.mutation.graphql";
 import {View} from "@code0-tech/pictor/dist/utils/view";
+import {RoleView} from "@edition/role/services/Role.view";
 
-export class RoleService extends DNamespaceRoleReactiveService {
+export type RoleDependencies = {
+    namespaceId: Namespace['id']
+}
+
+export class RoleService extends ReactiveArrayService<RoleView, RoleDependencies> {
 
     private readonly client: GraphqlClient
     private i = 0;
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<DNamespaceRoleView>>) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<RoleView>>) {
         super(store);
         this.client = client
     }
 
-    values(dependencies: DRoleDependencies): DNamespaceRoleView[] {
+    values(dependencies: RoleDependencies): RoleView[] {
         const roles = super.values()
         if (!dependencies?.namespaceId) return roles
 
@@ -62,7 +62,7 @@ export class RoleService extends DNamespaceRoleReactiveService {
                         role.namespace?.id === namespaceId &&
                         !this.hasById(role.id)
                     ) {
-                        this.set(this.i++, new View(new DNamespaceRoleView(role)))
+                        this.set(this.i++, new View(new RoleView(role)))
                     }
                 })
             })
@@ -74,6 +74,10 @@ export class RoleService extends DNamespaceRoleReactiveService {
     hasById(id: NamespaceRole["id"]): boolean {
         const role = super.values().find(r => r.id === id)
         return role !== undefined
+    }
+
+    getById(id: NamespaceRole['id'], dependencies?: RoleDependencies): RoleView | undefined {
+        return this.values(dependencies!).find(role => role && role.id === id);
     }
 
     async roleAssignAbilities(payload: NamespacesRolesAssignAbilitiesInput): Promise<NamespacesRolesAssignAbilitiesPayload | undefined> {
@@ -89,7 +93,7 @@ export class RoleService extends DNamespaceRoleReactiveService {
             const currentRole = this.getById(payload.roleId)
             const index = super.values().findIndex(m => m.id === payload.roleId)
 
-            const newRole = new DNamespaceRoleView({
+            const newRole = new RoleView({
                 ...currentRole?.json(),
                 abilities: payload.abilities
             })
@@ -113,7 +117,7 @@ export class RoleService extends DNamespaceRoleReactiveService {
             const currentRole = this.getById(payload.roleId)
             const index = super.values().findIndex(m => m.id === payload.roleId)
 
-            const newRole = new DNamespaceRoleView({
+            const newRole = new RoleView({
                 ...currentRole?.json(),
                 assignedProjects: {
                     count: payload.projectIds.length,
@@ -142,7 +146,7 @@ export class RoleService extends DNamespaceRoleReactiveService {
             const currentRole = this.getById(payload.namespaceRoleId)
             const index = super.values().findIndex(m => m.id === payload.namespaceRoleId)
 
-            const newRole = new DNamespaceRoleView({
+            const newRole = new RoleView({
                 ...currentRole?.json(),
                 name: payload.name
             })

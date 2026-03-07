@@ -1,4 +1,4 @@
-import {DOrganizationReactiveService, DOrganizationView, ReactiveArrayStore} from "@code0-tech/pictor";
+import {ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor";
 import {
     Mutation,
     Organization,
@@ -16,18 +16,19 @@ import updateOrganizationMutation from "./mutations/Organization.update.mutation
 import deleteOrganizationMutation from "./mutations/Organization.delete.mutation.graphql";
 import organizationQuery from "./queries/Organization.query.graphql";
 import {View} from "@code0-tech/pictor/dist/utils/view";
+import {OrganizationView} from "@edition/organization/services/Organization.view";
 
-export class OrganizationService extends DOrganizationReactiveService {
+export class OrganizationService extends ReactiveArrayService<OrganizationView> {
 
     private readonly client: GraphqlClient
     private i = 0;
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<DOrganizationView>>) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<OrganizationView>>) {
         super(store);
         this.client = client
     }
 
-    values(): DOrganizationView[] {
+    values(): OrganizationView[] {
         if (super.values().length > 0) return super.values();
         this.client.query<Query>({
             query: organizationQuery
@@ -37,7 +38,7 @@ export class OrganizationService extends DOrganizationReactiveService {
 
             if (data.organizations && data.organizations.nodes) {
                 data.organizations.nodes.forEach((organization) => {
-                    if (organization && !this.hasById(organization.id)) this.set(this.i++, new View(new DOrganizationView(organization)))
+                    if (organization && !this.hasById(organization.id)) this.set(this.i++, new View(new OrganizationView(organization)))
                 })
             }
         })
@@ -47,6 +48,10 @@ export class OrganizationService extends DOrganizationReactiveService {
     hasById(id: Organization["id"]): boolean {
         const organization = super.values().find(o => o.id === id)
         return organization !== undefined
+    }
+
+    getById(id: Organization["id"]): OrganizationView | undefined {
+        return this.values().find(organization => organization && organization.id === id)
     }
 
     async organizationCreate(payload: OrganizationsCreateInput): Promise<OrganizationsCreatePayload | undefined> {
@@ -60,7 +65,7 @@ export class OrganizationService extends DOrganizationReactiveService {
         if (result.data && result.data.organizationsCreate && result.data.organizationsCreate.organization) {
             const organization = result.data.organizationsCreate.organization
             if (!this.hasById(organization.id)) {
-                this.add(new View(new DOrganizationView(organization)))
+                this.add(new View(new OrganizationView(organization)))
             }
         }
 
@@ -96,7 +101,7 @@ export class OrganizationService extends DOrganizationReactiveService {
         if (result.data && result.data.organizationsUpdate && result.data.organizationsUpdate.organization) {
             const organization = result.data.organizationsUpdate.organization
             const index = this.values().findIndex(o => o.id === organization.id)
-            this.set(index, new View(new DOrganizationView(organization)))
+            this.set(index, new View(new OrganizationView(organization)))
 
         }
 

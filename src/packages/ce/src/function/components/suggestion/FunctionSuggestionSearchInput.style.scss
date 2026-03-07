@@ -1,0 +1,18 @@
+@use "@core/style/helpers";
+@use "@core/style/box";
+@use "@core/style/variables";
+
+.d-flow-suggestion-search-input {
+  border: none !important;
+  background: none !important;
+  margin: -1 * variables.$xxs;
+  padding-left: variables.$xxs;
+  padding-right: variables.$xxs;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+
+  > input {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+}

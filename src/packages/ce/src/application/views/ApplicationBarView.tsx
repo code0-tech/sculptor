@@ -1,24 +1,14 @@
 "use client"
 
-import {
-    Avatar,
-    Badge,
-    Button,
-    Flex,
-    MenuItem,
-    MenuSeparator,
-    TextInput,
-    useService,
-    useStore,
-    useUserSession
-} from "@code0-tech/pictor";
+import {Button, Flex, MenuItem, MenuSeparator, useService, useStore} from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import {useRouter} from "next/navigation";
 import React from "react";
-import DUserMenu from "@code0-tech/pictor/dist/components/d-user/DUserMenu";
 import Link from "next/link";
 import {IconBuilding, IconFolders, IconInbox, IconLogout, IconSearch} from "@tabler/icons-react";
 import {ApplicationBreadcrumbView} from "@edition/application/views/ApplicationBreadcrumbView";
+import UserMenuComponent from "@edition/user/components/UserMenuComponent";
+import {useUserSession} from "@edition/user/hooks/User.session.hook";
 
 export const ApplicationBarView: React.FC = () => {
 
@@ -48,7 +38,7 @@ export const ApplicationBarView: React.FC = () => {
             })
         }
 
-        return <DUserMenu userId={currentSession.user?.id!!}>
+        return <UserMenuComponent userId={currentSession.user?.id!!}>
             <Link href={"/organizations"}>
                 <MenuItem>
                     <IconBuilding size={16}/>Organizations
@@ -63,7 +53,7 @@ export const ApplicationBarView: React.FC = () => {
             <MenuItem onSelect={userLogout}>
                 <IconLogout size={16}/>Logout
             </MenuItem>
-        </DUserMenu>
+        </UserMenuComponent>
     }, [currentUser, currentSession, namespaceIndex])
 
     return <Flex py={0.7} align={"center"} justify={"space-between"}>

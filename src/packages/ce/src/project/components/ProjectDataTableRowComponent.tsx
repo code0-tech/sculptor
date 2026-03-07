@@ -7,11 +7,12 @@ import {formatDistanceToNow} from "date-fns";
 
 export interface ProjectDataTableRowComponentProps {
     projectId: NamespaceProject['id']
+    additionalColumns?: React.ReactNode[]
 }
 
 export const ProjectDataTableRowComponent: React.FC<ProjectDataTableRowComponentProps> = (props) => {
 
-    const {projectId} = props
+    const {projectId, additionalColumns} = props
 
     const projectService = useService(ProjectService)
     const projectStore = useStore(ProjectService)
@@ -74,5 +75,6 @@ export const ProjectDataTableRowComponent: React.FC<ProjectDataTableRowComponent
                 ) : null}
             </Flex>
         </DataTableColumn>
+        {additionalColumns}
     </>
 }

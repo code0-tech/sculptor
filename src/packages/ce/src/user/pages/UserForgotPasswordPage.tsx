@@ -4,7 +4,6 @@ import React from "react";
 import {Button, EmailInput, emailValidation, Text, useForm, useService} from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import Link from "next/link";
-import Image from "next/image";
 import {useRouter} from "next/navigation";
 
 export const UserForgotPasswordPage: React.FC = () => {

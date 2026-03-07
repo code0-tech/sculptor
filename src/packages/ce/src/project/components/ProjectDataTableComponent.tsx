@@ -11,11 +11,13 @@ export interface ProjectDataTableComponentProps {
     filter?: DataTableFilterProps
     preFilter?: (project: NamespaceProject, index: number) => boolean
     onSelect?: (item: NamespaceProject | undefined) => void
+    additionalColumns?: (project: NamespaceProject, index: number) => React.ReactNode[]
+
 }
 
 export const ProjectDataTableComponent: React.FC<ProjectDataTableComponentProps> = (props) => {
 
-    const {namespaceId, sort, filter, preFilter = () => true, onSelect} = props
+    const {namespaceId, sort, filter, preFilter = () => true, onSelect, additionalColumns = () => []} = props
 
     const projectService = useService(ProjectService)
     const projectStore = useStore(ProjectService)
@@ -31,7 +33,7 @@ export const ProjectDataTableComponent: React.FC<ProjectDataTableComponentProps>
                       onSelect={(item) => item && onSelect?.(item)}
                       data={projects.map(p => p.json()).filter(preFilter)}>
         {(project, index) => {
-            return <ProjectDataTableRowComponent projectId={project.id}/>
+            return <ProjectDataTableRowComponent additionalColumns={additionalColumns(project, index)} projectId={project.id}/>
         }}
     </DataTable>
 

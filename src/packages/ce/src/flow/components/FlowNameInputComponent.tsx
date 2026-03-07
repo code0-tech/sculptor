@@ -1,5 +1,5 @@
 import React from "react";
-import {TextInputProps, InputSuggestion, InputSyntaxSegment, TextInput, Badge} from "@code0-tech/pictor"
+import {Badge, InputSuggestion, InputSyntaxSegment, TextInput, TextInputProps} from "@code0-tech/pictor"
 
 export interface FlowNameInputComponentProps extends TextInputProps {
 
@@ -35,7 +35,8 @@ export const FlowNameInputComponent: React.FC<FlowNameInputComponentProps> = (pr
                 start: cursor,
                 end: cursor + value.length,
                 visualLength: splitValue.length - 1 !== index ? 1 : value.length,
-                content: splitValue.length - 1 !== index ? <Badge color={value == "/" ? "warning" : "info"}>{value}</Badge> : value,
+                content: splitValue.length - 1 !== index ?
+                    <Badge color={value == "/" ? "warning" : "info"}>{value}</Badge> : value,
             }
             cursor += value.length
             return [segment]

@@ -2,10 +2,9 @@
 
 import {Tab, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {Button, Text, Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from "@code0-tech/pictor";
-import {IconBuilding, IconHome, IconSettings} from "@tabler/icons-react";
+import {IconHome, IconSettings} from "@tabler/icons-react";
 import React from "react";
 import {useParams, usePathname, useRouter} from "next/navigation";
-import {hashToColor} from "@code0-tech/pictor/dist/components/d-flow/DFlow.util";
 
 export default function Page() {
 
@@ -45,7 +44,8 @@ export default function Page() {
             <Tooltip>
                 <TooltipTrigger asChild>
                     <TabTrigger value={"settings"} asChild={true}>
-                        <Button variant={"none"} paddingSize={"xs"} onClick={() => router.push(`/namespace/${namespaceId}/project/${projectId}/settings`)}>
+                        <Button variant={"none"} paddingSize={"xs"}
+                                onClick={() => router.push(`/namespace/${namespaceId}/project/${projectId}/settings`)}>
                             <IconSettings size={16}/>
                         </Button>
                     </TabTrigger>

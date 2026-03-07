@@ -10,7 +10,7 @@ import {
     DialogContent,
     DialogOverlay,
     DialogPortal,
-    Flex,
+    Flex, hashToColor,
     InputDescription,
     InputLabel,
     InputMessage,
@@ -27,8 +27,7 @@ import {
     useService,
     useStore
 } from "@code0-tech/pictor";
-import {hashToColor} from "@code0-tech/pictor/dist/components/d-flow/DFlow.util";
-import {FlowTypeService} from "@edition/flowtype/services/FlowTypeService";
+import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FlowNameInputComponent} from "@edition/flow/components/FlowNameInputComponent";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import {useParams, useRouter} from "next/navigation";
@@ -82,7 +81,11 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
     )
 
     const flowTypes = React.useMemo(
-        () => flowTypeService.values({runtimeId: primaryRuntime?.id, projectId: projectId, namespaceId: project?.namespace?.id}),
+        () => flowTypeService.values({
+            runtimeId: primaryRuntime?.id,
+            projectId: projectId,
+            namespaceId: project?.namespace?.id
+        }),
         [flowTypeStore]
     )
 

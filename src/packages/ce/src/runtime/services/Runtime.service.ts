@@ -1,6 +1,6 @@
-import {DRuntimeDependencies, DRuntimeReactiveService, DRuntimeView, ReactiveArrayStore} from "@code0-tech/pictor";
+import {ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor";
 import {
-    Mutation,
+    Mutation, Namespace,
     Query,
     Runtime,
     RuntimesCreateInput,
@@ -20,13 +20,18 @@ import updateRuntimeMutation from "./mutations/Runtime.update.mutation.graphql"
 import deleteRuntimeMutation from "./mutations/Runtime.delete.mutation.graphql"
 import rotateTokenRuntimeMutation from "./mutations/Runtime.rotateToken.mutation.graphql"
 import {View} from "@code0-tech/pictor/dist/utils/view";
+import {RuntimeView} from "@edition/runtime/services/Runtime.view";
 
-export class RuntimeService extends DRuntimeReactiveService {
+export type RuntimeDependencies = {
+    namespaceId: Namespace['id']
+}
+
+export class RuntimeService extends ReactiveArrayService<RuntimeView, RuntimeDependencies> {
 
     private readonly client: GraphqlClient
     private i = 0
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<DRuntimeView>>) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<RuntimeView>>) {
         super(store);
         this.client = client
     }
@@ -36,9 +41,13 @@ export class RuntimeService extends DRuntimeReactiveService {
         return runtime !== undefined
     }
 
+    getById(id: Runtime['id']): RuntimeView | undefined {
+        return this.values().find(runtime => runtime && runtime.id === id);
+    }
+
     //TODO: rework to be able to get all runtimes that you can access. If no namespace id is provided just get the global runtiimes
     // TODO: if namespace id is provided get the runtimes for this namespace and also the global runtimes
-    values(dependencies?: DRuntimeDependencies): DRuntimeView[] {
+    values(dependencies?: RuntimeDependencies): RuntimeView[] {
         const runtimes = super.values()
 
         if (!dependencies?.namespaceId) {
@@ -53,7 +62,7 @@ export class RuntimeService extends DRuntimeReactiveService {
                     const nodes = res.data?.globalRuntimes?.nodes ?? []
                     nodes.forEach(runtime => {
                         if (runtime && !this.hasById(runtime.id)) {
-                            this.set(this.i++, new View(new DRuntimeView(runtime)))
+                            this.set(this.i++, new View(new RuntimeView(runtime)))
                         }
                     })
                 })
@@ -81,7 +90,7 @@ export class RuntimeService extends DRuntimeReactiveService {
                         runtime.namespace?.id === namespaceId &&
                         !this.hasById(runtime.id)
                     ) {
-                        this.set(this.i++, new View(new DRuntimeView(runtime)))
+                        this.set(this.i++, new View(new RuntimeView(runtime)))
                     }
                 })
             })
@@ -101,7 +110,7 @@ export class RuntimeService extends DRuntimeReactiveService {
         if (result.data && result.data.runtimesCreate && result.data.runtimesCreate.runtime) {
             const runtime = result.data.runtimesCreate.runtime
             if (!this.hasById(runtime.id)) {
-                this.add(new View(new DRuntimeView(runtime)))
+                this.add(new View(new RuntimeView(runtime)))
             }
         }
 
@@ -119,7 +128,7 @@ export class RuntimeService extends DRuntimeReactiveService {
         if (result.data && result.data.runtimesUpdate && result.data.runtimesUpdate.runtime) {
             const runtime = result.data.runtimesUpdate.runtime
             const index = this.values().findIndex(r => r.id === runtime.id)
-            this.set(index, new View(new DRuntimeView(runtime)))
+            this.set(index, new View(new RuntimeView(runtime)))
 
         }
 
@@ -155,7 +164,7 @@ export class RuntimeService extends DRuntimeReactiveService {
         if (result.data && result.data.runtimesRotateToken && result.data.runtimesRotateToken.runtime) {
             const runtime = result.data.runtimesRotateToken.runtime
             const index = this.values().findIndex(r => r.id === runtime.id)
-            this.set(index, new View(new DRuntimeView(runtime)))
+            this.set(index, new View(new RuntimeView(runtime)))
 
         }
 
