@@ -11,13 +11,13 @@ import {
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
-import {FunctionDefinitionView} from "@edition/function/services/Function.view";
+import {FunctionView} from "@edition/function/services/Function.view";
 import {FlowTypeView} from "@edition/flowtype/services/FlowType.view";
 
 export interface NodeBadgeComponentProps extends Omit<BadgeType, 'value' | 'children'> {
     value: NodeFunction | NodeFunctionIdWrapper
     flowId: Flow['id']
-    definition?: FunctionDefinitionView | FlowTypeView
+    definition?: FunctionView | FlowTypeView
 }
 
 export const NodeBadgeComponent: React.FC<NodeBadgeComponentProps> = (props) => {

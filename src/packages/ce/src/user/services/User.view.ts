@@ -7,7 +7,7 @@ import {
     UserIdentityConnection, UserSessionConnection, UserUserAbilities
 } from "@code0-tech/sagittarius-graphql-types";
 
-export class DUserView {
+export class UserView {
 
     /** Global admin status of the user */
     private _admin?: Maybe<Scalars['Boolean']['output']>;

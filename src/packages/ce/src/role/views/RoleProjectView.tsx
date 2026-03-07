@@ -8,7 +8,7 @@ import {RoleService} from "@edition/role/services/Role.service";
 import type {Namespace, NamespaceProject, NamespaceRole, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {ProjectDataTableComponent} from "@edition/project/components/ProjectDataTableComponent";
 import {ProjectMenuComponent} from "@edition/project/components/ProjectMenuComponent";
-import {DNamespaceProjectView} from "@edition/project/services/Project.view";
+import {ProjectView} from "@edition/project/services/Project.view";
 import {IconTrash} from "@tabler/icons-react";
 
 export const RoleProjectView: React.FC = () => {
@@ -60,7 +60,7 @@ export const RoleProjectView: React.FC = () => {
         })
     }
 
-    const filterNotAssignedProjects = React.useCallback((project: DNamespaceProjectView) => {
+    const filterNotAssignedProjects = React.useCallback((project: ProjectView) => {
         return !assignedProjectIds.find(projectId => projectId == project.id!!)
     }, [assignedProjectIds])
 

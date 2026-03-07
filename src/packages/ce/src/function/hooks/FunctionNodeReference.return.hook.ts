@@ -7,13 +7,13 @@ import {
     resolveType,
     targetForGenericKey
 } from "@edition/flow/utils/generics";
-import {FunctionDefinitionView} from "@edition/function/services/Function.view";
+import {FunctionView} from "@edition/function/services/Function.view";
 
 export const getReferenceType = (
     reference: ReferenceValue,
     dataTypeService: DatatypeService,
     functionService: FunctionService,
-    functionDefinition?: FunctionDefinitionView,
+    functionDefinition?: FunctionView,
     node?: NodeFunction,
     flowType?: FlowType
 ): DataTypeIdentifier | undefined => {

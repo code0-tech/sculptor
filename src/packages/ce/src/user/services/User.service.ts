@@ -41,19 +41,19 @@ import usersQuery from "./queries/Users.query.graphql";
 import userByUsernameQuery from "./queries/User.byUsername.query.graphql";
 import userByIdQuery from "./queries/User.byId.query.graphql";
 import {View} from "@code0-tech/pictor/dist/utils/view";
-import {DUserView} from "@edition/user/services/User.view";
+import {UserView} from "@edition/user/services/User.view";
 
-export class UserService extends ReactiveArrayService<DUserView> {
+export class UserService extends ReactiveArrayService<UserView> {
 
     private readonly client: GraphqlClient
     private i = 0;
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<DUserView>>) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<UserView>>) {
         super(store);
         this.client = client
     }
 
-    values(): DUserView[] {
+    values(): UserView[] {
         if (super.values().length > 0) return super.values();
         this.client.query<Query>({
             query: usersQuery
@@ -61,17 +61,17 @@ export class UserService extends ReactiveArrayService<DUserView> {
             const data = result.data
             if (!data) return
 
-            if (data && data.currentUser && !this.hasById(data.currentUser.id)) this.set(this.i++, new View(new DUserView(data.currentUser)))
+            if (data && data.currentUser && !this.hasById(data.currentUser.id)) this.set(this.i++, new View(new UserView(data.currentUser)))
             if (data.users && data.users.nodes) {
                 data.users.nodes.forEach((user) => {
-                    if (user && !(user.id === data.currentUser?.id) && !this.hasById(user.id)) this.set(this.i++, new View(new DUserView(user)))
+                    if (user && !(user.id === data.currentUser?.id) && !this.hasById(user.id)) this.set(this.i++, new View(new UserView(user)))
                 })
             }
         })
         return super.values();
     }
 
-    getById(id: User["id"]): DUserView | undefined {
+    getById(id: User["id"]): UserView | undefined {
         const user = this.values().find(user => user && user.id === id)
         if (user) return user
 
@@ -85,14 +85,14 @@ export class UserService extends ReactiveArrayService<DUserView> {
                 const data = result.data
                 if (!data) return
 
-                if (data && data.user && !this.hasById(data.user.id)) this.set(this.i++, new View(new DUserView(data.user)))
+                if (data && data.user && !this.hasById(data.user.id)) this.set(this.i++, new View(new UserView(data.user)))
             })
         }
 
         return this.values().find(user => user && user.id === id)
     }
 
-    getByUsername(username: User["username"]): DUserView | undefined {
+    getByUsername(username: User["username"]): UserView | undefined {
         if (this.values().find(user => user && user.username === username)) return this.values().find(user => user && user.username === username)
 
         this.client.query<Query>({
@@ -104,7 +104,7 @@ export class UserService extends ReactiveArrayService<DUserView> {
             const data = result.data
             if (!data) return
 
-            if (data && data.user && !this.hasById(data.user.id)) this.set(this.i++, new View(new DUserView(data.user)))
+            if (data && data.user && !this.hasById(data.user.id)) this.set(this.i++, new View(new UserView(data.user)))
         })
 
         return this.values().find(user => user && user.username === username)
@@ -165,7 +165,7 @@ export class UserService extends ReactiveArrayService<DUserView> {
         })
 
         if (result.data && result.data.usersLogin && result.data.usersLogin.userSession?.user && !this.hasById(result.data.usersLogin.userSession?.user.id)) {
-            this.add(new View(new DUserView(result.data.usersLogin.userSession.user)))
+            this.add(new View(new UserView(result.data.usersLogin.userSession.user)))
         }
 
         return result.data?.usersLogin ?? undefined
@@ -233,7 +233,7 @@ export class UserService extends ReactiveArrayService<DUserView> {
         })
 
         if (result.data && result.data.usersRegister && result.data.usersRegister.userSession?.user && !this.hasById(result.data.usersRegister.userSession?.user.id)) {
-            this.add(new View(new DUserView(result.data.usersRegister.userSession.user)))
+            this.add(new View(new UserView(result.data.usersRegister.userSession.user)))
         }
 
         return result.data?.usersRegister ?? undefined

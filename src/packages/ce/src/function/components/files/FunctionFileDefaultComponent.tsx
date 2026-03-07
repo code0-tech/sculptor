@@ -13,7 +13,7 @@ import {useNodeValidation} from "@edition/flow/hooks/NodeValidation.hook";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent";
-import {ParameterDefinitionView} from "@edition/function/services/Function.view";
+import {ParameterView} from "@edition/function/services/Function.view";
 
 export interface FunctionFileDefaultComponentProps {
     node: NodeFunction
@@ -39,7 +39,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
     }, [functionStore])
 
     const paramDefinitions = React.useMemo(() => {
-        const map: Record<string, ParameterDefinitionView> = {}
+        const map: Record<string, ParameterView> = {}
         definition?.parameterDefinitions?.forEach(pd => {
             map[pd.id!!] = pd
         })

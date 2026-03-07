@@ -6,7 +6,7 @@ import {
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 
-export class DOrganizationView {
+export class OrganizationView {
 
     private readonly _createdAt?: Maybe<Scalars['Time']['output']>;
     /** Global ID of this Organization */

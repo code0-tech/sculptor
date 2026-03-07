@@ -21,23 +21,23 @@ import roleDeleteMutation from "@edition/role/services/mutations/Role.delete.mut
 import roleAssignAbilitiesMutation from "@edition/role/services/mutations/Role.assignAbilities.mutation.graphql";
 import roleAssignProjectsMutation from "@edition/role/services/mutations/Role.assignProjects.mutation.graphql";
 import {View} from "@code0-tech/pictor/dist/utils/view";
-import {DNamespaceRoleView} from "@edition/role/services/Role.view";
+import {RoleView} from "@edition/role/services/Role.view";
 
 export type RoleDependencies = {
     namespaceId: Namespace['id']
 }
 
-export class RoleService extends ReactiveArrayService<DNamespaceRoleView, RoleDependencies> {
+export class RoleService extends ReactiveArrayService<RoleView, RoleDependencies> {
 
     private readonly client: GraphqlClient
     private i = 0;
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<DNamespaceRoleView>>) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<RoleView>>) {
         super(store);
         this.client = client
     }
 
-    values(dependencies: RoleDependencies): DNamespaceRoleView[] {
+    values(dependencies: RoleDependencies): RoleView[] {
         const roles = super.values()
         if (!dependencies?.namespaceId) return roles
 
@@ -62,7 +62,7 @@ export class RoleService extends ReactiveArrayService<DNamespaceRoleView, RoleDe
                         role.namespace?.id === namespaceId &&
                         !this.hasById(role.id)
                     ) {
-                        this.set(this.i++, new View(new DNamespaceRoleView(role)))
+                        this.set(this.i++, new View(new RoleView(role)))
                     }
                 })
             })
@@ -76,7 +76,7 @@ export class RoleService extends ReactiveArrayService<DNamespaceRoleView, RoleDe
         return role !== undefined
     }
 
-    getById(id: NamespaceRole['id'], dependencies?: RoleDependencies): DNamespaceRoleView | undefined {
+    getById(id: NamespaceRole['id'], dependencies?: RoleDependencies): RoleView | undefined {
         return this.values(dependencies!).find(role => role && role.id === id);
     }
 
@@ -93,7 +93,7 @@ export class RoleService extends ReactiveArrayService<DNamespaceRoleView, RoleDe
             const currentRole = this.getById(payload.roleId)
             const index = super.values().findIndex(m => m.id === payload.roleId)
 
-            const newRole = new DNamespaceRoleView({
+            const newRole = new RoleView({
                 ...currentRole?.json(),
                 abilities: payload.abilities
             })
@@ -117,7 +117,7 @@ export class RoleService extends ReactiveArrayService<DNamespaceRoleView, RoleDe
             const currentRole = this.getById(payload.roleId)
             const index = super.values().findIndex(m => m.id === payload.roleId)
 
-            const newRole = new DNamespaceRoleView({
+            const newRole = new RoleView({
                 ...currentRole?.json(),
                 assignedProjects: {
                     count: payload.projectIds.length,
@@ -146,7 +146,7 @@ export class RoleService extends ReactiveArrayService<DNamespaceRoleView, RoleDe
             const currentRole = this.getById(payload.namespaceRoleId)
             const index = super.values().findIndex(m => m.id === payload.namespaceRoleId)
 
-            const newRole = new DNamespaceRoleView({
+            const newRole = new RoleView({
                 ...currentRole?.json(),
                 name: payload.name
             })

@@ -25,14 +25,14 @@ import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FileTabsView} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.view";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
 import Image from "next/image";
-import {DUserView} from "@edition/user/services/User.view";
-import {DOrganizationView} from "@edition/organization/services/Organization.view";
-import {DNamespaceMemberView} from "@edition/member/services/Member.view";
-import {DNamespaceView} from "@edition/namespace/services/Namespace.view";
-import {DRuntimeView} from "@edition/runtime/services/Runtime.view";
-import {DNamespaceProjectView} from "@edition/project/services/Project.view";
-import {DNamespaceRoleView} from "@edition/role/services/Role.view";
-import {FunctionDefinitionView} from "@edition/function/services/Function.view";
+import {UserView} from "@edition/user/services/User.view";
+import {OrganizationView} from "@edition/organization/services/Organization.view";
+import {MemberView} from "@edition/member/services/Member.view";
+import {NamespaceView} from "@edition/namespace/services/Namespace.view";
+import {RuntimeView} from "@edition/runtime/services/Runtime.view";
+import {ProjectView} from "@edition/project/services/Project.view";
+import {RoleView} from "@edition/role/services/Role.view";
+import {FunctionView} from "@edition/function/services/Function.view";
 import {DataTypeView} from "@edition/datatype/services/DataType.view";
 import {FlowTypeView} from "@edition/flowtype/services/FlowType.view";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
@@ -59,15 +59,15 @@ export default function FlowLayout({bar, tab, children}: {
 
     if (currentSession === null) router.push("/login")
 
-    const user = usePersistentReactiveArrayService<DUserView, UserService>(`dashboard::users::${currentSession?.id}`, (store) => new UserService(graphqlClient, store))
-    const organization = usePersistentReactiveArrayService<DOrganizationView, OrganizationService>(`dashboard::organizations::${currentSession?.id}`, (store) => new OrganizationService(graphqlClient, store))
-    const member = usePersistentReactiveArrayService<DNamespaceMemberView, MemberService>(`dashboard::members::${currentSession?.id}`, (store) => new MemberService(graphqlClient, store))
-    const namespace = usePersistentReactiveArrayService<DNamespaceView, NamespaceService>(`dashboard::namespaces::${currentSession?.id}`, (store) => new NamespaceService(graphqlClient, store))
-    const runtime = usePersistentReactiveArrayService<DRuntimeView, RuntimeService>(`dashboard::global_runtimes::${currentSession?.id}`, (store) => new RuntimeService(graphqlClient, store))
-    const project = usePersistentReactiveArrayService<DNamespaceProjectView, ProjectService>(`dashboard::projects::${currentSession?.id}`, (store) => new ProjectService(graphqlClient, store))
-    const role = usePersistentReactiveArrayService<DNamespaceRoleView, RoleService>(`dashboard::roles::${currentSession?.id}`, (store) => new RoleService(graphqlClient, store))
+    const user = usePersistentReactiveArrayService<UserView, UserService>(`dashboard::users::${currentSession?.id}`, (store) => new UserService(graphqlClient, store))
+    const organization = usePersistentReactiveArrayService<OrganizationView, OrganizationService>(`dashboard::organizations::${currentSession?.id}`, (store) => new OrganizationService(graphqlClient, store))
+    const member = usePersistentReactiveArrayService<MemberView, MemberService>(`dashboard::members::${currentSession?.id}`, (store) => new MemberService(graphqlClient, store))
+    const namespace = usePersistentReactiveArrayService<NamespaceView, NamespaceService>(`dashboard::namespaces::${currentSession?.id}`, (store) => new NamespaceService(graphqlClient, store))
+    const runtime = usePersistentReactiveArrayService<RuntimeView, RuntimeService>(`dashboard::global_runtimes::${currentSession?.id}`, (store) => new RuntimeService(graphqlClient, store))
+    const project = usePersistentReactiveArrayService<ProjectView, ProjectService>(`dashboard::projects::${currentSession?.id}`, (store) => new ProjectService(graphqlClient, store))
+    const role = usePersistentReactiveArrayService<RoleView, RoleService>(`dashboard::roles::${currentSession?.id}`, (store) => new RoleService(graphqlClient, store))
     const flow = usePersistentReactiveArrayService<Flow, FlowService>(`dashboard::flows::${currentSession?.id}`, (store) => new FlowService(graphqlClient, store))
-    const functions = usePersistentReactiveArrayService<FunctionDefinitionView, FunctionService>(`dashboard::functions::${currentSession?.id}`, (store) => new FunctionService(graphqlClient, store))
+    const functions = usePersistentReactiveArrayService<FunctionView, FunctionService>(`dashboard::functions::${currentSession?.id}`, (store) => new FunctionService(graphqlClient, store))
     const datatype = usePersistentReactiveArrayService<DataTypeView, DatatypeService>(`dashboard::datatypes::${currentSession?.id}`, (store) => new DatatypeService(graphqlClient, store))
     const flowtype = usePersistentReactiveArrayService<FlowTypeView, FlowTypeService>(`dashboard::flowtypes::${currentSession?.id}`, (store) => new FlowTypeService(graphqlClient, store))
     const file = usePersistentReactiveArrayService<FileTabsView, FileTabsService>(`dashboard::files::${flowId}`, FileTabsService, [])

@@ -19,23 +19,23 @@ import memberAssignRoleMutation from "./mutations/Member.assignRoles.mutation.gr
 import memberDeleteMutation from "./mutations/Member.delete.mutation.graphql"
 import memberInviteMutation from "./mutations/Member.invite.mutation.graphql"
 import {View} from "@code0-tech/pictor/dist/utils/view";
-import {DNamespaceMemberView} from "@edition/member/services/Member.view";
+import {MemberView} from "@edition/member/services/Member.view";
 
 export type MemberDependencies = {
     namespaceId: Namespace['id']
 }
 
-export class MemberService extends ReactiveArrayService<DNamespaceMemberView, MemberDependencies> {
+export class MemberService extends ReactiveArrayService<MemberView, MemberDependencies> {
 
     private readonly client: GraphqlClient
     private i = 0
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<DNamespaceMemberView>>) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<MemberView>>) {
         super(store)
         this.client = client
     }
 
-    values(dependencies?: MemberDependencies): DNamespaceMemberView[] {
+    values(dependencies?: MemberDependencies): MemberView[] {
         const members = super.values()
         if (!dependencies?.namespaceId) return members
 
@@ -56,7 +56,7 @@ export class MemberService extends ReactiveArrayService<DNamespaceMemberView, Me
                 const nodes = res.data?.namespace?.members?.nodes ?? []
                 nodes.forEach(member => {
                     if (member && !this.hasById(member.id)) {
-                        this.set(this.i++, new View(new DNamespaceMemberView(member)))
+                        this.set(this.i++, new View(new MemberView(member)))
                     }
                 })
             })
@@ -70,11 +70,11 @@ export class MemberService extends ReactiveArrayService<DNamespaceMemberView, Me
         return member !== undefined
     }
 
-    getById(id: NamespaceMember['id'], dependencies?: MemberDependencies): DNamespaceMemberView | undefined {
+    getById(id: NamespaceMember['id'], dependencies?: MemberDependencies): MemberView | undefined {
         return this.values(dependencies).find(member => member && member.id === id);
     }
 
-    getByNamespaceIdAndUserId(namespaceId: Namespace['id'], userId: User['id']): DNamespaceMemberView | undefined {
+    getByNamespaceIdAndUserId(namespaceId: Namespace['id'], userId: User['id']): MemberView | undefined {
         return this.values({namespaceId: namespaceId}).find(member => member.namespace?.id === namespaceId && member.user?.id === userId)
     }
 
@@ -91,7 +91,7 @@ export class MemberService extends ReactiveArrayService<DNamespaceMemberView, Me
             const currentMember = this.getById(payload.memberId)
             const index = super.values().findIndex(m => m.id === payload.memberId)
 
-            const newMember = new DNamespaceMemberView({
+            const newMember = new MemberView({
                 ...currentMember?.json(),
                 roles: {
                     count: payload.roleIds.length,
@@ -132,7 +132,7 @@ export class MemberService extends ReactiveArrayService<DNamespaceMemberView, Me
 
         if (result.data && result.data.namespacesMembersInvite && result.data.namespacesMembersInvite.namespaceMember) {
             const member = result.data.namespacesMembersInvite.namespaceMember
-            this.set(this.i++, new View(new DNamespaceMemberView(member)))
+            this.set(this.i++, new View(new MemberView(member)))
         }
 
         return result.data?.namespacesMembersInvite ?? undefined

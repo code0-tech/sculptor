@@ -9,7 +9,7 @@ import Link from "next/link";
 import {UserService} from "@edition/user/services/User.service";
 import {InputSyntaxSegment} from "@code0-tech/pictor/dist/components/form/Input.syntax.hook";
 import {UserInputComponent} from "@edition/user/components/UserInputComponent";
-import {DUserView} from "@edition/user/services/User.view";
+import {UserView} from "@edition/user/services/User.view";
 
 export const MemberAddPage: React.FC = () => {
 
@@ -27,7 +27,7 @@ export const MemberAddPage: React.FC = () => {
     const members = React.useMemo(() => memberService.values({namespaceId: namespaceId}), [memberStore, userStore])
     const formInitialValues = React.useMemo(() => ({users: null}), [])
     const filteredUsers = React.useMemo(() => {
-        return (user: DUserView) => {
+        return (user: UserView) => {
             return !members.find(m => m.user?.id === user.id)
         }
     }, [members])

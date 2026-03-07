@@ -10,12 +10,12 @@ import {IconCheck} from "@tabler/icons-react";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
 import {DataTableFilterProps} from "@code0-tech/pictor/dist/components/data-table/DataTable";
 import {RuntimeService} from "@edition/runtime/services/Runtime.service";
-import {DRuntimeView} from "@edition/runtime/services/Runtime.view";
+import {RuntimeView} from "@edition/runtime/services/Runtime.view";
 
 export interface RoleDataTableFilterInputComponentProps {
     namespaceId?: Namespace['id']
     onChange: (filter: DataTableFilterProps) => void
-    preFilter?: (project: DRuntimeView, index: number) => boolean
+    preFilter?: (project: RuntimeView, index: number) => boolean
 }
 
 export const RuntimeDataTableFilterInputComponent: React.FC<RoleDataTableFilterInputComponentProps> = (props) => {

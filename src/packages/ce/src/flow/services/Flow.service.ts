@@ -26,27 +26,27 @@ import flowCreateMutation from "@edition/flow/services/mutations/Flow.create.mut
 import flowDeleteMutation from "@edition/flow/services/mutations/Flow.delete.mutation.graphql";
 import flowUpdateMutation from "@edition/flow/services/mutations/Flow.update.mutation.graphql";
 import {View} from "@code0-tech/pictor/dist/utils/view";
-import {Flow} from "@edition/flow/services/Flow.view";
+import {FlowView} from "@edition/flow/services/Flow.view";
 
 export type FlowDependencies = {
     namespaceId: Namespace['id']
     projectId: NamespaceProject['id']
 }
 
-export class FlowService extends ReactiveArrayService<Flow, FlowDependencies> {
+export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies> {
 
     private readonly client: GraphqlClient
-    private flowUpdateQueue: Array<Flow["id"]>
+    private flowUpdateQueue: Array<FlowView["id"]>
     private i
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<Flow>>) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<FlowView>>) {
         super(store)
         this.client = client
         this.flowUpdateQueue = []
         this.i = 0
     }
 
-    values(dependencies?: FlowDependencies): Flow[] {
+    values(dependencies?: FlowDependencies): FlowView[] {
         const flows = super.values()
         if (!dependencies?.namespaceId || !dependencies.projectId) return flows
 
@@ -96,16 +96,16 @@ export class FlowService extends ReactiveArrayService<Flow, FlowDependencies> {
         return filtered
     }
 
-    hasById(id: Flow["id"]): boolean {
+    hasById(id: FlowView["id"]): boolean {
         const flow = super.values().find(f => f.id === id)
         return flow !== undefined
     }
 
-    getById(id: Flow['id'], dependencies?: FlowDependencies): Flow | undefined {
+    getById(id: FlowView['id'], dependencies?: FlowDependencies): FlowView | undefined {
         return this.values(dependencies).find(value => value.id === id);
     }
 
-    protected removeParameterNode(flow: Flow, parameter: NodeParameter): void {
+    protected removeParameterNode(flow: FlowView, parameter: NodeParameter): void {
         if (parameter?.value?.__typename === "NodeFunctionIdWrapper") {
             const parameterNode = flow?.nodes?.nodes?.find(n => n?.id === (parameter.value as NodeFunction)?.id)
             if (parameterNode) {
@@ -127,7 +127,7 @@ export class FlowService extends ReactiveArrayService<Flow, FlowDependencies> {
         }
     }
 
-    getLinkedNodesById(flowId: Flow['id'], nodeId: NodeFunction['id']): NodeFunction[] {
+    getLinkedNodesById(flowId: FlowView['id'], nodeId: NodeFunction['id']): NodeFunction[] {
         const parentNode = this.getNodeById(flowId, nodeId)
         const nextNodes = parentNode ? this.getLinkedNodesById(flowId, parentNode.nextNodeId) : []
         const parameterNodes: NodeFunction[] = []
@@ -143,11 +143,11 @@ export class FlowService extends ReactiveArrayService<Flow, FlowDependencies> {
         return [...(parentNode ? [parentNode] : []), ...parameterNodes, ...nextNodes]
     }
 
-    getNodeById(flowId: Flow['id'], nodeId: NodeFunction['id']): NodeFunction | undefined {
+    getNodeById(flowId: FlowView['id'], nodeId: NodeFunction['id']): NodeFunction | undefined {
         return this.getById(flowId)?.nodes?.nodes?.find(node => node?.id === nodeId)!!
     }
 
-    getPayloadById(flowId: Flow['id']): FlowInput {
+    getPayloadById(flowId: FlowView['id']): FlowInput {
         const flow = this.getById(flowId)
 
         return {
@@ -210,7 +210,7 @@ export class FlowService extends ReactiveArrayService<Flow, FlowDependencies> {
         }
     }
 
-    async deleteNodeById(flowId: Flow['id'], nodeId: NodeFunction['id']): Promise<void> {
+    async deleteNodeById(flowId: FlowView['id'], nodeId: NodeFunction['id']): Promise<void> {
         const flow = this.getById(flowId)
         const node = this.getNodeById(flowId, nodeId)
         const parentNode = flow?.nodes?.nodes?.find(node => node?.parameters?.nodes?.find(p => p?.value?.__typename === "NodeFunctionIdWrapper" && (p.value as NodeFunction)?.id === nodeId))
@@ -241,7 +241,7 @@ export class FlowService extends ReactiveArrayService<Flow, FlowDependencies> {
         await this.syncFlow(flowId)
     }
 
-    async addNextNodeById(flowId: Flow['id'], parentNodeId: NodeFunction['id'] | null, nextNode: NodeFunction): Promise<void> {
+    async addNextNodeById(flowId: FlowView['id'], parentNodeId: NodeFunction['id'] | null, nextNode: NodeFunction): Promise<void> {
 
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
@@ -276,7 +276,7 @@ export class FlowService extends ReactiveArrayService<Flow, FlowDependencies> {
         await this.syncFlow(flowId)
     }
 
-    async setSettingValue(flowId: Flow['id'], settingIdentifier: Maybe<Scalars['String']['output']>, value: FlowSetting['value']): Promise<void> {
+    async setSettingValue(flowId: FlowView['id'], settingIdentifier: Maybe<Scalars['String']['output']>, value: FlowSetting['value']): Promise<void> {
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
         if (!flow) return
@@ -300,7 +300,7 @@ export class FlowService extends ReactiveArrayService<Flow, FlowDependencies> {
         await this.syncFlow(flowId)
     }
 
-    async setParameterValue(flowId: Flow['id'], nodeId: NodeFunction['id'], parameterId: NodeParameter['id'], value?: LiteralValue | ReferenceValue | NodeFunction): Promise<void> {
+    async setParameterValue(flowId: FlowView['id'], nodeId: NodeFunction['id'], parameterId: NodeParameter['id'], value?: LiteralValue | ReferenceValue | NodeFunction): Promise<void> {
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
         if (!flow) return
@@ -330,7 +330,7 @@ export class FlowService extends ReactiveArrayService<Flow, FlowDependencies> {
         await this.syncFlow(flowId)
     }
 
-    private async syncFlow(flowId: Flow["id"]) {
+    private async syncFlow(flowId: FlowView["id"]) {
 
         const alreadyQueued = this.flowUpdateQueue.includes(flowId)
         if (alreadyQueued) return Promise.resolve()

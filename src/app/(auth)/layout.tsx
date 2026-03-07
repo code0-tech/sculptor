@@ -14,13 +14,13 @@ import {GraphqlClient} from "@core/util/graphql-client";
 import Image from "next/image";
 import React from "react";
 import {usePersistentReactiveArrayService} from "@/hooks/usePersistentReactiveArrayService";
-import {DUserView} from "@edition/user/services/User.view";
+import {UserView} from "@edition/user/services/User.view";
 import {FullScreen} from "@code0-tech/pictor/dist/components/fullscreen/FullScreen";
 
 export default function AuthLayout({children}: Readonly<{ children: React.ReactNode }>) {
 
     const client = useApolloClient()
-    const [store, service] = usePersistentReactiveArrayService<DUserView, UserService>("auth-users", (store) => new UserService(new GraphqlClient(client), store))
+    const [store, service] = usePersistentReactiveArrayService<UserView, UserService>("auth-users", (store) => new UserService(new GraphqlClient(client), store))
 
     return (
         <FullScreen>

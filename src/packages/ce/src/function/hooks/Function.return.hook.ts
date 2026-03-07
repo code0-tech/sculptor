@@ -2,10 +2,10 @@ import type {DataTypeIdentifier, NodeParameterValue} from "@code0-tech/sagittari
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {replaceGenericKeysInType, resolveGenericKeys} from "@edition/flow/utils/generics";
-import {FunctionDefinitionView} from "@edition/function/services/Function.view";
+import {FunctionView} from "@edition/function/services/Function.view";
 
 export const useReturnType = (
-    func: FunctionDefinitionView,
+    func: FunctionView,
     values: NodeParameterValue[],
     dataTypeService: DatatypeService,
     functionService: FunctionService,

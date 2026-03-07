@@ -5,7 +5,7 @@ import {
     NamespaceRoleAbility, NamespaceRoleUserAbilities, Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 
-export class DNamespaceRoleView {
+export class RoleView {
 
     /** The abilities the role is granted */
     private readonly _abilities?: Maybe<Array<NamespaceRoleAbility>>;

@@ -2,7 +2,7 @@
 
 import React from "react"
 import {IconArrowDown, IconArrowUp, IconCornerDownLeft} from "@tabler/icons-react";
-import {DNamespaceProjectView} from "@edition/project/services/Project.view";
+import {ProjectView} from "@edition/project/services/Project.view";
 import {
     Avatar,
     Badge,
@@ -24,9 +24,9 @@ import {Namespace, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {ProjectService} from "@edition/project/services/Project.service";
 
 export interface ProjectMenuComponentProps extends MenuProps {
-    onProjectSelect: (project: DNamespaceProjectView) => void
+    onProjectSelect: (project: ProjectView) => void
     namespaceId: Namespace["id"]
-    filter?: (project: DNamespaceProjectView, index: number) => boolean
+    filter?: (project: ProjectView, index: number) => boolean
     projectId?: Scalars['NamespaceProjectID']['output']
     children?: React.ReactNode
 }

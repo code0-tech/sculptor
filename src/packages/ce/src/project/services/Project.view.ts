@@ -8,7 +8,7 @@ import {
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 
-export class DNamespaceProjectView {
+export class ProjectView {
     /** Time when this NamespaceProject was created */
     private readonly _createdAt?: Maybe<Scalars['Time']['output']>;
     /** Description of the project */

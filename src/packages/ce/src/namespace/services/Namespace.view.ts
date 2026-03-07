@@ -5,7 +5,7 @@ import {
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 
-export class DNamespaceView {
+export class NamespaceView {
     /** Time when this Namespace was created */
     private readonly _createdAt?: Maybe<Scalars['Time']['output']>;
     /** Global ID of this Namespace */

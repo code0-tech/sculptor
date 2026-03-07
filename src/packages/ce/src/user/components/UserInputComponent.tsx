@@ -1,6 +1,6 @@
 import React from "react";
 import {IconArrowDown, IconArrowUp, IconCornerDownLeft} from "@tabler/icons-react";
-import {DUserView} from "@edition/user/services/User.view";
+import {UserView} from "@edition/user/services/User.view";
 import {
     Badge,
     Flex,
@@ -18,7 +18,7 @@ import {
 import {UserService} from "@edition/user/services/User.service";
 
 export interface UserInputComponentProps extends TextInputProps {
-    filter?: (user: DUserView, index: number) => boolean
+    filter?: (user: UserView, index: number) => boolean
 }
 
 export const UserInputComponent: React.FC<UserInputComponentProps> = (props) => {

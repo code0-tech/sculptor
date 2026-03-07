@@ -8,11 +8,11 @@ import {MemberService} from "@edition/member/services/Member.service";
 import {UserService} from "@edition/user/services/User.service";
 import {formatDistanceToNow} from "date-fns";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
-import {DOrganizationView} from "@edition/organization/services/Organization.view";
+import {OrganizationView} from "@edition/organization/services/Organization.view";
 
 export interface OrganizationDataTableRowComponentProps {
     organizationId: Organization['id']
-    onLeave?: (organization: DOrganizationView) => void
+    onLeave?: (organization: OrganizationView) => void
     minimized?: boolean
 }
 

@@ -3,13 +3,13 @@ import React from "react";
 import {NodeBadgeComponent} from "./NodeBadgeComponent";
 import {IconVariable} from "@tabler/icons-react";
 import {Badge, BadgeType, Flex, Text} from "@code0-tech/pictor";
-import {FunctionDefinitionView} from "@edition/function/services/Function.view";
+import {FunctionView} from "@edition/function/services/Function.view";
 import {FlowTypeView} from "@edition/flowtype/services/FlowType.view";
 
 export interface ReferenceBadgeComponentProps extends Omit<BadgeType, 'value' | 'children'> {
     value: ReferenceValue
     flowId: Flow['id']
-    definition?: FunctionDefinitionView | FlowTypeView
+    definition?: FunctionView | FlowTypeView
 }
 
 export const ReferenceBadgeComponent: React.FC<ReferenceBadgeComponentProps> = (props) => {

@@ -14,7 +14,7 @@ import type {
 import {useReturnType} from "@edition/function/hooks/Function.return.hook";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FunctionService} from "@edition/function/services/Function.service";
-import {FunctionDefinitionView} from "@edition/function/services/Function.view";
+import {FunctionView} from "@edition/function/services/Function.view";
 
 const GENERIC_PLACEHOLDER = "GENERIC";
 
@@ -436,7 +436,7 @@ export const replaceGenericKeysInDataTypeObject = (
 };
 
 export const resolveGenericKeys = (
-    func: FunctionDefinitionView,
+    func: FunctionView,
     values: NodeParameterValue[],
     dataTypeService: DatatypeService,
     functionService: FunctionService,
@@ -657,7 +657,7 @@ const sortValue = (value: unknown): unknown => {
     return value;
 };
 
-export const targetForGenericKey = (func: FunctionDefinitionView, target: DataTypeIdentifier): GenericTargetMap => {
+export const targetForGenericKey = (func: FunctionView, target: DataTypeIdentifier): GenericTargetMap => {
     if (!target.genericType) return new Map()
 
     const genericKeySet = new Set(func.genericKeys ?? []);

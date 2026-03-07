@@ -22,23 +22,23 @@ import projectDeleteMutation from "./mutations/Project.delete.mutation.graphql"
 import projectUpdateMutation from "./mutations/Project.update.mutation.graphql"
 import projectAssignRuntimesMutation from "./mutations/Project.assignRuntimes.mutation.graphql"
 import {View} from "@code0-tech/pictor/dist/utils/view";
-import {DNamespaceProjectView} from "@edition/project/services/Project.view";
+import {ProjectView} from "@edition/project/services/Project.view";
 
 export type ProjectDependencies = {
     namespaceId: Namespace['id']
 }
 
-export class ProjectService extends ReactiveArrayService<DNamespaceProjectView, ProjectDependencies> {
+export class ProjectService extends ReactiveArrayService<ProjectView, ProjectDependencies> {
 
     private readonly client: GraphqlClient
     private i = 0;
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<DNamespaceProjectView>>) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<ProjectView>>) {
         super(store);
         this.client = client
     }
 
-    values(dependencies: ProjectDependencies): DNamespaceProjectView[] {
+    values(dependencies: ProjectDependencies): ProjectView[] {
         const projects = super.values()
         if (!dependencies?.namespaceId) return projects
 
@@ -61,7 +61,7 @@ export class ProjectService extends ReactiveArrayService<DNamespaceProjectView, 
                         project.namespace?.id === namespaceId &&
                         !this.hasById(project.id)
                     ) {
-                        this.set(this.i++, new View(new DNamespaceProjectView(project)))
+                        this.set(this.i++, new View(new ProjectView(project)))
                     }
                 })
             })
@@ -75,7 +75,7 @@ export class ProjectService extends ReactiveArrayService<DNamespaceProjectView, 
         return project !== undefined
     }
 
-    getById(id: NamespaceProject['id'], dependencies?: ProjectDependencies): DNamespaceProjectView | undefined {
+    getById(id: NamespaceProject['id'], dependencies?: ProjectDependencies): ProjectView | undefined {
         return this.values(dependencies!).find(project => project && project.id === id)
     }
 
@@ -91,7 +91,7 @@ export class ProjectService extends ReactiveArrayService<DNamespaceProjectView, 
             const project = result.data.namespacesProjectsAssignRuntimes.namespaceProject
             const index = this.values({namespaceId: project?.namespace?.id}).findIndex(o => o.id === project.id)
             const projectStored = this.values({namespaceId: project?.namespace?.id}).find(o => o.id === project.id)
-            this.set(index, new View(new DNamespaceProjectView({
+            this.set(index, new View(new ProjectView({
                 ...projectStored?.json(),
                 runtimes: {
                     count: payload.runtimeIds.length,
@@ -115,7 +115,7 @@ export class ProjectService extends ReactiveArrayService<DNamespaceProjectView, 
         if (result.data && result.data.namespacesProjectsCreate && result.data.namespacesProjectsCreate.namespaceProject) {
             const project = result.data.namespacesProjectsCreate.namespaceProject
             if (!this.hasById(project.id)) {
-                this.add(new View(new DNamespaceProjectView(project)))
+                this.add(new View(new ProjectView(project)))
             }
         }
 
@@ -152,7 +152,7 @@ export class ProjectService extends ReactiveArrayService<DNamespaceProjectView, 
             const project = result.data.namespacesProjectsUpdate.namespaceProject
             const index = this.values({namespaceId: project?.namespace?.id}).findIndex(o => o.id === project.id)
             const projectStored = this.values({namespaceId: project?.namespace?.id}).find(o => o.id === project.id)
-            this.set(index, new View(new DNamespaceProjectView({
+            this.set(index, new View(new ProjectView({
                 ...projectStored?.json(),
                 ...(payload.name ? {name: payload.name} : {}),
                 ...(payload.description ? {description: payload.description} : {}),

@@ -9,7 +9,7 @@ import {
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 
-export class DRuntimeView {
+export class RuntimeView {
 
     /** Time when this Runtime was created */
     private readonly _createdAt?: Maybe<Scalars['Time']['output']>;

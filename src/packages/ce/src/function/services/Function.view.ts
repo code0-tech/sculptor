@@ -10,7 +10,7 @@ import {
     resolveDataTypeIdentifiers
 } from "@edition/flow/components/builder/FlowBuilderComponent.util";
 
-export class FunctionDefinitionView {
+export class FunctionView {
 
     /** Name of the function */
     private readonly _aliases?: Maybe<Array<Translation>>;
@@ -35,7 +35,7 @@ export class FunctionDefinitionView {
     /** Name of the function */
     private readonly _names?: Maybe<Array<Translation>>;
     /** Parameters of the function */
-    private readonly _parameterDefinitions?: Maybe<ParameterDefinitionView[]>;
+    private readonly _parameterDefinitions?: Maybe<ParameterView[]>;
     /** Return type of the function */
     private readonly _returnType?: Maybe<DataTypeIdentifier>;
     /** Runtime function definition */
@@ -60,7 +60,7 @@ export class FunctionDefinitionView {
         this._id = object.id;
         this._identifier = object.identifier;
         this._names = object.names;
-        this._parameterDefinitions = object.parameterDefinitions?.nodes?.map(definition => new ParameterDefinitionView(definition!!, dataTypeIdentifiers)) ?? undefined;
+        this._parameterDefinitions = object.parameterDefinitions?.nodes?.map(definition => new ParameterView(definition!!, dataTypeIdentifiers)) ?? undefined;
         this._returnType = attachDataTypeIdentifiers(dataTypeIdentifiers, object.returnType);
         this._runtimeFunctionDefinition = object.runtimeFunctionDefinition;
         this._throwsError = object.throwsError;
@@ -112,7 +112,7 @@ export class FunctionDefinitionView {
         return this._names;
     }
 
-    get parameterDefinitions(): Maybe<ParameterDefinitionView[]> | undefined {
+    get parameterDefinitions(): Maybe<ParameterView[]> | undefined {
         return this._parameterDefinitions;
     }
 
@@ -156,7 +156,7 @@ export class FunctionDefinitionView {
     }
 }
 
-export class ParameterDefinitionView {
+export class ParameterView {
 
     /** Time when this ParameterDefinition was created */
     private readonly _createdAt?: Maybe<Scalars['Time']['output']>;
