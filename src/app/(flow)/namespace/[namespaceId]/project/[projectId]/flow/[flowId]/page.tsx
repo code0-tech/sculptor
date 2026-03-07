@@ -8,7 +8,7 @@ import React from "react";
 import {IconDatabase, IconFile, IconMessageChatbot} from "@tabler/icons-react";
 import {useParams} from "next/navigation";
 import {Flow} from "@code0-tech/sagittarius-graphql-types";
-import {FlowBuilderComponent} from "@edition/flow/components/FlowBuilderComponent";
+import {FlowBuilderComponent} from "@edition/flow/components/builder/FlowBuilderComponent";
 import {FunctionFiles} from "@edition/function/components/FunctionFiles";
 import {
     ResizableHandle,

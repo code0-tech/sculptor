@@ -19,12 +19,12 @@ import {Flow, FlowType} from "@code0-tech/sagittarius-graphql-types";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import {FlowCreateDialogComponent} from "@edition/flow/components/FlowCreateDialogComponent";
-import {FlowFolderComponent, FlowFolderComponentHandle} from "@edition/flow/components/FlowFolderComponent";
+import {FlowFolderComponent, FlowFolderComponentHandle} from "@edition/flow/components/folder/FlowFolderComponent";
 import {FlowDeleteDialogComponent} from "@edition/flow/components/FlowDeleteDialogComponent";
 import {
     FlowFolderContextMenuComponentGroupData,
     FlowFolderContextMenuComponentItemData
-} from "@edition/flow/components/FlowFolderContextMenuComponent";
+} from "@edition/flow/components/folder/FlowFolderContextMenuComponent";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 
 export const FlowFolderView: React.FC = () => {

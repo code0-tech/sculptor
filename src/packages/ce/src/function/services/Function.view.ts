@@ -8,7 +8,7 @@ import {
 import {
     attachDataTypeIdentifiers,
     resolveDataTypeIdentifiers
-} from "@edition/flow/components/FlowBuilderComponent.util";
+} from "@edition/flow/components/builder/FlowBuilderComponent.util";
 
 export class FunctionDefinitionView {
 

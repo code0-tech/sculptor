@@ -24,10 +24,10 @@ import {FunctionNodeDefault} from "@edition/function/components/FunctionNodeDefa
 import {FunctionNodeGroup} from "@edition/function/components/FunctionNodeGroup";
 import {FunctionNodeTrigger} from "@edition/function/components/FunctionNodeTrigger";
 import {useEdges} from "@edition/flow/hooks/Flow.edges.hook";
-import {FlowPanelSizeComponent} from "@edition/flow/components/FlowPanelSizeComponent";
-import {FlowPanelLayoutComponent} from "@edition/flow/components/FlowPanelLayoutComponent";
-import {FlowPanelControlComponent} from "@edition/flow/components/FlowPanelControlComponent";
-import {FlowPanelUpdateComponent} from "@edition/flow/components/FlowPanelUpdateComponent";
+import {FlowPanelSizeComponent} from "@edition/flow/components/panels/FlowPanelSizeComponent";
+import {FlowPanelLayoutComponent} from "@edition/flow/components/panels/FlowPanelLayoutComponent";
+import {FlowPanelControlComponent} from "@edition/flow/components/panels/FlowPanelControlComponent";
+import {FlowPanelUpdateComponent} from "@edition/flow/components/panels/FlowPanelUpdateComponent";
 
 /**
  * Dynamically layouts a tree of nodes and their parameter nodes for a flow-based editor.

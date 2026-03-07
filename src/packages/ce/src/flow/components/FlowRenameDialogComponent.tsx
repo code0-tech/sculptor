@@ -1,5 +1,5 @@
 import React from "react";
-import {FlowFolderContextMenuComponentGroupData, FlowFolderContextMenuComponentItemData} from "./FlowFolderContextMenuComponent";
+import {FlowFolderContextMenuComponentGroupData, FlowFolderContextMenuComponentItemData} from "./folder/FlowFolderContextMenuComponent";
 import {Flow} from "@code0-tech/sagittarius-graphql-types";
 import {
     Button,

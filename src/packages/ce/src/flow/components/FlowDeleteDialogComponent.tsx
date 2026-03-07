@@ -2,7 +2,7 @@ import React from "react";
 import {
     FlowFolderContextMenuComponentGroupData,
     FlowFolderContextMenuComponentItemData
-} from "./FlowFolderContextMenuComponent";
+} from "./folder/FlowFolderContextMenuComponent";
 import {Flow} from "@code0-tech/sagittarius-graphql-types";
 import {
     Badge,
