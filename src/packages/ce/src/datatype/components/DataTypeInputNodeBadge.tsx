@@ -4,8 +4,6 @@ import {IconBolt, IconNote} from "@tabler/icons-react";
 import {
     Badge,
     BadgeType,
-    FlowTypeView,
-    FunctionDefinitionView,
     hashToColor, Text,
     useService,
     useStore
@@ -13,6 +11,8 @@ import {
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
+import {FunctionDefinitionView} from "@edition/function/services/Function.view";
+import {FlowTypeView} from "@edition/flowtype/services/FlowType.view";
 
 export interface DataTypeInputNodeBadgeProps extends Omit<BadgeType, 'value' | 'children'> {
     value: NodeFunction | NodeFunctionIdWrapper
