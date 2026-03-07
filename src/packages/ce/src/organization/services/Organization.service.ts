@@ -1,4 +1,4 @@
-import {DOrganizationReactiveService, DOrganizationView, ReactiveArrayStore} from "@code0-tech/pictor";
+import {ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor";
 import {
     Mutation,
     Organization,
@@ -16,8 +16,9 @@ import updateOrganizationMutation from "./mutations/Organization.update.mutation
 import deleteOrganizationMutation from "./mutations/Organization.delete.mutation.graphql";
 import organizationQuery from "./queries/Organization.query.graphql";
 import {View} from "@code0-tech/pictor/dist/utils/view";
+import {DOrganizationView} from "@edition/organization/services/Organization.view";
 
-export class OrganizationService extends DOrganizationReactiveService {
+export class OrganizationService extends ReactiveArrayService<DOrganizationView> {
 
     private readonly client: GraphqlClient
     private i = 0;
@@ -47,6 +48,10 @@ export class OrganizationService extends DOrganizationReactiveService {
     hasById(id: Organization["id"]): boolean {
         const organization = super.values().find(o => o.id === id)
         return organization !== undefined
+    }
+
+    getById(id: Organization["id"]): DOrganizationView | undefined {
+        return this.values().find(organization => organization && organization.id === id)
     }
 
     async organizationCreate(payload: OrganizationsCreateInput): Promise<OrganizationsCreatePayload | undefined> {
