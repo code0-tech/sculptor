@@ -17,11 +17,11 @@ import {
 } from "@code0-tech/pictor";
 import React from "react";
 import type {Namespace, NamespaceRole, NamespaceRoleAbility} from "@code0-tech/sagittarius-graphql-types";
-import {DNamespaceRolePermissions} from "@code0-tech/pictor/dist/components/d-role/DNamespaceRolePermissions";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {useParams} from "next/navigation";
 import {RoleService} from "@edition/role/services/Role.service";
+import {RolePermissionComponent} from "@edition/role/components/RolePermissionComponent";
 
 type Permission = {
     label: string
@@ -257,7 +257,7 @@ export const RolePermissionView: React.FC = () => {
                                 {permissionTemplate.name}
                             </Text>
                             <Spacing spacing={"xs"}/>
-                            <DNamespaceRolePermissions
+                            <RolePermissionComponent
                                 abilities={Object.entries(permissionTemplate.abilities)
                                     .filter(([_, enabled]) => enabled)
                                     .map(([ability, _]) => ability as NamespaceRoleAbility)}/>
@@ -277,7 +277,7 @@ export const RolePermissionView: React.FC = () => {
             Current stored permissions
         </Text>
         <Spacing spacing={"xxs"}/>
-        <DNamespaceRolePermissions abilities={role?.abilities!!}/>
+        <RolePermissionComponent abilities={role?.abilities!!}/>
         <Spacing spacing={"xl"}/>
         <Card color={"secondary"}>
             {permissions.map(permissionGroup => {
