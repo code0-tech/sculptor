@@ -72,7 +72,7 @@ export class ProjectService extends ReactiveArrayService<DNamespaceProjectView, 
     }
 
     getById(id: NamespaceProject['id'], dependencies?: DProjectDependencies): DNamespaceProjectView | undefined {
-        return super.values(dependencies).find(project => project && project.id === id)
+        return this.values(dependencies!).find(project => project && project.id === id)
     }
 
     async projectAssignRuntimes(payload: NamespacesProjectsAssignRuntimesInput): Promise<NamespacesProjectsAssignRuntimesPayload | undefined> {

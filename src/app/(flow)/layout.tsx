@@ -5,18 +5,8 @@ import {useParams, useRouter} from "next/navigation";
 import {
     AuroraBackground,
     ContextStoreProvider,
-    DataTypeView,
     DLayout,
-    DNamespaceMemberView,
-    DNamespaceProjectView,
-    DNamespaceRoleView,
-    DNamespaceView,
-    DOrganizationView,
-    DRuntimeView,
-    DUserView,
     Flex,
-    FlowTypeView,
-    FunctionDefinitionView,
     useUserSession
 } from "@code0-tech/pictor";
 import React from "react";
@@ -37,6 +27,16 @@ import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FileTabsView} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.view";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
 import Image from "next/image";
+import {DUserView} from "@edition/user/services/User.view";
+import {DOrganizationView} from "@edition/organization/services/Organization.view";
+import {DNamespaceMemberView} from "@edition/member/services/Member.view";
+import {DNamespaceView} from "@edition/namespace/services/Namespace.view";
+import {DRuntimeView} from "@edition/runtime/services/Runtime.view";
+import {DNamespaceProjectView} from "@edition/project/services/Project.view";
+import {DNamespaceRoleView} from "@edition/role/services/Role.view";
+import {FunctionDefinitionView} from "@edition/function/services/Function.view";
+import {DataTypeView} from "@edition/datatype/services/DataType.view";
+import {FlowTypeView} from "@edition/flowtype/services/FlowType.view";
 
 export default function Layout({bar, tab, children}: {
     bar: React.ReactNode,
