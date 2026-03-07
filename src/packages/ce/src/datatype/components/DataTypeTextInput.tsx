@@ -6,7 +6,7 @@ import {DataTypeInputProps} from "./DataTypeInput";
 import {InputSyntaxSegment, MenuItem, Text, TextInput, useService} from "@code0-tech/pictor";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import {FlowTypeService} from "@edition/flowtype/services/FlowTypeService";
+import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {useSuggestions} from "@edition/function/hooks/FunctionSuggestion.hook";
 import {FunctionSuggestionMenuFooter} from "@edition/function/components/FunctionSuggestionMenuFooter";
 import {toInputSuggestions} from "@edition/function/components/FunctionSuggestionMenu.util";

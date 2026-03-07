@@ -19,7 +19,7 @@ import {
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import {IconDotsVertical, IconPlus} from "@tabler/icons-react";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import {FlowTypeService} from "@edition/flowtype/services/FlowTypeService";
+import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 
 export interface FunctionFilesProps {
     flowId: Flow['id']

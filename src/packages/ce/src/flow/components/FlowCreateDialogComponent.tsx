@@ -28,7 +28,7 @@ import {
     useStore
 } from "@code0-tech/pictor";
 import {hashToColor} from "@code0-tech/pictor/dist/components/d-flow/DFlow.util";
-import {FlowTypeService} from "@edition/flowtype/services/FlowTypeService";
+import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FlowNameInputComponent} from "@edition/flow/components/FlowNameInputComponent";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import {useParams, useRouter} from "next/navigation";

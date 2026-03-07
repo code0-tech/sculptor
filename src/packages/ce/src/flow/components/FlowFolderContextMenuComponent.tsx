@@ -15,7 +15,7 @@ import {
     ContextMenuTrigger
 } from "@code0-tech/pictor/dist/components/context-menu/ContextMenu";
 import {Flex, Text, useService, useStore} from "@code0-tech/pictor";
-import {FlowTypeService} from "@edition/flowtype/services/FlowTypeService";
+import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 
 export interface FlowFolderContextMenuComponentGroupData {
     name: string

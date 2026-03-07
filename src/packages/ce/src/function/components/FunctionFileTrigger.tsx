@@ -8,7 +8,7 @@ import {FunctionSuggestion} from "@edition/function/components/FunctionSuggestio
 import {useValueSuggestions} from "@edition/function/hooks/FunctionValueSuggestions.hook";
 import {useDataTypeSuggestions} from "@edition/function/hooks/FunctionDataTypeSuggestions.hook";
 import {toInputSuggestions} from "@edition/function/components/FunctionSuggestionMenu.util";
-import {FlowTypeService} from "@edition/flowtype/services/FlowTypeService";
+import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {DataTypeTextInput} from "@edition/datatype/components/DataTypeTextInput";

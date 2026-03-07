@@ -12,7 +12,7 @@ import {
 } from "@code0-tech/pictor";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import {FlowTypeService} from "@edition/flowtype/services/FlowTypeService";
+import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 
 export interface DataTypeInputNodeBadgeProps extends Omit<BadgeType, 'value' | 'children'> {
     value: NodeFunction | NodeFunctionIdWrapper

@@ -33,7 +33,7 @@ import {RoleService} from "@edition/role/services/Role.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
-import {FlowTypeService} from "@edition/flowtype/services/FlowTypeService";
+import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FileTabsView} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.view";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
 import Image from "next/image";

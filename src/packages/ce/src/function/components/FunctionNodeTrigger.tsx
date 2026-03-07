@@ -3,7 +3,7 @@ import {Handle, Node, NodeProps, Position, useReactFlow, useStore} from "@xyflow
 import {Badge, Card, Flex, Text, useService, useStore as usePictorStore} from "@code0-tech/pictor";
 import {FunctionNodeProps} from "@edition/function/components/FunctionNodeComponent";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
-import {FlowTypeService} from "@edition/flowtype/services/FlowTypeService";
+import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {IconBolt} from "@tabler/icons-react";
 import {FunctionFileTrigger} from "@edition/function/components/FunctionFileTrigger";

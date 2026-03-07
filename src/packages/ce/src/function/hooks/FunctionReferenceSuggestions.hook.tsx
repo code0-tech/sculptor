@@ -25,7 +25,7 @@ import {useReturnType} from "@edition/function/hooks/Function.return.hook";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
-import {FlowTypeService} from "@edition/flowtype/services/FlowTypeService";
+import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 
 interface ExtendedReferenceValue extends ReferenceValue {
     inputTypeIdentifier?: string
