@@ -1,9 +1,4 @@
-import {
-    DNamespaceRoleReactiveService,
-    DNamespaceRoleView,
-    DRoleDependencies,
-    ReactiveArrayStore
-} from "@code0-tech/pictor"
+import {DRoleDependencies, ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor"
 import {
     Mutation,
     NamespaceRole,
@@ -16,7 +11,7 @@ import {
     NamespacesRolesDeleteInput,
     NamespacesRolesDeletePayload,
     NamespacesRolesUpdateInput,
-    NamespacesRolesUpdatePayload, OrganizationsDeleteInput,
+    NamespacesRolesUpdatePayload,
     Query
 } from "@code0-tech/sagittarius-graphql-types"
 import {GraphqlClient} from "@core/util/graphql-client";
@@ -26,8 +21,9 @@ import roleDeleteMutation from "@edition/role/services/mutations/Role.delete.mut
 import roleAssignAbilitiesMutation from "@edition/role/services/mutations/Role.assignAbilities.mutation.graphql";
 import roleAssignProjectsMutation from "@edition/role/services/mutations/Role.assignProjects.mutation.graphql";
 import {View} from "@code0-tech/pictor/dist/utils/view";
+import {DNamespaceRoleView} from "@edition/role/services/Role.view";
 
-export class RoleService extends DNamespaceRoleReactiveService {
+export class RoleService extends ReactiveArrayService<DNamespaceRoleView, DRoleDependencies> {
 
     private readonly client: GraphqlClient
     private i = 0;
@@ -74,6 +70,10 @@ export class RoleService extends DNamespaceRoleReactiveService {
     hasById(id: NamespaceRole["id"]): boolean {
         const role = super.values().find(r => r.id === id)
         return role !== undefined
+    }
+
+    getById(id: NamespaceRole['id'], dependencies?: DRoleDependencies): DNamespaceRoleView | undefined {
+        return super.values(dependencies).find(role => role && role.id === id);
     }
 
     async roleAssignAbilities(payload: NamespacesRolesAssignAbilitiesInput): Promise<NamespacesRolesAssignAbilitiesPayload | undefined> {
