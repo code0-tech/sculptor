@@ -1,4 +1,4 @@
-import {DUserReactiveService, DUserView, ReactiveArrayStore} from "@code0-tech/pictor";
+import {ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor";
 import {
     Mutation,
     Query,
@@ -41,8 +41,9 @@ import usersQuery from "./queries/Users.query.graphql";
 import userByUsernameQuery from "./queries/User.byUsername.query.graphql";
 import userByIdQuery from "./queries/User.byId.query.graphql";
 import {View} from "@code0-tech/pictor/dist/utils/view";
+import {DUserView} from "@edition/user/services/User.view";
 
-export class UserService extends DUserReactiveService {
+export class UserService extends ReactiveArrayService<DUserView> {
 
     private readonly client: GraphqlClient
     private i = 0;
@@ -71,7 +72,7 @@ export class UserService extends DUserReactiveService {
     }
 
     getById(id: User["id"]): DUserView | undefined {
-        const user = super.getById(id)
+        const user = this.values().find(user => user && user.id === id)
         if (user) return user
 
         if (id) {
@@ -88,11 +89,11 @@ export class UserService extends DUserReactiveService {
             })
         }
 
-        return super.getById(id)
+        return this.values().find(user => user && user.id === id)
     }
 
     getByUsername(username: User["username"]): DUserView | undefined {
-        if (super.getByUsername(username)) return super.getByUsername(username)
+        if (this.values().find(user => user && user.username === username)) return this.values().find(user => user && user.username === username)
 
         this.client.query<Query>({
             query: userByUsernameQuery,
@@ -106,7 +107,7 @@ export class UserService extends DUserReactiveService {
             if (data && data.user && !this.hasById(data.user.id)) this.set(this.i++, new View(new DUserView(data.user)))
         })
 
-        return super.getByUsername(username)
+        return this.values().find(user => user && user.username === username)
     }
 
     deleteById(id: User["id"]): void {
