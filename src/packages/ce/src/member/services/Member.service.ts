@@ -1,11 +1,9 @@
 import {
-    DMemberDependencies,
-    DNamespaceMemberReactiveService,
-    DNamespaceMemberView,
+    DMemberDependencies, ReactiveArrayService,
     ReactiveArrayStore
 } from "@code0-tech/pictor"
 import {
-    Mutation,
+    Mutation, Namespace,
     NamespaceMember,
     NamespacesMembersAssignRolesInput,
     NamespacesMembersAssignRolesPayload,
@@ -13,7 +11,7 @@ import {
     NamespacesMembersDeletePayload,
     NamespacesMembersInviteInput,
     NamespacesMembersInvitePayload,
-    Query
+    Query, User
 } from "@code0-tech/sagittarius-graphql-types"
 import {GraphqlClient} from "@core/util/graphql-client"
 import membersQuery from "./queries/Members.query.graphql"
@@ -21,8 +19,9 @@ import memberAssignRoleMutation from "./mutations/Member.assignRoles.mutation.gr
 import memberDeleteMutation from "./mutations/Member.delete.mutation.graphql"
 import memberInviteMutation from "./mutations/Member.invite.mutation.graphql"
 import {View} from "@code0-tech/pictor/dist/utils/view";
+import {DNamespaceMemberView} from "@edition/member/services/Member.view";
 
-export class MemberService extends DNamespaceMemberReactiveService {
+export class MemberService extends ReactiveArrayService<DNamespaceMemberView, DMemberDependencies> {
 
     private readonly client: GraphqlClient
     private i = 0
@@ -65,6 +64,14 @@ export class MemberService extends DNamespaceMemberReactiveService {
     hasById(id: NamespaceMember["id"]): boolean {
         const member = super.values().find(o => o.id === id)
         return member !== undefined
+    }
+
+    getById(id: NamespaceMember['id'], dependencies?: DMemberDependencies): DNamespaceMemberView | undefined {
+        return this.values(dependencies).find(member => member && member.id === id);
+    }
+
+    getByNamespaceIdAndUserId(namespaceId: Namespace['id'], userId: User['id']): DNamespaceMemberView | undefined {
+        return this.values({namespaceId: namespaceId}).find(member => member.namespace?.id === namespaceId && member.user?.id === userId)
     }
 
     async memberAssignRoles(payload: NamespacesMembersAssignRolesInput): Promise<NamespacesMembersAssignRolesPayload | undefined> {
