@@ -7,7 +7,7 @@ import React from "react";
 import Link from "next/link";
 import {IconBuilding, IconFolders, IconInbox, IconLogout, IconSearch} from "@tabler/icons-react";
 import {ApplicationBreadcrumbView} from "@edition/application/views/ApplicationBreadcrumbView";
-import UserMenuComponent from "@edition/user/components/UserMenu";
+import UserMenuComponent from "@edition/user/components/UserMenuComponent";
 
 export const ApplicationBarView: React.FC = () => {
 
