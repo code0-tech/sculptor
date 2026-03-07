@@ -1,10 +1,11 @@
-import {DNamespaceReactiveService, DNamespaceView, ReactiveArrayStore} from "@code0-tech/pictor";
+import {ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor";
 import {GraphqlClient} from "@core/util/graphql-client";
 import {Namespace, Query} from "@code0-tech/sagittarius-graphql-types";
 import namespaceQuery from "./queries/Namespace.query.graphql";
 import {View} from "@code0-tech/pictor/dist/utils/view";
+import {DNamespaceView} from "@edition/namespace/services/Namespace.view";
 
-export class NamespaceService extends DNamespaceReactiveService {
+export class NamespaceService extends ReactiveArrayService<DNamespaceView> {
 
     private readonly client: GraphqlClient
 
@@ -14,7 +15,7 @@ export class NamespaceService extends DNamespaceReactiveService {
     }
 
     getById(id: Namespace["id"]): DNamespaceView | undefined {
-        if (super.getById(id)) return super.getById(id);
+        if (this.values().find(namespace => namespace && namespace.id === id)) return this.values().find(namespace => namespace && namespace.id === id)
         this.client.query<Query>({
             query: namespaceQuery,
             variables: {
@@ -29,7 +30,7 @@ export class NamespaceService extends DNamespaceReactiveService {
             }
         })
 
-        return super.getById(id);
+        return this.values().find(namespace => namespace && namespace.id === id)
     }
 
 }
