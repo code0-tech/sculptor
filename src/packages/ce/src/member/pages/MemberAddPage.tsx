@@ -1,24 +1,15 @@
 "use client"
 
 import React from "react";
-import {
-    Button,
-    Col,
-    DUserInput,
-    DUserView,
-    Flex,
-    Spacing,
-    Text,
-    useForm,
-    useService,
-    useStore
-} from "@code0-tech/pictor";
+import {Button, Col, Flex, Spacing, Text, useForm, useService, useStore} from "@code0-tech/pictor";
 import {MemberService} from "@edition/member/services/Member.service";
 import {useParams, useRouter} from "next/navigation";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
 import Link from "next/link";
 import {UserService} from "@edition/user/services/User.service";
 import {InputSyntaxSegment} from "@code0-tech/pictor/dist/components/form/Input.syntax.hook";
+import {UserInputComponent} from "@edition/user/components/UserInputComponent";
+import {DUserView} from "@edition/user/services/User.view";
 
 export const MemberAddPage: React.FC = () => {
 
@@ -83,11 +74,11 @@ export const MemberAddPage: React.FC = () => {
                 </Text>
                 <Spacing spacing={"xl"}/>
                 {/*@ts-ignore*/}
-                <DUserInput title={"Description"}
-                            description={"Provide a simple project description"}
-                            filter={filteredUsers}
-                            validationUsesSyntax
-                            {...inputs.getInputProps("users")}/>
+                <UserInputComponent title={"Description"}
+                                    description={"Provide a simple project description"}
+                                    filter={filteredUsers}
+                                    validationUsesSyntax
+                                    {...inputs.getInputProps("users")}/>
                 <Spacing spacing={"xl"}/>
                 <Flex style={{gap: "0.35rem"}} justify={"space-between"}>
                     <Link href={"/public"}>
