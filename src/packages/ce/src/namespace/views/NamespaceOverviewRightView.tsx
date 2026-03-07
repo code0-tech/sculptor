@@ -6,12 +6,10 @@ import {
     Avatar,
     Badge,
     Button,
-    DRuntimeList,
     Flex,
     Spacing,
     Text,
     Tooltip,
-    TooltipArrow,
     TooltipContent,
     TooltipPortal,
     TooltipTrigger,
@@ -23,6 +21,7 @@ import {useParams} from "next/navigation";
 import {NamespaceService} from "@edition/namespace/services/Namespace.service";
 import {UserService} from "@edition/user/services/User.service";
 import Link from "next/link";
+import {RuntimeDataTableComponent} from "@edition/runtime/components/RuntimeDataTableComponent";
 
 export const NamespaceOverviewRightView: React.FC = () => {
 
@@ -77,7 +76,7 @@ export const NamespaceOverviewRightView: React.FC = () => {
         <Spacing spacing={"xl"}/>
         <Text size={"md"}>Runtimes</Text>
         <Spacing spacing={"xs"}/>
-        <DRuntimeList minimized namespaceId={`gid://sagittarius/Namespace/${namespaceId}`}/>
+        <RuntimeDataTableComponent minimized namespaceId={`gid://sagittarius/Namespace/${namespaceId}`}/>
     </Flex>
 
 }

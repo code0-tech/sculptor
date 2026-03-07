@@ -3,9 +3,12 @@
 import React from "react";
 import {
     Button,
-    DRuntimeList,
     Flex,
-    Menu, MenuCheckboxItem, MenuContent, MenuPortal, MenuTrigger,
+    Menu,
+    MenuCheckboxItem,
+    MenuContent,
+    MenuPortal,
+    MenuTrigger,
     Spacing,
     Text,
     useService,
@@ -17,9 +20,6 @@ import {notFound, useParams, useRouter} from "next/navigation";
 import {UserService} from "@edition/user/services/User.service";
 import {RuntimeDataTableComponent} from "@edition/runtime/components/RuntimeDataTableComponent";
 import {DataTableFilterProps, DataTableSortProps} from "@code0-tech/pictor/dist/components/data-table/DataTable";
-import {
-    OrganizationDataTableFilterInputComponent
-} from "@edition/organization/components/OrganizationDataTableFilterInputComponent";
 import {RuntimeDataTableFilterInputComponent} from "@edition/runtime/components/RuntimeDataTableFilterInputComponent";
 import {IconMinus, IconSortAscending, IconSortDescending} from "@tabler/icons-react";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
@@ -128,13 +128,18 @@ export const RuntimesPage: React.FC = () => {
         </Flex>
         <Spacing spacing={"xl"}/>
         <div style={{width: "100%"}}>
-            <RuntimeDataTableFilterInputComponent preFilter={(runtime) => namespaceIndex ? true : !runtime?.namespace?.id} namespaceId={namespaceIndex ? `gid://sagittarius/Namespace/${namespaceIndex}` : undefined} onChange={filter => setFilter(filter)}/>
+            <RuntimeDataTableFilterInputComponent
+                preFilter={(runtime) => namespaceIndex ? true : !runtime?.namespace?.id}
+                namespaceId={namespaceIndex ? `gid://sagittarius/Namespace/${namespaceIndex}` : undefined}
+                onChange={filter => setFilter(filter)}/>
         </div>
         <Spacing spacing={"xl"}/>
-        <RuntimeDataTableComponent filter={filter} sort={sort} namespaceId={namespaceIndex ? `gid://sagittarius/Namespace/${namespaceIndex}` : undefined}
-                      preFilter={(runtime) => namespaceIndex ? true : !runtime?.namespace?.id} onSelect={(runtime) => {
-            const number = runtime?.id?.match(/Runtime\/(\d+)$/)?.[1]
-            router.push(namespaceIndex ? `/namespace/${namespaceIndex}/runtimes/${number}/settings` : `/runtimes/${number}/settings`)
-        }}/>
+        <RuntimeDataTableComponent filter={filter} sort={sort}
+                                   namespaceId={namespaceIndex ? `gid://sagittarius/Namespace/${namespaceIndex}` : undefined}
+                                   preFilter={(runtime) => namespaceIndex ? true : !runtime?.namespace?.id}
+                                   onSelect={(runtime) => {
+                                       const number = runtime?.id?.match(/Runtime\/(\d+)$/)?.[1]
+                                       router.push(namespaceIndex ? `/namespace/${namespaceIndex}/runtimes/${number}/settings` : `/runtimes/${number}/settings`)
+                                   }}/>
     </div>
 }
