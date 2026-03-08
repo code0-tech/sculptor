@@ -81,7 +81,7 @@ export const MemberAddPage: React.FC = () => {
                                     {...inputs.getInputProps("users")}/>
                 <Spacing spacing={"xl"}/>
                 <Flex style={{gap: "0.35rem"}} justify={"space-between"}>
-                    <Link href={"/public"}>
+                    <Link href={`/namespace/${namespaceIndex}/members`}>
                         <Button color={"primary"}>
                             Go back to members
                         </Button>
