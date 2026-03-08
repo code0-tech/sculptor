@@ -291,7 +291,11 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
                 value: null
             }
             localSetting.value = value
-            flow.settings!.nodes!.push(localSetting)
+            if (flow.settings && flow.settings.nodes)
+                flow.settings.nodes.push(localSetting)
+            else {
+                flow.settings = {nodes: [localSetting]}
+            }
         } else {
             setting.value = value
         }
