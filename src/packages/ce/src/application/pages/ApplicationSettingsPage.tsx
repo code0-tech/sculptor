@@ -151,7 +151,7 @@ export const ApplicationSettingsPage: React.FC = () => {
                                         <Text size={"md"} hierarchy={"primary"}>Sagittarius version</Text>
                                         <Text size={"md"} hierarchy={"tertiary"}>Version of the backend</Text>
                                     </Flex>
-                                    <Badge color={"info"}>2134929721-ee</Badge>
+                                    <Badge color={"info"}>{application?.metadata?.version}</Badge>
                                 </Flex>
                             </CardSection>
                         </Card>
