@@ -43,9 +43,6 @@ export default function Page() {
                                     Go back to project overview
                                 </Button>
                             </Link>
-                            <Button color={"success"}>
-                                Create new flow
-                            </Button>
                         </Flex>
                         <Spacing spacing={"xl"}/>
                         <Text size={"xl"} hierarchy={"primary"}>Or start from a template</Text>
