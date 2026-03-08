@@ -89,22 +89,13 @@ export const FlowFolderView: React.FC = () => {
                     </Button>
                 </Flex>
                 <Flex style={{gap: "0.35rem"}} align={"center"} justify={"space-between"}>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button color={"tertiary"} paddingSize={"xxs"} onClick={() => {
-                                setCreateDialogOpen(true)
-                                setFlowTypeId(undefined)
-                            }}>
-                                <IconPlus size={13}/>
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipPortal>
-                            <TooltipContent side={"bottom"}>
-                                <Text>Add new flow</Text>
-                                <TooltipArrow/>
-                            </TooltipContent>
-                        </TooltipPortal>
-                    </Tooltip>
+                    <Button color={"tertiary"} paddingSize={"xxs"} style={{textWrap: "nowrap"}} onClick={() => {
+                        setCreateDialogOpen(true)
+                        setFlowTypeId(undefined)
+                    }}>
+                        <IconPlus size={13}/>
+                        Create flow
+                    </Button>
                     <ButtonGroup color={"secondary"} style={{boxShadow: "none"}} p={0}>
                         <Tooltip>
                             <TooltipTrigger asChild>
