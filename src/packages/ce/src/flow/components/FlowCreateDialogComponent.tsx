@@ -1,5 +1,5 @@
 import React, {startTransition} from "react";
-import {FlowType, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
+import {FlowType, Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {IconArrowDown, IconArrowUp, IconCornerDownLeft, IconFile} from "@tabler/icons-react";
 import {
     Badge,
@@ -10,7 +10,8 @@ import {
     DialogContent,
     DialogOverlay,
     DialogPortal,
-    Flex, hashToColor,
+    Flex,
+    hashToColor,
     InputDescription,
     InputLabel,
     InputMessage,
@@ -34,6 +35,7 @@ import {useParams, useRouter} from "next/navigation";
 import {ProjectService} from "@edition/project/services/Project.service";
 import {RuntimeService} from "@edition/runtime/services/Runtime.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
+import Link from "next/link";
 
 export interface FlowCreateDialogComponentProps {
     open?: boolean
@@ -55,6 +57,8 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
     const runtimeService = useService(RuntimeService)
     const runtimeStore = useStore(RuntimeService)
 
+    const namespaceIndex = params.namespaceId as any as number
+    const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
     const projectIndex = params.projectId as any as number
     const projectId: NamespaceProject['id'] = `gid://sagittarius/NamespaceProject/${projectIndex}`
 
@@ -76,7 +80,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
     )
 
     const primaryRuntime = React.useMemo(
-        () => runtimeService.values({namespaceId: project?.namespace?.id}).find(runtime => runtime.id == project?.primaryRuntime?.id),
+        () => [...runtimeService.values(), ...runtimeService.values({namespaceId: project?.namespace?.id})].find(runtime => runtime.id == project?.primaryRuntime?.id),
         [project, runtimeStore]
     )
 
@@ -152,15 +156,44 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                             <Button color={"tertiary"}>No, go back!</Button>
                         </DialogClose>
                         <ButtonGroup color={"tertiary"}>
-                            <Button color={"tertiary"} variant={"filled"}>
-                                <Text>Assign</Text>
-                            </Button>
-                            <Button color={"tertiary"} variant={"filled"}>
-                                <Text>Create</Text>
-                            </Button>
+                            <Link href={`/namespace/${namespaceIndex}/project/${projectIndex}/settings`}>
+                                <Button color={"info"} variant={"none"}>
+                                    <Text>Assign</Text>
+                                </Button>
+                            </Link>
+                            <Link href={`/namespace/${namespaceIndex}/runtimes/create`}>
+                                <Button color={"success"} variant={"none"}>
+                                    <Text>Create</Text>
+                                </Button>
+                            </Link>
                         </ButtonGroup>
                     </Flex>
-                </> : (
+                </> : flowTypes.length <= 0 ? (
+                    <>
+                        <Text size={"md"}>
+                            Their is no flow type available for the primary runtime, assign and/or create another
+                            runtime to be able to create flows.
+                        </Text>
+                        <Spacing spacing={"xl"}/>
+                        <Flex justify={"space-between"} align={"center"}>
+                            <DialogClose asChild>
+                                <Button color={"tertiary"}>No, go back!</Button>
+                            </DialogClose>
+                            <ButtonGroup color={"tertiary"}>
+                                <Link href={`/namespace/${namespaceIndex}/project/${projectIndex}/settings`}>
+                                    <Button color={"info"} variant={"none"}>
+                                        <Text>Assign</Text>
+                                    </Button>
+                                </Link>
+                                <Link href={`/namespace/${namespaceIndex}/runtimes/create`}>
+                                    <Button color={"success"} variant={"none"}>
+                                        <Text>Create</Text>
+                                    </Button>
+                                </Link>
+                            </ButtonGroup>
+                        </Flex>
+                    </>
+                ) : (
                     <>
                         <InputLabel>Type of flow</InputLabel>
                         <InputDescription>You can choose a flow type here</InputDescription>
