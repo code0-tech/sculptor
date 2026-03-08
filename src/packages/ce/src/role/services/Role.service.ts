@@ -18,6 +18,7 @@ import {GraphqlClient} from "@core/util/graphql-client";
 import rolesQuery from "@edition/role/services/queries/Roles.query.graphql";
 import roleUpdateMutation from "@edition/role/services/mutations/Role.update.mutation.graphql";
 import roleDeleteMutation from "@edition/role/services/mutations/Role.delete.mutation.graphql";
+import roleCreateMutation from "@edition/role/services/mutations/Role.create.mutation.graphql";
 import roleAssignAbilitiesMutation from "@edition/role/services/mutations/Role.assignAbilities.mutation.graphql";
 import roleAssignProjectsMutation from "@edition/role/services/mutations/Role.assignProjects.mutation.graphql";
 import {View} from "@code0-tech/pictor/dist/utils/view";
@@ -157,8 +158,22 @@ export class RoleService extends ReactiveArrayService<RoleView, RoleDependencies
         return result.data?.namespacesRolesUpdate ?? undefined
     }
 
-    roleCreate(payload: NamespacesRolesCreateInput): Promise<NamespacesRolesCreatePayload | undefined> {
-        throw new Error("Method not implemented.")
+    async roleCreate(payload: NamespacesRolesCreateInput): Promise<NamespacesRolesCreatePayload | undefined> {
+        const result = await this.client.mutate<Mutation, NamespacesRolesCreateInput>({
+            mutation: roleCreateMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        if (result.data && result.data.namespacesRolesCreate && result.data.namespacesRolesCreate.namespaceRole) {
+            const role = result.data.namespacesRolesCreate.namespaceRole
+            if (!this.hasById(role.id)) {
+                this.add(new View(new RoleView(role)))
+            }
+        }
+
+        return result.data?.namespacesRolesCreate ?? undefined
     }
 
     async roleDelete(payload: NamespacesRolesDeleteInput): Promise<NamespacesRolesDeletePayload | undefined> {
