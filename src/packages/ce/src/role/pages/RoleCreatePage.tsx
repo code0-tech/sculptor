@@ -79,7 +79,7 @@ export const RoleCreatePage: React.FC = () => {
                 />
                 <Spacing spacing={"xl"}/>
                 <Flex style={{gap: "0.35rem"}} justify={"space-between"}>
-                    <Link href={"/public"}>
+                    <Link href={`/namespace/${namespaceIndex}/roles`}>
                         <Button color={"primary"}>
                             Go back to roles
                         </Button>
