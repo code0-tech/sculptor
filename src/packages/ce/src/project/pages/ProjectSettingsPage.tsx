@@ -12,46 +12,35 @@ import {
     ResizablePanel,
     ResizablePanelGroup
 } from "@code0-tech/pictor/dist/components/resizable/Resizable";
+import {SidebarComponent} from "@core/components/SidebarComponent";
 
 export const ProjectSettingsPage: React.FC = () => {
     return <Tab orientation={"vertical"} defaultValue={"general"} h={"100%"}>
         <ResizablePanelGroup>
-            <ResizablePanel id={"1"} defaultSize={"20%"} collapsedSize={"0%"}
-                             collapsible minSize={"10%"} style={{textWrap: "nowrap"}}>
-                <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
-                    <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"}>
-                        <Text size={"md"} hierarchy={"secondary"}>Project settings</Text>
-
-                        <Button variant={"none"} paddingSize={"xxs"}>
-                            <IconLayoutSidebar size={16}/>
+            <SidebarComponent id={"1"}
+                              title={"Project settings"}
+                              description={"General settings and restrictions for your Sculptor application. These settings affect all users and organizations within the application."}>
+                <TabList>
+                    <TabTrigger value={"general"} w={"100%"} asChild>
+                        <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                            <Text size={"md"}>General</Text>
                         </Button>
-                    </Flex>
-                    <Text size={"sm"} hierarchy={"tertiary"} style={{textWrap: "wrap"}}>
-                        General settings and restrictions for your Sculptor application. These settings affect all users
-                        and organizations within the application.
-                    </Text>
-                    <TabList>
-                        <TabTrigger value={"general"} w={"100%"} asChild>
-                            <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                <Text size={"md"}>General</Text>
-                            </Button>
-                        </TabTrigger>
-                        <TabTrigger value={"access"} w={"100%"} asChild>
-                            <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                <Text size={"md"}>Runtimes</Text>
-                            </Button>
-                        </TabTrigger>
-                        <TabTrigger value={"delete"} w={"100%"} asChild>
-                            <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                <Text size={"md"}>Delete</Text>
-                            </Button>
-                        </TabTrigger>
-                    </TabList>
-                </Flex>
-            </ResizablePanel>
+                    </TabTrigger>
+                    <TabTrigger value={"access"} w={"100%"} asChild>
+                        <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                            <Text size={"md"}>Runtimes</Text>
+                        </Button>
+                    </TabTrigger>
+                    <TabTrigger value={"delete"} w={"100%"} asChild>
+                        <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                            <Text size={"md"}>Delete</Text>
+                        </Button>
+                    </TabTrigger>
+                </TabList>
+            </SidebarComponent>
             <ResizableHandle/>
             <ResizablePanel id={"2"} color={"primary"} p={1}
-                             style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
+                            style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
                 <>
                     <ProjectSettingsGeneralView/>
                     <ProjectSettingsRuntimesView/>

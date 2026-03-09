@@ -82,12 +82,6 @@ export const FlowFolderView: React.FC = () => {
 
         <Layout layoutGap={"0.7rem"} showLayoutSplitter={false} topContent={
             <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
-                <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"}>
-                    <Text size={"md"} hierarchy={"secondary"}>Explorer</Text>
-                    <Button variant={"none"} paddingSize={"xxs"}>
-                        <IconLayoutSidebar size={16}/>
-                    </Button>
-                </Flex>
                 <Flex style={{gap: "0.35rem"}} align={"center"} justify={"space-between"}>
                     <Button color={"tertiary"} paddingSize={"xxs"} style={{textWrap: "nowrap"}} onClick={() => {
                         setCreateDialogOpen(true)
