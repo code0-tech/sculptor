@@ -7,6 +7,7 @@ import {
     ResizablePanel,
     ResizablePanelGroup
 } from "@code0-tech/pictor/dist/components/resizable/Resizable";
+import {SidebarComponent} from "@core/components/SidebarComponent";
 
 interface ApplicationLayoutProps {
     children: React.ReactNode
@@ -15,9 +16,9 @@ interface ApplicationLayoutProps {
 const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children}) => {
 
     return <ResizablePanelGroup orientation={"horizontal"}>
-        <ResizablePanel id={"1"} defaultSize={"25%"}>
+        <SidebarComponent title={"Explorer"} id={"1"}>
             <FlowFolderView/>
-        </ResizablePanel>
+        </SidebarComponent>
         <ResizableHandle/>
         {children}
     </ResizablePanelGroup>
