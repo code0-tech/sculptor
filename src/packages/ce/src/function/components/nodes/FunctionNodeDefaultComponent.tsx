@@ -29,6 +29,7 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
     const node = React.useMemo(() => flowService.getNodeById(data.flowId, data.nodeId), [flowStore, data])
     const definition = React.useMemo(() => node ? functionService.getById(node.functionDefinition?.id!!) : undefined, [functionStore, data, node])
     const validation = useNodeValidation(data.nodeId, data.flowId)
+
     const activeTabId = React.useMemo(() => {
         return fileTabsService.getActiveTab()?.id
     }, [fileTabsStore, fileTabsService]);
@@ -142,7 +143,7 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
             borderColor={activeTabId == id ? "info" : undefined}
             className={`d-flow-node ${activeTabId == id ? "d-flow-node--active" : ""} ${isReferenced === false ? "d-flow-node--notReferenced" : ""}`}
             color={"primary"} style={{
-            ...(isReferenced === true ? {boxShadow: `0 0 1px 0 ${data.color}`} : {}),
+            ...(isReferenced === true ? {boxShadow: `0 0 5rem 0 ${withAlpha(data.color, 0.25)}`} : {}),
         }}>
 
             <Handle
@@ -185,3 +186,57 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
         </Card>
     );
 })
+
+type RGBA = {
+    r: number
+    g: number
+    b: number
+    a: number
+}
+
+const clamp01 = (v: number) => Math.min(Math.max(v, 0), 1)
+
+const parseCssColorToRgba = (color: string): RGBA => {
+    if (typeof document === "undefined") {
+        return {r: 0, g: 0, b: 0, a: 1}
+    }
+
+    const el = document.createElement("span")
+    el.style.color = color
+    document.body.appendChild(el)
+
+    const computed = getComputedStyle(el).color
+    document.body.removeChild(el)
+
+    const match = computed.match(
+        /rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/
+    )
+
+    if (!match) {
+        return {r: 0, g: 0, b: 0, a: 1}
+    }
+
+    return {
+        r: Math.round(Number(match[1])),
+        g: Math.round(Number(match[2])),
+        b: Math.round(Number(match[3])),
+        a: match[4] !== undefined ? Number(match[4]) : 1,
+    }
+}
+
+const mixColorRgb = (color: string, level: number) => {
+    const w = clamp01(level * 0.1)
+
+    const c1 = parseCssColorToRgba(color)
+    const c2 = parseCssColorToRgba("#070514")
+
+    const mix = (a: number, b: number) =>
+        Math.round(a * (1 - w) + b * w)
+
+    return `rgb(${mix(c1.r, c2.r)}, ${mix(c1.g, c2.g)}, ${mix(c1.b, c2.b)})`
+}
+
+const withAlpha = (color: string, alpha: number) => {
+    const c = parseCssColorToRgba(color)
+    return `rgba(${c.r}, ${c.g}, ${c.b}, ${clamp01(alpha)})`
+}
