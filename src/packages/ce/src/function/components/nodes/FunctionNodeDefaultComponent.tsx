@@ -1,31 +1,24 @@
-import {Handle, Node, NodeProps, Position, useReactFlow, useStore} from "@xyflow/react";
+import {Handle, Node, NodeProps, Position, useStore} from "@xyflow/react";
 import React, {CSSProperties, memo} from "react";
 import "./FunctionNodeComponent.style.scss";
 import {FunctionNodeComponentProps} from "./FunctionNodeComponent";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
-import {
-    Badge, Card,
-    Flex, Text, underlineBySeverity,
-    useService,
-    useStore as usePictorStore
-} from "@code0-tech/pictor";
+import {Badge, Card, Flex, Text, underlineBySeverity, useService, useStore as usePictorStore} from "@code0-tech/pictor";
 import {useNodeValidation} from "@edition/flow/hooks/NodeValidation.hook";
-import {IconNote} from "@tabler/icons-react";
+import {IconArrowNarrowRightDashed, IconLink, IconNote, IconPointFilled} from "@tabler/icons-react";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {LiteralBadgeComponent} from "@edition/datatype/components/badges/LiteralBadgeComponent";
 import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
 import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeComponent";
 import {FunctionFileDefaultComponent} from "@edition/function/components/files/FunctionFileDefaultComponent";
+import {NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 
 export type FunctionNodeDefaultComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
 
 export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponentProps> = memo((props) => {
-    const {data, id, width = 0, height = 0} = props
+    const {data, id} = props
 
-    const viewportWidth = useStore(s => s.width);
-    const viewportHeight = useStore(s => s.height);
-    const flowInstance = useReactFlow()
     const fileTabsService = useService(FileTabsService)
     const fileTabsStore = usePictorStore(FileTabsService)
     const flowService = useService(FlowService)
@@ -110,9 +103,9 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
     }), [flowStore, functionStore, data, definition])
 
     React.useEffect(() => {
-        if (!node?.id) return
+        if (!node?.id || !id) return
         fileTabsService.registerTab({
-            id: node.id,
+            id: id,
             active: false,
             closeable: true,
             children: <>
@@ -121,7 +114,23 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
             </>,
             content: <FunctionFileDefaultComponent flowId={props.data.flowId} node={node}/>
         })
-    }, [node?.id, definition, data])
+    }, [])
+
+    const isReferenced = React.useMemo(() => {
+
+        const activeNode = flowService.getNodeById(data.flowId, activeTabId as NodeFunction['id'])
+        const isActiveNodeReferencingCurrentNode = activeNode?.parameters?.nodes?.some(p => p?.value?.__typename === "ReferenceValue" && p.value.nodeFunctionId === node?.id)
+        const hasReferences = activeNode?.parameters?.nodes?.some(p => p?.value?.__typename === "ReferenceValue")
+
+        if (isActiveNodeReferencingCurrentNode) {
+            return true
+        } else if (hasReferences && !isActiveNodeReferencingCurrentNode && activeTabId !== data.nodeId) {
+            return false
+        }
+
+        return undefined
+
+    }, [flowStore, activeTabId, data.flowId, node])
 
     return (
         <Card
@@ -130,19 +139,21 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
             paddingSize={"xs"}
             py={"0.35"}
             outline={firstItem.id === id}
-            borderColor={activeTabId == node?.id ? "info" : undefined}
-            className={`d-flow-node ${activeTabId == node?.id ? "d-flow-node--active" : undefined}`}
+            borderColor={activeTabId == id ? "info" : undefined}
+            className={`d-flow-node ${activeTabId == id ? "d-flow-node--active" : undefined}`}
             color={"primary"}
-            onClick={() => {
-                flowInstance.setViewport({
-                    x: (viewportWidth / 2) + (props.positionAbsoluteX * -1) - (width / 2),
-                    y: (viewportHeight / 2) + (props.positionAbsoluteY * -1) - (height / 2),
-                    zoom: 1
-                }, {
-                    duration: 250,
-                })
-                fileTabsService.activateTab(node?.id!!)
-            }} style={{position: "relative"}}>
+            style={{
+                position: "relative", ...(
+                    isReferenced === true ? {
+                        opacity: 1,
+                    } : {}
+                ),
+                ...(
+                    isReferenced === false ? {
+                        opacity: 0.5
+                    } : {}
+                )
+            } as React.CSSProperties}>
 
             <Handle
                 isConnectable={false}
@@ -161,6 +172,22 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
                 className={"d-flow-node__handle d-flow-node__handle--source"}
                 position={data.isParameter ? Position.Left : Position.Bottom}
             />
+
+            {
+                isReferenced === true ? (
+                    <div style={{
+                        position: "absolute",
+                        top: "50%",
+                        left: firstItem.id === id ? "-0.733rem" :"-0.5rem",
+                        transform: "translate(-100%, -50%)",
+                        display: "flex"
+                    }}>
+                        <IconArrowNarrowRightDashed color={data.color} size={13}/>
+                    </div>
+                ) : null
+            }
+
+
             <Flex align={"center"} style={{gap: "0.7rem"}}>
                 <IconNote color={data.color} size={16}/>
                 <Text size={"md"}>{displayMessage}</Text>
