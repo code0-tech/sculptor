@@ -15,7 +15,6 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
 
     const {data, id} = props
     const fileTabsService = useService(FileTabsService)
-    const flowInstance = useReactFlow()
     const flowTypeService = useService(FlowTypeService)
     const flowTypeStore = usePictorStore(FlowTypeService)
     const flowService = useService(FlowService)
@@ -24,15 +23,10 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
     const flow = React.useMemo(() => flowService.getById(data.flowId), [flowStore, data])
     const definition = React.useMemo(() => flow ? flowTypeService.getById(flow.type?.id) : undefined, [flowTypeStore, flow])
 
-    const width = props.width ?? 0
-    const height = props.height ?? 0
-    const viewportWidth = useStore(s => s.width)
-    const viewportHeight = useStore(s => s.height)
-
     React.useEffect(() => {
-        if (!definition?.id || !flow) return
+        if (!id || !flow) return
         fileTabsService.registerTab({
-            id: definition?.id!!,
+            id: id,
             active: true,
             closeable: true,
             children: <>
@@ -42,24 +36,14 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
             content: <FunctionFileTriggerComponent instance={flow}/>,
             show: true
         })
-    }, [definition, data.instance, fileTabsService, flow])
+    }, [])
 
     return <Card variant={"normal"}
                  color={"info"}
                  paddingSize={"xs"}
                  key={id}
                  data-flow-refernce={id}
-                 className={`d-flow-node ${fileTabsService.getActiveTab()?.id == definition?.id ? "d-flow-node--active" : undefined}`}
-                 onClick={() => {
-                     flowInstance.setViewport({
-                         x: (viewportWidth / 2) + (props.positionAbsoluteX * -1) - (width / 2),
-                         y: (viewportHeight / 2) + (props.positionAbsoluteY * -1) - (height / 2),
-                         zoom: 1
-                     }, {
-                         duration: 250,
-                     })
-                     fileTabsService.activateTab(definition?.id!!)
-                 }}>
+                 className={`d-flow-node ${fileTabsService.getActiveTab()?.id == id ? "d-flow-node--active" : undefined}`}>
 
         <Badge color={"info"}
                pos={"absolute"}
