@@ -5,7 +5,7 @@ import {FunctionNodeComponentProps} from "./FunctionNodeComponent";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
 import {Badge, Card, Flex, Text, underlineBySeverity, useService, useStore as usePictorStore} from "@code0-tech/pictor";
 import {useNodeValidation} from "@edition/flow/hooks/NodeValidation.hook";
-import {IconArrowNarrowRightDashed, IconLink, IconNote, IconPointFilled} from "@tabler/icons-react";
+import {IconNote, IconVariable} from "@tabler/icons-react";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {LiteralBadgeComponent} from "@edition/datatype/components/badges/LiteralBadgeComponent";
@@ -141,7 +141,9 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
             outline={firstItem.id === id}
             borderColor={activeTabId == id ? "info" : undefined}
             className={`d-flow-node ${activeTabId == id ? "d-flow-node--active" : ""} ${isReferenced === false ? "d-flow-node--notReferenced" : ""}`}
-            color={"primary"}>
+            color={"primary"} style={{
+            ...(isReferenced === true ? {boxShadow: `0 0 1px 0 ${data.color}`} : {}),
+        }}>
 
             <Handle
                 isConnectable={false}
@@ -163,16 +165,14 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
 
             {
                 isReferenced === true ? (
-                    <div style={{
+                    <div className={"d-flow-node__isReferenced"} style={{
                         position: "absolute",
                         top: "50%",
-                        left: firstItem.id === id ? "-0.733rem" :"-0.5rem",
+                        left: firstItem.id === id ? "-0.733rem" : "-0.5rem",
                         transform: "translate(-100%, -50%)",
                         display: "flex"
                     }}>
-                        <IconPointFilled color={data.color} size={13} style={{
-                            filter: `drop-shadow(0 0 0.75rem ${data.color})`
-                        }}/>
+                        <IconVariable className={"d-flow-node__isReferenced-icon"} color={data.color} size={13}/>
                     </div>
                 ) : null
             }
