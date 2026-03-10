@@ -616,7 +616,7 @@ export const FlowBuilderComponent: React.FC<FlowBuilderProps> = (props) => {
 const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
     const {flowId, namespaceId, projectId, ...rest} = props
 
-    const { setCenter, getInternalNode } = useReactFlow();
+    const { setCenter, getInternalNode, getZoom } = useReactFlow();
     const fileTabsService = useService(FileTabsService)
 
     const nodeTypes = React.useMemo(() => ({
@@ -634,10 +634,6 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
     const [nodes, setNodes] = useNodesState<Node>([])
     const [edges, setEdges, edgeChangeEvent] = useEdgesState<Edge>([])
     const [showTree, setShowTree] = React.useState<boolean>(false)
-
-    const viewportWidth = useStore(s => s.width);
-    const viewportHeight = useStore(s => s.height);
-    const flowInstance = useReactFlow()
 
     const updateNodeInternals = useUpdateNodeInternals()
 
@@ -740,8 +736,10 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
                     const centerX = node.internals.positionAbsolute.x + node.measured.width / 2;
                     const centerY = node.internals.positionAbsolute.y + node.measured.height / 2;
 
+                    const currentZoom = getZoom();
+
                     setCenter(centerX, centerY, {
-                        zoom: 1,
+                        zoom: Math.max(currentZoom, 1),
                         duration: 250,
                     }).then();
                 }
