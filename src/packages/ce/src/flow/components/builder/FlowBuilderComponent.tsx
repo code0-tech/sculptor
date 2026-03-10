@@ -7,7 +7,7 @@ import {
     ReactFlowProvider,
     useEdgesState,
     useNodesState,
-    useReactFlow,
+    useReactFlow, useStore,
     useUpdateNodeInternals,
     ViewportPortal
 } from "@xyflow/react";
@@ -19,7 +19,7 @@ import {Flow, type Namespace, type NamespaceProject} from "@code0-tech/sagittari
 import {LineWobble} from 'ldrs/react'
 import 'ldrs/react/LineWobble.css'
 import {useFlowNodes} from "@edition/flow/hooks/Flow.nodes.hook";
-import {Code0ComponentProps, mergeCode0Props, Spacing, Text} from "@code0-tech/pictor";
+import {Code0ComponentProps, mergeCode0Props, Spacing, Text, useService} from "@code0-tech/pictor";
 import {FunctionNodeDefaultComponent} from "@edition/function/components/nodes/FunctionNodeDefaultComponent";
 import {FunctionNodeGroupComponent} from "@edition/function/components/nodes/FunctionNodeGroupComponent";
 import {FunctionNodeTriggerComponent} from "@edition/function/components/nodes/FunctionNodeTriggerComponent";
@@ -28,6 +28,7 @@ import {FlowPanelSizeComponent} from "@edition/flow/components/panels/FlowPanelS
 import {FlowPanelLayoutComponent} from "@edition/flow/components/panels/FlowPanelLayoutComponent";
 import {FlowPanelControlComponent} from "@edition/flow/components/panels/FlowPanelControlComponent";
 import {FlowPanelUpdateComponent} from "@edition/flow/components/panels/FlowPanelUpdateComponent";
+import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
 
 /**
  * Dynamically layouts a tree of nodes and their parameter nodes for a flow-based editor.
@@ -615,12 +616,14 @@ export const FlowBuilderComponent: React.FC<FlowBuilderProps> = (props) => {
 const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
     const {flowId, namespaceId, projectId, ...rest} = props
 
+    const { setCenter, getInternalNode } = useReactFlow();
+    const fileTabsService = useService(FileTabsService)
+
     const nodeTypes = React.useMemo(() => ({
         default: FunctionNodeDefaultComponent,
         group: FunctionNodeGroupComponent,
         trigger: FunctionNodeTriggerComponent,
     }), [])
-
     const edgeTypes = React.useMemo(() => ({
         default: FlowBuilderEdgeComponent,
     }), [])
@@ -631,6 +634,10 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
     const [nodes, setNodes] = useNodesState<Node>([])
     const [edges, setEdges, edgeChangeEvent] = useEdgesState<Edge>([])
     const [showTree, setShowTree] = React.useState<boolean>(false)
+
+    const viewportWidth = useStore(s => s.width);
+    const viewportHeight = useStore(s => s.height);
+    const flowInstance = useReactFlow()
 
     const updateNodeInternals = useUpdateNodeInternals()
 
@@ -725,6 +732,24 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
             {...mergeCode0Props("flow", rest)}
             data-tree-visibility={showTree}
             proOptions={{hideAttribution: true}}
+            onNodeClick={(_, clickedNode) => {
+
+                const node = getInternalNode(clickedNode.id);
+
+                if (node && node.measured.width && node.measured.height) {
+                    const centerX = node.internals.positionAbsolute.x + node.measured.width / 2;
+                    const centerY = node.internals.positionAbsolute.y + node.measured.height / 2;
+
+                    setCenter(centerX, centerY, {
+                        zoom: 1,
+                        duration: 250,
+                    }).then();
+                }
+                fileTabsService.activateTab(node?.id ?? "")
+            }}
+            onPaneClick={_ => {
+                fileTabsService.activateTab("")
+            }}
             nodes={nodes}
             edges={edges}
             panOnDrag={showTree}
