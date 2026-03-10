@@ -6,6 +6,8 @@
   border: 1px solid helpers.borderColor();
   box-shadow: none;
   text-wrap: nowrap;
+  position: relative;
+  transition: opacity .25s ease-in-out;
 
   &__handle {
     border: none !important;
@@ -24,6 +26,11 @@
       @include helpers.borderRadius();
       position: absolute;
     }
+  }
+
+  &--notReferenced {
+    transition: opacity .25s ease-in-out;
+    opacity: 0.5 !important;
   }
 
   &--active {
