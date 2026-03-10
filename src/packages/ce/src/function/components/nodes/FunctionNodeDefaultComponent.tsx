@@ -140,20 +140,8 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
             py={"0.35"}
             outline={firstItem.id === id}
             borderColor={activeTabId == id ? "info" : undefined}
-            className={`d-flow-node ${activeTabId == id ? "d-flow-node--active" : undefined}`}
-            color={"primary"}
-            style={{
-                position: "relative", ...(
-                    isReferenced === true ? {
-                        opacity: 1,
-                    } : {}
-                ),
-                ...(
-                    isReferenced === false ? {
-                        opacity: 0.5
-                    } : {}
-                )
-            } as React.CSSProperties}>
+            className={`d-flow-node ${activeTabId == id ? "d-flow-node--active" : ""} ${isReferenced === false ? "d-flow-node--notReferenced" : ""}`}
+            color={"primary"}>
 
             <Handle
                 isConnectable={false}
@@ -182,7 +170,9 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
                         transform: "translate(-100%, -50%)",
                         display: "flex"
                     }}>
-                        <IconArrowNarrowRightDashed color={data.color} size={13}/>
+                        <IconPointFilled color={data.color} size={13} style={{
+                            filter: `drop-shadow(0 0 0.75rem ${data.color})`
+                        }}/>
                     </div>
                 ) : null
             }
