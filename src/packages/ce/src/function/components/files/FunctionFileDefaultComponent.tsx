@@ -126,11 +126,12 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
     })
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
-        {sortedParameters.map(parameter => {
+        {definition?.parameterDefinitions?.map(parameterDefinition => {
 
-            if (!parameter) return null
+            if (!parameterDefinition) return null
 
-            const parameterDefinition = paramDefinitions[parameter?.parameterDefinition?.id!!]
+            const nodeParameter = node.parameters?.nodes?.find(p => p?.parameterDefinition?.id === parameterDefinition.id)
+
             const title = parameterDefinition?.names ? parameterDefinition?.names!![0]?.content : parameterDefinition?.id
             const description = parameterDefinition?.descriptions ? parameterDefinition?.descriptions!![0]?.content : JSON.stringify(parameterDefinition?.dataTypeIdentifier)
 
@@ -138,15 +139,15 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                 {/*@ts-ignore*/}
                 <DataTypeInputComponent flowId={flowId}
                                         nodeId={node.id}
-                                        parameterId={parameter.id}
+                                        parameterId={nodeParameter?.id}
                                         title={title}
                                         description={description}
                                         clearable
                                         onChange={() => {
-                                changedParameters.current.add(parameter.id!!)
-                                validate()
-                            }}
-                                        {...inputs.getInputProps(parameter.id!!)}
+                                            changedParameters.current.add(nodeParameter?.id!!)
+                                            validate()
+                                        }}
+                                        {...inputs.getInputProps(nodeParameter?.id!!)}
                 />
             </div>
         })}

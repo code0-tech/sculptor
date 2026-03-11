@@ -4,7 +4,9 @@ import {
     FlowSetting,
     LiteralValue,
     Maybe,
-    Mutation, Namespace, NamespaceProject,
+    Mutation,
+    Namespace,
+    NamespaceProject,
     NamespacesProjectsFlowsCreateInput,
     NamespacesProjectsFlowsCreatePayload,
     NamespacesProjectsFlowsDeleteInput,
@@ -311,24 +313,51 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         const node = this.getNodeById(flowId, nodeId)
         if (!node) return
         const parameter = node.parameters?.nodes?.find(p => p?.id === parameterId)
-        if (!parameter) return
-        this.removeParameterNode(flow, parameter)
-        if (value?.__typename === "NodeFunction") {
-            const nextNodeIndex: number = Math.max(0, ...flow.nodes?.nodes?.map(node => Number(node?.id?.match(/NodeFunction\/(\d+)$/)?.[1] ?? 0)) ?? [0])
-            const addingIdValue: NodeFunction = {
-                ...value,
-                id: `gid://sagittarius/NodeFunction/${nextNodeIndex + 1}`
+        if (!parameter) {
+            const localParameter: NodeParameter = {
+                __typename: "NodeParameter",
+                id: parameterId,
+                value: null
             }
-            flow.nodes?.nodes?.push(addingIdValue)
-            parameter.value = {
-                id: `gid://sagittarius/NodeFunction/${nextNodeIndex + 1}`,
-                __typename: "NodeFunctionIdWrapper"
-            } as NodeFunctionIdWrapper
+
+            if (value?.__typename === "NodeFunction") {
+                const nextNodeIndex: number = Math.max(0, ...flow.nodes?.nodes?.map(node => Number(node?.id?.match(/NodeFunction\/(\d+)$/)?.[1] ?? 0)) ?? [0])
+                const addingIdValue: NodeFunction = {
+                    ...value,
+                    id: `gid://sagittarius/NodeFunction/${nextNodeIndex + 1}`
+                }
+                flow.nodes?.nodes?.push(addingIdValue)
+                localParameter.value = {
+                    id: `gid://sagittarius/NodeFunction/${nextNodeIndex + 1}`,
+                    __typename: "NodeFunctionIdWrapper"
+                } as NodeFunctionIdWrapper
+            } else {
+                localParameter.value = value as LiteralValue | ReferenceValue
+            }
+
+            flow.editedAt = new Date().toISOString()
+
+            node.parameters?.nodes?.push(localParameter)
         } else {
-            parameter.value = value as LiteralValue | ReferenceValue
+            this.removeParameterNode(flow, parameter)
+            if (value?.__typename === "NodeFunction") {
+                const nextNodeIndex: number = Math.max(0, ...flow.nodes?.nodes?.map(node => Number(node?.id?.match(/NodeFunction\/(\d+)$/)?.[1] ?? 0)) ?? [0])
+                const addingIdValue: NodeFunction = {
+                    ...value,
+                    id: `gid://sagittarius/NodeFunction/${nextNodeIndex + 1}`
+                }
+                flow.nodes?.nodes?.push(addingIdValue)
+                parameter.value = {
+                    id: `gid://sagittarius/NodeFunction/${nextNodeIndex + 1}`,
+                    __typename: "NodeFunctionIdWrapper"
+                } as NodeFunctionIdWrapper
+            } else {
+                parameter.value = value as LiteralValue | ReferenceValue
+            }
+
+            flow.editedAt = new Date().toISOString()
         }
 
-        flow.editedAt = new Date().toISOString()
 
         this.set(index, new View(flow))
         await this.syncFlow(flowId)
