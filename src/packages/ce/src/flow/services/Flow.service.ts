@@ -179,10 +179,11 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
 
                         case "ReferenceValue": {
                             const v = parameter.value as ReferenceValue
+                            console.log(v)
                             value = {
                                 referenceValue: {
                                     ...(v.nodeFunctionId ? {nodeFunctionId: v.nodeFunctionId} : {}),
-                                    ...(v.parameterIndex && v.inputIndex ?
+                                    ...("parameterIndex" in v && "inputIndex" in v ?
                                         {
                                             parameterIndex: v.parameterIndex,
                                             inputIndex: v.inputIndex
