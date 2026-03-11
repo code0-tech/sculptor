@@ -314,6 +314,8 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         if (!node) return
         const parameter = node.parameters?.nodes?.find(p => p?.id === parameterId)
         if (!parameter) {
+
+            //TODO: needs a parameterDefinitionId
             const localParameter: NodeParameter = {
                 __typename: "NodeParameter",
                 id: parameterId,
