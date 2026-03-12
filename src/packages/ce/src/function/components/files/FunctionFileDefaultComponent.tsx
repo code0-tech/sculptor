@@ -64,7 +64,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
         startTransition(async () => {
             for (const parameterDefinition of definition?.parameterDefinitions!) {
                 const parameterIndex = definition?.parameterDefinitions?.findIndex(p => p?.id === parameterDefinition.id)
-                if (!parameterIndex) return
+                if (typeof parameterIndex !== "number") return
                 if (!changedParameters.current.has(parameterIndex)) continue;
                 const nodeParameter = node.parameters?.nodes?.find(p => p?.parameterDefinition?.id === parameterDefinition.id)
                 const syntaxSegment = values[parameterIndex]
@@ -120,8 +120,6 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
         {definition?.parameterDefinitions?.map((parameterDefinition, index) => {
 
             if (!parameterDefinition) return null
-
-            const nodeParameter = node.parameters?.nodes?.find(p => p?.parameterDefinition?.id === parameterDefinition.id)
 
             const title = parameterDefinition?.names ? parameterDefinition?.names!![0]?.content : parameterDefinition?.id
             const description = parameterDefinition?.descriptions ? parameterDefinition?.descriptions!![0]?.content : JSON.stringify(parameterDefinition?.dataTypeIdentifier)

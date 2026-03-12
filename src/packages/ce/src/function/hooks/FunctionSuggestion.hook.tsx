@@ -26,7 +26,7 @@ export const useSuggestions = (
     const node = React.useMemo(() => (flowService.getNodeById(flowId, nodeId)), [flowId, flowStore, nodeId])
     const functionDefinition = React.useMemo(() => (node?.functionDefinition?.id ? functionService.getById(node.functionDefinition.id) : undefined), [functionStore, node?.functionDefinition?.id])
     const parameterDefinition = React.useMemo(() => (functionDefinition?.parameterDefinitions?.find(definition => {
-        const parameterDefinitionId = node?.parameters?.nodes?.[parameterIndex ?? 0]?.parameterDefinition?.id
+        const parameterDefinitionId = node?.parameters?.nodes?.[parameterIndex ?? -1]?.parameterDefinition?.id
         return definition.id === parameterDefinitionId
     })), [functionDefinition?.parameterDefinitions, node])
 
