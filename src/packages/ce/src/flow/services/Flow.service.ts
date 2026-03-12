@@ -16,7 +16,7 @@ import {
     NodeFunction,
     NodeFunctionIdWrapper,
     NodeParameter,
-    NodeParameterValueInput,
+    NodeParameterValueInput, ParameterDefinition,
     Query,
     ReferencePathInput,
     ReferenceValue,
@@ -307,19 +307,21 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         await this.syncFlow(flowId)
     }
 
-    async setParameterValue(flowId: FlowView['id'], nodeId: NodeFunction['id'], parameterId: NodeParameter['id'], value?: LiteralValue | ReferenceValue | NodeFunction): Promise<void> {
+    async setParameterValue(flowId: FlowView['id'], nodeId: NodeFunction['id'], parameterIndex: number, value?: LiteralValue | ReferenceValue | NodeFunction, parameterDefinitionId?: ParameterDefinition['id']): Promise<void> {
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
         if (!flow) return
         const node = this.getNodeById(flowId, nodeId)
         if (!node) return
-        const parameter = node.parameters?.nodes?.find(p => p?.id === parameterId)
-        if (!parameter) {
-
+        const parameter = node.parameters?.nodes?.[parameterIndex]
+        if (!parameter && parameterDefinitionId) {
             //TODO: needs a parameterDefinitionId
             const localParameter: NodeParameter = {
                 __typename: "NodeParameter",
-                id: parameterId,
+                parameterDefinition: {
+                    __typename: "ParameterDefinition",
+                    id: parameterDefinitionId
+                },
                 value: null
             }
 
@@ -341,7 +343,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
             flow.editedAt = new Date().toISOString()
 
             node.parameters?.nodes?.push(localParameter)
-        } else {
+        } else if (parameter) {
             this.removeParameterNode(flow, parameter)
             if (value?.__typename === "NodeFunction") {
                 const nextNodeIndex: number = Math.max(0, ...flow.nodes?.nodes?.map(node => Number(node?.id?.match(/NodeFunction\/(\d+)$/)?.[1] ?? 0)) ?? [0])

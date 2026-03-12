@@ -104,7 +104,7 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
             return <div>
                 <DataTypeTextInputComponent flowId={undefined}
                                             nodeId={undefined}
-                                            parameterId={undefined}
+                                            parameterIndex={0}
                                             title={title}
                                             description={description}
                                             clearable

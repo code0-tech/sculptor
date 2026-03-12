@@ -66,8 +66,8 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
         })
 
         const parameterDefinition = definition?.parameterDefinitions?.find(pd => pd.identifier == item)
-
-        const parameterValidation = validation?.filter(v => v.parameterId === nodeParameter?.id)
+        const parameterIndex = parameterDefinition ? definition?.parameterDefinitions?.findIndex(p => p?.id === parameterDefinition.id) : undefined
+        const parameterValidation = validation?.filter(v => v.parameterIndex === parameterIndex)
         const decorationStyle: CSSProperties =
             parameterValidation?.length
                 ? underlineBySeverity[parameterValidation[0].type]
@@ -87,10 +87,10 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
                     return <div style={{...decorationStyle, display: "inline-block"}}>
                         <NodeBadgeComponent value={nodeParameter.value} flowId={props.data.flowId}/>
                         <Handle
-                            key={nodeParameter?.id}
+                            key={parameterIndex}
                             type={"target"}
                             position={Position.Right}
-                            id={`param-${nodeParameter?.id}`}
+                            id={`param-${parameterIndex}`}
                             isConnectable={false}
                             className={"d-flow-node__handle d-flow-node__handle--target"}
                         />

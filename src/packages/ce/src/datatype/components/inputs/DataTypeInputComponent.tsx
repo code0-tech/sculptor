@@ -10,14 +10,14 @@ import {FunctionService} from "@edition/function/services/Function.service";
 export interface DataTypeInputComponentProps extends Omit<InputProps<any | null>, "wrapperComponent" | "type"> {
     flowId: Flow['id']
     nodeId: NodeFunction['id']
-    parameterId: NodeParameter['id']
+    parameterIndex: number
     clearable?: boolean
     onClear?: (event: React.MouseEvent<HTMLButtonElement>) => void
 }
 
 export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (props) => {
 
-    const {flowId, nodeId, parameterId, ...rest} = props
+    const {flowId, nodeId, parameterIndex, ...rest} = props
 
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
@@ -32,8 +32,8 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
     )
 
     const parameter = React.useMemo(
-        () => node?.parameters?.nodes?.find(p => p?.id === parameterId),
-        [node, parameterId]
+        () => node?.parameters?.nodes?.[parameterIndex],
+        [node, parameterIndex]
     )
 
     const functionDefinition = React.useMemo(
@@ -57,14 +57,14 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
             return <DataTypeJSONInputComponent
                 flowId={flowId}
                 nodeId={nodeId}
-                parameterId={parameterId}
+                parameterIndex={parameterIndex}
                 {...rest}
             />
         default:
             return <DataTypeTextInputComponent
                 flowId={flowId}
                 nodeId={nodeId}
-                parameterId={parameterId}
+                parameterIndex={parameterIndex}
                 {...rest}
             />
     }

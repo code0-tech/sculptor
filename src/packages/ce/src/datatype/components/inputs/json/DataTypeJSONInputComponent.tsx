@@ -36,7 +36,7 @@ export type DataTypeJSONInputComponentProps = DataTypeInputComponentProps
 export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProps> = (props) => {
 
 
-    const {flowId, nodeId, parameterId, title, description, formValidation, onChange} = props
+    const {flowId, nodeId, parameterIndex, title, description, formValidation, onChange} = props
 
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
@@ -51,8 +51,8 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
     )
 
     const parameter = React.useMemo(
-        () => node?.parameters?.nodes?.find(p => p?.id === parameterId),
-        [node, parameterId]
+        () => node?.parameters?.nodes?.[parameterIndex],
+        [node, parameterIndex]
     )
 
     const functionDefinition = React.useMemo(
@@ -73,7 +73,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
     }, [parameter, parameterDefinition, dataTypeStore])
 
 
-    const suggestions = useSuggestions(flowId, nodeId, parameterId)
+    const suggestions = useSuggestions(flowId, nodeId, parameterIndex)
 
     const [value, setValue] = React.useState<NodeParameterValue | NodeFunction | undefined>(initialValue)
     const [editDialogOpen, setEditDialogOpen] = React.useState(false)
