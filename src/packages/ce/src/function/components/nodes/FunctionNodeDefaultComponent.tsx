@@ -60,35 +60,37 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
             );
 
     const displayMessage = React.useMemo(() => splitTemplate(definition?.displayMessages!![0]?.content ?? "").map(item => {
-        const param = node?.parameters?.nodes?.find(p => {
+        const nodeParameter = node?.parameters?.nodes?.find(p => {
             const parameterDefinition = definition?.parameterDefinitions?.find(pd => pd.id == p?.parameterDefinition?.id)
             return parameterDefinition?.identifier == item
         })
 
-        const parameterValidation = validation?.filter(v => v.parameterId === param?.id)
+        const parameterDefinition = definition?.parameterDefinitions?.find(pd => pd.identifier == item)
+        const parameterIndex = parameterDefinition ? definition?.parameterDefinitions?.findIndex(p => p?.id === parameterDefinition.id) : undefined
+        const parameterValidation = validation?.filter(v => v.parameterIndex === parameterIndex)
         const decorationStyle: CSSProperties =
             parameterValidation?.length
                 ? underlineBySeverity[parameterValidation[0].type]
                 : {};
 
-        if (param) {
-            switch (param?.value?.__typename) {
+        if (parameterDefinition) {
+            switch (nodeParameter?.value?.__typename) {
                 case "LiteralValue":
                     return <div style={{...decorationStyle, display: "inline-block"}}>
-                        <LiteralBadgeComponent value={param.value}/>
+                        <LiteralBadgeComponent value={nodeParameter.value}/>
                     </div>
                 case "ReferenceValue":
                     return <div style={{...decorationStyle, display: "inline-block"}}>
-                        <ReferenceBadgeComponent flowId={props.data.flowId} value={param.value}/>
+                        <ReferenceBadgeComponent flowId={props.data.flowId} value={nodeParameter.value}/>
                     </div>
                 case "NodeFunctionIdWrapper":
                     return <div style={{...decorationStyle, display: "inline-block"}}>
-                        <NodeBadgeComponent value={param.value} flowId={props.data.flowId}/>
+                        <NodeBadgeComponent value={nodeParameter.value} flowId={props.data.flowId}/>
                         <Handle
-                            key={param?.id}
+                            key={parameterIndex}
                             type={"target"}
                             position={Position.Right}
-                            id={`param-${param?.id}`}
+                            id={`param-${parameterIndex}`}
                             isConnectable={false}
                             className={"d-flow-node__handle d-flow-node__handle--target"}
                         />

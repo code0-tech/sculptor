@@ -16,10 +16,8 @@ import {
     resolveGenericKeys
 } from "@edition/flow/utils/generics";
 import {
-    InspectionSeverity,
     useService,
-    useStore,
-    ValidationResult
+    useStore
 } from "@code0-tech/pictor";
 import {useReturnType} from "@edition/function/hooks/Function.return.hook";
 import {getReferenceType} from "@edition/function/hooks/FunctionNodeReference.return.hook";
@@ -27,6 +25,7 @@ import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
+import {InspectionSeverity, ValidationResult} from "@core/util/inspection";
 
 const isReference = (value: NodeParameterValue) =>
     value.__typename === "ReferenceValue"
@@ -43,11 +42,11 @@ const resolveDataTypeWithGenerics = (
     )
 
 const errorResult = (
-    parameterId: NodeParameter['id'],
+    parameterIndex: number,
     expected?: DataTypeView,
     actual?: DataTypeView
 ): ValidationResult => ({
-    parameterId,
+    parameterIndex: parameterIndex,
     type: InspectionSeverity.ERROR,
     message: [{
         code: "en-US",
@@ -106,7 +105,6 @@ export const useNodeValidation = (
         for (let i = 0; i < parameters.length; i++) {
             const parameter = parameters[i]
             const value = values[i]
-            const nodeParameter = node?.parameters?.nodes?.find(p => p?.parameterDefinition?.id === parameter.id)
             if (!value) continue
 
             const expectedType = parameter.dataTypeIdentifier
@@ -116,7 +114,7 @@ export const useNodeValidation = (
             const valueDT = dataTypeService.getDataType(valueType!!)
 
             if (!expectedDT || !valueDT) {
-                errors.push(errorResult(nodeParameter?.id, expectedDT, valueDT))
+                errors.push(errorResult(i, expectedDT, valueDT))
                 continue
             }
 
@@ -150,7 +148,7 @@ export const useNodeValidation = (
             }
 
             if (!isValid) {
-                errors.push(errorResult(nodeParameter?.id, expectedDT, valueDT))
+                errors.push(errorResult(i, expectedDT, valueDT))
             }
         }
 

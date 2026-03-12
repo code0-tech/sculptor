@@ -15,7 +15,7 @@ import {FlowService} from "@edition/flow/services/Flow.service";
 export const useSuggestions = (
     flowId: Flow['id'],
     nodeId?: NodeFunction['id'],
-    parameterId?: NodeParameter['id']
+    parameterIndex?: number
 ): FunctionSuggestion[] => {
 
     const functionService = useService(FunctionService)
@@ -26,7 +26,7 @@ export const useSuggestions = (
     const node = React.useMemo(() => (flowService.getNodeById(flowId, nodeId)), [flowId, flowStore, nodeId])
     const functionDefinition = React.useMemo(() => (node?.functionDefinition?.id ? functionService.getById(node.functionDefinition.id) : undefined), [functionStore, node?.functionDefinition?.id])
     const parameterDefinition = React.useMemo(() => (functionDefinition?.parameterDefinitions?.find(definition => {
-        const parameterDefinitionId = node?.parameters?.nodes?.find(parameter => parameter?.id === parameterId)?.parameterDefinition?.id
+        const parameterDefinitionId = node?.parameters?.nodes?.[parameterIndex ?? -1]?.parameterDefinition?.id
         return definition.id === parameterDefinitionId
     })), [functionDefinition?.parameterDefinitions, node])
 
@@ -45,5 +45,5 @@ export const useSuggestions = (
             ...refObjectSuggestions,
             ...functionSuggestions
         ].sort()
-    }, [flowId, nodeId, parameterId, dataTypeSuggestions, refObjectSuggestions, functionSuggestions])
+    }, [flowId, nodeId, parameterIndex, dataTypeSuggestions, refObjectSuggestions, functionSuggestions])
 }

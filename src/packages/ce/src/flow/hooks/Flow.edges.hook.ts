@@ -87,7 +87,7 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                 }
             }
 
-            node.parameters?.nodes?.forEach((param) => {
+            node.parameters?.nodes?.forEach((param, index) => {
                 const parameterValue = param?.value;
                 const parameterDefinition = functionService.getById(node.functionDefinition?.id!!)?.parameterDefinitions?.find(p => p.id === param?.parameterDefinition?.id);
                 const parameterDataTypeIdentifier = parameterDefinition?.dataTypeIdentifier;
@@ -101,13 +101,13 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                         const groupId = `${node.id}-group-${idCounter++}`;
 
                         edges.push({
-                            id: `${node.id}-${groupId}-param-${param.id}`,
+                            id: `${node.id}-${groupId}-param-${index}`,
                             source: node.id!,
                             target: groupId,
                             deletable: false,
                             selectable: false,
                             animated: true,
-                            label: parameterDefinition?.names!![0]?.content ?? param.id,
+                            label: parameterDefinition?.names!![0]?.content ?? index,
                             data: {
                                 color: hashToColor(parameterValue?.id || ""),
                                 type: 'group',
@@ -132,10 +132,10 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                     );
 
                     edges.push({
-                        id: `${subFnId}-${node.id}-param-${param.id}`,
+                        id: `${subFnId}-${node.id}-param-${index}`,
                         source: subFnId,
                         target: node.id!,
-                        targetHandle: `param-${param.id}`,
+                        targetHandle: `param-${index}`,
                         animated: true,
                         deletable: false,
                         selectable: false,

@@ -13,7 +13,6 @@ import {useNodeValidation} from "@edition/flow/hooks/NodeValidation.hook";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent";
-import {ParameterView} from "@edition/function/services/Function.view";
 
 export interface FunctionFileDefaultComponentProps {
     node: NodeFunction
@@ -31,38 +30,27 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
     const fileTabsService = useService(FileTabsService)
     const validation = useNodeValidation(node.id, flowId)
 
-    const changedParameters = React.useRef<Set<string>>(new Set())
+    const changedParameters = React.useRef<Set<number>>(new Set())
     const [, startTransition] = React.useTransition()
 
     const definition = React.useMemo(() => {
         return functionService.getById(node.functionDefinition?.id!!)
     }, [functionStore])
 
-    const paramDefinitions = React.useMemo(() => {
-        const map: Record<string, ParameterView> = {}
-        definition?.parameterDefinitions?.forEach(pd => {
-            map[pd.id!!] = pd
-        })
-        return map
-    }, [definition])
-
-    const sortedParameters = React.useMemo(() => {
-        return [...(node.parameters?.nodes || [])].sort((a, b) => a!!.id!!.localeCompare(b?.id!!))
-    }, [node])
-
     const initialValues = React.useMemo(() => {
         const values: Record<string, any> = {}
-        sortedParameters.forEach(parameter => {
-            values[parameter?.id!!] = parameter?.value?.__typename === "LiteralValue" ? (typeof parameter.value?.value === "object" && parameter.value?.value != null ? JSON.stringify(parameter.value?.value) : parameter.value.value) : parameter?.value != null ? JSON.stringify(parameter?.value) : parameter?.value
+        definition?.parameterDefinitions?.forEach((parameter, index) => {
+            const nodeParameter = node.parameters?.nodes?.[index]
+            values[index] = nodeParameter?.value?.__typename === "LiteralValue" ? (typeof nodeParameter.value?.value === "object" && nodeParameter.value?.value != null ? JSON.stringify(nodeParameter.value?.value) : nodeParameter.value.value) : nodeParameter?.value != null ? JSON.stringify(nodeParameter?.value) : nodeParameter?.value
         })
         return values
-    }, [sortedParameters])
+    }, [node])
 
     const validations = React.useMemo(() => {
         const values: Record<string, any> = {}
-        sortedParameters.forEach(parameter => {
-            values[parameter?.id!!] = (_: any) => {
-                const validationForParameter = validation?.find(v => v.parameterId === parameter?.id)
+        node.parameters?.nodes?.forEach((parameter, index) => {
+            values[index] = (_: any) => {
+                const validationForParameter = validation?.find(v => v.parameterIndex === index)
                 if (validationForParameter) {
                     return validationForParameter.message!![0]?.content || "Invalid value"
                 }
@@ -70,14 +58,17 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
             }
         })
         return values
-    }, [sortedParameters, validation])
+    }, [node, validation])
 
     const onSubmit = React.useCallback((values: any) => {
         startTransition(async () => {
-            for (const paramDefinitions1 of sortedParameters) {
-                if (!changedParameters.current.has(paramDefinitions1?.id!!)) continue;
-                const syntaxSegment = values[paramDefinitions1?.id!]
-                const previousValue = paramDefinitions1?.value as NodeParameterValue
+            for (const parameterDefinition of definition?.parameterDefinitions!) {
+                const parameterIndex = definition?.parameterDefinitions?.findIndex(p => p?.id === parameterDefinition.id)
+                if (typeof parameterIndex !== "number") return
+                if (!changedParameters.current.has(parameterIndex)) continue;
+                const nodeParameter = node.parameters?.nodes?.find(p => p?.parameterDefinition?.id === parameterDefinition.id)
+                const syntaxSegment = values[parameterIndex]
+                const previousValue = nodeParameter?.value as NodeParameterValue
                 const syntaxValue = syntaxSegment?.[0]?.value ?? syntaxSegment?.value ?? syntaxSegment as NodeFunction | LiteralValue | ReferenceValue
 
                 if (previousValue && previousValue.__typename === "NodeFunctionIdWrapper" && previousValue.id) {
@@ -88,37 +79,37 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                 }
 
                 if (!syntaxValue || !syntaxSegment) {
-                    await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, undefined);
+                    await flowService.setParameterValue(flowId, node.id!!, parameterIndex, undefined, parameterDefinition.id);
                 }
 
                 try {
                     const parsedSyntaxValue = Number.isNaN(Number(syntaxValue)) ? JSON.parse(syntaxValue) : syntaxValue
                     if (!parsedSyntaxValue?.__typename) {
-                        await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, syntaxValue ? {
+                        await flowService.setParameterValue(flowId, node.id!!, parameterIndex, syntaxValue ? {
                             __typename: "LiteralValue",
                             value: parsedSyntaxValue === null || parsedSyntaxValue === undefined ? String(parsedSyntaxValue) : parsedSyntaxValue
-                        } : undefined);
+                        } : undefined, parameterDefinition.id);
                         continue;
                     }
                 } catch (e) {
                     if (!syntaxValue?.__typename) {
-                        await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, syntaxValue ? {
+                        await flowService.setParameterValue(flowId, node.id!!, parameterIndex, syntaxValue ? {
                             __typename: "LiteralValue",
                             value: syntaxValue,
-                        } : undefined);
+                        } : undefined, parameterDefinition.id);
                         continue;
                     }
                 }
 
                 const parsedSyntaxValue = typeof syntaxValue === "object" ? syntaxValue : JSON.parse(syntaxValue)
 
-                await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, parsedSyntaxValue.__typename === "LiteralValue" ? (!!parsedSyntaxValue.value ? parsedSyntaxValue : undefined) : parsedSyntaxValue);
+                await flowService.setParameterValue(flowId, node.id!!, parameterIndex, parsedSyntaxValue.__typename === "LiteralValue" ? (!!parsedSyntaxValue.value ? parsedSyntaxValue : undefined) : parsedSyntaxValue, parameterDefinition.id);
             }
             changedParameters.current.clear()
         })
-    }, [flowStore, sortedParameters])
+    }, [flowStore])
 
-    const [inputs, validate] = useForm<Record<Scalars['NodeParameterID']['output'], InputSyntaxSegment[]>>({
+    const [inputs, validate] = useForm<Record<number, InputSyntaxSegment[]>>({
         initialValues: initialValues,
         validate: validations,
         truthyValidationBeforeSubmit: false,
@@ -126,11 +117,10 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
     })
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
-        {sortedParameters.map(parameter => {
+        {definition?.parameterDefinitions?.map((parameterDefinition, index) => {
 
-            if (!parameter) return null
+            if (!parameterDefinition) return null
 
-            const parameterDefinition = paramDefinitions[parameter?.parameterDefinition?.id!!]
             const title = parameterDefinition?.names ? parameterDefinition?.names!![0]?.content : parameterDefinition?.id
             const description = parameterDefinition?.descriptions ? parameterDefinition?.descriptions!![0]?.content : JSON.stringify(parameterDefinition?.dataTypeIdentifier)
 
@@ -138,15 +128,15 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                 {/*@ts-ignore*/}
                 <DataTypeInputComponent flowId={flowId}
                                         nodeId={node.id}
-                                        parameterId={parameter.id}
+                                        parameterIndex={index}
                                         title={title}
                                         description={description}
                                         clearable
                                         onChange={() => {
-                                changedParameters.current.add(parameter.id!!)
-                                validate()
-                            }}
-                                        {...inputs.getInputProps(parameter.id!!)}
+                                            changedParameters.current.add(index)
+                                            validate()
+                                        }}
+                                        {...inputs.getInputProps(index)}
                 />
             </div>
         })}
