@@ -2,11 +2,11 @@ Copyright 2023-2026 Code0 UG (haftungsbeschränkt) i.G.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to use the Software for personal and non-commercial purposes only. For the purposes of this license, personal use is strictly defined as the individual use of the Software by a natural person for private, and non-commercial projects where no financial gain is sought. This permission includes the rights to use, copy, modify, and merge the Software for such individual purposes.
 
-Any and all use of the Software or its source code that does not strictly conform to the aforementioned definition of personal use is classified as commercial or professional use and requires a valid Enterprise Edition (EE) License issued by the Copyright Holder. This requirement applies without limitation to use within a commercial entity, use for professional services, or use as part of any revenue-generating product or service.
+Any and all use of the Software or its source code that does not strictly conform to the aforementioned definition of personal use is classified as commercial or professional use and requires a valid Enterprise Edition (EE) License for the correct number of user seats issued by the Copyright Holder. This requirement applies without limitation to use within a commercial entity, use for professional services, or use as part of any revenue-generating product or service.
 
-The use of any components located within the /src/packages/ee directory specifically and exclusively requires a valid Enterprise Edition (EE) License, regardless of the user's intent or status.
+The use of any content located within the "/src/packages/ee" directory, if that directory exists, specifically and exclusively requires a valid Enterprise Edition (EE) License for the correct number of user seats, regardless of the user's intent or status.
 
-The directory /src/packages/cloud is reserved for the exclusive use of the Copyright Holder.
+The use of any content located within the "/src/packages/cloud" directory, if that directory exists, is reserved for the exclusive use of the Copyright Holder.
 
 Notwithstanding the permissions granted above, this Software and its source code may not be used, in whole or in part, for the purpose of training, fine-tuning, or developing artificial intelligence (AI) models or machine learning algorithms without prior written consent from the Copyright Holder.
 
