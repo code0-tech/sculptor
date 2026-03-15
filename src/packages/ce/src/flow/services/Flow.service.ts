@@ -74,16 +74,6 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
 
                     firstSetting: 50,
                     afterSetting: null,
-
-                    // firstInputDataTypeIdentifier: 50,
-                    // afterInputDataTypeIdentifier: null,
-                    // firstInputRule: 50,
-                    // afterInputRule: null,
-                    //
-                    // firstReturnDataTypeIdentifier: 50,
-                    // afterReturnDataTypeIdentifier: null,
-                    // firstReturnRule: 50,
-                    // afterReturnRule: null
                 }
             }).then(res => {
                 const nodes = res.data?.namespace?.project?.flows?.nodes ?? []
@@ -179,7 +169,6 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
 
                         case "ReferenceValue": {
                             const v = parameter.value as ReferenceValue
-                            console.log(v)
                             value = {
                                 referenceValue: {
                                     ...(v.nodeFunctionId ? {nodeFunctionId: v.nodeFunctionId} : {}),

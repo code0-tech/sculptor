@@ -6,7 +6,6 @@ import {GraphqlClient} from "@core/util/graphql-client";
 import {FunctionDefinition, Namespace, NamespaceProject, Query, Runtime} from "@code0-tech/sagittarius-graphql-types";
 import functionsQuery from "@edition/function/services/queries/Functions.query.graphql";
 import {View} from "@code0-tech/pictor/dist/utils/view";
-import {FunctionView} from "@edition/function/services/Function.view";
 
 export type FunctionDependencies = {
     namespaceId: Namespace['id']
@@ -14,17 +13,17 @@ export type FunctionDependencies = {
     runtimeId: Runtime['id']
 }
 
-export class FunctionService extends ReactiveArrayService<FunctionView, FunctionDependencies> {
+export class FunctionService extends ReactiveArrayService<FunctionDefinition, FunctionDependencies> {
 
     private readonly client: GraphqlClient
     private i = 0
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<FunctionView>>) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<FunctionDefinition>>) {
         super(store)
         this.client = client
     }
 
-    values(dependencies?: FunctionDependencies): FunctionView[] {
+    values(dependencies?: FunctionDependencies): FunctionDefinition[] {
         const functions = super.values()
         if (!dependencies?.namespaceId || !dependencies.projectId || !dependencies.runtimeId) return functions
 
@@ -43,9 +42,6 @@ export class FunctionService extends ReactiveArrayService<FunctionView, Function
                     firstFunction: 50,
                     afterFunction: null,
 
-                    firstDataTypeIdentifier: 50,
-                    afterDataTypeIdentifier: null,
-
                     firstParameterDefinition: 50,
                     afterParameterDefinition: null,
                 }
@@ -53,7 +49,7 @@ export class FunctionService extends ReactiveArrayService<FunctionView, Function
                 const nodes = res.data?.namespace?.project?.primaryRuntime?.functionDefinitions?.nodes ?? []
                 nodes.forEach(functionD => {
                     if (functionD && !this.hasById(functionD.id)) {
-                        this.set(this.i++, new View(new FunctionView(functionD)))
+                        this.set(this.i++, new View(functionD))
                     }
                 })
             })
@@ -67,7 +63,7 @@ export class FunctionService extends ReactiveArrayService<FunctionView, Function
         return functionD !== undefined
     }
 
-    getById(id: FunctionDefinition['id'], dependencies?: FunctionDependencies): FunctionView | undefined {
+    getById(id: FunctionDefinition['id'], dependencies?: FunctionDependencies): FunctionDefinition | undefined {
         return this.values(dependencies).find(functionDefinition => functionDefinition.id === id)
     }
 

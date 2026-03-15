@@ -3,6 +3,8 @@ fragment Flow on Flow {
     id
     createdAt
     name
+    inputType
+    returnType
     nodes (first: $firstNode, after: $afterNode) {
         __typename
         nodes {

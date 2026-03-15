@@ -13,7 +13,7 @@ import {
     TooltipTrigger,
     useService
 } from "@code0-tech/pictor";
-import {IconArrowsMaximize, IconArrowsMinimize, IconCircleDot, IconLayoutSidebar, IconPlus} from "@tabler/icons-react";
+import {IconArrowsMaximize, IconArrowsMinimize, IconCircleDot, IconPlus} from "@tabler/icons-react";
 import {useParams, useRouter} from "next/navigation";
 import {Flow, FlowType} from "@code0-tech/sagittarius-graphql-types";
 import {FlowService} from "@edition/flow/services/Flow.service";
