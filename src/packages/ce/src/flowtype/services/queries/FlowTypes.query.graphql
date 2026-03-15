@@ -5,16 +5,6 @@ query FlowTypes (
     $projectId: NamespaceProjectID!
     $firstFlowType: Int!
     $afterFlowType: String
-
-    $firstInputDataTypeIdentifier: Int!
-    $afterInputDataTypeIdentifier: String
-    $firstInputRule: Int!
-    $afterInputRule: String
-
-    $firstReturnDataTypeIdentifier: Int!
-    $afterReturnDataTypeIdentifier: String
-    $firstReturnRule: Int!
-    $afterReturnRule: String
 ) {
     namespace(id: $namespaceId) {
         project(id: $projectId) {

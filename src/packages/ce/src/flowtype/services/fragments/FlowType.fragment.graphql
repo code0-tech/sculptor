@@ -1,13 +1,10 @@
-#import "@edition/function/services/fragments/DataTypeIdentifier.fragment.graphql"
-#import "@edition/datatype/services/fragments/DataType.basic.fragment.graphql"
-#import "@edition/datatype/services/fragments/DataTypeRule.fragment.graphql"
-
 fragment FlowType on FlowType {
     __typename
     id
     updatedAt
     createdAt
     identifier
+
     names {
         code
         content
@@ -31,57 +28,8 @@ fragment FlowType on FlowType {
     runtime {
         id
     }
-    inputType {
-        ...BasicDataType
-        dataTypeIdentifiers (first: $firstInputDataTypeIdentifier, after: $afterInputDataTypeIdentifier) {
-            __typename
-            count
-            nodes {
-                ...DataTypeIdentifier
-            }
-            pageInfo {
-                endCursor
-                hasNextPage
-            }
-        }
-        rules (first: $firstInputRule, after: $afterInputRule) {
-            __typename
-            count
-            nodes {
-                ...DataTypeRule
-            }
-            pageInfo {
-                endCursor
-                hasNextPage
-            }
-        }
-
-    }
-    returnType {
-        ...BasicDataType
-        dataTypeIdentifiers (first: $firstReturnDataTypeIdentifier, after: $afterReturnDataTypeIdentifier) {
-            __typename
-            count
-            nodes {
-                ...DataTypeIdentifier
-            }
-            pageInfo {
-                endCursor
-                hasNextPage
-            }
-        }
-        rules (first: $firstReturnRule, after: $afterReturnRule) {
-            __typename
-            count
-            nodes {
-                ...DataTypeRule
-            }
-            pageInfo {
-                endCursor
-                hasNextPage
-            }
-        }
-    }
+    inputType
+    returnType
     flowTypeSettings {
         __typename
         id
@@ -89,12 +37,14 @@ fragment FlowType on FlowType {
         updatedAt
         identifier
         unique
-
-
-        dataType {
-            id
+        type
+        linkedDataTypes {
+            count
+            nodes {
+                id
+                identifier
+            }
         }
-
         names {
             __typename
             code
@@ -108,5 +58,11 @@ fragment FlowType on FlowType {
 
     }
     editable
-
+    linkedDataTypes {
+        count
+        nodes {
+            id
+            identifier
+        }
+    }
 }

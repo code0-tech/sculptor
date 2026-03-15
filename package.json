@@ -16,6 +16,7 @@
   "dependencies": {
     "@apollo/client": "^4.0.9",
     "@code0-tech/pictor": "^0.4.0",
+    "@code0-tech/sagittarius-graphql-types": "^0.0.0-experimental-2385560645-52d09772ef7058a833cf32edc393ce95668b8404",
     "@code0-tech/triangulum": "^0.2.0",
     "date-fns": "^4.1.0",
     "graphql": "^16.12.0",
