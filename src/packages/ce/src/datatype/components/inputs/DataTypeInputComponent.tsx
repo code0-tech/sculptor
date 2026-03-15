@@ -1,11 +1,11 @@
-import {Flow, NodeFunction, NodeParameter} from "@code0-tech/sagittarius-graphql-types";
+import {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
 import {DataTypeTextInputComponent} from "./text/DataTypeTextInputComponent";
-import {DataTypeJSONInputComponent} from "./json/DataTypeJSONInputComponent";
 import {InputProps, useService, useStore} from "@code0-tech/pictor";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FunctionService} from "@edition/function/services/Function.service";
+import {getTypesFromNode, getTypeVariant} from "@code0-tech/triangulum";
 
 export interface DataTypeInputComponentProps extends Omit<InputProps<any | null>, "wrapperComponent" | "type"> {
     flowId: Flow['id']
@@ -21,9 +21,7 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
 
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
-    const dataTypeService = useService(DatatypeService)
     const dataTypeStore = useStore(DatatypeService)
-    const functionService = useService(FunctionService)
     const functionStore = useStore(FunctionService)
 
     const node = React.useMemo(
@@ -31,35 +29,26 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
         [flowStore, flowId, nodeId]
     )
 
-    const parameter = React.useMemo(
-        () => node?.parameters?.nodes?.[parameterIndex],
-        [node, parameterIndex]
+    const types = React.useMemo(
+        () => getTypesFromNode(node!, functionStore, dataTypeStore),
+        [node, functionStore, dataTypeStore]
     )
 
-    const functionDefinition = React.useMemo(
-        () => functionService.getById(node?.functionDefinition?.id!),
-        [functionStore, node]
+    const dataTypeVariant = React.useMemo(
+        () => getTypeVariant(types.parameters[parameterIndex], dataTypeStore),
+        [dataTypeStore, types]
     )
 
-    const parameterDefinition = React.useMemo(
-        () => functionDefinition?.parameterDefinitions?.find(pd => pd.id === parameter?.parameterDefinition?.id),
-        [functionDefinition, parameter]
-    )
-
-    const dataType = React.useMemo(
-        () => dataTypeService.getDataType(parameterDefinition?.dataTypeIdentifier!),
-        [dataTypeStore, parameterDefinition]
-    )
-
-    switch (dataType?.variant) {
-        case "ARRAY":
-        case "OBJECT":
+    switch (dataTypeVariant) {
+        /*case DataTypeVariant.ARRAY:
+        case DataTypeVariant.OBJECT:
             return <DataTypeJSONInputComponent
                 flowId={flowId}
                 nodeId={nodeId}
                 parameterIndex={parameterIndex}
                 {...rest}
             />
+            */
         default:
             return <DataTypeTextInputComponent
                 flowId={flowId}

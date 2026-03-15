@@ -1,13 +1,14 @@
 import React from "react";
-import type {Flow, NodeFunction, NodeParameter,} from "@code0-tech/sagittarius-graphql-types";
+import type {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {useValueSuggestions} from "./FunctionValueSuggestions.hook";
 import {useReferenceSuggestions} from "./FunctionReferenceSuggestions.hook";
-import {useFunctionSuggestions} from "./FunctionNodeSuggestions.hook";
-import {useDataTypeSuggestions} from "./FunctionDataTypeSuggestions.hook";
+import {useNodeSuggestions} from "./FunctionNodeSuggestions.hook";
 import {useService, useStore} from "@code0-tech/pictor";
 import {FunctionSuggestion} from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
+import {getTypesFromNode} from "@code0-tech/triangulum";
+import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 
 //TODO: deep type search
 //TODO: calculate FUNCTION_COMBINATION deepness max 2
@@ -22,28 +23,26 @@ export const useSuggestions = (
     const functionStore = useStore(FunctionService)
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
+    const dataTypeStore = useStore(DatatypeService)
 
     const node = React.useMemo(() => (flowService.getNodeById(flowId, nodeId)), [flowId, flowStore, nodeId])
-    const functionDefinition = React.useMemo(() => (node?.functionDefinition?.id ? functionService.getById(node.functionDefinition.id) : undefined), [functionStore, node?.functionDefinition?.id])
-    const parameterDefinition = React.useMemo(() => (functionDefinition?.parameterDefinitions?.find(definition => {
-        const parameterDefinitionId = node?.parameters?.nodes?.[parameterIndex ?? -1]?.parameterDefinition?.id
-        return definition.id === parameterDefinitionId
-    })), [functionDefinition?.parameterDefinitions, node])
+    const types = React.useMemo(
+        () => {
+            if (!node) return null
+            return getTypesFromNode(node, functionStore, dataTypeStore)
+        },
+        [node, functionStore, dataTypeStore]
+    )
 
-    const dataTypeIdentifier = parameterDefinition?.dataTypeIdentifier!
-    const genericKeys = functionDefinition?.genericKeys ?? []
-
-    const valueSuggestions = useValueSuggestions(dataTypeIdentifier)
-    const dataTypeSuggestions = useDataTypeSuggestions(dataTypeIdentifier)
-    const refObjectSuggestions = useReferenceSuggestions(flowId, nodeId, dataTypeIdentifier, genericKeys)
-    const functionSuggestions = useFunctionSuggestions(dataTypeIdentifier, genericKeys)
+    const valueSuggestions = useValueSuggestions(types?.parameters[parameterIndex ?? 0])
+    const refObjectSuggestions = useReferenceSuggestions(flowId, nodeId, types?.parameters[parameterIndex ?? 0])
+    const functionSuggestions = useNodeSuggestions(types?.parameters[parameterIndex ?? 0])
 
     return React.useMemo(() => {
         return [
             ...valueSuggestions,
-            ...dataTypeSuggestions,
             ...refObjectSuggestions,
             ...functionSuggestions
         ].sort()
-    }, [flowId, nodeId, parameterIndex, dataTypeSuggestions, refObjectSuggestions, functionSuggestions])
+    }, [flowId, nodeId, parameterIndex, refObjectSuggestions, functionSuggestions])
 }

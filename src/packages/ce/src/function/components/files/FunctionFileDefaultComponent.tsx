@@ -5,8 +5,7 @@ import {
     LiteralValue,
     NodeFunction,
     NodeParameterValue,
-    ReferenceValue,
-    Scalars
+    ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
 import {useNodeValidation} from "@edition/flow/hooks/NodeValidation.hook";
@@ -39,7 +38,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
 
     const initialValues = React.useMemo(() => {
         const values: Record<string, any> = {}
-        definition?.parameterDefinitions?.forEach((parameter, index) => {
+        definition?.parameterDefinitions?.nodes?.forEach((parameter, index) => {
             const nodeParameter = node.parameters?.nodes?.[index]
             values[index] = nodeParameter?.value?.__typename === "LiteralValue" ? (typeof nodeParameter.value?.value === "object" && nodeParameter.value?.value != null ? JSON.stringify(nodeParameter.value?.value) : nodeParameter.value.value) : nodeParameter?.value != null ? JSON.stringify(nodeParameter?.value) : nodeParameter?.value
         })
@@ -62,11 +61,11 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
 
     const onSubmit = React.useCallback((values: any) => {
         startTransition(async () => {
-            for (const parameterDefinition of definition?.parameterDefinitions!) {
-                const parameterIndex = definition?.parameterDefinitions?.findIndex(p => p?.id === parameterDefinition.id)
+            for (const parameterDefinition of definition?.parameterDefinitions?.nodes!) {
+                const parameterIndex = definition?.parameterDefinitions?.nodes?.findIndex(p => p?.id === parameterDefinition?.id)
                 if (typeof parameterIndex !== "number") return
                 if (!changedParameters.current.has(parameterIndex)) continue;
-                const nodeParameter = node.parameters?.nodes?.find(p => p?.parameterDefinition?.id === parameterDefinition.id)
+                const nodeParameter = node.parameters?.nodes?.find(p => p?.parameterDefinition?.id === parameterDefinition?.id)
                 const syntaxSegment = values[parameterIndex]
                 const previousValue = nodeParameter?.value as NodeParameterValue
                 const syntaxValue = syntaxSegment?.[0]?.value ?? syntaxSegment?.value ?? syntaxSegment as NodeFunction | LiteralValue | ReferenceValue
@@ -79,7 +78,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                 }
 
                 if (!syntaxValue || !syntaxSegment) {
-                    await flowService.setParameterValue(flowId, node.id!!, parameterIndex, undefined, parameterDefinition.id);
+                    await flowService.setParameterValue(flowId, node.id!!, parameterIndex, undefined, parameterDefinition?.id);
                 }
 
                 try {
@@ -88,7 +87,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                         await flowService.setParameterValue(flowId, node.id!!, parameterIndex, syntaxValue ? {
                             __typename: "LiteralValue",
                             value: parsedSyntaxValue === null || parsedSyntaxValue === undefined ? String(parsedSyntaxValue) : parsedSyntaxValue
-                        } : undefined, parameterDefinition.id);
+                        } : undefined, parameterDefinition?.id);
                         continue;
                     }
                 } catch (e) {
@@ -96,14 +95,14 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                         await flowService.setParameterValue(flowId, node.id!!, parameterIndex, syntaxValue ? {
                             __typename: "LiteralValue",
                             value: syntaxValue,
-                        } : undefined, parameterDefinition.id);
+                        } : undefined, parameterDefinition?.id);
                         continue;
                     }
                 }
 
                 const parsedSyntaxValue = typeof syntaxValue === "object" ? syntaxValue : JSON.parse(syntaxValue)
 
-                await flowService.setParameterValue(flowId, node.id!!, parameterIndex, parsedSyntaxValue.__typename === "LiteralValue" ? (!!parsedSyntaxValue.value ? parsedSyntaxValue : undefined) : parsedSyntaxValue, parameterDefinition.id);
+                await flowService.setParameterValue(flowId, node.id!!, parameterIndex, parsedSyntaxValue.__typename === "LiteralValue" ? (!!parsedSyntaxValue.value ? parsedSyntaxValue : undefined) : parsedSyntaxValue, parameterDefinition?.id);
             }
             changedParameters.current.clear()
         })
@@ -117,12 +116,12 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
     })
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
-        {definition?.parameterDefinitions?.map((parameterDefinition, index) => {
+        {definition?.parameterDefinitions?.nodes?.map((parameterDefinition, index) => {
 
             if (!parameterDefinition) return null
 
             const title = parameterDefinition?.names ? parameterDefinition?.names!![0]?.content : parameterDefinition?.id
-            const description = parameterDefinition?.descriptions ? parameterDefinition?.descriptions!![0]?.content : JSON.stringify(parameterDefinition?.dataTypeIdentifier)
+            const description = parameterDefinition?.descriptions ? parameterDefinition?.descriptions!![0]?.content : JSON.stringify(parameterDefinition.identifier)
 
             return <div>
                 {/*@ts-ignore*/}
