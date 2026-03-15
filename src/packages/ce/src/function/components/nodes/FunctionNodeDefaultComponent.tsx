@@ -61,12 +61,12 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
 
     const displayMessage = React.useMemo(() => splitTemplate(definition?.displayMessages!![0]?.content ?? "").map(item => {
         const nodeParameter = node?.parameters?.nodes?.find(p => {
-            const parameterDefinition = definition?.parameterDefinitions?.find(pd => pd.id == p?.parameterDefinition?.id)
+            const parameterDefinition = definition?.parameterDefinitions?.nodes?.find(pd => pd?.id == p?.parameterDefinition?.id)
             return parameterDefinition?.identifier == item
         })
 
-        const parameterDefinition = definition?.parameterDefinitions?.find(pd => pd.identifier == item)
-        const parameterIndex = parameterDefinition ? definition?.parameterDefinitions?.findIndex(p => p?.id === parameterDefinition.id) : undefined
+        const parameterDefinition = definition?.parameterDefinitions?.nodes?.find(pd => pd?.identifier == item)
+        const parameterIndex = parameterDefinition ? definition?.parameterDefinitions?.nodes?.findIndex(p => p?.id === parameterDefinition.id) : undefined
         const parameterValidation = validation?.filter(v => v.parameterIndex === parameterIndex)
         const decorationStyle: CSSProperties =
             parameterValidation?.length

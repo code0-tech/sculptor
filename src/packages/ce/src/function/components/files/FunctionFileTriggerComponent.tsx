@@ -1,13 +1,13 @@
 import React from "react";
-import {Flex, useService} from "@code0-tech/pictor";
+import {Flex, useService, useStore} from "@code0-tech/pictor";
 import {Flow, LiteralValue, NodeParameterValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {FunctionSuggestion} from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
 import {useValueSuggestions} from "@edition/function/hooks/FunctionValueSuggestions.hook";
 import {toInputSuggestions} from "@edition/function/components/suggestion/FunctionSuggestionMenuComponent.util";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {DataTypeTextInputComponent} from "@edition/datatype/components/inputs/text/DataTypeTextInputComponent";
+import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 
 export interface FunctionFileTriggerComponentProps {
     instance: Flow
@@ -23,6 +23,7 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
 
     const definition = flowTypeService.getById(instance.type?.id!!)
 
+    //TODO: performance use log inside for each to see the problem
     const suggestionsById: Record<string, FunctionSuggestion[]> = {}
     definition?.flowTypeSettings?.forEach(settingDefinition => {
         const valueSuggestions = useValueSuggestions(settingDefinition.type!)
