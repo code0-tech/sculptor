@@ -25,14 +25,17 @@ export const useNodeValidation = (
 ): ValidationResult[] | null => {
 
     const functionStore = useStore(FunctionService)
+    const functionService = useService(FunctionService)
     const flowService = useService(FlowService)
+    const flowStore = useStore(FlowService)
     const dataTypeStore = useStore(DatatypeService)
+    const dataTypeService = useService(DatatypeService)
 
     const flow = flowService.getById(flowId)
     const node = flowService.getNodeById(flowId, nodeId)
 
     return React.useMemo(() => {
-        const validation = getNodeValidation(flow!, node!, functionStore, dataTypeStore)
+        const validation = getNodeValidation(flow!, node!, functionService.values(), dataTypeService.values())
         return validation.diagnostics.map(diagnostic => errorResult(diagnostic.parameterIndex!, diagnostic.message))
-    }, [])
+    }, [flow, node, flowStore])
 }

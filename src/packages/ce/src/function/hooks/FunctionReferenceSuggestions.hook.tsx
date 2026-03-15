@@ -17,17 +17,20 @@ export const useReferenceSuggestions = (
 ): FunctionSuggestion[] => {
 
     const flowService = useService(FlowService)
+    const flowStore = useStore(FlowService)
     const functionStore = useStore(FunctionService)
+    const functionService = useService(FunctionService)
     const dataTypeStore = useStore(DatatypeService)
+    const dataTypeService = useService(DatatypeService)
 
     const flow = React.useMemo(
         () => flowService.getById(flowId),
-        [flowId, flowService]
+        [flowId, flowStore]
     )
 
     if (!type || !flow) return []
 
-    const suggestions = getReferenceSuggestions(flow, nodeId, type, functionStore, dataTypeStore)
+    const suggestions = getReferenceSuggestions(flow, nodeId, type, functionService.values(), dataTypeService.values())
 
     return suggestions.map(suggestion => {
 

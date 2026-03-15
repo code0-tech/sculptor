@@ -14,10 +14,9 @@ export const useNodeSuggestions = (
     const functionStore = useStore(FunctionService)
     const functionService = useService(FunctionService)
     const dataTypeStore = useStore(DatatypeService)
+    const dataTypeService = useService(DatatypeService)
 
-    if (!type) return []
-
-    const suggestions = getNodeSuggestions(type, functionStore, dataTypeStore)
+    const suggestions = getNodeSuggestions(type, functionService.values(), dataTypeService.values())
 
     return suggestions.map(suggestion => {
 

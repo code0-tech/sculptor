@@ -24,19 +24,20 @@ export const useSuggestions = (
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
     const dataTypeStore = useStore(DatatypeService)
+    const dataTypeService = useService(DatatypeService)
 
     const node = React.useMemo(() => (flowService.getNodeById(flowId, nodeId)), [flowId, flowStore, nodeId])
     const types = React.useMemo(
         () => {
             if (!node) return null
-            return getTypesFromNode(node, functionStore, dataTypeStore)
+            return getTypesFromNode(node, functionService.values(), dataTypeService.values())
         },
         [node, functionStore, dataTypeStore]
     )
 
-    const valueSuggestions = useValueSuggestions(types?.parameters[parameterIndex ?? 0])
-    const refObjectSuggestions = useReferenceSuggestions(flowId, nodeId, types?.parameters[parameterIndex ?? 0])
-    const functionSuggestions = useNodeSuggestions(types?.parameters[parameterIndex ?? 0])
+    const valueSuggestions = useValueSuggestions(types?.parameters?.[parameterIndex ?? 0])
+    const refObjectSuggestions = useReferenceSuggestions(flowId, nodeId, types?.parameters?.[parameterIndex ?? 0])
+    const functionSuggestions = useNodeSuggestions(types?.parameters?.[parameterIndex ?? 0])
 
     return React.useMemo(() => {
         return [
