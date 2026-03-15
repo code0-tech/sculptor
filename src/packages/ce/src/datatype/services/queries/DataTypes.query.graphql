@@ -5,8 +5,6 @@ query DataTypes (
     $projectId: NamespaceProjectID!
     $firstDataType: Int!
     $afterDataType: String
-    $firstDataTypeIdentifier: Int!
-    $afterDataTypeIdentifier: String
     $firstRule: Int!
     $afterRule: String
 ) {

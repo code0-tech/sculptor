@@ -1,54 +1,14 @@
-fragment DataTypeIdentifier on DataTypeIdentifier {
-    id
-    createdAt
-    updatedAt
-    genericKey
-    genericType {
-        id
-        updatedAt
-        createdAt
-        genericMappers {
-            id
-            target
-            sourceDataTypeIdentifierIds
-            updatedAt
-            createdAt
-            genericCombinationStrategies {
-                id
-                type
-                createdAt
-                updatedAt
-                __typename
-            }
-            __typename
-        }
-        dataType {
-            identifier
-            id
-            __typename
-        }
-    }
-    dataType {
-        id
-        identifier
-    }
-    __typename
-}
-
 fragment Function on FunctionDefinition {
     id
     createdAt
     updatedAt
-    dataTypeIdentifiers (first: $firstDataTypeIdentifier, after: $afterDataTypeIdentifier) {
+    signature
+    linkedDataTypes {
         count
         nodes {
-            ...DataTypeIdentifier
+            id
+            identifier
         }
-        pageInfo {
-            endCursor
-            hasNextPage
-        }
-        __typename
     }
     aliases {
         code
@@ -70,7 +30,6 @@ fragment Function on FunctionDefinition {
         content
         __typename
     }
-    genericKeys
     displayMessages {
         code
         content
@@ -81,9 +40,6 @@ fragment Function on FunctionDefinition {
         code
         content
         __typename
-    }
-    returnType {
-        ...DataTypeIdentifier
     }
     parameterDefinitions (first: $firstParameterDefinition, after: $afterParameterDefinition) {
         nodes {
@@ -107,13 +63,9 @@ fragment Function on FunctionDefinition {
                 content
                 __typename
             }
-            dataTypeIdentifier {
-                ...DataTypeIdentifier
-            }
             __typename
         }
     }
-    #throwsError
     runtimeFunctionDefinition {
         id
         identifier

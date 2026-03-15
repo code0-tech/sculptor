@@ -5,9 +5,7 @@ fragment BasicDataType on DataType {
     updatedAt
     identifier
     genericKeys
-    variant
-
-
+    type
     name {
         __typename
         code

@@ -5,8 +5,6 @@ query Functions (
     $projectId: NamespaceProjectID!
     $firstFunction: Int!
     $afterFunction: String
-    $firstDataTypeIdentifier: Int!
-    $afterDataTypeIdentifier: String
     $firstParameterDefinition: Int!
     $afterParameterDefinition: String
 ) {
