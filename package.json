@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@apollo/client": "^4.0.9",
-    "@code0-tech/pictor": "^0.0.0-mvp.47",
+    "@code0-tech/pictor": "^0.4.0",
     "@code0-tech/triangulum": "^0.2.0",
     "date-fns": "^4.1.0",
     "graphql": "^16.12.0",
