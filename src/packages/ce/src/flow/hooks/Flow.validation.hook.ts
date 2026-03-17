@@ -5,12 +5,14 @@ import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {InspectionSeverity, ValidationResult} from "@core/util/inspection";
-import {getNodeValidation} from "@code0-tech/triangulum";
+import {getFlowValidation} from "@code0-tech/triangulum";
 
 const errorResult = (
+    nodeId: NodeFunction['id'],
     parameterIndex: number,
     message: string
 ): ValidationResult => ({
+    nodeId: nodeId,
     parameterIndex: parameterIndex,
     type: InspectionSeverity.ERROR,
     message: [{
@@ -19,8 +21,7 @@ const errorResult = (
     }]
 })
 
-export const useNodeValidation = (
-    nodeId: NodeFunction['id'],
+export const useFlowValidation = (
     flowId: Flow['id']
 ): ValidationResult[] | null => {
 
@@ -32,10 +33,9 @@ export const useNodeValidation = (
     const dataTypeService = useService(DatatypeService)
 
     const flow = flowService.getById(flowId)
-    const node = flowService.getNodeById(flowId, nodeId)
 
     return React.useMemo(() => {
-        const validation = getNodeValidation(flow!, node!, functionService.values(), dataTypeService.values())
-        return validation.diagnostics.map(diagnostic => errorResult(diagnostic.parameterIndex!, diagnostic.message))
-    }, [flow, node, flowStore])
+        const validation = getFlowValidation(flow!, functionService.values(), dataTypeService.values())
+        return validation.diagnostics.map(diagnostic => errorResult(diagnostic.nodeId, diagnostic.parameterIndex!, diagnostic.message))
+    }, [flow, flowStore])
 }

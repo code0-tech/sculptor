@@ -8,7 +8,7 @@ import {
     ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
-import {useNodeValidation} from "@edition/flow/hooks/NodeValidation.hook";
+import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent";
@@ -27,7 +27,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
     const fileTabsService = useService(FileTabsService)
-    const validation = useNodeValidation(node.id, flowId)
+    const validation = useFlowValidation(flowId)
 
     const changedParameters = React.useRef<Set<number>>(new Set())
     const [, startTransition] = React.useTransition()
@@ -49,7 +49,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
         const values: Record<string, any> = {}
         node.parameters?.nodes?.forEach((parameter, index) => {
             values[index] = (_: any) => {
-                const validationForParameter = validation?.find(v => v.parameterIndex === index)
+                const validationForParameter = validation?.find(v => v.parameterIndex === index && v.nodeId === node.id)
                 if (validationForParameter) {
                     return validationForParameter.message!![0]?.content || "Invalid value"
                 }

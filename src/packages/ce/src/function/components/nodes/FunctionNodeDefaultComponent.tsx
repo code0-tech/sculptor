@@ -4,7 +4,7 @@ import "./FunctionNodeComponent.style.scss";
 import {FunctionNodeComponentProps} from "./FunctionNodeComponent";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
 import {Badge, Card, Flex, Text, underlineBySeverity, useService, useStore as usePictorStore} from "@code0-tech/pictor";
-import {useNodeValidation} from "@edition/flow/hooks/NodeValidation.hook";
+import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
 import {IconNote, IconVariable} from "@tabler/icons-react";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
@@ -28,7 +28,7 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
 
     const node = React.useMemo(() => flowService.getNodeById(data.flowId, data.nodeId), [flowStore, data])
     const definition = React.useMemo(() => node ? functionService.getById(node.functionDefinition?.id!!) : undefined, [functionStore, data, node])
-    const validation = useNodeValidation(data.nodeId, data.flowId)
+    const validation = useFlowValidation(data.flowId)
 
     const activeTabId = React.useMemo(() => {
         return fileTabsService.getActiveTab()?.id
@@ -67,7 +67,7 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
 
         const parameterDefinition = definition?.parameterDefinitions?.nodes?.find(pd => pd?.identifier == item)
         const parameterIndex = parameterDefinition ? definition?.parameterDefinitions?.nodes?.findIndex(p => p?.id === parameterDefinition.id) : undefined
-        const parameterValidation = validation?.filter(v => v.parameterIndex === parameterIndex)
+        const parameterValidation = validation?.filter(v => v.parameterIndex === parameterIndex && v.nodeId === node?.id)
         const decorationStyle: CSSProperties =
             parameterValidation?.length
                 ? underlineBySeverity[parameterValidation[0].type]
