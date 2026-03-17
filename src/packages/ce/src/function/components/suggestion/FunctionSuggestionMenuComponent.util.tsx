@@ -36,8 +36,10 @@ export const toInputSuggestions = (suggestions: FunctionSuggestion[]): InputSugg
 
         if (suggestion.type === FunctionSuggestionType.FUNCTION || suggestion.type === FunctionSuggestionType.FUNCTION_COMBINATION) {
             const runtimeIdentifier = suggestion.value.__typename === "NodeFunction"
-                ? suggestion.value.functionDefinition?.runtimeFunctionDefinition?.identifier
+                ? suggestion.value.functionDefinition?.identifier
                 : undefined
+
+
 
             if (runtimeIdentifier) {
                 const [runtime, pkg] = runtimeIdentifier.split("::")

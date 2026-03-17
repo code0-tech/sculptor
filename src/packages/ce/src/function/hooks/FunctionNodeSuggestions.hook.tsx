@@ -18,7 +18,18 @@ export const useNodeSuggestions = (
 
     const suggestions = getNodeSuggestions(type, functionService.values(), dataTypeService.values())
 
-    return suggestions.map(suggestion => {
+    return suggestions.sort((a, b) => {
+        const [rA, pA, fA] = a?.functionDefinition!!.identifier!!.split("::");
+        const [rB, pB, fB] = b?.functionDefinition!!.identifier!!.split("::");
+
+        const runtimeCmp = rA.localeCompare(rB);
+        if (runtimeCmp !== 0) return runtimeCmp;
+
+        const packageCmp = pA.localeCompare(pB);
+        if (packageCmp !== 0) return packageCmp;
+
+        return fA.localeCompare(fB);
+    }).map(suggestion => {
 
         const functionDefinition = functionService.getById(suggestion.functionDefinition?.id)
 

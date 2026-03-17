@@ -159,7 +159,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                 });
             }
 
-            const types = getTypesFromNode(node, functionStore, dataTypeStore);
+            const types = getTypesFromNode(node, functionService.values(), dataTypeService.values());
 
             node.parameters?.nodes?.forEach((param, index) => {
                 const value = param?.value;
@@ -167,7 +167,6 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                 
                 const variant = getTypeVariant(types.parameters[index], dataTypeStore);
 
-                //@ts-ignore
                 if (variant === DataTypeVariant.NODE) {
                     const groupId = `${nodeId}-group-${groupCounter++}`;
 

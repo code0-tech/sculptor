@@ -38,7 +38,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
         return fileTabsService.values().find((t: any) => (t as any).active)
     }, [fileTabsStore, fileTabsService])
 
-    const result = useSuggestions(flowId, activeTab?.content?.props?.node?.id as NodeFunction['id'] | undefined)
+    const result = useSuggestions(flowId, undefined)
 
     //callbacks
     const deleteActiveNode = React.useCallback(() => {
