@@ -29,6 +29,7 @@ import {FlowPanelLayoutComponent} from "@edition/flow/components/panels/FlowPane
 import {FlowPanelControlComponent} from "@edition/flow/components/panels/FlowPanelControlComponent";
 import {FlowPanelUpdateComponent} from "@edition/flow/components/panels/FlowPanelUpdateComponent";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
+import {FlowPanelExportComponent} from "@edition/flow/components/panels/FlowPanelExportComponent";
 
 /**
  * Dynamically layouts a tree of nodes and their parameter nodes for a flow-based editor.
@@ -696,7 +697,7 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
 
         revalidateHandles((layouted.nodes as Node[]).map(n => n.id))
 
-    }, [initialNodes, initialEdges, revalidateHandles])
+    }, [initialNodes.length, initialEdges.length, revalidateHandles])
 
     React.useEffect(() => {
         if (didFitViewRef.current) return
@@ -719,7 +720,6 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
 
     return (
         <ReactFlow
-            onlyRenderVisibleElements
             panOnScroll={false}
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
@@ -794,6 +794,7 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
                     <FlowPanelLayoutComponent/>
                     <FlowPanelControlComponent flowId={flowId}/>
                     <FlowPanelUpdateComponent flowId={flowId}/>
+                    <FlowPanelExportComponent flowId={flowId}/>
                 </>
             ) : null}
         </ReactFlow>
