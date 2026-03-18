@@ -1,29 +1,22 @@
 import React from "react"
-import type {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types"
+import type {Flow} from "@code0-tech/sagittarius-graphql-types"
 import {useService, useStore} from "@code0-tech/pictor";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
-import {InspectionSeverity, ValidationResult} from "@core/util/inspection";
-import {getFlowValidation} from "@code0-tech/triangulum";
+import {ValidationResult} from "@core/util/inspection";
 
-const errorResult = (
-    nodeId: NodeFunction['id'],
-    parameterIndex: number,
-    message: string
-): ValidationResult => ({
-    nodeId: nodeId,
-    parameterIndex: parameterIndex,
-    type: InspectionSeverity.ERROR,
-    message: [{
-        code: "en-US",
-        content: message
-    }]
-})
+declare global {
+    interface Window {
+        lastValidatedFlows?: Record<string, { lastValidated: string, validation: ValidationResult[] }>;
+    }
+}
 
 export const useFlowValidation = (
     flowId: Flow['id']
 ): ValidationResult[] | null => {
+
+    const workerRef = React.useRef<Worker>(null);
 
     const functionStore = useStore(FunctionService)
     const functionService = useService(FunctionService)
@@ -32,10 +25,42 @@ export const useFlowValidation = (
     const dataTypeStore = useStore(DatatypeService)
     const dataTypeService = useService(DatatypeService)
 
-    const flow = flowService.getById(flowId)
+    const [validationResult, setValidationResult] = React.useState<ValidationResult[] | null>(null)
 
-    return React.useMemo(() => {
-        const validation = getFlowValidation(flow!, functionService.values(), dataTypeService.values())
-        return validation.diagnostics.map(diagnostic => errorResult(diagnostic.nodeId, diagnostic.parameterIndex!, diagnostic.message))
-    }, [flow, flowStore])
+    const flow = React.useMemo(
+        () => flowService.getById(flowId),
+        [flowStore, flowId]
+    )
+
+    React.useEffect(() => {
+        workerRef.current = new Worker(new URL("./Flow.validation.worker.ts", import.meta.url));
+        workerRef.current.onmessage = (event: MessageEvent<ValidationResult[]>) =>  {
+            window.lastValidatedFlows = {
+                ...window.lastValidatedFlows,
+                [flowId as string]: {
+                    lastValidated: flow?.editedAt!,
+                    validation: event.data
+                }
+            }
+            setValidationResult(event.data);
+        }
+
+        return () => {
+            workerRef.current?.terminate();
+        };
+    }, [])
+
+    React.useEffect(() => {
+        if (window.lastValidatedFlows?.[flowId as string].lastValidated === flow?.editedAt) {
+            setValidationResult(window.lastValidatedFlows?.[flowId as string].validation!)
+            return;
+        }
+        workerRef.current?.postMessage({
+            flow,
+            functions: functionService.values(),
+            dataTypes: dataTypeService.values()
+        });
+    })
+
+    return React.useMemo(() => validationResult, [validationResult])
 }
