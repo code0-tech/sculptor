@@ -26,8 +26,15 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
     const functionService = useService(FunctionService)
     const functionStore = usePictorStore(FunctionService)
 
-    const node = React.useMemo(() => flowService.getNodeById(data.flowId, data.nodeId), [flowStore, data])
-    const definition = React.useMemo(() => node ? functionService.getById(node.functionDefinition?.id!!) : undefined, [functionStore, data, node])
+    const node = React.useMemo(
+        () => flowService.getNodeById(data.flowId, data.nodeId),
+        [flowStore, data]
+    )
+    const definition = React.useMemo(
+        () => node ? functionService.getById(node.functionDefinition?.id!!) : undefined,
+        [functionStore, data, node]
+    )
+
     const validation = useFlowValidation(data.flowId)
 
     const activeTabId = React.useMemo(() => {
@@ -96,19 +103,22 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
                         />
                     </div>
             }
-            return <Badge style={{verticalAlign: "middle"}} border>
-                <Text size={"sm"}>
-                    {item}
-                </Text>
-            </Badge>
+            return <div style={{...decorationStyle, display: "inline-block"}}>
+                <Badge style={{verticalAlign: "middle"}} border>
+                    <Text size={"sm"}>
+                        {item}
+                    </Text>
+                </Badge>
+            </div>
         }
         return " " + String(item) + " "
-    }), [flowStore, functionStore, data, definition])
+    }), [flowStore, functionStore, data, definition, validation])
 
     React.useEffect(() => {
-        if (!node?.id || !id) return
+        if (!node?.id) return
+        console.log("register", node.id)
         fileTabsService.registerTab({
-            id: id,
+            id: id || node.id,
             active: false,
             closeable: true,
             children: <>
@@ -117,6 +127,9 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
             </>,
             content: <FunctionFileDefaultComponent flowId={props.data.flowId} node={node}/>
         })
+        return () => {
+            console.log("unregister", node.id)
+        }
     }, [])
 
     const isReferenced = React.useMemo(() => {
