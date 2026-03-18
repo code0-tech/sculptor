@@ -15,8 +15,6 @@ export const useValueSuggestions = (
 
     if (!type) return []
 
-    console.log(type, dataTypeService.values())
-
     const suggestions = getValueSuggestions(type, dataTypeService.values())
 
     return suggestions.map(suggestion => {
