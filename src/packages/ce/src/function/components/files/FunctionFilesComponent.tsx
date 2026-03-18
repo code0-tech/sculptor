@@ -160,7 +160,10 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
             </FileTabsList>}>
                 <>
                     {fileTabsService.values().map((tab: FileTabsView) => (
-                        <FileTabsContent key={`content-${tab.id}`} value={tab.id!}>
+                        <FileTabsContent forceMount
+                                         display={tab.active ? "block" : "none"}
+                                         key={`content-${tab.id}`}
+                                         value={tab.id!}>
                             {tab.content}
                         </FileTabsContent>
                     ))}
