@@ -29,6 +29,13 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
     const fileTabsService = useService(FileTabsService)
     const validation = useFlowValidation(flowId)
 
+    React.useEffect(() => {
+        console.log("register tab", node.id)
+        return () => {
+            console.log("unregister tab", node.id)
+        }
+    }, [])
+
     const changedParameters = React.useRef<Set<number>>(new Set())
     const [, startTransition] = React.useTransition()
 
@@ -68,7 +75,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                 const nodeParameter = node.parameters?.nodes?.find(p => p?.parameterDefinition?.id === parameterDefinition?.id)
                 const syntaxSegment = values[parameterIndex]
                 const previousValue = nodeParameter?.value as NodeParameterValue
-                const syntaxValue = syntaxSegment?.[0]?.value ?? syntaxSegment?.value ?? syntaxSegment as NodeFunction | LiteralValue | ReferenceValue
+                const syntaxValue = syntaxSegment?.[0]?.value ?? syntaxSegment?.value ?? null as NodeFunction | LiteralValue | ReferenceValue | null
 
                 if (previousValue && previousValue.__typename === "NodeFunctionIdWrapper" && previousValue.id) {
                     const linkedNodes = flowService.getLinkedNodesById(flowId, previousValue.id)
@@ -82,11 +89,11 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                 }
 
                 try {
-                    const parsedSyntaxValue = Number.isNaN(Number(syntaxValue)) ? JSON.parse(syntaxValue) : syntaxValue
+                    const parsedSyntaxValue = JSON.parse(syntaxValue)
                     if (!parsedSyntaxValue?.__typename) {
                         await flowService.setParameterValue(flowId, node.id!!, parameterIndex, syntaxValue ? {
                             __typename: "LiteralValue",
-                            value: parsedSyntaxValue === null || parsedSyntaxValue === undefined ? String(parsedSyntaxValue) : parsedSyntaxValue
+                            value: parsedSyntaxValue
                         } : undefined, parameterDefinition?.id);
                         continue;
                     }
@@ -131,7 +138,13 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                                         title={title}
                                         description={description}
                                         clearable
-                                        onChange={() => {
+                                        onSuggestionSelect={
+                                            () => {
+                                                changedParameters.current.add(index)
+                                                validate()
+                                            }
+                                        }
+                                        onKeyUp={() => {
                                             changedParameters.current.add(index)
                                             validate()
                                         }}
