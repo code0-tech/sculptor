@@ -144,7 +144,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                                                 validate()
                                             }
                                         }
-                                        onKeyUp={() => {
+                                        onChange={() => {
                                             changedParameters.current.add(index)
                                             validate()
                                         }}
