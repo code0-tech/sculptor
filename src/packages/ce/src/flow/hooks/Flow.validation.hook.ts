@@ -29,38 +29,53 @@ export const useFlowValidation = (
 
     const flow = React.useMemo(
         () => flowService.getById(flowId),
-        [flowStore, flowId]
+        [flowStore, flowId, flowService]
     )
 
+    const functions = React.useMemo(() => functionService.values(), [functionStore]);
+    const dataTypes = React.useMemo(() => dataTypeService.values(), [dataTypeStore]);
+
     React.useEffect(() => {
-        workerRef.current = new Worker(new URL("./Flow.validation.worker.ts", import.meta.url));
-        workerRef.current.onmessage = (event: MessageEvent<ValidationResult[]>) =>  {
-            window.lastValidatedFlows = {
-                ...window.lastValidatedFlows,
-                [flowId as string]: {
-                    lastValidated: flow?.editedAt!,
-                    validation: event.data
+        const currentWorker = new Worker(new URL("./Flow.validation.worker.ts", import.meta.url));
+        workerRef.current = currentWorker;
+
+        currentWorker.onmessage = (event: MessageEvent<ValidationResult[]>) => {
+            if (flow) {
+                window.lastValidatedFlows = {
+                    ...window.lastValidatedFlows,
+                    [flowId as string]: {
+                        lastValidated: flow.editedAt!,
+                        validation: event.data
+                    }
                 }
             }
             setValidationResult(event.data);
         }
 
         return () => {
-            workerRef.current?.terminate();
+            currentWorker.terminate();
         };
-    }, [])
+    }, [flowId, flow?.id]) // Re-create worker only if flow changes fundamentally
 
     React.useEffect(() => {
-        if (window.lastValidatedFlows?.[flowId as string].lastValidated === flow?.editedAt) {
+        if (!flow || !workerRef.current) return;
+
+        // Skip if already validated for this version
+        if (window.lastValidatedFlows?.[flowId as string]?.lastValidated === flow.editedAt) {
             setValidationResult(window.lastValidatedFlows?.[flowId as string].validation!)
             return;
         }
-        workerRef.current?.postMessage({
-            flow,
-            functions: functionService.values(),
-            dataTypes: dataTypeService.values()
-        });
-    })
 
-    return React.useMemo(() => validationResult, [validationResult])
+        const timeout = setTimeout(() => {
+            workerRef.current?.postMessage({
+                flow,
+                functions,
+                dataTypes
+            });
+        }, 300); // Increased debounce to reduce load
+
+        return () => clearTimeout(timeout);
+    }, [flow, functions, dataTypes, flowId, flowStore])
+
+    return validationResult
 }
