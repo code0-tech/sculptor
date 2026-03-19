@@ -2,22 +2,56 @@ import {
     FunctionSuggestion,
     FunctionSuggestionType
 } from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
-import {getValueSuggestions} from "@code0-tech/triangulum";
 import {useService, useStore} from "@code0-tech/pictor";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
+import React, {startTransition} from "react";
 
 export const useValueSuggestions = (
     type?: string
 ): FunctionSuggestion[] => {
 
+    const workerRef = React.useRef<Worker>(null);
+    const [suggestions, setSuggestions] = React.useState<any[]>([])
+
     const dataTypeStore = useStore(DatatypeService)
     const dataTypeService = useService(DatatypeService)
 
-    if (!type) return []
+    const dataTypes = React.useMemo(() => dataTypeService.values(), [dataTypeStore]);
 
-    const suggestions = getValueSuggestions(type, dataTypeService.values())
+    React.useEffect(() => {
+        console.log("Value suggestion worker init")
+        const currentWorker = new Worker(new URL("./FunctionValueSuggestions.worker.ts", import.meta.url));
+        workerRef.current = currentWorker;
 
-    return suggestions.map(suggestion => {
+        currentWorker.onmessage = (event) => {
+            startTransition(() => {
+                setSuggestions(event.data);
+            })
+        }
+
+        return () => {
+            currentWorker.terminate();
+        };
+    }, [])
+
+    React.useEffect(() => {
+        console.log("Requesting value suggestions for type", type)
+        if (!type || !workerRef.current) {
+            setSuggestions([])
+            return;
+        }
+
+        const timeout = setTimeout(() => {
+            workerRef.current?.postMessage({
+                type,
+                dataTypes
+            });
+        }, 100);
+
+        return () => clearTimeout(timeout);
+    }, [type, dataTypes])
+
+    return React.useMemo(() => suggestions.map(suggestion => {
 
         return {
             path: [],
@@ -25,5 +59,5 @@ export const useValueSuggestions = (
             displayText: [suggestion.value as string],
             value: suggestion,
         }
-    })
+    }), [suggestions]);
 }

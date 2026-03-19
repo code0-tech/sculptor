@@ -2,23 +2,58 @@ import {
     FunctionSuggestion,
     FunctionSuggestionType
 } from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
-import {getNodeSuggestions} from "@code0-tech/triangulum";
 import {useService, useStore} from "@code0-tech/pictor";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
+import React, {startTransition} from "react";
 
 export const useNodeSuggestions = (
     type?: string,
 ): FunctionSuggestion[] => {
+
+    const workerRef = React.useRef<Worker>(null);
+    const [suggestions, setSuggestions] = React.useState<any[]>([])
 
     const functionStore = useStore(FunctionService)
     const functionService = useService(FunctionService)
     const dataTypeStore = useStore(DatatypeService)
     const dataTypeService = useService(DatatypeService)
 
-    const suggestions = getNodeSuggestions(type, functionService.values(), dataTypeService.values())
+    const functions = React.useMemo(() => functionService.values(), [functionStore]);
+    const dataTypes = React.useMemo(() => dataTypeService.values(), [dataTypeStore]);
 
-    return suggestions.sort((a, b) => {
+    React.useEffect(() => {
+        console.log("Node suggestion worker init")
+        const currentWorker = new Worker(new URL("./FunctionNodeSuggestions.worker.ts", import.meta.url));
+        workerRef.current = currentWorker;
+
+        currentWorker.onmessage = (event) => {
+            startTransition(() => {
+                setSuggestions(event.data);
+            })
+        }
+
+        return () => {
+            currentWorker.terminate();
+        };
+    }, [])
+
+    React.useEffect(() => {
+        console.log("Requesting node suggestions for type", type)
+        if (!workerRef.current) return;
+
+        const timeout = setTimeout(() => {
+            workerRef.current?.postMessage({
+                type,
+                functions,
+                dataTypes
+            });
+        }, 100);
+
+        return () => clearTimeout(timeout);
+    }, [type, functions, dataTypes])
+
+    return React.useMemo(() => suggestions.sort((a, b) => {
         const [rA, pA, fA] = a?.functionDefinition!!.identifier!!.split("::");
         const [rB, pB, fB] = b?.functionDefinition!!.identifier!!.split("::");
 
@@ -39,5 +74,5 @@ export const useNodeSuggestions = (
             displayText: [functionDefinition?.names![0]?.content as string],
             value: suggestion,
         }
-    })
+    }), [suggestions]);
 }

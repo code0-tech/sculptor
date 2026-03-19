@@ -6,15 +6,17 @@ import {
 import {useService, useStore} from "@code0-tech/pictor";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
-import {getReferenceSuggestions} from "@code0-tech/triangulum";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import React from "react";
+import React, {startTransition} from "react";
 
 export const useReferenceSuggestions = (
     flowId: Flow['id'],
     nodeId?: NodeFunction['id'],
-    type?: string
+    parameterIndex?: number,
 ): FunctionSuggestion[] => {
+
+    const workerRef = React.useRef<Worker>(null);
+    const [suggestions, setSuggestions] = React.useState<any[]>([])
 
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
@@ -27,18 +29,50 @@ export const useReferenceSuggestions = (
         () => flowService.getById(flowId),
         [flowId, flowStore]
     )
+    const functions = React.useMemo(() => functionService.values(), [functionStore]);
+    const dataTypes = React.useMemo(() => dataTypeService.values(), [dataTypeStore]);
 
-    if (!type || !flow) return []
+    React.useEffect(() => {
+        console.log("Reference suggestion worker init")
+        const currentWorker = new Worker(new URL("./FunctionReferenceSuggestions.worker.ts", import.meta.url));
+        workerRef.current = currentWorker;
 
-    const suggestions = getReferenceSuggestions(flow, nodeId, type, functionService.values(), dataTypeService.values())
+        currentWorker.onmessage = (event) => {
+            startTransition(() => {
+                setSuggestions(event.data);
+            })
+        }
 
-    return suggestions.map(suggestion => {
+        return () => {
+            currentWorker.terminate();
+        };
+    }, [])
+
+
+    React.useEffect(() => {
+        console.log("Requesting reference suggestions for node", nodeId, "parameter", parameterIndex)
+        if (!workerRef.current || typeof parameterIndex != "number" || !flow) return;
+
+        const timeout = setTimeout(() => {
+            workerRef.current?.postMessage({
+                flow,
+                nodeId,
+                parameterIndex,
+                functions,
+                dataTypes
+            });
+        }, 100);
+
+        return () => clearTimeout(timeout);
+    }, [flow, nodeId, parameterIndex, functions, dataTypes])
+
+    return React.useMemo(() => suggestions.map(suggestion => {
 
         return {
             path: [],
             type: FunctionSuggestionType.REF_OBJECT,
-            displayText: [`${suggestion.referencePath?.map(path => path.path).join(".") ?? ""}`],
+            displayText: [`${suggestion.referencePath?.map((path: any) => path.path).join(".") ?? ""}`],
             value: suggestion,
         }
-    })
+    }), [suggestions]);
 }
