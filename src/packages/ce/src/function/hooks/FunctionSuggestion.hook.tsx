@@ -67,7 +67,7 @@ export const useSuggestions = (
         }, 100);
 
         return () => clearTimeout(timeout);
-    }, [node, functions, dataTypes])
+    }, [node, functions, dataTypes, flowStore])
 
     const valueSuggestions = useValueSuggestions(types?.parameters?.[parameterIndex ?? 0])
     const refObjectSuggestions = useReferenceSuggestions(flowId, nodeId, parameterIndex)
@@ -79,5 +79,5 @@ export const useSuggestions = (
             ...refObjectSuggestions,
             ...functionSuggestions
         ].sort()
-    }, [flowId, nodeId, parameterIndex, refObjectSuggestions, functionSuggestions, types])
+    }, [valueSuggestions, refObjectSuggestions, functionSuggestions])
 }
