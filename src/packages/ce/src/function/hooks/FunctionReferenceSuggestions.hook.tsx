@@ -15,9 +15,6 @@ export const useReferenceSuggestions = (
     parameterIndex?: number,
 ): FunctionSuggestion[] => {
 
-    const workerRef = React.useRef<Worker>(null);
-    const [suggestions, setSuggestions] = React.useState<any[]>([])
-
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
     const functionStore = useStore(FunctionService)
@@ -25,6 +22,9 @@ export const useReferenceSuggestions = (
     const dataTypeStore = useStore(DatatypeService)
     const dataTypeService = useService(DatatypeService)
 
+    const workerRef = React.useRef<Worker>(null);
+    const [suggestions, setSuggestions] = React.useState<any[]>([])
+    const isFirstRun = React.useRef(true);
     const flow = React.useMemo(
         () => flowService.getById(flowId),
         [flowId, flowStore]
@@ -61,7 +61,9 @@ export const useReferenceSuggestions = (
                 functions,
                 dataTypes
             });
-        }, 100);
+        }, isFirstRun.current ? 0 : 500);
+
+        isFirstRun.current = false
 
         return () => clearTimeout(timeout);
     }, [flow, nodeId, parameterIndex, functions, dataTypes])
