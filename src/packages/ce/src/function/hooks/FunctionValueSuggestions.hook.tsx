@@ -5,17 +5,20 @@ import {
 import {useService, useStore} from "@code0-tech/pictor";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import React, {startTransition} from "react";
+import {FlowService} from "@edition/flow/services/Flow.service";
 
 export const useValueSuggestions = (
     type?: string
 ): FunctionSuggestion[] => {
 
-    const workerRef = React.useRef<Worker>(null);
-    const [suggestions, setSuggestions] = React.useState<any[]>([])
 
     const dataTypeStore = useStore(DatatypeService)
+    const flowStore = useStore(FlowService)
     const dataTypeService = useService(DatatypeService)
 
+    const workerRef = React.useRef<Worker>(null);
+    const [suggestions, setSuggestions] = React.useState<any[]>([])
+    const isFirstRun = React.useRef(true);
     const dataTypes = React.useMemo(() => dataTypeService.values(), [dataTypeStore]);
 
     React.useEffect(() => {
@@ -46,7 +49,9 @@ export const useValueSuggestions = (
                 type,
                 dataTypes
             });
-        }, 100);
+        }, isFirstRun.current ? 0 : 500);
+
+        isFirstRun.current = false
 
         return () => clearTimeout(timeout);
     }, [type, dataTypes])
