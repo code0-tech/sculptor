@@ -20,9 +20,6 @@ export const useSuggestions = (
 
     console.log("useSuggestions", {flowId, nodeId, parameterIndex})
 
-    const [types, setTypes] = React.useState<any>(null);
-    const workerRef = React.useRef<Worker>(null);
-
     const functionService = useService(FunctionService)
     const functionStore = useStore(FunctionService)
     const flowService = useService(FlowService)
@@ -30,13 +27,25 @@ export const useSuggestions = (
     const dataTypeStore = useStore(DatatypeService)
     const dataTypeService = useService(DatatypeService)
 
+    const isFirstRun = React.useRef(true);
+    const [types, setTypes] = React.useState<any>(null);
+    const workerRef = React.useRef<Worker>(null);
+
     const node = React.useMemo(
         () => flowService.getNodeById(flowId, nodeId),
         [flowId, flowStore, nodeId]
     )
 
-    const functions = React.useMemo(() => functionService.values(), [functionStore]);
-    const dataTypes = React.useMemo(() => dataTypeService.values(), [dataTypeStore]);
+    const functions = React.useMemo(
+        () => functionService.values(),
+        [functionStore]
+    )
+
+    const dataTypes = React.useMemo(
+        () => dataTypeService.values(),
+        [dataTypeStore]
+    )
+
 
     React.useEffect(() => {
         console.log("FunctionSuggestion worker init")
@@ -64,10 +73,14 @@ export const useSuggestions = (
                 functions,
                 dataTypes
             });
-        }, 100);
+        }, isFirstRun.current ? 0 : 500);
+
+        isFirstRun.current = false
 
         return () => clearTimeout(timeout);
     }, [node, functions, dataTypes, flowStore])
+
+    console.log(types, node)
 
     const valueSuggestions = useValueSuggestions(types?.parameters?.[parameterIndex ?? 0])
     const refObjectSuggestions = useReferenceSuggestions(flowId, nodeId, parameterIndex)
