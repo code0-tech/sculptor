@@ -17,16 +17,20 @@ import {
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
+import {useParams} from "next/navigation";
 
 export interface NodeBadgeComponentProps extends Omit<BadgeType, 'value' | 'children'> {
     value: NodeFunction | NodeFunctionIdWrapper
-    flowId: Flow['id']
     definition?: FunctionDefinition | FlowType
 }
 
 export const NodeBadgeComponent: React.FC<NodeBadgeComponentProps> = (props) => {
 
-    const {value, flowId, definition, ...rest} = props
+    const params = useParams()
+    const flowIndex = params.flowId as any as number
+    const flowId: Flow['id'] = `gid://sagittarius/Flow/${flowIndex}`
+
+    const {value, definition, ...rest} = props
 
     const functionService = definition || useService(FunctionService)
     const functionStore = definition || useStore(FunctionService)
