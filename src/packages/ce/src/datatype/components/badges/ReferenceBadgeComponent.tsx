@@ -3,16 +3,20 @@ import React from "react";
 import {NodeBadgeComponent} from "./NodeBadgeComponent";
 import {IconVariable} from "@tabler/icons-react";
 import {Badge, BadgeType, Flex, Text} from "@code0-tech/pictor";
+import {useParams} from "next/navigation";
 
 export interface ReferenceBadgeComponentProps extends Omit<BadgeType, 'value' | 'children'> {
     value: ReferenceValue
-    flowId: Flow['id']
     definition?: FunctionDefinition | FlowType
 }
 
 export const ReferenceBadgeComponent: React.FC<ReferenceBadgeComponentProps> = (props) => {
 
-    const {value, flowId, definition, ...rest} = props
+    const params = useParams()
+    const flowIndex = params.flowId as any as number
+    const flowId: Flow['id'] = `gid://sagittarius/Flow/${flowIndex}`
+
+    const {value, definition, ...rest} = props
     const content = React.useMemo(() => {
         if (flowId) {
             return <Flex align={"center"} display={"inline-flex"}>
