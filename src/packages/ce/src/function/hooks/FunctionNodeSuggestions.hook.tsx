@@ -19,6 +19,7 @@ export const useNodeSuggestions = (
     const dataTypeStore = useStore(DatatypeService)
     const dataTypeService = useService(DatatypeService)
 
+    const isFirstRun = React.useRef(true);
     const functions = React.useMemo(() => functionService.values(), [functionStore]);
     const dataTypes = React.useMemo(() => dataTypeService.values(), [dataTypeStore]);
 
@@ -48,7 +49,9 @@ export const useNodeSuggestions = (
                 functions,
                 dataTypes
             });
-        }, 100);
+        }, isFirstRun.current ? 0 : 500);
+
+        isFirstRun.current = false
 
         return () => clearTimeout(timeout);
     }, [type, functions, dataTypes])
