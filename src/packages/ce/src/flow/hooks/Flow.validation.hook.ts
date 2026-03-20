@@ -72,10 +72,10 @@ export const useFlowValidation = (
                 functions,
                 dataTypes
             });
-        }, 300); // Increased debounce to reduce load
+        }, 500);
 
         return () => clearTimeout(timeout);
-    }, [flow, functions, dataTypes, flowId, flowStore])
+    }, [flow, functions, dataTypes, flowStore])
 
     return validationResult
 }
