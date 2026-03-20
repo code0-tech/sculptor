@@ -2,12 +2,9 @@
 
 import React from "react";
 import {FlowFolderView} from "@edition/flow/views/FlowFolderView";
-import {
-    ResizableHandle,
-    ResizablePanel,
-    ResizablePanelGroup
-} from "@code0-tech/pictor/dist/components/resizable/Resizable";
+import {ResizableHandle, ResizablePanelGroup} from "@code0-tech/pictor/dist/components/resizable/Resizable";
 import {SidebarComponent} from "@core/components/SidebarComponent";
+import {WorkerProvider} from "@edition/flow/components/FlowWorkerProvider";
 
 interface ApplicationLayoutProps {
     children: React.ReactNode
@@ -20,7 +17,9 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children}) => {
             <FlowFolderView/>
         </SidebarComponent>
         <ResizableHandle/>
-        {children}
+        <WorkerProvider>
+            {children}
+        </WorkerProvider>
     </ResizablePanelGroup>
 }
 

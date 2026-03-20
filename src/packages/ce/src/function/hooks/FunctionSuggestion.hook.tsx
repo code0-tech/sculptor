@@ -8,6 +8,7 @@ import {FunctionSuggestion} from "@edition/function/components/suggestion/Functi
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
+import {useTypeExtractionAction} from "@edition/flow/components/FlowWorkerProvider";
 
 //TODO: deep type search
 //TODO: calculate FUNCTION_COMBINATION deepness max 2
@@ -25,9 +26,8 @@ export const useSuggestions = (
     const dataTypeStore = useStore(DatatypeService)
     const dataTypeService = useService(DatatypeService)
 
-    const isFirstRun = React.useRef(true);
+    const {execute} = useTypeExtractionAction()
     const [types, setTypes] = React.useState<any>(null);
-    const workerRef = React.useRef<Worker>(null);
 
     const node = React.useMemo(
         () => flowService.getNodeById(flowId, nodeId),
@@ -44,36 +44,20 @@ export const useSuggestions = (
         [dataTypeStore]
     )
 
-
-    React.useEffect(() => {
-        console.log("FunctionSuggestion worker init")
-        const currentWorker = new Worker(new URL("./FunctionTypesFromNode.worker.ts", import.meta.url));
-        workerRef.current = currentWorker;
-
-        currentWorker.onmessage = (event) => {
-            startTransition(() => {
-                setTypes(event.data);
-            })
-        }
-
-        return () => {
-            currentWorker.terminate();
-        };
-    }, [])
-
     React.useEffect(() => {
         console.log("Requesting suggestions for node", nodeId, "parameter", parameterIndex)
-        if (!workerRef.current || !node) return;
 
         const timeout = setTimeout(() => {
-            workerRef.current?.postMessage({
-                node,
-                functions,
-                dataTypes
-            });
-        }, isFirstRun.current ? 0 : 500);
-
-        isFirstRun.current = false
+            execute({
+                node: node!,
+                dataTypes: dataTypes,
+                functions: functions
+            }).then(value => {
+                startTransition(() => {
+                    setTypes(value)
+                })
+            })
+        }, 200);
 
         return () => clearTimeout(timeout);
     }, [...(node?.parameters?.nodes?.map(p => p?.value) ?? []), functions, dataTypes])

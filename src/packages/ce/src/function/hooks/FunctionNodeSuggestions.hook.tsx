@@ -6,52 +6,37 @@ import {useService, useStore} from "@code0-tech/pictor";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import React, {startTransition} from "react";
+import {useNodeSuggestionsAction} from "@edition/flow/components/FlowWorkerProvider";
 
 export const useNodeSuggestions = (
     type?: string,
 ): FunctionSuggestion[] => {
-
-    const workerRef = React.useRef<Worker>(null);
-    const [suggestions, setSuggestions] = React.useState<any[]>([])
 
     const functionStore = useStore(FunctionService)
     const functionService = useService(FunctionService)
     const dataTypeStore = useStore(DatatypeService)
     const dataTypeService = useService(DatatypeService)
 
-    const isFirstRun = React.useRef(true);
+    const [suggestions, setSuggestions] = React.useState<any[]>([])
+    const {execute} = useNodeSuggestionsAction()
+
     const functions = React.useMemo(() => functionService.values(), [functionStore]);
     const dataTypes = React.useMemo(() => dataTypeService.values(), [dataTypeStore]);
 
     React.useEffect(() => {
-        console.log("Node suggestion worker init")
-        const currentWorker = new Worker(new URL("./FunctionNodeSuggestions.worker.ts", import.meta.url));
-        workerRef.current = currentWorker;
-
-        currentWorker.onmessage = (event) => {
-            startTransition(() => {
-                setSuggestions(event.data);
-            })
-        }
-
-        return () => {
-            currentWorker.terminate();
-        };
-    }, [])
-
-    React.useEffect(() => {
         console.log("Requesting node suggestions for type", type)
-        if (!workerRef.current) return;
 
         const timeout = setTimeout(() => {
-            workerRef.current?.postMessage({
-                type,
+            execute({
+                type: type as string,
                 functions,
                 dataTypes
-            });
-        }, isFirstRun.current ? 0 : 500);
-
-        isFirstRun.current = false
+            }).then(value => {
+                startTransition(() => {
+                    setSuggestions(value as any[])
+                })
+            })
+        }, 200);
 
         return () => clearTimeout(timeout);
     }, [type, functions, dataTypes])

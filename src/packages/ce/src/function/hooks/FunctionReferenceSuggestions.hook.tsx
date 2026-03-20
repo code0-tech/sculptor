@@ -8,6 +8,7 @@ import {FunctionService} from "@edition/function/services/Function.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import React, {startTransition} from "react";
+import {useReferenceSuggestionsAction} from "@edition/flow/components/FlowWorkerProvider";
 
 export const useReferenceSuggestions = (
     flowId: Flow['id'],
@@ -22,9 +23,9 @@ export const useReferenceSuggestions = (
     const dataTypeStore = useStore(DatatypeService)
     const dataTypeService = useService(DatatypeService)
 
-    const workerRef = React.useRef<Worker>(null);
+    const {execute} = useReferenceSuggestionsAction()
     const [suggestions, setSuggestions] = React.useState<any[]>([])
-    const isFirstRun = React.useRef(true);
+
     const flow = React.useMemo(
         () => flowService.getById(flowId),
         [flowId, flowStore]
@@ -33,37 +34,22 @@ export const useReferenceSuggestions = (
     const dataTypes = React.useMemo(() => dataTypeService.values(), [dataTypeStore]);
 
     React.useEffect(() => {
-        console.log("Reference suggestion worker init")
-        const currentWorker = new Worker(new URL("./FunctionReferenceSuggestions.worker.ts", import.meta.url));
-        workerRef.current = currentWorker;
-
-        currentWorker.onmessage = (event) => {
-            startTransition(() => {
-                setSuggestions(event.data);
-            })
-        }
-
-        return () => {
-            currentWorker.terminate();
-        };
-    }, [])
-
-
-    React.useEffect(() => {
         console.log("Requesting reference suggestions for node", nodeId, "parameter", parameterIndex)
-        if (!workerRef.current || typeof parameterIndex != "number" || !flow) return;
+        if (typeof parameterIndex != "number" || !flow) return;
 
         const timeout = setTimeout(() => {
-            workerRef.current?.postMessage({
+            execute({
                 flow,
                 nodeId,
                 parameterIndex,
                 functions,
                 dataTypes
-            });
-        }, isFirstRun.current ? 0 : 500);
-
-        isFirstRun.current = false
+            }).then(value => {
+                startTransition(() => {
+                    setSuggestions(value as any[])
+                })
+            })
+        }, 200);
 
         return () => clearTimeout(timeout);
     }, [flow, nodeId, parameterIndex, functions, dataTypes])

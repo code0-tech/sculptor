@@ -5,51 +5,37 @@ import {
 import {useService, useStore} from "@code0-tech/pictor";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import React, {startTransition} from "react";
+import {useValueSuggestionsAction} from "@edition/flow/components/FlowWorkerProvider";
 
 export const useValueSuggestions = (
     type?: string
 ): FunctionSuggestion[] => {
 
-
     const dataTypeStore = useStore(DatatypeService)
     const dataTypeService = useService(DatatypeService)
 
-    const workerRef = React.useRef<Worker>(null);
+    const {execute} = useValueSuggestionsAction()
     const [suggestions, setSuggestions] = React.useState<any[]>([])
-    const isFirstRun = React.useRef(true);
+
     const dataTypes = React.useMemo(() => dataTypeService.values(), [dataTypeStore]);
 
     React.useEffect(() => {
-        console.log("Value suggestion worker init")
-        const currentWorker = new Worker(new URL("./FunctionValueSuggestions.worker.ts", import.meta.url));
-        workerRef.current = currentWorker;
-
-        currentWorker.onmessage = (event) => {
-            startTransition(() => {
-                setSuggestions(event.data);
-            })
-        }
-
-        return () => {
-            currentWorker.terminate();
-        };
-    }, [])
-
-    React.useEffect(() => {
         console.log("Requesting value suggestions for type", type)
-        if (!type || !workerRef.current) {
+        if (!type) {
             setSuggestions([])
             return;
         }
 
         const timeout = setTimeout(() => {
-            workerRef.current?.postMessage({
+            execute({
                 type,
                 dataTypes
-            });
-        }, isFirstRun.current ? 0 : 500);
-
-        isFirstRun.current = false
+            }).then(value => {
+                startTransition(() => {
+                    setSuggestions(value as any[])
+                })
+            })
+        }, 200);
 
         return () => clearTimeout(timeout);
     }, [type, dataTypes])
