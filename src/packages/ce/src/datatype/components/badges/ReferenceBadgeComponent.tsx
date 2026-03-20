@@ -23,7 +23,7 @@ export const ReferenceBadgeComponent: React.FC<ReferenceBadgeComponentProps> = (
                 <NodeBadgeComponent definition={definition} value={{
                     id: value.nodeFunctionId,
                     __typename: "NodeFunctionIdWrapper"
-                }} flowId={flowId}/>
+                }}/>
                 {"inputTypeIdentifier" in value && value.inputTypeIdentifier ? "." + value.inputTypeIdentifier : ""}
                 {value.referencePath ? "." + (value.referencePath?.map(path => path.path).join(".") ?? "") : ""}
             </Flex>

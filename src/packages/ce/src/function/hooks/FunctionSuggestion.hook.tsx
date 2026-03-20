@@ -18,8 +18,6 @@ export const useSuggestions = (
     parameterIndex?: number
 ): FunctionSuggestion[] => {
 
-    console.log("useSuggestions", {flowId, nodeId, parameterIndex})
-
     const functionService = useService(FunctionService)
     const functionStore = useStore(FunctionService)
     const flowService = useService(FlowService)
@@ -78,9 +76,7 @@ export const useSuggestions = (
         isFirstRun.current = false
 
         return () => clearTimeout(timeout);
-    }, [node, functions, dataTypes, flowStore])
-
-    console.log(types, node)
+    }, [...(node?.parameters?.nodes?.map(p => p?.value) ?? []), functions, dataTypes])
 
     const valueSuggestions = useValueSuggestions(types?.parameters?.[parameterIndex ?? 0])
     const refObjectSuggestions = useReferenceSuggestions(flowId, nodeId, parameterIndex)

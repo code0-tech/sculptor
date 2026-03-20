@@ -5,7 +5,6 @@ import {
 import {useService, useStore} from "@code0-tech/pictor";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import React, {startTransition} from "react";
-import {FlowService} from "@edition/flow/services/Flow.service";
 
 export const useValueSuggestions = (
     type?: string
@@ -13,7 +12,6 @@ export const useValueSuggestions = (
 
 
     const dataTypeStore = useStore(DatatypeService)
-    const flowStore = useStore(FlowService)
     const dataTypeService = useService(DatatypeService)
 
     const workerRef = React.useRef<Worker>(null);
