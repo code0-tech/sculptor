@@ -88,11 +88,11 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
                     </div>
                 case "ReferenceValue":
                     return <div style={{...decorationStyle, display: "inline-block"}}>
-                        <ReferenceBadgeComponent flowId={props.data.flowId} value={nodeParameter.value}/>
+                        <ReferenceBadgeComponent value={nodeParameter.value}/>
                     </div>
                 case "NodeFunctionIdWrapper":
                     return <div style={{...decorationStyle, display: "inline-block"}}>
-                        <NodeBadgeComponent value={nodeParameter.value} flowId={props.data.flowId}/>
+                        <NodeBadgeComponent value={nodeParameter.value}/>
                         <Handle
                             key={parameterIndex}
                             type={"target"}
@@ -118,7 +118,7 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
         if (!node?.id) return
         console.log("register", node.id)
         fileTabsService.registerTab({
-            id: id || node.id,
+            id: node.id,
             active: false,
             closeable: true,
             children: <>
@@ -160,6 +160,8 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
             color={"primary"} style={{
             ...(isReferenced === true ? {boxShadow: `0 0 5rem 0 ${withAlpha(data.color, 0.25)}`} : {}),
         }}>
+
+            {node?.id}
 
             <Handle
                 isConnectable={false}
