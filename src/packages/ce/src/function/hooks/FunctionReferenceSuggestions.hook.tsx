@@ -52,7 +52,7 @@ export const useReferenceSuggestions = (
         }, 200);
 
         return () => clearTimeout(timeout);
-    }, [flow, nodeId, parameterIndex, functions, dataTypes])
+    }, [flow?.editedAt, nodeId, parameterIndex, functions, dataTypes])
 
     return React.useMemo(() => suggestions.map(suggestion => {
 
