@@ -20,7 +20,6 @@ export const useValueSuggestions = (
     const dataTypes = React.useMemo(() => dataTypeService.values(), [dataTypeStore]);
 
     React.useEffect(() => {
-        console.log("Requesting value suggestions for type", type)
         if (!type) {
             setSuggestions([])
             return;

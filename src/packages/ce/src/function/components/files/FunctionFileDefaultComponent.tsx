@@ -29,13 +29,6 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
     const fileTabsService = useService(FileTabsService)
     const validation = useFlowValidation(flowId)
 
-    React.useEffect(() => {
-        console.log("register tab", node.id)
-        return () => {
-            console.log("unregister tab", node.id)
-        }
-    }, [])
-
     const changedParameters = React.useRef<Set<number>>(new Set())
     const [, startTransition] = React.useTransition()
 

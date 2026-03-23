@@ -24,8 +24,6 @@ export const useNodeSuggestions = (
     const dataTypes = React.useMemo(() => dataTypeService.values(), [dataTypeStore]);
 
     React.useEffect(() => {
-        console.log("Requesting node suggestions for type", type)
-
         const timeout = setTimeout(() => {
             execute({
                 type: type as string,

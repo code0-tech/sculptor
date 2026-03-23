@@ -45,8 +45,6 @@ export const useSuggestions = (
     )
 
     React.useEffect(() => {
-        console.log("Requesting suggestions for node", nodeId, "parameter", parameterIndex)
-
         const timeout = setTimeout(() => {
             execute({
                 node: node!,

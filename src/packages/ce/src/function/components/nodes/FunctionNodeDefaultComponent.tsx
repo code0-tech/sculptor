@@ -116,7 +116,6 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
 
     React.useEffect(() => {
         if (!node?.id) return
-        console.log("register", node.id)
         fileTabsService.registerTab({
             id: node.id,
             active: false,
@@ -127,9 +126,6 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
             </>,
             content: <FunctionFileDefaultComponent flowId={props.data.flowId} node={node}/>
         })
-        return () => {
-            console.log("unregister", node.id)
-        }
     }, [])
 
     const isReferenced = React.useMemo(() => {

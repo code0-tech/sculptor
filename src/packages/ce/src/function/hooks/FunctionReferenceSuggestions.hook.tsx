@@ -34,7 +34,6 @@ export const useReferenceSuggestions = (
     const dataTypes = React.useMemo(() => dataTypeService.values(), [dataTypeStore]);
 
     React.useEffect(() => {
-        console.log("Requesting reference suggestions for node", nodeId, "parameter", parameterIndex)
         if (typeof parameterIndex != "number" || !flow) return;
 
         const timeout = setTimeout(() => {
