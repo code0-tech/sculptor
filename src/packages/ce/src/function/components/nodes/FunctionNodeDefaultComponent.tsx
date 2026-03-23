@@ -161,8 +161,6 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
             ...(isReferenced === true ? {boxShadow: `0 0 5rem 0 ${withAlpha(data.color, 0.25)}`} : {}),
         }}>
 
-            {node?.id}
-
             <Handle
                 isConnectable={false}
                 draggable={false}
