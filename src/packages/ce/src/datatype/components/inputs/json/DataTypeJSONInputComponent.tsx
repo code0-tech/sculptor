@@ -90,7 +90,11 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
     }
 
     const handleClear = React.useCallback(() => {
-        setValue(initialNullValue)
+        setValue({
+            __typename: "LiteralValue",
+            value: null
+        })
+        setEditEntry(null)
         // @ts-ignore
         onChange?.()
     }, [initialNullValue])
@@ -99,7 +103,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
         <>
             {value?.__typename === "LiteralValue" && (
                 <DataTypeJSONInputEditDialogComponent
-                    key={String(editDialogOpen)}
+                    key={String(value)}
                     open={editDialogOpen}
                     entry={editEntry}
                     value={value as any}
