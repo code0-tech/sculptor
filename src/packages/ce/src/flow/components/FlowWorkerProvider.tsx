@@ -12,6 +12,7 @@ type FlowWorkerActions =
     | "reference_suggestions"
     | "node_suggestions"
     | "type_extraction"
+    | "value_extraction"
 
 interface FlowWorkerValidationPayload {
     flow: Flow
@@ -44,12 +45,18 @@ interface FlowWorkerTypeExtractionPayload {
     dataTypes: DataType[]
 }
 
+interface FlowWorkerValueExtractionPayload {
+    type: string
+    dataTypes: DataType[]
+}
+
 type FlowWorkerPayload =
     FlowWorkerValidationPayload
     | FlowWorkerValueSuggestionsPayload
     | FlowWorkerReferenceSuggestionsPayload
     | FlowWorkerNodeSuggestionsPayload
     | FlowWorkerTypeExtractionPayload
+    | FlowWorkerValueExtractionPayload
 
 interface WorkerContextType {
     calculate: (action: FlowWorkerActions, payload: FlowWorkerPayload) => Promise<any>
@@ -145,3 +152,6 @@ export const useNodeSuggestionsAction = () =>
 
 export const useTypeExtractionAction = () =>
     useWorkerAction<any[], FlowWorkerTypeExtractionPayload>("type_extraction");
+
+export const useValueExtractionAction = () =>
+    useWorkerAction<any[], FlowWorkerValueExtractionPayload>("value_extraction");

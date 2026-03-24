@@ -5,7 +5,8 @@ import {InputProps, useService, useStore} from "@code0-tech/pictor";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FunctionService} from "@edition/function/services/Function.service";
-import {getTypesFromNode, getTypeVariant} from "@code0-tech/triangulum";
+import {DataTypeVariant, getTypesFromNode, getTypeVariant} from "@code0-tech/triangulum";
+import {DataTypeJSONInputComponent} from "@edition/datatype/components/inputs/json/DataTypeJSONInputComponent";
 
 export interface DataTypeInputComponentProps extends Omit<InputProps<any | null>, "wrapperComponent" | "type"> {
     flowId: Flow['id']
@@ -22,7 +23,9 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
     const dataTypeStore = useStore(DatatypeService)
+    const dataTypeService = useService(DatatypeService)
     const functionStore = useStore(FunctionService)
+    const functionService = useService(FunctionService)
 
     const node = React.useMemo(
         () => flowService.getNodeById(flowId, nodeId),
@@ -30,17 +33,19 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
     )
 
     const types = React.useMemo(
-        () => getTypesFromNode(node!, functionStore, dataTypeStore),
+        () => getTypesFromNode(node, functionService.values(), dataTypeService.values()),
         [node, functionStore, dataTypeStore]
     )
 
     const dataTypeVariant = React.useMemo(
-        () => getTypeVariant(types.parameters[parameterIndex], dataTypeStore),
+        () => getTypeVariant(types.parameters[parameterIndex], dataTypeService.values()),
         [dataTypeStore, types]
     )
 
+    console.log(dataTypeVariant, types)
+
     switch (dataTypeVariant) {
-        /*case DataTypeVariant.ARRAY:
+        case DataTypeVariant.ARRAY:
         case DataTypeVariant.OBJECT:
             return <DataTypeJSONInputComponent
                 flowId={flowId}
@@ -48,7 +53,6 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
                 parameterIndex={parameterIndex}
                 {...rest}
             />
-            */
         default:
             return <DataTypeTextInputComponent
                 flowId={flowId}

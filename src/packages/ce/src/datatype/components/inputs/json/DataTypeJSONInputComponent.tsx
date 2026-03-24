@@ -24,6 +24,7 @@ import {DataTypeJSONInputEditDialogComponent} from "@edition/datatype/components
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FunctionService} from "@edition/function/services/Function.service";
+import {useValue} from "@edition/datatype/hooks/DataType.value.hook";
 
 export interface EditableJSONEntry {
     key: string
@@ -45,6 +46,8 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
     const functionService = useService(FunctionService)
     const functionStore = useStore(FunctionService)
 
+    const clearValue = useValue(flowId, nodeId, parameterIndex)
+
     const node = React.useMemo(
         () => flowService.getNodeById(flowId, nodeId),
         [flowStore, flowId, nodeId]
@@ -61,21 +64,21 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
     )
 
     const parameterDefinition = React.useMemo(
-        () => functionDefinition?.parameterDefinitions?.find(pd => pd.id === parameter?.parameterDefinition?.id),
+        () => functionDefinition?.parameterDefinitions?.nodes?.find(pd => pd?.id === parameter?.parameterDefinition?.id),
         [functionDefinition, parameter]
     )
 
-    const initialValue: NodeParameterValue | undefined = React.useMemo(() => {
+    const initialValue: NodeParameterValue | null = (() => {
         if (!parameter?.value || (parameter?.value?.__typename === "LiteralValue" && parameter.value.value == null)) {
-            return dataTypeService.getValueFromType(parameterDefinition?.dataTypeIdentifier!)
+            return clearValue
         }
         return parameter?.value
-    }, [parameter, parameterDefinition, dataTypeStore])
+    })()
 
 
     const suggestions = useSuggestions(flowId, nodeId, parameterIndex)
 
-    const [value, setValue] = React.useState<NodeParameterValue | NodeFunction | undefined>(initialValue)
+    const [value, setValue] = React.useState<NodeParameterValue | NodeFunction | null>(initialValue)
     const [editDialogOpen, setEditDialogOpen] = React.useState(false)
     const [editEntry, setEditEntry] = React.useState<EditableJSONEntry | null>(null)
     const [collapsedState, setCollapsedStateRaw] = React.useState<Record<string, boolean>>({})
@@ -90,7 +93,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
     }
 
     const handleClear = React.useCallback(() => {
-        setValue(dataTypeService.getValueFromType(parameterDefinition?.dataTypeIdentifier!))
+        setValue(clearValue)
     }, [parameter, parameterDefinition, dataTypeStore])
 
     React.useEffect(() => {
@@ -108,7 +111,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                     entry={editEntry}
                     value={value as any}
                     onOpenChange={open => setEditDialogOpen(open)}
-                    onObjectChange={v => setValue(v ?? undefined)}
+                    onObjectChange={v => setValue(v ?? null)}
                 />
             )}
             <InputLabel>{title}</InputLabel>
@@ -138,9 +141,9 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                 </Flex>
                 <Card paddingSize="xs" mt={0.7} mb={-0.55} mx={-0.55}>
                     {value?.__typename === "NodeFunction" || value?.__typename === "NodeFunctionIdWrapper" ? (
-                        <NodeBadgeComponent value={value} flowId={flowId}/>
+                        <NodeBadgeComponent value={value}/>
                     ) : value?.__typename === "ReferenceValue" ? (
-                        <ReferenceBadgeComponent value={value} flowId={flowId}/>
+                        <ReferenceBadgeComponent value={value}/>
                     ) : (
                         <DataTypeJSONInputTreeComponent
                             object={value as any}

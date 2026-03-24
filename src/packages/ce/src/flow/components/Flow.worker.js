@@ -2,7 +2,7 @@ import {
     getFlowValidation,
     getNodeSuggestions,
     getReferenceSuggestions,
-    getTypesFromNode,
+    getTypesFromNode, getValueFromType,
     getValueSuggestions
 } from "@code0-tech/triangulum";
 import {InspectionSeverity} from "../../../../core/src/util/inspection";
@@ -43,6 +43,9 @@ addEventListener("message", (event) => {
                 break;
             case 'type_extraction':
                 result = getTypesFromNode(payload.node, payload.functions, payload.dataTypes);
+                break;
+            case 'value_extraction':
+                result = getValueFromType(payload.type, payload.dataTypes);
                 break;
         }
         // Wichtig: id mitsenden!
