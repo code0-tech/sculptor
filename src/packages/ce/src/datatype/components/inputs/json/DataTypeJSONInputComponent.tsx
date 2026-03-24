@@ -20,9 +20,10 @@ import {
 } from "@code0-tech/pictor";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import {FunctionSuggestionMenuComponent} from "@edition/function/components/suggestion/FunctionSuggestionMenuComponent";
-import {DataTypeJSONInputEditDialogComponent} from "@edition/datatype/components/inputs/json/DataTypeJSONInputEditDialogComponent";
+import {
+    DataTypeJSONInputEditDialogComponent
+} from "@edition/datatype/components/inputs/json/DataTypeJSONInputEditDialogComponent";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {useValue} from "@edition/datatype/hooks/DataType.value.hook";
 
@@ -41,22 +42,19 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
 
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
-    const dataTypeService = useService(DatatypeService)
-    const dataTypeStore = useStore(DatatypeService)
     const functionService = useService(FunctionService)
     const functionStore = useStore(FunctionService)
 
-    const clearValue = useValue(flowId, nodeId, parameterIndex)
+    const initialNullValue = useValue(flowId, nodeId, parameterIndex)
+
+    if (nodeId?.includes("31")) console.log(initialNullValue)
 
     const node = React.useMemo(
         () => flowService.getNodeById(flowId, nodeId),
         [flowStore, flowId, nodeId]
     )
 
-    const parameter = React.useMemo(
-        () => node?.parameters?.nodes?.[parameterIndex],
-        [node, parameterIndex]
-    )
+    const parameter = node?.parameters?.nodes?.[parameterIndex]
 
     const functionDefinition = React.useMemo(
         () => functionService.getById(node?.functionDefinition?.id!),
@@ -68,13 +66,12 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
         [functionDefinition, parameter]
     )
 
-    const initialValue: NodeParameterValue | null = (() => {
+    const initialValue: NodeParameterValue | null = React.useMemo(() => {
         if (!parameter?.value || (parameter?.value?.__typename === "LiteralValue" && parameter.value.value == null)) {
-            return clearValue
+            return initialNullValue
         }
         return parameter?.value
-    })()
-
+    }, [initialNullValue])
 
     const suggestions = useSuggestions(flowId, nodeId, parameterIndex)
 
@@ -93,14 +90,10 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
     }
 
     const handleClear = React.useCallback(() => {
-        setValue(clearValue)
-    }, [parameter, parameterDefinition, dataTypeStore])
-
-    React.useEffect(() => {
-        formValidation?.setValue(value)
+        setValue(initialNullValue)
         // @ts-ignore
         onChange?.()
-    }, [value])
+    }, [initialNullValue])
 
     return (
         <>
@@ -111,7 +104,12 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                     entry={editEntry}
                     value={value as any}
                     onOpenChange={open => setEditDialogOpen(open)}
-                    onObjectChange={v => setValue(v ?? null)}
+                    onObjectChange={v => {
+                        formValidation?.setValue(v)
+                        setValue(v ?? null)
+                        // @ts-ignore
+                        onChange?.()
+                    }}
                 />
             )}
             <InputLabel>{title}</InputLabel>
@@ -123,12 +121,17 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                     </Flex>
                     <ButtonGroup color={"primary"}>
                         <FunctionSuggestionMenuComponent suggestions={suggestions}
-                                                         onSuggestionSelect={suggestion => setValue(suggestion.value)}
+                                                         onSuggestionSelect={suggestion => {
+                                                             formValidation?.setValue(suggestion.value)
+                                                             setValue(suggestion.value)
+                                                             // @ts-ignore
+                                                             onChange?.()
+                                                         }}
                                                          triggerContent={<Button paddingSize="xxs" variant="filled"
-                                                                        color="secondary"
-                                                                        onClick={() => setEditDialogOpen(true)}>
-                                                    <IconAlignLeft size={13}/>
-                                                </Button>}/>
+                                                                                 color="secondary"
+                                                                                 onClick={() => setEditDialogOpen(true)}>
+                                                             <IconAlignLeft size={13}/>
+                                                         </Button>}/>
                         <Button paddingSize="xxs" variant="filled" color="secondary"
                                 onClick={() => setEditDialogOpen(true)}>
                             <IconEdit size={13}/>

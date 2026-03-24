@@ -68,7 +68,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                 const nodeParameter = node.parameters?.nodes?.find(p => p?.parameterDefinition?.id === parameterDefinition?.id)
                 const syntaxSegment = values[parameterIndex]
                 const previousValue = nodeParameter?.value as NodeParameterValue
-                const syntaxValue = syntaxSegment?.[0]?.value ?? syntaxSegment?.value ?? null as NodeFunction | LiteralValue | ReferenceValue | null
+                const syntaxValue = syntaxSegment?.[0]?.value ?? syntaxSegment?.value ?? syntaxSegment ?? null as NodeFunction | LiteralValue | ReferenceValue | null
 
                 if (previousValue && previousValue.__typename === "NodeFunctionIdWrapper" && previousValue.id) {
                     const linkedNodes = flowService.getLinkedNodesById(flowId, previousValue.id)

@@ -42,8 +42,6 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
         [dataTypeStore, types]
     )
 
-    console.log(dataTypeVariant, types)
-
     switch (dataTypeVariant) {
         case DataTypeVariant.ARRAY:
         case DataTypeVariant.OBJECT:
