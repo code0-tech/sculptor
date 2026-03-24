@@ -3,7 +3,7 @@ import React, {CSSProperties, memo} from "react";
 import "./FunctionNodeComponent.style.scss";
 import {FunctionNodeComponentProps} from "./FunctionNodeComponent";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
-import {Badge, Card, Flex, Text, underlineBySeverity, useService, useStore as usePictorStore} from "@code0-tech/pictor";
+import {Badge, Card, Flex, Text, useService, useStore as usePictorStore} from "@code0-tech/pictor";
 import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
 import {IconNote, IconVariable} from "@tabler/icons-react";
 import {FlowService} from "@edition/flow/services/Flow.service";
@@ -13,6 +13,7 @@ import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/Refer
 import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeComponent";
 import {FunctionFileDefaultComponent} from "@edition/function/components/files/FunctionFileDefaultComponent";
 import {NodeFunction} from "@code0-tech/sagittarius-graphql-types";
+import {underlineBySeverity} from "@core/util/inspection";
 
 export type FunctionNodeDefaultComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
 
