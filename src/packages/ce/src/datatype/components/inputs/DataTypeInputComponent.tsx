@@ -5,7 +5,7 @@ import {InputProps, useService, useStore} from "@code0-tech/pictor";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FunctionService} from "@edition/function/services/Function.service";
-import {DataTypeVariant, getTypesFromNode, getTypeVariant} from "@code0-tech/triangulum";
+import {DataTypeVariant, getTypesFromFunction, getTypesFromNode, getTypeVariant} from "@code0-tech/triangulum";
 import {DataTypeJSONInputComponent} from "@edition/datatype/components/inputs/json/DataTypeJSONInputComponent";
 
 export interface DataTypeInputComponentProps extends Omit<InputProps<any | null>, "wrapperComponent" | "type"> {
@@ -32,9 +32,14 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
         [flowStore, flowId, nodeId]
     )
 
+    const functionDefinition = React.useMemo(
+        () => functionService.getById(node?.functionDefinition?.id),
+        [functionStore, node]
+    )
+
     const types = React.useMemo(
-        () => getTypesFromNode(node, functionService.values(), dataTypeService.values()),
-        [node, functionStore, dataTypeStore]
+        () => getTypesFromFunction(functionDefinition!),
+        [functionDefinition]
     )
 
     const dataTypeVariant = React.useMemo(
