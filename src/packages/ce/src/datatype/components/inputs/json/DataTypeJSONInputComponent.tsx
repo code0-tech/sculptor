@@ -105,7 +105,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
         <>
             {value?.__typename === "LiteralValue" && (
                 <DataTypeJSONInputEditDialogComponent
-                    key={JSON.stringify(value)}
+                    key={`edit-dialog-${editEntry?.path.join("-")}-${editDialogOpen}`}
                     open={editDialogOpen}
                     entry={editEntry}
                     value={value as any}
