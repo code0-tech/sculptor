@@ -13,8 +13,13 @@ export const LiteralBadgeComponent: React.FC<LiteralBadgeComponentProps> = (prop
     return <Badge style={{verticalAlign: "middle"}}
                   color={"secondary"}
                   {...rest}>
-        <Text size={"sm"}>
-            {String(value.value)}
+        <Text size={"sm"} style={{
+            maxWidth: "50px",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+        }}>
+            {JSON.stringify(value.value)}
         </Text>
     </Badge>
 }
