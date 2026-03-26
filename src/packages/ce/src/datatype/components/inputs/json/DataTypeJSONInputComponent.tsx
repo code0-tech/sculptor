@@ -47,8 +47,6 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
 
     const initialNullValue = useValue(flowId, nodeId, parameterIndex)
 
-    if (nodeId?.includes("31")) console.log(initialNullValue)
-
     const node = React.useMemo(
         () => flowService.getNodeById(flowId, nodeId),
         [flowStore, flowId, nodeId]
@@ -90,6 +88,10 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
     }
 
     const handleClear = React.useCallback(() => {
+        formValidation?.setValue({
+            __typename: "LiteralValue",
+            value: null
+        })
         setValue({
             __typename: "LiteralValue",
             value: null
@@ -103,7 +105,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
         <>
             {value?.__typename === "LiteralValue" && (
                 <DataTypeJSONInputEditDialogComponent
-                    key={String(value)}
+                    key={JSON.stringify(value)}
                     open={editDialogOpen}
                     entry={editEntry}
                     value={value as any}

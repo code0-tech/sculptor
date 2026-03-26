@@ -58,7 +58,7 @@ export const useSuggestions = (
         }, 200);
 
         return () => clearTimeout(timeout);
-    }, [...(node?.parameters?.nodes?.map(p => p?.value) ?? []), functions, dataTypes])
+    }, [(node?.parameters?.nodes?.map(p => p?.value) ?? []), functions, dataTypes])
 
     const valueSuggestions = useValueSuggestions(types?.parameters?.[parameterIndex ?? 0])
     const refObjectSuggestions = useReferenceSuggestions(flowId, nodeId, parameterIndex)

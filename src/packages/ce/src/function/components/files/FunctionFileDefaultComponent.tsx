@@ -131,18 +131,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                                         title={title}
                                         description={description}
                                         clearable
-                                        onSuggestionSelect={
-                                            () => {
-                                                changedParameters.current.add(index)
-                                                validate()
-                                            }
-                                        }
                                         onChange={() => {
-                                            //TODO this should be debounced
-                                            changedParameters.current.add(index)
-                                            validate()
-                                        }}
-                                        onKeyUp={() => {
                                             //TODO this should be debounced
                                             changedParameters.current.add(index)
                                             validate()
