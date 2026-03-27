@@ -5,35 +5,6 @@ fragment DataTypeRule on DataTypeRule {
     updatedAt
     createdAt
     config {
-        ... on DataTypeRulesContainsKeyConfig {
-            __typename
-            dataTypeIdentifierId
-            key
-        }
-        ... on DataTypeRulesContainsTypeConfig {
-            __typename
-            dataTypeIdentifierId
-        }
-        ... on DataTypeRulesParentTypeConfig {
-            __typename
-            dataTypeIdentifierId
-        }
-        ... on DataTypeRulesReturnTypeConfig {
-            __typename
-            dataTypeIdentifierId
-        }
-        ... on DataTypeRulesInputTypesConfig {
-            __typename
-            inputTypes {
-                __typename
-                inputIdentifier
-                dataTypeIdentifierId
-            }
-        }
-        ... on DataTypeRulesItemOfCollectionConfig {
-            __typename
-            items
-        }
         ... on DataTypeRulesNumberRangeConfig {
             __typename
             from

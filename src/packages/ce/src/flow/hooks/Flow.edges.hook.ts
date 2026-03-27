@@ -5,6 +5,7 @@ import {hashToColor, useService, useStore} from "@code0-tech/pictor";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
+import {DataTypeVariant, getTypesFromFunction, getTypesFromNode, getTypeVariant} from "@code0-tech/triangulum";
 
 // @ts-ignore
 export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], projectId?: NamespaceProject['id']): Edge<DFlowEdgeDataProps>[] => {
@@ -87,15 +88,16 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                 }
             }
 
+            const types = getTypesFromFunction(functionService.getById(node.functionDefinition?.id)!);
+
             node.parameters?.nodes?.forEach((param, index) => {
                 const parameterValue = param?.value;
-                const parameterDefinition = functionService.getById(node.functionDefinition?.id!!)?.parameterDefinitions?.find(p => p.id === param?.parameterDefinition?.id);
-                const parameterDataTypeIdentifier = parameterDefinition?.dataTypeIdentifier;
-                const parameterDataType = parameterDataTypeIdentifier ? dataTypeService.getDataType(parameterDataTypeIdentifier) : undefined;
-
+                const parameterDefinition = functionService.getById(node.functionDefinition?.id!!)?.parameterDefinitions?.nodes?.find(p => p?.id === param?.parameterDefinition?.id);
+                const variant = getTypeVariant(types.parameters[index], dataTypeService.values());
                 if (!parameterValue) return
 
-                if (parameterDataType?.variant === "NODE") {
+                //@ts-ignore
+                if (variant === DataTypeVariant.NODE) {
                     if (parameterValue && parameterValue.__typename === "NodeFunctionIdWrapper") {
 
                         const groupId = `${node.id}-group-${idCounter++}`;

@@ -1,57 +1,51 @@
-import React from "react";
-import type {
-    DataTypeIdentifier,
-    DataTypeRulesItemOfCollectionConfig,
-    DataTypeRulesNumberRangeConfig
-} from "@code0-tech/sagittarius-graphql-types";
-import {FunctionSuggestion, FunctionSuggestionType} from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
+import {
+    FunctionSuggestion,
+    FunctionSuggestionType
+} from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
 import {useService, useStore} from "@code0-tech/pictor";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
+import React, {startTransition} from "react";
+import {useValueSuggestionsAction} from "@edition/flow/components/FlowWorkerProvider";
 
-export const useValueSuggestions = (dataTypeIdentifier?: DataTypeIdentifier): FunctionSuggestion[] => {
-    const dataTypeService = useService(DatatypeService)
+export const useValueSuggestions = (
+    type?: string
+): FunctionSuggestion[] => {
+
     const dataTypeStore = useStore(DatatypeService)
+    const dataTypeService = useService(DatatypeService)
 
-    const dataType = React.useMemo(() => (
-        dataTypeIdentifier ? dataTypeService?.getDataType(dataTypeIdentifier) : undefined
-    ), [dataTypeIdentifier, dataTypeService, dataTypeStore])
+    const {execute} = useValueSuggestionsAction()
+    const [suggestions, setSuggestions] = React.useState<any[]>([])
 
-    return React.useMemo(() => {
-        if (!dataType) return []
+    const dataTypes = React.useMemo(() => dataTypeService.values(), [dataTypeStore]);
 
-        const suggestions: FunctionSuggestion[] = []
-        dataType.rules?.nodes?.forEach(rule => {
-            if (rule?.variant === "ITEM_OF_COLLECTION") {
-                (rule.config as DataTypeRulesItemOfCollectionConfig)!!.items?.forEach(value => {
-                    suggestions.push({
-                        path: [],
-                        type: FunctionSuggestionType.VALUE,
-                        displayText: [value.toString()],
-                        value: {
-                            __typename: "LiteralValue",
-                            value: value
-                        },
-                    })
+    React.useEffect(() => {
+        if (!type) {
+            setSuggestions([])
+            return;
+        }
+
+        const timeout = setTimeout(() => {
+            execute({
+                type,
+                dataTypes
+            }).then(value => {
+                startTransition(() => {
+                    setSuggestions(value as any[])
                 })
-            } else if (rule?.variant === "NUMBER_RANGE") {
-                const config: DataTypeRulesNumberRangeConfig = rule.config as DataTypeRulesNumberRangeConfig
-                if (config.from === null || config.from === undefined) return
-                if (config.to === null || config.to === undefined) return
+            })
+        }, 200);
 
-                for (let i = config.from; i <= config.to; i += ((config.steps ?? 1) <= 0 ? 1 : (config.steps ?? 1))) {
-                    suggestions.push({
-                        path: [],
-                        type: FunctionSuggestionType.VALUE,
-                        displayText: [i.toString() ?? ""],
-                        value: {
-                            __typename: "LiteralValue",
-                            value: String(i)
-                        },
-                    })
-                }
-            }
-        })
+        return () => clearTimeout(timeout);
+    }, [type, dataTypes])
 
-        return suggestions
-    }, [dataType])
+    return React.useMemo(() => suggestions.map(suggestion => {
+
+        return {
+            path: [],
+            type: FunctionSuggestionType.VALUE,
+            displayText: [suggestion.value as string],
+            value: suggestion,
+        }
+    }), [suggestions]);
 }

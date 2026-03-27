@@ -74,16 +74,6 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
 
                     firstSetting: 50,
                     afterSetting: null,
-
-                    // firstInputDataTypeIdentifier: 50,
-                    // afterInputDataTypeIdentifier: null,
-                    // firstInputRule: 50,
-                    // afterInputRule: null,
-                    //
-                    // firstReturnDataTypeIdentifier: 50,
-                    // afterReturnDataTypeIdentifier: null,
-                    // firstReturnRule: 50,
-                    // afterReturnRule: null
                 }
             }).then(res => {
                 const nodes = res.data?.namespace?.project?.flows?.nodes ?? []
@@ -131,18 +121,18 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
 
     getLinkedNodesById(flowId: FlowView['id'], nodeId: NodeFunction['id']): NodeFunction[] {
         const parentNode = this.getNodeById(flowId, nodeId)
-        const nextNodes = parentNode ? this.getLinkedNodesById(flowId, parentNode.nextNodeId) : []
+        //const nextNodes = parentNode ? this.getLinkedNodesById(flowId, parentNode.nextNodeId) : []
         const parameterNodes: NodeFunction[] = []
         parentNode?.parameters?.nodes?.forEach(p => {
             if (p?.value?.__typename === "NodeFunctionIdWrapper") {
                 const parameterNode = this.getNodeById(flowId, (p.value as NodeFunctionIdWrapper)?.id!!)
                 if (parameterNode) {
                     parameterNodes.push(parameterNode)
-                    parameterNodes.push(...(parameterNode ? this.getLinkedNodesById(flowId, parameterNode.nextNodeId) : []))
+                    //parameterNodes.push(...(parameterNode ? this.getLinkedNodesById(flowId, parameterNode.nextNodeId) : []))
                 }
             }
         })
-        return [...(parentNode ? [parentNode] : []), ...parameterNodes, ...nextNodes]
+        return [...(parentNode ? [parentNode] : []), ...parameterNodes]
     }
 
     getNodeById(flowId: FlowView['id'], nodeId: NodeFunction['id']): NodeFunction | undefined {
@@ -152,9 +142,10 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
     getPayloadById(flowId: FlowView['id']): FlowInput {
         const flow = this.getById(flowId)
 
-        return {
+        const payload: FlowInput = {
             name: flow?.name!,
             type: flow?.type?.id!,
+            inputType: flow?.inputType,
             settings: flow?.settings?.nodes?.map(setting => {
                 return {
                     flowSettingIdentifier: setting?.flowSettingIdentifier!,
@@ -179,7 +170,6 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
 
                         case "ReferenceValue": {
                             const v = parameter.value as ReferenceValue
-                            console.log(v)
                             value = {
                                 referenceValue: {
                                     ...(v.nodeFunctionId ? {nodeFunctionId: v.nodeFunctionId} : {}),
@@ -211,6 +201,8 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
             })),
             startingNodeId: flow?.startingNodeId!,
         }
+
+        return payload
     }
 
     async deleteNodeById(flowId: FlowView['id'], nodeId: NodeFunction['id']): Promise<void> {
@@ -277,6 +269,20 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
 
         this.set(index, new View(flow))
         await this.syncFlow(flowId)
+    }
+
+    async setInputType(flowId: FlowView['id'], type: string): Promise<void> {
+
+        const flow = this.getById(flowId)
+        const index = this.values().findIndex(f => f.id === flowId)
+        if (!flow) return
+
+        flow.editedAt = new Date().toISOString()
+        flow.inputType = type
+
+        this.set(index, new View(flow))
+        await this.syncFlow(flowId)
+
     }
 
     async setSettingValue(flowId: FlowView['id'], settingIdentifier: Maybe<Scalars['String']['output']>, value: FlowSetting['value']): Promise<void> {

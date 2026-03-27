@@ -2,18 +2,13 @@ fragment BasicFlow on Flow {
     __typename
     id
     createdAt
-    inputType {
-        id
-    }
+    inputType
     name
     project {
         __typename
         id
     }
-    returnType {
-        __typename
-        id
-    }
+    returnType
     settings {
         __typename
     }

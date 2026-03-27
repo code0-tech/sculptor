@@ -1,4 +1,10 @@
-import {Flow, NodeFunction, NodeFunctionIdWrapper} from "@code0-tech/sagittarius-graphql-types";
+import {
+    Flow,
+    FlowType,
+    FunctionDefinition,
+    NodeFunction,
+    NodeFunctionIdWrapper
+} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
 import {IconBolt, IconNote} from "@tabler/icons-react";
 import {
@@ -11,18 +17,20 @@ import {
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
-import {FunctionView} from "@edition/function/services/Function.view";
-import {FlowTypeView} from "@edition/flowtype/services/FlowType.view";
+import {useParams} from "next/navigation";
 
 export interface NodeBadgeComponentProps extends Omit<BadgeType, 'value' | 'children'> {
     value: NodeFunction | NodeFunctionIdWrapper
-    flowId: Flow['id']
-    definition?: FunctionView | FlowTypeView
+    definition?: FunctionDefinition | FlowType
 }
 
 export const NodeBadgeComponent: React.FC<NodeBadgeComponentProps> = (props) => {
 
-    const {value, flowId, definition, ...rest} = props
+    const params = useParams()
+    const flowIndex = params.flowId as any as number
+    const flowId: Flow['id'] = `gid://sagittarius/Flow/${flowIndex}`
+
+    const {value, definition, ...rest} = props
 
     const functionService = definition || useService(FunctionService)
     const functionStore = definition || useStore(FunctionService)
@@ -33,7 +41,7 @@ export const NodeBadgeComponent: React.FC<NodeBadgeComponentProps> = (props) => 
 
     const isTrigger = value.__typename === "NodeFunctionIdWrapper" && !value.id
 
-    const node: NodeFunction | FlowTypeView | NodeFunctionIdWrapper | undefined = React.useMemo(() => {
+    const node: NodeFunction | FlowType | NodeFunctionIdWrapper | undefined = React.useMemo(() => {
         if (isTrigger && !definition) {
             const flow = (flowService as FlowService).getById(flowId)
             return (flowTypeService as FlowTypeService).getById(flow?.type?.id)
@@ -44,7 +52,7 @@ export const NodeBadgeComponent: React.FC<NodeBadgeComponentProps> = (props) => 
     const name = React.useMemo(() => {
         if (definition) {
             return definition.names?.[0]?.content
-        } else if (isTrigger && node instanceof FlowTypeView) {
+        } else if (isTrigger && node?.__typename === "FlowType") {
             return node.names?.[0]?.content
         }
         return (functionService as FunctionService).getById((node as NodeFunction)?.functionDefinition?.id)?.names?.[0]?.content

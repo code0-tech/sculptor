@@ -8,7 +8,9 @@ import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {useSuggestions} from "@edition/function/hooks/FunctionSuggestion.hook";
-import {FunctionSuggestionMenuFooterComponent} from "@edition/function/components/suggestion/FunctionSuggestionMenuFooterComponent";
+import {
+    FunctionSuggestionMenuFooterComponent
+} from "@edition/function/components/suggestion/FunctionSuggestionMenuFooterComponent";
 import {toInputSuggestions} from "@edition/function/components/suggestion/FunctionSuggestionMenuComponent.util";
 import {FunctionSuggestion} from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
 
@@ -147,7 +149,7 @@ export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProp
             if (value?.__typename === "NodeFunctionIdWrapper" || value?.__typename === "NodeFunction") {
                 const node = value?.__typename === "NodeFunction" ? value : flowService.getNodeById(flowId, value.id)
                 return buildBlockSegment(
-                    <NodeBadgeComponent value={value} flowId={flowId}
+                    <NodeBadgeComponent value={value}
                                         definition={functionService.getById(node?.functionDefinition.id)}/>,
                     value
                 )
@@ -156,7 +158,7 @@ export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProp
             if (value?.__typename === "ReferenceValue") {
                 const node = (value as ReferenceValue).nodeFunctionId === "gid://sagittarius/NodeFunction/-1" ? flowTypeService.getById(flow?.type?.id) : functionService.getById(flowService.getNodeById(flowId, (value as ReferenceValue).nodeFunctionId)?.functionDefinition?.id)
                 return buildBlockSegment(
-                    <ReferenceBadgeComponent flowId={flowId} definition={node} value={value}/>,
+                    <ReferenceBadgeComponent definition={node} value={value}/>,
                     value
                 )
             }

@@ -6,7 +6,6 @@ import {GraphqlClient} from "@core/util/graphql-client";
 import {FlowType, Namespace, NamespaceProject, Query, Runtime} from "@code0-tech/sagittarius-graphql-types";
 import flowTypesQuery from "@edition/flowtype/services/queries/FlowTypes.query.graphql"
 import {View} from "@code0-tech/pictor/dist/utils/view";
-import {FlowTypeView} from "@edition/flowtype/services/FlowType.view";
 
 export type FlowTypeDependencies = {
     namespaceId?: Namespace['id']
@@ -14,17 +13,17 @@ export type FlowTypeDependencies = {
     runtimeId?: Runtime['id']
 }
 
-export class FlowTypeService extends ReactiveArrayService<FlowTypeView, FlowTypeDependencies> {
+export class FlowTypeService extends ReactiveArrayService<FlowType, FlowTypeDependencies> {
 
     private readonly client: GraphqlClient
     private i = 0
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<FlowTypeView>>) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<FlowType>>) {
         super(store)
         this.client = client
     }
 
-    values(dependencies?: FlowTypeDependencies): FlowTypeView[] {
+    values(dependencies?: FlowTypeDependencies): FlowType[] {
         const functions = super.values()
         if (!dependencies?.runtimeId) return functions
 
@@ -42,22 +41,12 @@ export class FlowTypeService extends ReactiveArrayService<FlowTypeView, FlowType
 
                     firstFlowType: 50,
                     afterFlowType: null,
-
-                    firstInputDataTypeIdentifier: 50,
-                    afterInputDataTypeIdentifier: null,
-                    firstInputRule: 50,
-                    afterInputRule: null,
-
-                    firstReturnDataTypeIdentifier: 50,
-                    afterReturnDataTypeIdentifier: null,
-                    firstReturnRule: 50,
-                    afterReturnRule: null
                 }
             }).then(res => {
                 const nodes = res.data?.namespace?.project?.primaryRuntime?.flowTypes?.nodes ?? []
                 nodes.forEach(flowType => {
                     if (flowType && !this.hasById(flowType.id)) {
-                        this.set(this.i++, new View(new FlowTypeView(flowType)))
+                        this.set(this.i++, new View(flowType))
                     }
                 })
             })
@@ -71,7 +60,7 @@ export class FlowTypeService extends ReactiveArrayService<FlowTypeView, FlowType
         return flowType !== undefined
     }
 
-    getById(id: FlowType['id'], dependencies?: FlowTypeDependencies): FlowTypeView | undefined {
+    getById(id: FlowType['id'], dependencies?: FlowTypeDependencies): FlowType | undefined {
         return this.values(dependencies).find(value => value.id === id);
     }
 

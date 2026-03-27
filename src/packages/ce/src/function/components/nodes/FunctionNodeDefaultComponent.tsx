@@ -3,8 +3,8 @@ import React, {CSSProperties, memo} from "react";
 import "./FunctionNodeComponent.style.scss";
 import {FunctionNodeComponentProps} from "./FunctionNodeComponent";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
-import {Badge, Card, Flex, Text, underlineBySeverity, useService, useStore as usePictorStore} from "@code0-tech/pictor";
-import {useNodeValidation} from "@edition/flow/hooks/NodeValidation.hook";
+import {Badge, Card, Flex, Text, useService, useStore as usePictorStore} from "@code0-tech/pictor";
+import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
 import {IconNote, IconVariable} from "@tabler/icons-react";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
@@ -13,6 +13,7 @@ import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/Refer
 import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeComponent";
 import {FunctionFileDefaultComponent} from "@edition/function/components/files/FunctionFileDefaultComponent";
 import {NodeFunction} from "@code0-tech/sagittarius-graphql-types";
+import {underlineBySeverity} from "@core/util/inspection";
 
 export type FunctionNodeDefaultComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
 
@@ -26,9 +27,16 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
     const functionService = useService(FunctionService)
     const functionStore = usePictorStore(FunctionService)
 
-    const node = React.useMemo(() => flowService.getNodeById(data.flowId, data.nodeId), [flowStore, data])
-    const definition = React.useMemo(() => node ? functionService.getById(node.functionDefinition?.id!!) : undefined, [functionStore, data, node])
-    const validation = useNodeValidation(data.nodeId, data.flowId)
+    const node = React.useMemo(
+        () => flowService.getNodeById(data.flowId, data.nodeId),
+        [flowStore, data]
+    )
+    const definition = React.useMemo(
+        () => node ? functionService.getById(node.functionDefinition?.id!!) : undefined,
+        [functionStore, data, node]
+    )
+
+    const validation = useFlowValidation(data.flowId)
 
     const activeTabId = React.useMemo(() => {
         return fileTabsService.getActiveTab()?.id
@@ -61,13 +69,13 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
 
     const displayMessage = React.useMemo(() => splitTemplate(definition?.displayMessages!![0]?.content ?? "").map(item => {
         const nodeParameter = node?.parameters?.nodes?.find(p => {
-            const parameterDefinition = definition?.parameterDefinitions?.find(pd => pd.id == p?.parameterDefinition?.id)
+            const parameterDefinition = definition?.parameterDefinitions?.nodes?.find(pd => pd?.id == p?.parameterDefinition?.id)
             return parameterDefinition?.identifier == item
         })
 
-        const parameterDefinition = definition?.parameterDefinitions?.find(pd => pd.identifier == item)
-        const parameterIndex = parameterDefinition ? definition?.parameterDefinitions?.findIndex(p => p?.id === parameterDefinition.id) : undefined
-        const parameterValidation = validation?.filter(v => v.parameterIndex === parameterIndex)
+        const parameterDefinition = definition?.parameterDefinitions?.nodes?.find(pd => pd?.identifier == item)
+        const parameterIndex = parameterDefinition ? definition?.parameterDefinitions?.nodes?.findIndex(p => p?.id === parameterDefinition.id) : undefined
+        const parameterValidation = validation?.filter(v => v.parameterIndex === parameterIndex && v.nodeId === node?.id)
         const decorationStyle: CSSProperties =
             parameterValidation?.length
                 ? underlineBySeverity[parameterValidation[0].type]
@@ -81,11 +89,11 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
                     </div>
                 case "ReferenceValue":
                     return <div style={{...decorationStyle, display: "inline-block"}}>
-                        <ReferenceBadgeComponent flowId={props.data.flowId} value={nodeParameter.value}/>
+                        <ReferenceBadgeComponent value={nodeParameter.value}/>
                     </div>
                 case "NodeFunctionIdWrapper":
                     return <div style={{...decorationStyle, display: "inline-block"}}>
-                        <NodeBadgeComponent value={nodeParameter.value} flowId={props.data.flowId}/>
+                        <NodeBadgeComponent value={nodeParameter.value}/>
                         <Handle
                             key={parameterIndex}
                             type={"target"}
@@ -96,19 +104,21 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
                         />
                     </div>
             }
-            return <Badge style={{verticalAlign: "middle"}} border>
-                <Text size={"sm"}>
-                    {item}
-                </Text>
-            </Badge>
+            return <div style={{...decorationStyle, display: "inline-block"}}>
+                <Badge style={{verticalAlign: "middle"}} border>
+                    <Text size={"sm"}>
+                        {item}
+                    </Text>
+                </Badge>
+            </div>
         }
         return " " + String(item) + " "
-    }), [flowStore, functionStore, data, definition])
+    }), [flowStore, functionStore, data, definition, validation])
 
     React.useEffect(() => {
-        if (!node?.id || !id) return
+        if (!node?.id) return
         fileTabsService.registerTab({
-            id: id,
+            id: node.id,
             active: false,
             closeable: true,
             children: <>

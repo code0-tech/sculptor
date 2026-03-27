@@ -1,81 +1,64 @@
-import React from "react";
-import type {
-    DataTypeIdentifier,
-    LiteralValue,
-    NodeFunction,
-    ReferenceValue
-} from "@code0-tech/sagittarius-graphql-types";
-import {FunctionSuggestion, FunctionSuggestionType} from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
+import {
+    FunctionSuggestion,
+    FunctionSuggestionType
+} from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
 import {useService, useStore} from "@code0-tech/pictor";
-import {isMatchingType, replaceGenericsAndSortType, resolveType} from "@edition/flow/utils/generics";
-import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FunctionService} from "@edition/function/services/Function.service";
+import {DatatypeService} from "@edition/datatype/services/Datatype.service";
+import React, {startTransition} from "react";
+import {useNodeSuggestionsAction} from "@edition/flow/components/FlowWorkerProvider";
 
-export const useFunctionSuggestions = (
-    dataTypeIdentifier?: DataTypeIdentifier,
-    genericKeys: string[] = []
+export const useNodeSuggestions = (
+    type?: string,
 ): FunctionSuggestion[] => {
-    const dataTypeService = useService(DatatypeService)
+
+    const functionStore = useStore(FunctionService)
     const functionService = useService(FunctionService)
     const dataTypeStore = useStore(DatatypeService)
-    const functionStore = useStore(FunctionService)
+    const dataTypeService = useService(DatatypeService)
 
-    const dataType = React.useMemo(() => (
-        dataTypeIdentifier ? dataTypeService?.getDataType(dataTypeIdentifier) : undefined
-    ), [dataTypeIdentifier, dataTypeService, dataTypeStore])
+    const [suggestions, setSuggestions] = React.useState<any[]>([])
+    const {execute} = useNodeSuggestionsAction()
 
-    const resolvedType = React.useMemo(() => (
-        dataTypeIdentifier ? replaceGenericsAndSortType(resolveType(dataTypeIdentifier, dataTypeService), genericKeys) : undefined
-    ), [dataTypeIdentifier, dataTypeService, dataTypeStore, genericKeys])
+    const functions = React.useMemo(() => functionService.values(), [functionStore]);
+    const dataTypes = React.useMemo(() => dataTypeService.values(), [dataTypeStore]);
 
-    return React.useMemo(() => {
-        const matchingFunctions = functionService.values().filter(funcDefinition => {
-            if (!dataTypeIdentifier || !resolvedType) return true
-            if (funcDefinition.runtimeFunctionDefinition?.identifier == "std::control::return") return false
-            if (dataType?.variant === "NODE") return true
-            if (!funcDefinition.returnType) return false
-            if (!funcDefinition.genericKeys) return false
-            const resolvedReturnType = replaceGenericsAndSortType(resolveType(funcDefinition.returnType, dataTypeService), funcDefinition.genericKeys)
-            return isMatchingType(resolvedType, resolvedReturnType)
-        }).sort((a, b) => {
-            const [rA, pA, fA] = a.runtimeFunctionDefinition!!.identifier!!.split("::");
-            const [rB, pB, fB] = b.runtimeFunctionDefinition!!.identifier!!.split("::");
+    React.useEffect(() => {
+        const timeout = setTimeout(() => {
+            execute({
+                type: type as string,
+                functions,
+                dataTypes
+            }).then(value => {
+                startTransition(() => {
+                    setSuggestions(value as any[])
+                })
+            })
+        }, 200);
 
-            const runtimeCmp = rA.localeCompare(rB);
-            if (runtimeCmp !== 0) return runtimeCmp;
+        return () => clearTimeout(timeout);
+    }, [type, functions, dataTypes])
 
-            const packageCmp = pA.localeCompare(pB);
-            if (packageCmp !== 0) return packageCmp;
+    return React.useMemo(() => suggestions.sort((a, b) => {
+        const [rA, pA, fA] = a?.functionDefinition!!.identifier!!.split("::");
+        const [rB, pB, fB] = b?.functionDefinition!!.identifier!!.split("::");
 
-            return fA.localeCompare(fB);
-        })
+        const runtimeCmp = rA.localeCompare(rB);
+        if (runtimeCmp !== 0) return runtimeCmp;
 
-        return matchingFunctions.map(funcDefinition => {
-            const nodeFunctionSuggestion: LiteralValue | ReferenceValue | NodeFunction = {
-                __typename: "NodeFunction",
-                id: `gid://sagittarius/NodeFunction/1`,
-                functionDefinition: {
-                    id: funcDefinition.id,
-                    runtimeFunctionDefinition: funcDefinition.runtimeFunctionDefinition
-                },
-                parameters: {
-                    nodes: (funcDefinition.parameterDefinitions?.map((definition, index) => {
-                        return {
-                            id: `gid://sagittarius/NodeParameter/${index}`,
-                            parameterDefinition: {
-                                id: definition.id
-                            }
-                        }
-                    }) ?? [])
-                }
-            }
+        const packageCmp = pA.localeCompare(pB);
+        if (packageCmp !== 0) return packageCmp;
 
-            return {
-                path: [],
-                type: FunctionSuggestionType.FUNCTION,
-                displayText: [funcDefinition.names!![0]?.content as string],
-                value: nodeFunctionSuggestion,
-            }
-        })
-    }, [dataType, dataTypeIdentifier, dataTypeService, functionService, functionStore, resolvedType, dataTypeStore])
+        return fA.localeCompare(fB);
+    }).map(suggestion => {
+
+        const functionDefinition = functionService.getById(suggestion.functionDefinition?.id)
+
+        return {
+            path: [],
+            type: FunctionSuggestionType.FUNCTION,
+            displayText: [functionDefinition?.names![0]?.content as string],
+            value: suggestion,
+        }
+    }), [suggestions]);
 }

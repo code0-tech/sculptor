@@ -1,18 +1,13 @@
 import React from "react";
-import {
-    Flex,
-    useService
-} from "@code0-tech/pictor";
+import {Flex, InputSyntaxSegment, useForm, useService, useStore} from "@code0-tech/pictor";
 import {Flow, LiteralValue, NodeParameterValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {FunctionSuggestion} from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
 import {useValueSuggestions} from "@edition/function/hooks/FunctionValueSuggestions.hook";
-import {useDataTypeSuggestions} from "@edition/function/hooks/FunctionDataTypeSuggestions.hook";
 import {toInputSuggestions} from "@edition/function/components/suggestion/FunctionSuggestionMenuComponent.util";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {DataTypeTextInputComponent} from "@edition/datatype/components/inputs/text/DataTypeTextInputComponent";
-import {DataTypeTypeInputComponent} from "@edition/datatype/components/inputs/type/DataTypeTypeInputComponent";
+import {DataTypeTypeInputComponent} from "@edition/datatype/components/inputs/datatype/DataTypeTypeInputComponent";
 
 export interface FunctionFileTriggerComponentProps {
     instance: Flow
@@ -24,47 +19,48 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
 
     const flowTypeService = useService(FlowTypeService)
     const flowService = useService(FlowService)
-    const dataTypeService = useService(DatatypeService)
     const [, startTransition] = React.useTransition()
 
     const definition = flowTypeService.getById(instance.type?.id!!)
 
+    //TODO: performance use log inside for each to see the problem
     const suggestionsById: Record<string, FunctionSuggestion[]> = {}
     definition?.flowTypeSettings?.forEach(settingDefinition => {
-        const dataTypeIdentifier = {dataType: settingDefinition.dataType}
-        const valueSuggestions = useValueSuggestions(dataTypeIdentifier)
-        const dataTypeSuggestions = useDataTypeSuggestions(dataTypeIdentifier)
+        const valueSuggestions = useValueSuggestions(settingDefinition.type!)
         suggestionsById[settingDefinition.identifier!!] = [
             ...valueSuggestions,
-            ...dataTypeSuggestions,
         ].sort()
     })
 
-    const testDataType = dataTypeService.getTypeFromValue({
-        __typename: "LiteralValue",
-        value: {
-            body: {
-                users: [
-                    {
-                        username: "john_doe",
-                        email: "test@test.de",
-                    }
-                ],
-                test: "sd"
-            },
-            headers: {
-                username: "john_doe",
-                email: "sd",
-            }
+    const initialValues = React.useMemo(() => ({
+        "inputType": instance?.inputType ?? definition?.inputType
+    }), [instance?.inputType, definition?.inputType])
+
+    const [inputs, validate] = useForm({
+        initialValues: initialValues,
+        truthyValidationBeforeSubmit: false,
+        onSubmit: (values) => {
+            if (!values.inputType) return
+            startTransition(async () => {
+                await flowService.setInputType(instance.id, values.inputType!)
+            })
         }
     })
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
-        {definition?.inputType ? <DataTypeTypeInputComponent
-            initialValue={testDataType || undefined}
-            label={"Test Data Type"}
-            description={"Data type used for testing"}
-            onChange={(dataTypeIdentifier) => console.log(dataTypeIdentifier)}/> : null}
+        {
+
+            instance?.inputType ?? definition?.inputType ? <DataTypeTypeInputComponent
+                flowId={instance.id}
+                title={"Test Data Type"}
+                description={"Data type used for testing"}
+                onChange={() => {
+                    validate()
+                }}
+                {...inputs.getInputProps("inputType")}
+            /> : null
+
+        }
         {definition?.flowTypeSettings?.map(settingDefinition => {
             const setting = instance.settings?.nodes?.find(s => s?.flowSettingIdentifier == settingDefinition.identifier)
             const title = settingDefinition.names!![0]?.content ?? ""
@@ -113,8 +109,8 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
                                             onBlur={submitValueEvent}
                                             onClear={submitValueEvent}
                                             onSuggestionSelect={(suggestion) => {
-                                       submitValue(suggestion.value)
-                                   }}
+                                                submitValue(suggestion.value)
+                                            }}
                                             suggestions={toInputSuggestions(result)}
                 />
             </div>

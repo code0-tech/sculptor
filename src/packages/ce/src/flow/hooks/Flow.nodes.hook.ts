@@ -6,6 +6,7 @@ import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FunctionNodeComponentProps} from "@edition/function/components/nodes/FunctionNodeComponent";
+import {DataTypeVariant, getTypesFromFunction, getTypesFromNode, getTypeVariant} from "@code0-tech/triangulum";
 
 const packageNodes = new Map<string, string>([
     ['std', 'default'],
@@ -158,20 +159,15 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                 });
             }
 
-            const definition = node.functionDefinition?.id
-                ? functionService.getById(node.functionDefinition.id)
-                : undefined;
+            const types = getTypesFromFunction(functionService.getById(node.functionDefinition?.id)!);
 
-            node.parameters?.nodes?.forEach(param => {
+            node.parameters?.nodes?.forEach((param, index) => {
                 const value = param?.value;
                 if (!value || value.__typename !== "NodeFunctionIdWrapper") return;
+                
+                const variant = getTypeVariant(types.parameters[index], dataTypeService.values());
 
-                const paramDef = definition?.parameterDefinitions?.find(p => p.id === param?.parameterDefinition?.id);
-                const dataType = paramDef?.dataTypeIdentifier
-                    ? dataTypeService.getDataType(paramDef.dataTypeIdentifier)
-                    : undefined;
-
-                if (dataType?.variant === "NODE") {
+                if (variant === DataTypeVariant.NODE) {
                     const groupId = `${nodeId}-group-${groupCounter++}`;
 
                     if (!visited.has(groupId)) {

@@ -1,7 +1,9 @@
 import {FunctionSuggestion, FunctionSuggestionType} from "./FunctionSuggestionComponent.view";
 import React from "react";
-import {IconCircleDot, IconCirclesRelation, IconFileFunctionFilled} from "@tabler/icons-react";
+import {IconCircleDot, IconNote, IconVariable} from "@tabler/icons-react";
 import {InputSuggestion, Text} from "@code0-tech/pictor";
+import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
+import {LiteralValue, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
 
 export const toInputSuggestions = (suggestions: FunctionSuggestion[]): InputSuggestion[] => {
 
@@ -14,30 +16,33 @@ export const toInputSuggestions = (suggestions: FunctionSuggestion[]): InputSugg
     return suggestions.map(suggestion => {
 
         const iconMap: Record<FunctionSuggestionType, React.ReactNode> = {
-            [FunctionSuggestionType.FUNCTION]: <IconFileFunctionFilled color="#70ffb2" size={16}/>,
-            [FunctionSuggestionType.FUNCTION_COMBINATION]: <IconFileFunctionFilled color="#70ffb2" size={16}/>,
-            [FunctionSuggestionType.REF_OBJECT]: <IconCirclesRelation color="#FFBE0B" size={16}/>,
+            [FunctionSuggestionType.FUNCTION]: <IconNote color="#70ffb2" size={16}/>,
+            [FunctionSuggestionType.FUNCTION_COMBINATION]: <IconNote color="#70ffb2" size={16}/>,
+            [FunctionSuggestionType.REF_OBJECT]: <IconVariable color="#FFBE0B" size={16}/>,
             [FunctionSuggestionType.VALUE]: <IconCircleDot color="#D90429" size={16}/>,
             [FunctionSuggestionType.DATA_TYPE]: <IconCircleDot color="#D90429" size={16}/>,
         }
 
         const children: React.ReactNode = <>
             {iconMap[suggestion.type]}
-            <div>
-                <Text display="flex" style={{gap: ".5rem"}}>
-                    {suggestion.displayText.map((text, idx) => (
-                        <span key={idx}>{text}</span>
-                    ))}
-                </Text>
-            </div>
+            {
+                suggestion.type === FunctionSuggestionType.REF_OBJECT ? (
+                    <ReferenceBadgeComponent value={suggestion.value as ReferenceValue}/>
+                ) : suggestion.type === FunctionSuggestionType.VALUE ? (
+                    <Text>{String((suggestion.value as LiteralValue).value)}</Text>
+                ) : suggestion.type === FunctionSuggestionType.FUNCTION ? (
+                    <Text>{String(suggestion.displayText)}</Text>
+                ) : null
+            }
         </>
 
         let groupLabel: string | undefined = staticGroupLabels[suggestion.type]
 
         if (suggestion.type === FunctionSuggestionType.FUNCTION || suggestion.type === FunctionSuggestionType.FUNCTION_COMBINATION) {
             const runtimeIdentifier = suggestion.value.__typename === "NodeFunction"
-                ? suggestion.value.functionDefinition?.runtimeFunctionDefinition?.identifier
+                ? suggestion.value.functionDefinition?.identifier
                 : undefined
+
 
             if (runtimeIdentifier) {
                 const [runtime, pkg] = runtimeIdentifier.split("::")

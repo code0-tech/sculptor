@@ -1,4 +1,3 @@
-#import "@edition/function/services/fragments/DataTypeIdentifier.fragment.graphql"
 #import "./DataTypeRule.fragment.graphql"
 
 fragment DataType on DataType {
@@ -8,8 +7,7 @@ fragment DataType on DataType {
     updatedAt
     identifier
     genericKeys
-    variant
-
+    type
 
     name {
         __typename
@@ -29,18 +27,6 @@ fragment DataType on DataType {
 
     runtime {
         id
-    }
-
-    dataTypeIdentifiers (first: $firstDataTypeIdentifier, after: $afterDataTypeIdentifier) {
-        __typename
-        count
-        nodes {
-            ...DataTypeIdentifier
-        }
-        pageInfo {
-            endCursor
-            hasNextPage
-        }
     }
 
     rules (first: $firstRule, after: $afterRule) {

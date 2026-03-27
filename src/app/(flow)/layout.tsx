@@ -9,7 +9,14 @@ import {
 } from "@code0-tech/pictor";
 import React from "react";
 import {GraphqlClient} from "@core/util/graphql-client";
-import {Flow, Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
+import {
+    DataType,
+    Flow,
+    FlowType,
+    FunctionDefinition,
+    Namespace,
+    NamespaceProject, Runtime
+} from "@code0-tech/sagittarius-graphql-types";
 import {usePersistentReactiveArrayService} from "@/hooks/usePersistentReactiveArrayService";
 import {UserService} from "@edition/user/services/User.service";
 import {OrganizationService} from "@edition/organization/services/Organization.service";
@@ -29,12 +36,8 @@ import {UserView} from "@edition/user/services/User.view";
 import {OrganizationView} from "@edition/organization/services/Organization.view";
 import {MemberView} from "@edition/member/services/Member.view";
 import {NamespaceView} from "@edition/namespace/services/Namespace.view";
-import {RuntimeView} from "@edition/runtime/services/Runtime.view";
 import {ProjectView} from "@edition/project/services/Project.view";
 import {RoleView} from "@edition/role/services/Role.view";
-import {FunctionView} from "@edition/function/services/Function.view";
-import {DataTypeView} from "@edition/datatype/services/DataType.view";
-import {FlowTypeView} from "@edition/flowtype/services/FlowType.view";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 
@@ -63,13 +66,13 @@ export default function FlowLayout({bar, tab, children}: {
     const organization = usePersistentReactiveArrayService<OrganizationView, OrganizationService>(`dashboard::organizations::${currentSession?.id}`, (store) => new OrganizationService(graphqlClient, store))
     const member = usePersistentReactiveArrayService<MemberView, MemberService>(`dashboard::members::${currentSession?.id}`, (store) => new MemberService(graphqlClient, store))
     const namespace = usePersistentReactiveArrayService<NamespaceView, NamespaceService>(`dashboard::namespaces::${currentSession?.id}`, (store) => new NamespaceService(graphqlClient, store))
-    const runtime = usePersistentReactiveArrayService<RuntimeView, RuntimeService>(`dashboard::global_runtimes::${currentSession?.id}`, (store) => new RuntimeService(graphqlClient, store))
+    const runtime = usePersistentReactiveArrayService<Runtime, RuntimeService>(`dashboard::global_runtimes::${currentSession?.id}`, (store) => new RuntimeService(graphqlClient, store))
     const project = usePersistentReactiveArrayService<ProjectView, ProjectService>(`dashboard::projects::${currentSession?.id}`, (store) => new ProjectService(graphqlClient, store))
     const role = usePersistentReactiveArrayService<RoleView, RoleService>(`dashboard::roles::${currentSession?.id}`, (store) => new RoleService(graphqlClient, store))
     const flow = usePersistentReactiveArrayService<Flow, FlowService>(`dashboard::flows::${currentSession?.id}`, (store) => new FlowService(graphqlClient, store))
-    const functions = usePersistentReactiveArrayService<FunctionView, FunctionService>(`dashboard::functions::${currentSession?.id}`, (store) => new FunctionService(graphqlClient, store))
-    const datatype = usePersistentReactiveArrayService<DataTypeView, DatatypeService>(`dashboard::datatypes::${currentSession?.id}`, (store) => new DatatypeService(graphqlClient, store))
-    const flowtype = usePersistentReactiveArrayService<FlowTypeView, FlowTypeService>(`dashboard::flowtypes::${currentSession?.id}`, (store) => new FlowTypeService(graphqlClient, store))
+    const functions = usePersistentReactiveArrayService<FunctionDefinition, FunctionService>(`dashboard::functions::${currentSession?.id}`, (store) => new FunctionService(graphqlClient, store))
+    const datatype = usePersistentReactiveArrayService<DataType, DatatypeService>(`dashboard::datatypes::${currentSession?.id}`, (store) => new DatatypeService(graphqlClient, store))
+    const flowtype = usePersistentReactiveArrayService<FlowType, FlowTypeService>(`dashboard::flowtypes::${currentSession?.id}`, (store) => new FlowTypeService(graphqlClient, store))
     const file = usePersistentReactiveArrayService<FileTabsView, FileTabsService>(`dashboard::files::${flowId}`, FileTabsService, [])
 
 

@@ -5,11 +5,10 @@ import {
     LiteralValue,
     NodeFunction,
     NodeParameterValue,
-    ReferenceValue,
-    Scalars
+    ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
-import {useNodeValidation} from "@edition/flow/hooks/NodeValidation.hook";
+import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent";
@@ -28,7 +27,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
     const fileTabsService = useService(FileTabsService)
-    const validation = useNodeValidation(node.id, flowId)
+    const validation = useFlowValidation(flowId)
 
     const changedParameters = React.useRef<Set<number>>(new Set())
     const [, startTransition] = React.useTransition()
@@ -39,7 +38,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
 
     const initialValues = React.useMemo(() => {
         const values: Record<string, any> = {}
-        definition?.parameterDefinitions?.forEach((parameter, index) => {
+        definition?.parameterDefinitions?.nodes?.forEach((parameter, index) => {
             const nodeParameter = node.parameters?.nodes?.[index]
             values[index] = nodeParameter?.value?.__typename === "LiteralValue" ? (typeof nodeParameter.value?.value === "object" && nodeParameter.value?.value != null ? JSON.stringify(nodeParameter.value?.value) : nodeParameter.value.value) : nodeParameter?.value != null ? JSON.stringify(nodeParameter?.value) : nodeParameter?.value
         })
@@ -50,7 +49,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
         const values: Record<string, any> = {}
         node.parameters?.nodes?.forEach((parameter, index) => {
             values[index] = (_: any) => {
-                const validationForParameter = validation?.find(v => v.parameterIndex === index)
+                const validationForParameter = validation?.find(v => v.parameterIndex === index && v.nodeId === node.id)
                 if (validationForParameter) {
                     return validationForParameter.message!![0]?.content || "Invalid value"
                 }
@@ -62,14 +61,14 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
 
     const onSubmit = React.useCallback((values: any) => {
         startTransition(async () => {
-            for (const parameterDefinition of definition?.parameterDefinitions!) {
-                const parameterIndex = definition?.parameterDefinitions?.findIndex(p => p?.id === parameterDefinition.id)
+            for (const parameterDefinition of definition?.parameterDefinitions?.nodes!) {
+                const parameterIndex = definition?.parameterDefinitions?.nodes?.findIndex(p => p?.id === parameterDefinition?.id)
                 if (typeof parameterIndex !== "number") return
                 if (!changedParameters.current.has(parameterIndex)) continue;
-                const nodeParameter = node.parameters?.nodes?.find(p => p?.parameterDefinition?.id === parameterDefinition.id)
+                const nodeParameter = node.parameters?.nodes?.find(p => p?.parameterDefinition?.id === parameterDefinition?.id)
                 const syntaxSegment = values[parameterIndex]
                 const previousValue = nodeParameter?.value as NodeParameterValue
-                const syntaxValue = syntaxSegment?.[0]?.value ?? syntaxSegment?.value ?? syntaxSegment as NodeFunction | LiteralValue | ReferenceValue
+                const syntaxValue = syntaxSegment?.[0]?.value ?? syntaxSegment?.value ?? syntaxSegment ?? null as NodeFunction | LiteralValue | ReferenceValue | null
 
                 if (previousValue && previousValue.__typename === "NodeFunctionIdWrapper" && previousValue.id) {
                     const linkedNodes = flowService.getLinkedNodesById(flowId, previousValue.id)
@@ -78,17 +77,18 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                     })
                 }
 
-                if (!syntaxValue || !syntaxSegment) {
-                    await flowService.setParameterValue(flowId, node.id!!, parameterIndex, undefined, parameterDefinition.id);
+                if (!syntaxValue || !syntaxSegment || (Array.isArray(syntaxValue) && Array.from(syntaxValue).length <= 0)) {
+                    await flowService.setParameterValue(flowId, node.id!!, parameterIndex, undefined, parameterDefinition?.id);
+                    continue;
                 }
 
                 try {
-                    const parsedSyntaxValue = Number.isNaN(Number(syntaxValue)) ? JSON.parse(syntaxValue) : syntaxValue
+                    const parsedSyntaxValue = JSON.parse(syntaxValue)
                     if (!parsedSyntaxValue?.__typename) {
                         await flowService.setParameterValue(flowId, node.id!!, parameterIndex, syntaxValue ? {
                             __typename: "LiteralValue",
-                            value: parsedSyntaxValue === null || parsedSyntaxValue === undefined ? String(parsedSyntaxValue) : parsedSyntaxValue
-                        } : undefined, parameterDefinition.id);
+                            value: parsedSyntaxValue
+                        } : undefined, parameterDefinition?.id);
                         continue;
                     }
                 } catch (e) {
@@ -96,14 +96,14 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                         await flowService.setParameterValue(flowId, node.id!!, parameterIndex, syntaxValue ? {
                             __typename: "LiteralValue",
                             value: syntaxValue,
-                        } : undefined, parameterDefinition.id);
+                        } : undefined, parameterDefinition?.id);
                         continue;
                     }
                 }
 
                 const parsedSyntaxValue = typeof syntaxValue === "object" ? syntaxValue : JSON.parse(syntaxValue)
 
-                await flowService.setParameterValue(flowId, node.id!!, parameterIndex, parsedSyntaxValue.__typename === "LiteralValue" ? (!!parsedSyntaxValue.value ? parsedSyntaxValue : undefined) : parsedSyntaxValue, parameterDefinition.id);
+                await flowService.setParameterValue(flowId, node.id!!, parameterIndex, parsedSyntaxValue.__typename === "LiteralValue" ? (!!parsedSyntaxValue.value ? parsedSyntaxValue : undefined) : parsedSyntaxValue, parameterDefinition?.id);
             }
             changedParameters.current.clear()
         })
@@ -117,12 +117,12 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
     })
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
-        {definition?.parameterDefinitions?.map((parameterDefinition, index) => {
+        {definition?.parameterDefinitions?.nodes?.map((parameterDefinition, index) => {
 
             if (!parameterDefinition) return null
 
             const title = parameterDefinition?.names ? parameterDefinition?.names!![0]?.content : parameterDefinition?.id
-            const description = parameterDefinition?.descriptions ? parameterDefinition?.descriptions!![0]?.content : JSON.stringify(parameterDefinition?.dataTypeIdentifier)
+            const description = parameterDefinition?.descriptions ? parameterDefinition?.descriptions!![0]?.content : JSON.stringify(parameterDefinition.identifier)
 
             return <div>
                 {/*@ts-ignore*/}
@@ -133,6 +133,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                                         description={description}
                                         clearable
                                         onChange={() => {
+                                            //TODO this should be debounced
                                             changedParameters.current.add(index)
                                             validate()
                                         }}

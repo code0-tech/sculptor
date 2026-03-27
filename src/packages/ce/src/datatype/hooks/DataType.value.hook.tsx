@@ -1,23 +1,17 @@
-import React, {startTransition} from "react";
-import type {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
-import {useValueSuggestions} from "./FunctionValueSuggestions.hook";
-import {useReferenceSuggestions} from "./FunctionReferenceSuggestions.hook";
-import {useNodeSuggestions} from "./FunctionNodeSuggestions.hook";
+import type {Flow, LiteralValue, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {useService, useStore} from "@code0-tech/pictor";
-import {FunctionSuggestion} from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
-import {useTypeExtractionAction} from "@edition/flow/components/FlowWorkerProvider";
+import {useTypeExtractionAction, useValueExtractionAction} from "@edition/flow/components/FlowWorkerProvider";
+import React, {startTransition} from "react";
 
-//TODO: deep type search
-//TODO: calculate FUNCTION_COMBINATION deepness max 2
-
-export const useSuggestions = (
+export const useValue = (
     flowId: Flow['id'],
     nodeId?: NodeFunction['id'],
     parameterIndex?: number
-): FunctionSuggestion[] => {
+): LiteralValue | null => {
+
 
     const functionService = useService(FunctionService)
     const functionStore = useStore(FunctionService)
@@ -26,8 +20,10 @@ export const useSuggestions = (
     const dataTypeStore = useStore(DatatypeService)
     const dataTypeService = useService(DatatypeService)
 
-    const {execute} = useTypeExtractionAction()
+    const typeAction = useTypeExtractionAction()
+    const valueAction = useValueExtractionAction()
     const [types, setTypes] = React.useState<any>(null);
+    const [value, setValue] = React.useState<any>(null);
 
     const node = React.useMemo(
         () => flowService.getNodeById(flowId, nodeId),
@@ -46,7 +42,7 @@ export const useSuggestions = (
 
     React.useEffect(() => {
         const timeout = setTimeout(() => {
-            execute({
+            typeAction.execute({
                 node: node!,
                 dataTypes: dataTypes,
                 functions: functions
@@ -58,17 +54,24 @@ export const useSuggestions = (
         }, 200);
 
         return () => clearTimeout(timeout);
-    }, [(node?.parameters?.nodes?.map(p => p?.value) ?? []), functions, dataTypes])
+    }, [...(node?.parameters?.nodes?.map(p => p?.value) ?? []), functions, dataTypes])
 
-    const valueSuggestions = useValueSuggestions(types?.parameters?.[parameterIndex ?? 0])
-    const refObjectSuggestions = useReferenceSuggestions(flowId, nodeId, parameterIndex)
-    const functionSuggestions = useNodeSuggestions(types?.parameters?.[parameterIndex ?? 0])
+    React.useEffect(() => {
 
-    return React.useMemo(() => {
-        return [
-            ...valueSuggestions,
-            ...refObjectSuggestions,
-            ...functionSuggestions
-        ].sort()
-    }, [valueSuggestions, refObjectSuggestions, functionSuggestions])
+        const timeout = setTimeout(() => {
+            valueAction.execute({
+                type: types?.parameters?.[parameterIndex ?? 0],
+                dataTypes: dataTypes
+            }).then(value => {
+                startTransition(() => {
+                    setValue(value)
+                })
+            })
+        }, 200);
+
+        return () => clearTimeout(timeout);
+
+    }, [types, dataTypes])
+
+    return value
 }
