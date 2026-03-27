@@ -40,10 +40,11 @@ fragment Flow on Flow {
                         }
                         ... on ReferenceValue {
                             __typename
-                            id
                             updatedAt
                             createdAt
                             nodeFunctionId
+                            inputIndex
+                            parameterIndex
                             referencePath {
                                 __typename
                                 id
