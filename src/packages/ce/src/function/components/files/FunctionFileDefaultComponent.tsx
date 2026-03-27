@@ -79,7 +79,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
 
                 if (!syntaxValue || !syntaxSegment || (Array.isArray(syntaxValue) && Array.from(syntaxValue).length <= 0)) {
                     await flowService.setParameterValue(flowId, node.id!!, parameterIndex, undefined, parameterDefinition?.id);
-                    return
+                    continue;
                 }
 
                 try {
