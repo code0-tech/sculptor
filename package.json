@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@apollo/client": "^4.0.9",
-    "@code0-tech/pictor": "^0.4.0",
+    "@code0-tech/pictor": "^0.5.0",
     "@code0-tech/triangulum": "^0.7.0",
     "date-fns": "^4.1.0",
     "graphql": "^16.12.0",
@@ -24,7 +24,8 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "rxjs": "^7.8.2",
-    "sass": "^1.93.3"
+    "sass": "^1.93.3",
+    "ldrs": "^1.1.9"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
