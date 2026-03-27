@@ -20,18 +20,17 @@ import updateRuntimeMutation from "./mutations/Runtime.update.mutation.graphql"
 import deleteRuntimeMutation from "./mutations/Runtime.delete.mutation.graphql"
 import rotateTokenRuntimeMutation from "./mutations/Runtime.rotateToken.mutation.graphql"
 import {View} from "@code0-tech/pictor/dist/utils/view";
-import {RuntimeView} from "@edition/runtime/services/Runtime.view";
 
 export type RuntimeDependencies = {
     namespaceId: Namespace['id']
 }
 
-export class RuntimeService extends ReactiveArrayService<RuntimeView, RuntimeDependencies> {
+export class RuntimeService extends ReactiveArrayService<Runtime, RuntimeDependencies> {
 
     private readonly client: GraphqlClient
     private i = 0
 
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<RuntimeView>>) {
+    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<Runtime>>) {
         super(store);
         this.client = client
     }
@@ -41,13 +40,13 @@ export class RuntimeService extends ReactiveArrayService<RuntimeView, RuntimeDep
         return runtime !== undefined
     }
 
-    getById(id: Runtime['id']): RuntimeView | undefined {
+    getById(id: Runtime['id']): Runtime | undefined {
         return this.values().find(runtime => runtime && runtime.id === id);
     }
 
     //TODO: rework to be able to get all runtimes that you can access. If no namespace id is provided just get the global runtiimes
     // TODO: if namespace id is provided get the runtimes for this namespace and also the global runtimes
-    values(dependencies?: RuntimeDependencies): RuntimeView[] {
+    values(dependencies?: RuntimeDependencies): Runtime[] {
         const runtimes = super.values()
 
         if (!dependencies?.namespaceId) {
@@ -62,7 +61,7 @@ export class RuntimeService extends ReactiveArrayService<RuntimeView, RuntimeDep
                     const nodes = res.data?.globalRuntimes?.nodes ?? []
                     nodes.forEach(runtime => {
                         if (runtime && !this.hasById(runtime.id)) {
-                            this.set(this.i++, new View(new RuntimeView(runtime)))
+                            this.set(this.i++, new View(runtime))
                         }
                     })
                 })
@@ -90,7 +89,7 @@ export class RuntimeService extends ReactiveArrayService<RuntimeView, RuntimeDep
                         runtime.namespace?.id === namespaceId &&
                         !this.hasById(runtime.id)
                     ) {
-                        this.set(this.i++, new View(new RuntimeView(runtime)))
+                        this.set(this.i++, new View(runtime))
                     }
                 })
             })
@@ -110,7 +109,7 @@ export class RuntimeService extends ReactiveArrayService<RuntimeView, RuntimeDep
         if (result.data && result.data.runtimesCreate && result.data.runtimesCreate.runtime) {
             const runtime = result.data.runtimesCreate.runtime
             if (!this.hasById(runtime.id)) {
-                this.add(new View(new RuntimeView(runtime)))
+                this.add(new View(runtime))
             }
         }
 
@@ -128,7 +127,7 @@ export class RuntimeService extends ReactiveArrayService<RuntimeView, RuntimeDep
         if (result.data && result.data.runtimesUpdate && result.data.runtimesUpdate.runtime) {
             const runtime = result.data.runtimesUpdate.runtime
             const index = this.values().findIndex(r => r.id === runtime.id)
-            this.set(index, new View(new RuntimeView(runtime)))
+            this.set(index, new View(runtime))
 
         }
 
@@ -164,7 +163,7 @@ export class RuntimeService extends ReactiveArrayService<RuntimeView, RuntimeDep
         if (result.data && result.data.runtimesRotateToken && result.data.runtimesRotateToken.runtime) {
             const runtime = result.data.runtimesRotateToken.runtime
             const index = this.values().findIndex(r => r.id === runtime.id)
-            this.set(index, new View(new RuntimeView(runtime)))
+            this.set(index, new View(runtime))
 
         }
 

@@ -46,7 +46,7 @@ export const RuntimeProjectDataTableComponent: React.FC<RuntimeProjectDataTableC
                           </Text>
                       </DataTableColumn>}
                       onSelect={(item) => item && onSelect?.(item)}
-                      data={runtimes.map(r => r.json()).filter(preFilter)}>
+                      data={runtimes.filter(preFilter)}>
         {(runtime, index) => {
             return <RuntimeProjectDataTableRowComponent projectId={projectId} runtimeId={runtime.id}/>
         }}

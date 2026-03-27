@@ -38,7 +38,7 @@ export const RuntimeDataTableComponent: React.FC<ProjectDataTableComponentProps>
                           </Text>
                       </DataTableColumn>}
                       onSelect={(item) => item && onSelect?.(item)}
-                      data={runtimes.map(r => r.json()).filter(preFilter)}>
+                      data={runtimes.filter(preFilter)}>
         {(runtime, index) => {
             return <RuntimeDataTableRowComponent minimized={minimized} runtimeId={runtime.id}/>
         }}
