@@ -6,7 +6,7 @@ import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FunctionNodeComponentProps} from "@edition/function/components/nodes/FunctionNodeComponent";
-import {DataTypeVariant, getTypesFromNode, getTypeVariant} from "@code0-tech/triangulum";
+import {DataTypeVariant, getTypesFromFunction, getTypesFromNode, getTypeVariant} from "@code0-tech/triangulum";
 
 const packageNodes = new Map<string, string>([
     ['std', 'default'],
@@ -159,7 +159,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                 });
             }
 
-            const types = getTypesFromNode(node, functionService.values(), dataTypeService.values());
+            const types = getTypesFromFunction(functionService.getById(node.functionDefinition?.id)!);
 
             node.parameters?.nodes?.forEach((param, index) => {
                 const value = param?.value;
