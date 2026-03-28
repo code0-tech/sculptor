@@ -1,5 +1,11 @@
 stages:
   - build
+  - test
+
+include:
+  - project: code0-tech/development/telescopium
+    ref: build-branch
+    file: ci-template.gitlab-ci.yml
 
 .node:
   image: node:24.13.1
