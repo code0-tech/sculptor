@@ -7,12 +7,7 @@ import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/Butto
 import {
     DataTypeTypeInputEditDialogComponent
 } from "@edition/datatype/components/inputs/datatype/DataTypeTypeInputEditDialogComponent";
-
-export interface EditableJSONEntry {
-    key: string
-    value: LiteralValue | null
-    path: string[]
-}
+import {DataTypeTypeEditorInput} from "@edition/datatype/components/inputs/datatype/DataTypeTypeEditorInput";
 
 
 export interface DataTypeJSONInputComponentProps extends Omit<InputProps<any | null>, "wrapperComponent" | "type"> {
@@ -76,7 +71,17 @@ export const DataTypeTypeInputComponent: React.FC<DataTypeJSONInputComponentProp
                     </ButtonGroup>
                 </Flex>
                 <Card paddingSize="xs" mt={0.7} mb={-0.55} mx={-0.55}>
-                    <></>
+                    <DataTypeTypeEditorInput value={literalValue}
+                                             readonly
+                                             suggestions={undefined}
+                                             showValidation={false}
+                                             showTooltips={false}
+                                             basicSetup={{
+                                                 highlightActiveLineGutter: false,
+                                                 highlightActiveLine: false,
+                                                 lineNumbers: false
+                                             }}
+                                             key={`type-editor-${literalValue}`}/>
                 </Card>
             </Card>
             {!formValidation?.valid && formValidation?.notValidMessage && (
