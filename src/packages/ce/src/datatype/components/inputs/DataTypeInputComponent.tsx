@@ -43,7 +43,7 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
     )
 
     const dataTypeVariant = React.useMemo(
-        () => getTypeVariant(types.parameters[parameterIndex], dataTypeService.values()),
+        () => getTypeVariant(types.parameters[parameterIndex], dataTypeService.values())[0].variant,
         [dataTypeStore, types]
     )
 
