@@ -93,10 +93,9 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
             node.parameters?.nodes?.forEach((param, index) => {
                 const parameterValue = param?.value;
                 const parameterDefinition = functionService.getById(node.functionDefinition?.id!!)?.parameterDefinitions?.nodes?.find(p => p?.id === param?.parameterDefinition?.id);
-                const variant = getTypeVariant(types.parameters[index], dataTypeService.values());
+                const variant = getTypeVariant(types.parameters[index], dataTypeService.values())[0].variant;
                 if (!parameterValue) return
 
-                //@ts-ignore
                 if (variant === DataTypeVariant.NODE) {
                     if (parameterValue && parameterValue.__typename === "NodeFunctionIdWrapper") {
 
