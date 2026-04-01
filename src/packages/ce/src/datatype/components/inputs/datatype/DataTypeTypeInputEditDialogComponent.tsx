@@ -7,6 +7,8 @@ import {
     DialogOverlay,
     DialogPortal,
     Flex,
+    SegmentedControl,
+    SegmentedControlItem,
     Text,
     useService,
     useStore
@@ -21,9 +23,9 @@ import {
 } from "@code0-tech/pictor/dist/components/resizable/Resizable";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {LiteralValue} from "@code0-tech/sagittarius-graphql-types";
-import {useDebounce} from "use-debounce";
-import {useValueExtractionAction} from "@edition/flow/components/FlowWorkerProvider";
+import {useTypeExtractionAction, useValueExtractionAction} from "@edition/flow/components/FlowWorkerProvider";
 import {DataTypeTypeEditorInput} from "@edition/datatype/components/inputs/datatype/DataTypeTypeEditorInput";
+import {DataTypeJSONInputTreeComponent} from "@edition/datatype/components/inputs/json/DataTypeJSONInputTreeComponent";
 
 export interface DataTypeJSONInputEditDialogComponentProps {
     open: boolean
@@ -268,6 +270,113 @@ function humanToTs(input: string): string {
         .replace(/,/g, ", ").replace(/\s+/g, " ").trim();
 }
 
+function tsToHuman(ts: string): string {
+    if (!ts) return ""
+
+    const transform = (str: string, level: number = 0): string => {
+        str = str.trim()
+        const nextIndent = "  ".repeat(level + 1)
+
+        // Handle Parentheses: ( ... )
+        if (str.startsWith("(") && str.endsWith(")")) {
+            const inner = str.slice(1, -1).trim();
+            const transformedInner = transform(inner, level);
+            return `(${transformedInner})`;
+        }
+
+        // Handle Objects: { key: value, ... } -> key is/contains ... and ...
+        if (str.startsWith("{") && str.endsWith("}")) {
+            const inner = str.slice(1, -1).trim()
+            const pairs: string[] = []
+            let bLevel = 0
+            let lastIndex = 0
+            for (let i = 0; i < inner.length; i++) {
+                if (inner[i] === "{" || inner[i] === "(" || inner[i] === "<") bLevel++
+                else if (inner[i] === "}" || inner[i] === ")" || inner[i] === ">") bLevel--
+                else if (inner[i] === "," && bLevel === 0) {
+                    pairs.push(inner.substring(lastIndex, i).trim())
+                    lastIndex = i + 1
+                }
+            }
+            pairs.push(inner.substring(lastIndex).trim())
+
+            const transformedPairs = pairs.filter(p => p.length > 0).map(pair => {
+                const colonIndex = pair.indexOf(":")
+                if (colonIndex === -1) return transform(pair, level + 1)
+                const key = pair.substring(0, colonIndex).trim()
+                const value = pair.substring(colonIndex + 1).trim()
+
+                if (value.startsWith("{")) {
+                    return `\n${nextIndent}${key} contains ${transform(value, level + 1)}`
+                } else {
+                    const transformedVal = transform(value, level + 1)
+                    return `\n${nextIndent}${key} is ${transformedVal}`
+                }
+            })
+
+            return transformedPairs.join("")
+        }
+
+        // Handle Unions: A | B -> A or is B / A or contains B
+        const unionParts = []
+        let lastIdx = 0
+        let bLevel = 0
+        for (let i = 0; i < str.length; i++) {
+            if (str[i] === "{" || str[i] === "<" || str[i] === "(") bLevel++
+            else if (str[i] === "}" || str[i] === ">" || str[i] === ")") bLevel--
+            else if (str[i] === "|" && bLevel === 0) {
+                unionParts.push(str.substring(lastIdx, i).trim())
+                lastIdx = i + 1
+            }
+        }
+        unionParts.push(str.substring(lastIdx).trim())
+        if (unionParts.length > 1) {
+            return unionParts.map((s, idx) => {
+                const t = transform(s, level)
+                const prefix = idx === 0 ? "" : (s.trim().startsWith("{") ? " or contains " : " or is ")
+                const content = (t.includes("\n") || (t.includes(" ") && !t.startsWith("("))) && !t.startsWith("\n") ? `(${t.trim()})` : t
+                return `${prefix}${content}`
+            }).join("")
+        }
+
+        // Handle Intersections: A & B -> A and is B / A and contains B
+        const intersectParts = []
+        lastIdx = 0
+        bLevel = 0
+        for (let i = 0; i < str.length; i++) {
+            if (str[i] === "{" || str[i] === "<" || str[i] === "(") bLevel++
+            else if (str[i] === "}" || str[i] === ">" || str[i] === ")") bLevel--
+            else if (str[i] === "&" && bLevel === 0) {
+                intersectParts.push(str.substring(lastIdx, i).trim())
+                lastIdx = i + 1
+            }
+        }
+        intersectParts.push(str.substring(lastIdx).trim())
+        if (intersectParts.length > 1) {
+            return intersectParts.map((s, idx) => {
+                const t = transform(s, level)
+                const prefix = idx === 0 ? "" : (s.trim().startsWith("{") ? " and contains " : " and is ")
+                const content = (t.includes("\n") || (t.includes(" ") && !t.startsWith("("))) && !t.startsWith("\n") ? `(${t.trim()})` : t
+                return `${prefix}${content}`
+            }).join("")
+        }
+
+        // Handle Generics: NAME<TYPE> -> NAME of (TYPE)
+        const genericMatch = str.match(/^(\w+)<(.+)>$/)
+        if (genericMatch) {
+            const name = genericMatch[1]
+            const inner = genericMatch[2]
+            const transformedInner = transform(inner, level)
+            const needsParen = transformedInner.includes("\n") || (transformedInner.includes(" ") && !transformedInner.startsWith("("));
+            return `${name} of ${needsParen ? `(${transformedInner.trim()})` : transformedInner}`
+        }
+
+        return str
+    }
+
+    return transform(ts).trim()
+}
+
 export const DataTypeTypeInputEditDialogComponent: React.FC<DataTypeJSONInputEditDialogComponentProps> = (props) => {
     const {
         open,
@@ -279,37 +388,83 @@ export const DataTypeTypeInputEditDialogComponent: React.FC<DataTypeJSONInputEdi
     const [editOpen, setEditOpen] = useState(open)
     const dataTypeService = useService(DatatypeService)
     const dataTypeStore = useStore(DatatypeService)
-    const [humanValue, setHumanValue] = useState(value)
-    const [debouncedHumanValue] = useDebounce(humanValue ?? "", 300);
-    const {execute} = useValueExtractionAction()
-    const [valueFromType, setValueFromType] = useState<LiteralValue>({} as LiteralValue)
+    const valueFromTypeAction = useValueExtractionAction()
+    const typeFromValueAction = useTypeExtractionAction()
+    const [humanValue, setHumanValue] = useState("")
+    const [tsValue, setTsValue] = useState(value ?? "")
+    const [literalValue, setLiteralValue] = useState<LiteralValue>({
+        __typename: "LiteralValue",
+        value: {}
+    } as LiteralValue)
+    const [editVariant, setEditVariant] = useState<"manual" | "value">("manual")
 
     const dataTypes = useMemo(
         () => dataTypeService.values(),
         [dataTypeStore]
     )
 
-    const typeFromHumanLanguage = useMemo(
-        () => {
-            const type = humanToTs(debouncedHumanValue)
-            onTypeChange?.(type)
-            return type
-        },
-        [debouncedHumanValue]
-    )
-
-    useEffect(() => {
-        execute({
-            type: typeFromHumanLanguage,
-            dataTypes: dataTypes
-        }).then(val => {
-            setValueFromType(val as any)
-        })
-    }, [typeFromHumanLanguage, dataTypes]);
-
+    // Sync from props ONLY when opening the dialog
     useEffect(() => {
         setEditOpen(open)
+        if (open) {
+            const initialTs = value ?? ""
+            setTsValue(initialTs)
+            setHumanValue(tsToHuman(initialTs))
+            // Generate initial literal/JSON for the tree/editor
+            valueFromTypeAction.execute({
+                type: initialTs,
+                dataTypes: dataTypes
+            }).then(val => setLiteralValue(val as any))
+        }
     }, [open])
+
+    // Handler 1: Schema Editor changes
+    const handleSchemaChange = (human: string) => {
+        const ts = humanToTs(human)
+
+        if (ts !== tsValue) {
+            setTsValue(ts)
+            onTypeChange?.(ts)
+
+            // Sync Tree & JSON Editor (async)
+            valueFromTypeAction.execute({
+                type: ts,
+                dataTypes: dataTypes
+            }).then(val => {
+                setLiteralValue(val as any)
+            })
+        }
+    }
+
+    // Handler 2: JSON Input changes
+    const handleJsonChange = (json: object) => {
+        const newLiteral = {__typename: "LiteralValue", value: json} as LiteralValue
+        setLiteralValue(newLiteral)
+
+        typeFromValueAction.execute({
+            value: newLiteral,
+            dataTypes: dataTypes
+        }).then(type => {
+            setTsValue(type as string)
+            onTypeChange?.(type as string)
+            setHumanValue(tsToHuman(type as string))
+        })
+    }
+
+    // Use keys to force-refresh editors when switching tabs or when external sync happens
+    // We use humanValue for the Schema editor to ensure it's stable while typing but refreshes from JSON
+    const typeEditorInput = <DataTypeTypeEditorInput
+        value={humanValue}
+        showValidation={false}
+        showTooltips={false}
+        onChange={handleSchemaChange}/>
+
+    const jsonInput = <Editor
+        showValidation={false}
+        language={"json"}
+        initialValue={literalValue.value}
+        onChange={handleJsonChange}
+        showTooltips={false}/>
 
     return (
         <Dialog open={editOpen} onOpenChange={(open) => onOpenChange?.(open)}>
@@ -320,7 +475,7 @@ export const DataTypeTypeInputEditDialogComponent: React.FC<DataTypeJSONInputEdi
                     if (target.closest("[data-slot=resizable-handle]") || target.closest("[data-slot=resizable-panel]")) {
                         e.preventDefault()
                     }
-                }} w={"75%"} h={"75%"} style={{padding: "2px"}} forceMount>
+                }} w={"75%"} h={"75%"} style={{padding: "2px"}}>
                     <Layout layoutGap={0} showLayoutSplitter={false}
                             topContent={
                                 <Flex style={{gap: ".7rem"}} p={0.7} justify={"space-between"} align={"center"}>
@@ -333,21 +488,31 @@ export const DataTypeTypeInputEditDialogComponent: React.FC<DataTypeJSONInputEdi
                                 </Flex>
                             }>
                         <ResizablePanelGroup style={{borderRadius: "1rem"}}>
-                            <ResizablePanel color="secondary">
-                                <Editor key={JSON.stringify(valueFromType)}
-                                        language={"json"}
-                                        initialValue={valueFromType.value}
-                                        contentEditable={false}
-                                        showTooltips={false}
-                                        showValidation={false}
-                                        readonly
-                                />
+                            <ResizablePanel color="primary">
+                                <DataTypeJSONInputTreeComponent object={literalValue}
+                                                                onEntryClick={() => {
+                                                                }}
+                                                                collapsedState={{}}
+                                                                setCollapsedState={() => {
+                                                                }}/>
                             </ResizablePanel>
                             <ResizableHandle/>
                             <ResizablePanel color="primary">
-                                <DataTypeTypeEditorInput value={value}
-                                                         key={"type-editor"}
-                                                         onChange={human => setHumanValue(human)}/>
+                                {editVariant === "manual" ? typeEditorInput : jsonInput}
+                                <SegmentedControl type={"single"}
+                                                  pos={"absolute"}
+                                                  bottom={"1rem"}
+                                                  left={"50%"}
+                                                  value={editVariant}
+                                                  onValueChange={v => v && setEditVariant(v as any)}
+                                                  style={{transform: "translateX(-50%)", zIndex: 99}}>
+                                    <SegmentedControlItem value={"manual"}>
+                                        Schema
+                                    </SegmentedControlItem>
+                                    <SegmentedControlItem value={"value"}>
+                                        From Value
+                                    </SegmentedControlItem>
+                                </SegmentedControl>
                             </ResizablePanel>
                         </ResizablePanelGroup>
                     </Layout>

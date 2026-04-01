@@ -3,7 +3,7 @@ import {useService, useStore} from "@code0-tech/pictor";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
-import {useTypeExtractionAction, useValueExtractionAction} from "@edition/flow/components/FlowWorkerProvider";
+import {useNodeTypeExtractionAction, useValueExtractionAction} from "@edition/flow/components/FlowWorkerProvider";
 import React, {startTransition} from "react";
 
 export const useValue = (
@@ -20,7 +20,7 @@ export const useValue = (
     const dataTypeStore = useStore(DatatypeService)
     const dataTypeService = useService(DatatypeService)
 
-    const typeAction = useTypeExtractionAction()
+    const typeAction = useNodeTypeExtractionAction()
     const valueAction = useValueExtractionAction()
     const [types, setTypes] = React.useState<any>(null);
     const [value, setValue] = React.useState<any>(null);

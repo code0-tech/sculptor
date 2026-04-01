@@ -46,7 +46,7 @@ export const DataTypeTypeInputComponent: React.FC<DataTypeJSONInputComponentProp
             <DataTypeTypeInputEditDialogComponent
                 key={`edit-dialog-${editDialogOpen}`}
                 open={editDialogOpen}
-                value={literalValue}
+                value={initialValue}
                 onOpenChange={open => setEditDialogOpen(open)}
                 onTypeChange={v => {
                     setLiteralValue(v ?? null)
@@ -71,7 +71,7 @@ export const DataTypeTypeInputComponent: React.FC<DataTypeJSONInputComponentProp
                     </ButtonGroup>
                 </Flex>
                 <Card paddingSize="xs" mt={0.7} mb={-0.55} mx={-0.55}>
-                    <DataTypeTypeEditorInput value={literalValue}
+                    <DataTypeTypeEditorInput value={initialValue}
                                              readonly
                                              suggestions={undefined}
                                              showValidation={false}
@@ -81,7 +81,7 @@ export const DataTypeTypeInputComponent: React.FC<DataTypeJSONInputComponentProp
                                                  highlightActiveLine: false,
                                                  lineNumbers: false
                                              }}
-                                             key={`type-editor-${literalValue}`}/>
+                                             key={`type-editor}`}/>
                 </Card>
             </Card>
             {!formValidation?.valid && formValidation?.notValidMessage && (

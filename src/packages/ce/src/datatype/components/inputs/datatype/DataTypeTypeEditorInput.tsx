@@ -8,11 +8,12 @@ import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 
 export interface DataTypeTypeEditorInputProps extends EditorInputProps {
     value: string | null
+    isTechnicalType?: boolean
 }
 
 export const DataTypeTypeEditorInput: React.FC<DataTypeTypeEditorInputProps> = (props) => {
 
-    const {value, onChange, ...rest} = props
+    const {value, onChange, isTechnicalType = false, ...rest} = props
 
     const dataTypeService = useService(DatatypeService)
     const dataTypeStore = useStore(DatatypeService)
@@ -224,20 +225,30 @@ export const DataTypeTypeEditorInput: React.FC<DataTypeTypeEditorInputProps> = (
 
     const tokenHighlights: EditorTokenHighlights = useMemo(
         () => ({
+            // Optimization: The badge rendering was happening inside the editor's high-frequency render path.
+            // Returning a stable structure or minimizing internal renders within the token highlight is key.
             typeName: ({content}: { content: string }) => {
                 const isRealType = dataTypeMap.has(content);
-                return isRealType ? <Badge key={"Text"} color={hashToColor(content)} border>
+                if (!isRealType) return null;
+                return <Badge key={content} color={hashToColor(content)} border>
                     {content}
-                </Badge> : null
+                </Badge>
             },
         }),
         [dataTypeMap]
     )
 
+    // Define the initial text based on whether the input is technical TS or already the human language
+    const displayValue = useMemo(() => {
+        if (isTechnicalType) {
+            return tsToHuman(value ?? "")
+        }
+        return value ?? ""
+    }, [value, isTechnicalType]);
 
-    return <Editor key={"type-editor"}
-                   onChange={onChange}
-                   initialValue={tsToHuman(value!)}
+    return <Editor onChange={onChange}
+                   initialValue={displayValue}
+                   key={displayValue} // Maintain stability while typing if value doesn't change from outside
                    suggestions={suggestions}
                    tokenHighlights={tokenHighlights}
                    tokenStyles={[

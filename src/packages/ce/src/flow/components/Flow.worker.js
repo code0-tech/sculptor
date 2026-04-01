@@ -1,7 +1,7 @@
 import {
     getFlowValidation,
     getNodeSuggestions,
-    getReferenceSuggestions,
+    getReferenceSuggestions, getTypeFromValue,
     getTypesFromNode, getValueFromType,
     getValueSuggestions
 } from "@code0-tech/triangulum";
@@ -41,8 +41,11 @@ addEventListener("message", (event) => {
             case 'node_suggestions':
                 result = getNodeSuggestions(payload.type, payload.functions, payload.dataTypes);
                 break;
-            case 'type_extraction':
+            case 'node_type_extraction':
                 result = getTypesFromNode(payload.node, payload.functions, payload.dataTypes);
+                break;
+            case 'type_extraction':
+                result = getTypeFromValue(payload.value, payload.dataTypes);
                 break;
             case 'value_extraction':
                 result = getValueFromType(payload.type, payload.dataTypes);
