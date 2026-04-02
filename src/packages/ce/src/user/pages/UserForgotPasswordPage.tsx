@@ -4,10 +4,11 @@ import React from "react";
 import {Button, EmailInput, emailValidation, Text, useForm, useService} from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import Link from "next/link";
-import {useRouter} from "next/navigation";
+import {useRouter, useSearchParams} from "next/navigation";
 
 export const UserForgotPasswordPage: React.FC = () => {
 
+    const query = useSearchParams()
     const userService = useService(UserService)
     const [loading, startTransition] = React.useTransition()
     const router = useRouter()
@@ -51,7 +52,7 @@ export const UserForgotPasswordPage: React.FC = () => {
         </Button>
         <Text display={"flex"} hierarchy={"tertiary"} size={"md"}>
             Didn't forget your password?
-            <Link href={"/login"}>
+            <Link href={`/login?${query.toString()}`}>
                 <Text ml={0.35} hierarchy={"primary"} display={"flex"} size={"md"}>
                     Log in
                 </Text>

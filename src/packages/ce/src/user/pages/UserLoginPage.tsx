@@ -15,14 +15,18 @@ import {
 import {UserService} from "@edition/user/services/User.service";
 import Link from "next/link";
 import {useRouter, useSearchParams} from "next/navigation";
-import {setUserSession} from "@edition/user/hooks/User.session.hook";
+import {setUserSession, useUserSession} from "@edition/user/hooks/User.session.hook";
+import {isValidRedirect} from "@core/util/redirect";
 
 export const UserLoginPage: React.FC = () => {
 
     const query = useSearchParams() //can be passwordReset
     const userService = useService(UserService)
+    const userSession = useUserSession()
     const router = useRouter()
     const [loading, startTransition] = React.useTransition()
+
+    const callbackUrl = query.get("callbackUrl")
 
     const [inputs, validate] = useForm({
         initialValues: {
@@ -48,7 +52,14 @@ export const UserLoginPage: React.FC = () => {
                     email: (values.email as unknown as string),
                 }).then(payload => {
                     if (payload?.userSession) {
+                        const token = payload.userSession.token
                         setUserSession(payload.userSession)
+                        if (callbackUrl && isValidRedirect(callbackUrl)) {
+                            const targetURL = new URL(callbackUrl)
+                            targetURL.searchParams.set('token', token ?? "")
+                            router.push(targetURL.toString())
+                            return
+                        }
                         router.push("/")
                         router.refresh()
                     }
@@ -56,6 +67,18 @@ export const UserLoginPage: React.FC = () => {
             })
         }
     })
+
+    React.useEffect(() => {
+        if (userSession?.active && userSession.token) {
+            if (callbackUrl && isValidRedirect(callbackUrl)) {
+                const targetURL = new URL(callbackUrl)
+                targetURL.searchParams.set('token', userSession.token ?? "")
+                router.push(targetURL.toString())
+                return
+            }
+        }
+    }, [userSession])
+
 
     return <>
         <Text mb={0.7} size={"lg"} hierarchy={"primary"} display={"block"}>
@@ -77,14 +100,14 @@ export const UserLoginPage: React.FC = () => {
         <Button color={"success"} w={"100%"} mb={1.3} onClick={validate}>
             Login
         </Button>
-        <Link href={"/password"}>
+        <Link href={`/password?${query.toString()}`}>
             <Text display={"block"} hierarchy={"tertiary"} size={"md"} mb={0.7}>
                 Forgot password?
             </Text>
         </Link>
         <Text display={"flex"} hierarchy={"tertiary"} size={"md"}>
             Don't have an account yet
-            <Link href={"/register"}>
+            <Link href={`/register?${query.toString()}`}>
                 <Text ml={0.35} hierarchy={"primary"} display={"flex"} size={"md"}>
                     Sign up
                 </Text>
