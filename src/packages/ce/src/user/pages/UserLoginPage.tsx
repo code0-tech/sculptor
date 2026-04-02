@@ -15,14 +15,18 @@ import {
 import {UserService} from "@edition/user/services/User.service";
 import Link from "next/link";
 import {useRouter, useSearchParams} from "next/navigation";
-import {setUserSession} from "@edition/user/hooks/User.session.hook";
+import {setUserSession, useUserSession} from "@edition/user/hooks/User.session.hook";
+import {isValidRedirect} from "@core/util/redirect";
 
 export const UserLoginPage: React.FC = () => {
 
     const query = useSearchParams() //can be passwordReset
     const userService = useService(UserService)
+    const userSession = useUserSession()
     const router = useRouter()
     const [loading, startTransition] = React.useTransition()
+
+    const callbackUrl = query.get("callbackUrl")
 
     const [inputs, validate] = useForm({
         initialValues: {
@@ -48,7 +52,15 @@ export const UserLoginPage: React.FC = () => {
                     email: (values.email as unknown as string),
                 }).then(payload => {
                     if (payload?.userSession) {
+                        const token = payload.userSession.token
                         setUserSession(payload.userSession)
+                        console.log(callbackUrl)
+                        if (callbackUrl && isValidRedirect(callbackUrl)) {
+                            const targetURL = new URL(callbackUrl)
+                            targetURL.searchParams.set('token', token ?? "")
+                            router.push(targetURL.toString())
+                            return
+                        }
                         router.push("/")
                         router.refresh()
                     }
@@ -56,6 +68,16 @@ export const UserLoginPage: React.FC = () => {
             })
         }
     })
+
+    if (userSession?.active && userSession.token) {
+        if (callbackUrl && isValidRedirect(callbackUrl)) {
+            const targetURL = new URL(callbackUrl)
+            targetURL.searchParams.set('token', userSession.token ?? "")
+            router.push(targetURL.toString())
+            return
+        }
+        router.push("/")
+    }
 
     return <>
         <Text mb={0.7} size={"lg"} hierarchy={"primary"} display={"block"}>
