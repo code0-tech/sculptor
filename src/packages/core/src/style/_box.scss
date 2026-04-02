@@ -1,6 +1,6 @@
-@use "variables";
+@use "@core/style/variables";
 @use "sass:color";
-@use "helpers";
+@use "@core/style/helpers";
 
 @mixin box(
   $background: variables.$secondary,

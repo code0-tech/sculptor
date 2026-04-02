@@ -1,6 +1,6 @@
 @use "sass:math";
 @use "sass:color";
-@use "variables";
+@use "@core/style/variables";
 
 @mixin disabled() {
   &:disabled, &[data-disabled], &[aria-disabled=true], &--disabled {
