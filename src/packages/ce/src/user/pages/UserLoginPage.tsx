@@ -69,15 +69,17 @@ export const UserLoginPage: React.FC = () => {
         }
     })
 
-    if (userSession?.active && userSession.token) {
-        if (callbackUrl && isValidRedirect(callbackUrl)) {
-            const targetURL = new URL(callbackUrl)
-            targetURL.searchParams.set('token', userSession.token ?? "")
-            router.push(targetURL.toString())
-            return
+    React.useEffect(() => {
+        if (userSession?.active && userSession.token) {
+            if (callbackUrl && isValidRedirect(callbackUrl)) {
+                const targetURL = new URL(callbackUrl)
+                targetURL.searchParams.set('token', userSession.token ?? "")
+                router.push(targetURL.toString())
+                return
+            }
         }
-        router.push("/")
-    }
+    }, [userSession])
+
 
     return <>
         <Text mb={0.7} size={"lg"} hierarchy={"primary"} display={"block"}>
@@ -99,14 +101,14 @@ export const UserLoginPage: React.FC = () => {
         <Button color={"success"} w={"100%"} mb={1.3} onClick={validate}>
             Login
         </Button>
-        <Link href={"/password"}>
+        <Link href={`/password?${query.toString()}`}>
             <Text display={"block"} hierarchy={"tertiary"} size={"md"} mb={0.7}>
                 Forgot password?
             </Text>
         </Link>
         <Text display={"flex"} hierarchy={"tertiary"} size={"md"}>
             Don't have an account yet
-            <Link href={"/register"}>
+            <Link href={`/register?${query.toString()}`}>
                 <Text ml={0.35} hierarchy={"primary"} display={"flex"} size={"md"}>
                     Sign up
                 </Text>

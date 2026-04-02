@@ -14,11 +14,12 @@ import {
 } from "@code0-tech/pictor";
 import Link from "next/link";
 import {UserService} from "@edition/user/services/User.service";
-import {useRouter} from "next/navigation";
+import {useRouter, useSearchParams} from "next/navigation";
 import {setUserSession} from "@edition/user/hooks/User.session.hook";
 
 export const UserRegistrationPage: React.FC = () => {
 
+    const query = useSearchParams()
     const userService = useService(UserService)
     const router = useRouter()
     const [loading, startTransition] = React.useTransition()
@@ -92,7 +93,7 @@ export const UserRegistrationPage: React.FC = () => {
         </Button>
         <Text display={"flex"} hierarchy={"tertiary"} size={"md"}>
             Have an account
-            <Link href={"/login"}>
+            <Link href={`/login?${query.toString()}`}>
                 <Text ml={0.35} hierarchy={"primary"} display={"flex"} size={"md"}>
                     Log in
                 </Text>
