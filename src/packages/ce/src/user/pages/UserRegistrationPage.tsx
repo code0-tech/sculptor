@@ -16,6 +16,7 @@ import Link from "next/link";
 import {UserService} from "@edition/user/services/User.service";
 import {useRouter, useSearchParams} from "next/navigation";
 import {setUserSession} from "@edition/user/hooks/User.session.hook";
+import {isValidRedirect} from "@core/util/redirect";
 
 export const UserRegistrationPage: React.FC = () => {
 
@@ -23,6 +24,7 @@ export const UserRegistrationPage: React.FC = () => {
     const userService = useService(UserService)
     const router = useRouter()
     const [loading, startTransition] = React.useTransition()
+    const callbackUrl = query.get("callbackUrl")
 
     const [inputs, validate] = useForm({
         initialValues: {
@@ -60,7 +62,14 @@ export const UserRegistrationPage: React.FC = () => {
                     username: (values.username as unknown as string),
                 }).then(payload => {
                     if (payload?.userSession) {
+                        const token = payload.userSession.token
                         setUserSession(payload.userSession)
+                        if (callbackUrl && isValidRedirect(callbackUrl)) {
+                            const targetURL = new URL(callbackUrl)
+                            targetURL.searchParams.set('token', token ?? "")
+                            router.push(targetURL.toString())
+                            return
+                        }
                         router.push("/")
                         router.refresh()
                     }

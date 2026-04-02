@@ -54,7 +54,6 @@ export const UserLoginPage: React.FC = () => {
                     if (payload?.userSession) {
                         const token = payload.userSession.token
                         setUserSession(payload.userSession)
-                        console.log(callbackUrl)
                         if (callbackUrl && isValidRedirect(callbackUrl)) {
                             const targetURL = new URL(callbackUrl)
                             targetURL.searchParams.set('token', token ?? "")
