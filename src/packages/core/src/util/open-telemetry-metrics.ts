@@ -18,9 +18,6 @@ export const openTelemetryMetricProvider = new MeterProvider({
     readers: [openTelemetryMetricReader],
 })
 
-
-//TODO: memory in mb's
-//TODO: request time
 export default () => {
 
     const g = globalThis as any
@@ -37,9 +34,9 @@ export default () => {
         unit: '%',
     })
 
-    const memoryUsageGauge = meter.createObservableGauge('process.memory.percent', {
-        description: 'Memory usage as percentage',
-        unit: '%',
+    const memoryUsageGauge = meter.createObservableGauge('process.memory.mb', {
+        description: 'Memory usage in megabytes',
+        unit: 'MB',
     })
 
     let previousCpuUsage = proc['cpuUsage']()
@@ -65,8 +62,8 @@ export default () => {
                 previousTime = now
 
                 const memUsage = p['memoryUsage']()
-                const memoryPercent = (memUsage.heapUsed / memUsage.heapTotal) * 100
-                batchObservableCallback.observe(memoryUsageGauge, memoryPercent)
+                const memoryMB = memUsage.heapUsed / 1024 / 1024
+                batchObservableCallback.observe(memoryUsageGauge, memoryMB)
             } catch (error) {
             }
         },
