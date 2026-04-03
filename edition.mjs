@@ -36,7 +36,8 @@ try {
 
 envContent = envContent
   .replace(/^NEXT_PUBLIC_SCULPTOR_VERSION=.*$/m, `NEXT_PUBLIC_SCULPTOR_VERSION=${sculptorVersion}`)
-  .replace(/^NEXT_PUBLIC_PICTOR_VERSION=.*$/m, `NEXT_PUBLIC_PICTOR_VERSION=${pictorVersion}`);
+  .replace(/^NEXT_PUBLIC_PICTOR_VERSION=.*$/m, `NEXT_PUBLIC_PICTOR_VERSION=${pictorVersion}`)
+    .replace(/^NEXT_PUBLIC_EDITION=.*$/m, `NEXT_PUBLIC_EDITION=${edition}`);
 
 fs.writeFileSync(envPath, envContent.trim(), 'utf-8');
 console.log(`[set-edition] Versions written to .env.local`);

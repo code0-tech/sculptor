@@ -15,6 +15,7 @@ const cspHeader = `
     form-action 'self';
     frame-ancestors 'none';
     worker-src 'self' blob: data: *;
+    connect-src 'self' ${SAGITTARIUS_GRAPHQL_URL} http://localhost:4318;
 `
 
 const nextConfig: NextConfig = {
