@@ -34,10 +34,12 @@ export const DataTypeTypeInputComponent: React.FC<DataTypeJSONInputComponentProp
 
     React.useEffect(() => {
         formValidation?.setValue(literalValue)
-        setTimeout(() => {
+        const timeout = setTimeout(() => {
             // @ts-ignore
             onChange?.()
-        }, 100)
+        }, 200)
+
+        return () => clearTimeout(timeout);
 
     }, [literalValue])
 
@@ -71,17 +73,7 @@ export const DataTypeTypeInputComponent: React.FC<DataTypeJSONInputComponentProp
                     </ButtonGroup>
                 </Flex>
                 <Card paddingSize="xs" mt={0.7} mb={-0.55} mx={-0.55}>
-                    <DataTypeTypeEditorInput value={initialValue}
-                                             readonly
-                                             suggestions={undefined}
-                                             showValidation={false}
-                                             showTooltips={false}
-                                             basicSetup={{
-                                                 highlightActiveLineGutter: false,
-                                                 highlightActiveLine: false,
-                                                 lineNumbers: false
-                                             }}
-                                             key={`type-editor}`}/>
+                    <></>
                 </Card>
             </Card>
             {!formValidation?.valid && formValidation?.notValidMessage && (
