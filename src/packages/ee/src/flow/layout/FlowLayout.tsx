@@ -29,7 +29,7 @@ export const FlowLayout: React.FC<FlowLayoutProps> = ({children}) => {
         [namespaceStore, namespaceIndex]
     )
 
-    if (namespace && (!namespace.currentNamespaceLicense || namespace.currentNamespaceLicense?.endDate < new Date())) {
+    if (namespace && (!namespace.currentNamespaceLicense || (new Date(namespace.currentNamespaceLicense?.endDate  ?? 0)).getTime() < new Date().getTime())) {
         redirect(`/namespace/${namespaceIndex}/settings`)
     }
 
