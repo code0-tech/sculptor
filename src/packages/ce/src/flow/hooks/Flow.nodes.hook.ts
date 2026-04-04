@@ -165,7 +165,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                 const value = param?.value;
                 if (!value || value.__typename !== "NodeFunctionIdWrapper") return;
                 
-                const variant = getTypeVariant(types.parameters[index], dataTypeService.values());
+                const variant = getTypeVariant(types.parameters[index], dataTypeService.values())[0].variant;
 
                 if (variant === DataTypeVariant.NODE) {
                     const groupId = `${nodeId}-group-${groupCounter++}`;

@@ -8,7 +8,7 @@ import {FunctionSuggestion} from "@edition/function/components/suggestion/Functi
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
-import {useTypeExtractionAction} from "@edition/flow/components/FlowWorkerProvider";
+import {useNodeTypeExtractionAction} from "@edition/flow/components/FlowWorkerProvider";
 
 //TODO: deep type search
 //TODO: calculate FUNCTION_COMBINATION deepness max 2
@@ -26,7 +26,7 @@ export const useSuggestions = (
     const dataTypeStore = useStore(DatatypeService)
     const dataTypeService = useService(DatatypeService)
 
-    const {execute} = useTypeExtractionAction()
+    const {execute} = useNodeTypeExtractionAction()
     const [types, setTypes] = React.useState<any>(null);
 
     const node = React.useMemo(

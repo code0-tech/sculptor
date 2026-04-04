@@ -1,5 +1,5 @@
 import React from "react"
-import {DataType, Flow, FunctionDefinition, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
+import {DataType, Flow, FunctionDefinition, LiteralValue, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 
 interface Deferred {
     resolve: (value: any) => void
@@ -11,6 +11,7 @@ type FlowWorkerActions =
     | "value_suggestions"
     | "reference_suggestions"
     | "node_suggestions"
+    | "node_type_extraction"
     | "type_extraction"
     | "value_extraction"
 
@@ -39,7 +40,7 @@ interface FlowWorkerNodeSuggestionsPayload {
     dataTypes: DataType[]
 }
 
-interface FlowWorkerTypeExtractionPayload {
+interface FlowWorkerNodeTypeExtractionPayload {
     node: NodeFunction
     functions: FunctionDefinition[]
     dataTypes: DataType[]
@@ -50,12 +51,17 @@ interface FlowWorkerValueExtractionPayload {
     dataTypes: DataType[]
 }
 
+interface FlowWorkerTypeExtractionPayload {
+    value: LiteralValue
+    dataTypes: DataType[]
+}
+
 type FlowWorkerPayload =
     FlowWorkerValidationPayload
     | FlowWorkerValueSuggestionsPayload
     | FlowWorkerReferenceSuggestionsPayload
     | FlowWorkerNodeSuggestionsPayload
-    | FlowWorkerTypeExtractionPayload
+    | FlowWorkerNodeTypeExtractionPayload
     | FlowWorkerValueExtractionPayload
 
 interface WorkerContextType {
@@ -150,8 +156,11 @@ export const useReferenceSuggestionsAction = () =>
 export const useNodeSuggestionsAction = () =>
     useWorkerAction<any[], FlowWorkerNodeSuggestionsPayload>("node_suggestions");
 
+export const useNodeTypeExtractionAction = () =>
+    useWorkerAction<any[], FlowWorkerNodeTypeExtractionPayload>("node_type_extraction");
+
 export const useTypeExtractionAction = () =>
-    useWorkerAction<any[], FlowWorkerTypeExtractionPayload>("type_extraction");
+    useWorkerAction<string, FlowWorkerTypeExtractionPayload>("type_extraction");
 
 export const useValueExtractionAction = () =>
     useWorkerAction<any[], FlowWorkerValueExtractionPayload>("value_extraction");

@@ -2,33 +2,12 @@ import React from "react"
 import {IconEdit, IconX} from "@tabler/icons-react"
 import "../type/DataTypeTypeInputComponent.style.scss"
 import {Flow, LiteralValue} from "@code0-tech/sagittarius-graphql-types";
-import {
-    Button,
-    Card,
-    Flex,
-    InputDescription,
-    InputLabel,
-    InputMessage,
-    InputProps,
-    Text,
-    useService,
-    useStore
-} from "@code0-tech/pictor";
+import {Button, Card, Flex, InputDescription, InputLabel, InputMessage, InputProps, Text} from "@code0-tech/pictor";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
-import {getTypeFromValue, getValueFromType} from "@code0-tech/triangulum";
-import {DatatypeService} from "@edition/datatype/services/Datatype.service";
-import {
-    DataTypeTypeInputTreeComponent
-} from "@edition/datatype/components/inputs/datatype/DataTypeTypeInputTreeComponent";
 import {
     DataTypeTypeInputEditDialogComponent
 } from "@edition/datatype/components/inputs/datatype/DataTypeTypeInputEditDialogComponent";
-
-export interface EditableJSONEntry {
-    key: string
-    value: LiteralValue | null
-    path: string[]
-}
+import {DataTypeTypeEditorInput} from "@edition/datatype/components/inputs/datatype/DataTypeTypeEditorInput";
 
 
 export interface DataTypeJSONInputComponentProps extends Omit<InputProps<any | null>, "wrapperComponent" | "type"> {
@@ -42,55 +21,36 @@ export const DataTypeTypeInputComponent: React.FC<DataTypeJSONInputComponentProp
 
     const {initialValue, title, description, formValidation, onChange} = props
 
-    const datatypeService = useService(DatatypeService)
-    const datatypeStore = useStore(DatatypeService)
 
-    const initialType = React.useMemo(() => {
-        return initialValue
-    }, [])
-
-    const initialLiteralValue = React.useMemo(() => {
-        return getValueFromType(initialValue, datatypeService.values())
-    }, [datatypeStore, initialValue])
-
-    const [literalValue, setLiteralValue] = React.useState<LiteralValue | null>(initialLiteralValue)
+    const [literalValue, setLiteralValue] = React.useState<string | null>(initialValue)
     const [editDialogOpen, setEditDialogOpen] = React.useState(false)
-    const [editEntry, setEditEntry] = React.useState<EditableJSONEntry | null>(null)
-    const [collapsedState, setCollapsedStateRaw] = React.useState<Record<string, boolean>>({})
 
-    const setCollapsedState = (path: string[], collapsed: boolean) => {
-        setCollapsedStateRaw(prev => ({...prev, [path.join(".")]: collapsed}))
-    }
-
-    const handleEntryClick = (entry: EditableJSONEntry) => {
-        setEditEntry(entry)
-        setEditDialogOpen(true)
-    }
-
-    const handleClear = React.useCallback(() => {
-        setLiteralValue(getValueFromType(initialType, datatypeService.values()))
-    }, [])
+    const handleClear = React.useCallback(
+        () => {
+            setLiteralValue("")
+        },
+        [null]
+    )
 
     React.useEffect(() => {
-        const type = getTypeFromValue(literalValue)
-        formValidation?.setValue(type)
-        setTimeout(() => {
+        formValidation?.setValue(literalValue)
+        const timeout = setTimeout(() => {
             // @ts-ignore
             onChange?.()
-        }, 500)
+        }, 200)
+
+        return () => clearTimeout(timeout);
 
     }, [literalValue])
 
     return (
         <>
             <DataTypeTypeInputEditDialogComponent
-                key={`edit-dialog-${editEntry?.path.join("-")}-${editDialogOpen}`}
+                key={`edit-dialog-${editDialogOpen}`}
                 open={editDialogOpen}
-                entry={editEntry}
-                value={literalValue}
+                value={initialValue}
                 onOpenChange={open => setEditDialogOpen(open)}
-                onObjectChange={v => {
-                    console.log(v)
+                onTypeChange={v => {
                     setLiteralValue(v ?? null)
                 }}
             />
@@ -113,12 +73,7 @@ export const DataTypeTypeInputComponent: React.FC<DataTypeJSONInputComponentProp
                     </ButtonGroup>
                 </Flex>
                 <Card paddingSize="xs" mt={0.7} mb={-0.55} mx={-0.55}>
-                    <DataTypeTypeInputTreeComponent
-                        object={literalValue!}
-                        onEntryClick={handleEntryClick}
-                        collapsedState={collapsedState}
-                        setCollapsedState={setCollapsedState}
-                    />
+                    <></>
                 </Card>
             </Card>
             {!formValidation?.valid && formValidation?.notValidMessage && (
