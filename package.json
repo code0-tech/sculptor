@@ -15,7 +15,8 @@
   },
   "dependencies": {
     "@apollo/client": "^4.0.9",
-    "@code0-tech/pictor": "^0.5.0",
+    "@code0-tech/pictor": "^0.5.1",
+    "@code0-tech/triangulum": "^0.9.0",
     "@opentelemetry/api": "^1.9.1",
     "@opentelemetry/context-zone": "^2.6.1",
     "@opentelemetry/exporter-logs-otlp-http": "^0.214.0",
@@ -25,7 +26,6 @@
     "@opentelemetry/instrumentation-xml-http-request": "^0.214.0",
     "@opentelemetry/sdk-trace-web": "^2.6.1",
     "@vercel/otel": "^2.1.1",
-    "@code0-tech/triangulum": "^0.8.0",
     "@codemirror/lang-javascript": "^6.2.5",
     "@codemirror/lint": "^6.9.5",
     "date-fns": "^4.1.0",
