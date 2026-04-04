@@ -419,7 +419,7 @@ export const DataTypeTypeInputEditDialogComponent: React.FC<DataTypeJSONInputEdi
     }, [open])
 
     // Handler 1: Schema Editor changes
-    const handleSchemaChange = (human: string) => {
+    const handleSchemaChange = React.useCallback((human: string) => {
         const ts = humanToTs(human)
 
         if (ts !== tsValue) {
@@ -434,7 +434,7 @@ export const DataTypeTypeInputEditDialogComponent: React.FC<DataTypeJSONInputEdi
                 setLiteralValue(val as any)
             })
         }
-    }
+    }, [])
 
     // Handler 2: JSON Input changes
     const handleJsonChange = (json: object) => {
@@ -453,11 +453,13 @@ export const DataTypeTypeInputEditDialogComponent: React.FC<DataTypeJSONInputEdi
 
     // Use keys to force-refresh editors when switching tabs or when external sync happens
     // We use humanValue for the Schema editor to ensure it's stable while typing but refreshes from JSON
-    const typeEditorInput = <DataTypeTypeEditorInput
-        value={humanValue}
-        showValidation={false}
-        showTooltips={false}
-        onChange={handleSchemaChange}/>
+    const typeEditorInput = React.useMemo(() => {
+        return <DataTypeTypeEditorInput
+            value={humanValue}
+            showValidation={false}
+            showTooltips={false}
+            onChange={handleSchemaChange}/>
+    }, [humanValue, handleSchemaChange])
 
     const jsonInput = <Editor
         showValidation={false}
