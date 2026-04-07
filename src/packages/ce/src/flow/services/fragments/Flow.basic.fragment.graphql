@@ -2,13 +2,14 @@ fragment BasicFlow on Flow {
     __typename
     id
     createdAt
-    inputType
+    signature
+    disabledReason
+    validationStatus
     name
     project {
         __typename
         id
     }
-    returnType
     settings {
         __typename
     }

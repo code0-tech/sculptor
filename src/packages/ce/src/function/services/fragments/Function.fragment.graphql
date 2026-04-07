@@ -3,13 +3,9 @@ fragment Function on FunctionDefinition {
     createdAt
     updatedAt
     signature
-    linkedDataTypes {
-        count
-        nodes {
-            id
-            identifier
-        }
-    }
+    identifier
+    displayIcon
+
     aliases {
         code
         content
@@ -35,12 +31,12 @@ fragment Function on FunctionDefinition {
         content
         __typename
     }
-    identifier
     names {
         code
         content
         __typename
     }
+
     parameterDefinitions (first: $firstParameterDefinition, after: $afterParameterDefinition) {
         nodes {
             id
@@ -69,6 +65,8 @@ fragment Function on FunctionDefinition {
     runtimeFunctionDefinition {
         id
         identifier
+        definitionSource
+        version
         runtime {
             id
         }

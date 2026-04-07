@@ -5,9 +5,12 @@ fragment DataType on DataType {
     id
     createdAt
     updatedAt
+
     identifier
     genericKeys
     type
+    definitionSource
+    version
 
     name {
         __typename
