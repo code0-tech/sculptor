@@ -44,6 +44,7 @@ fragment Function on FunctionDefinition {
             updatedAt
             createdAt
             identifier
+            defaultValue
             names {
                 code
                 content
