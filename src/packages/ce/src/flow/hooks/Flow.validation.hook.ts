@@ -39,7 +39,7 @@ export const useFlowValidation = (
         if (!flow) return;
 
         // Skip if already validated for this version
-        if (window.lastValidatedFlows?.[flowId as string]?.lastValidated === flow.editedAt) {
+        if (flow.editedAt && window.lastValidatedFlows?.[flowId as string]?.lastValidated === flow.editedAt) {
             setValidationResult(window.lastValidatedFlows?.[flowId as string].validation!)
             return;
         }
