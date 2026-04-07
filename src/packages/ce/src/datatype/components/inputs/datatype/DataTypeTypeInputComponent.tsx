@@ -54,8 +54,10 @@ export const DataTypeTypeInputComponent: React.FC<DataTypeJSONInputComponentProp
                     setLiteralValue(v ?? null)
                 }}
             />
-            <InputLabel>{title}</InputLabel>
-            <InputDescription>{description}</InputDescription>
+            <div>
+                <InputLabel>{title}</InputLabel>
+                <InputDescription>{description}</InputDescription>
+            </div>
             <Card color="secondary" paddingSize="xs">
                 <Flex style={{gap: ".7rem"}} align="center" justify="space-between">
                     <Flex style={{gap: ".35rem"}} align="center">

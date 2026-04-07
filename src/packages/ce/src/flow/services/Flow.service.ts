@@ -151,6 +151,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
                     value: setting?.value!,
                 }
             }) ?? [],
+            signature: flow?.signature,
             nodes: (flow?.nodes?.nodes ?? []).map(node => ({
                 id: node?.id!,
                 nextNodeId: node?.nextNodeId!,
@@ -276,6 +277,9 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         const index = this.values().findIndex(f => f.id === flowId)
         if (!flow) return
 
+        const colonIndex = flow.signature?.lastIndexOf(')')
+        const prefix = flow.signature?.substring(0, (colonIndex ?? 0) + 1);
+        flow.signature = prefix + ": " + type;
         flow.editedAt = new Date().toISOString()
 
         this.set(index, new View(flow))
