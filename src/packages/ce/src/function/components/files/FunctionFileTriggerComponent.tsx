@@ -1,13 +1,10 @@
 import React from "react";
 import {Flex, InputSyntaxSegment, useForm, useService, useStore} from "@code0-tech/pictor";
-import {Flow, LiteralValue, NodeParameterValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
-import {FunctionSuggestion} from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
-import {useValueSuggestions} from "@edition/function/hooks/FunctionValueSuggestions.hook";
-import {toInputSuggestions} from "@edition/function/components/suggestion/FunctionSuggestionMenuComponent.util";
+import {Flow, LiteralValue} from "@code0-tech/sagittarius-graphql-types";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import {DataTypeTextInputComponent} from "@edition/datatype/components/inputs/text/DataTypeTextInputComponent";
-import {DataTypeTypeInputComponent} from "@edition/datatype/components/inputs/datatype/DataTypeTypeInputComponent";
+import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
+import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent";
 
 export interface FunctionFileTriggerComponentProps {
     instance: Flow
@@ -18,102 +15,94 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
     const {instance} = props
 
     const flowTypeService = useService(FlowTypeService)
+    const flowTypeStore = useStore(FlowTypeService)
     const flowService = useService(FlowService)
+    const validation = useFlowValidation(instance.id)
     const [, startTransition] = React.useTransition()
+    const changedParameters = React.useRef<Set<number>>(new Set())
 
-    const definition = flowTypeService.getById(instance.type?.id!!)
+    const definition = React.useMemo(
+        () => flowTypeService.getById(instance.type?.id!!),
+        [flowTypeStore, instance]
+    )
 
-    //TODO: performance use log inside for each to see the problem
-    const suggestionsById: Record<string, FunctionSuggestion[]> = {}
-    definition?.flowTypeSettings?.forEach(settingDefinition => {
-        const valueSuggestions = useValueSuggestions(settingDefinition.type!)
-        suggestionsById[settingDefinition.identifier!!] = [
-            ...valueSuggestions,
-        ].sort()
-    })
+    const initialValues = React.useMemo(() => {
+        const values: Record<string, any> = {}
+        definition?.flowTypeSettings?.forEach((setting, index) => {
+            const flowSetting = instance.settings?.nodes?.[index]
+            values[index] = flowSetting?.value?.__typename === "LiteralValue" ? (flowSetting?.value.value) : (flowSetting?.value)
+        })
+        return values
+    }, [definition, instance])
 
-    const initialValues = React.useMemo(() => ({
-        "inputType": instance?.inputType ?? definition?.inputType
-    }), [instance?.inputType, definition?.inputType])
+    const validations = React.useMemo(() => {
+        const values: Record<string, any> = {}
+        instance.settings?.nodes?.forEach((flowSetting, index) => {
+            values[index] = (_: any) => {
+                const validationForSetting = validation?.find(v => v.parameterIndex === index && !v.nodeId)
+                if (validationForSetting) {
+                    return validationForSetting.message!![0]?.content || "Invalid value"
+                }
+                return null
+            }
+        })
+        return values
+    }, [instance, validation])
 
-    const [inputs, validate] = useForm({
+    const onSubmit = React.useCallback((values: any) => {
+        startTransition(async () => {
+            for (const flowTypeSetting of definition?.flowTypeSettings ?? []) {
+                const index = definition?.flowTypeSettings?.findIndex(p => p?.id === flowTypeSetting?.id)
+                if (typeof index !== "number") return
+                if (!changedParameters.current.has(index)) continue;
+
+                const syntaxSegment = values[index]
+                const syntaxValue = syntaxSegment?.[0]?.value ?? syntaxSegment?.value ?? syntaxSegment ?? null as LiteralValue | null
+
+                if (!syntaxValue || !syntaxSegment || (Array.isArray(syntaxValue) && Array.from(syntaxValue).length <= 0)) {
+                    await flowService.setSettingValue(instance.id, index, null)
+                    continue;
+                }
+
+                await flowService.setSettingValue(props.instance.id, index, syntaxValue)
+            }
+            changedParameters.current.clear()
+        })
+    }, [definition, changedParameters])
+
+    const [inputs, validate] = useForm<Record<number, InputSyntaxSegment[]>>({
         initialValues: initialValues,
+        validate: validations,
         truthyValidationBeforeSubmit: false,
-        onSubmit: (values) => {
-            if (!values.inputType) return
-            startTransition(async () => {
-                await flowService.setInputType(instance.id, values.inputType!)
-            })
-        }
+        useInitialValidation: true,
+        onSubmit: onSubmit
     })
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
-        {
+        {definition?.flowTypeSettings?.map((settingDefinition, index) => {
 
-            instance?.inputType ?? definition?.inputType ? <DataTypeTypeInputComponent
-                flowId={instance.id}
-                title={"Test Data Type"}
-                description={"Data type used for testing"}
-                onChange={() => {
-                    validate()
-                }}
-                {...inputs.getInputProps("inputType")}
-            /> : null
+            if (!settingDefinition) return null
 
-        }
-        {definition?.flowTypeSettings?.map(settingDefinition => {
-            const setting = instance.settings?.nodes?.find(s => s?.flowSettingIdentifier == settingDefinition.identifier)
             const title = settingDefinition.names!![0]?.content ?? ""
             const description = settingDefinition?.descriptions!![0]?.content ?? ""
-            const result = suggestionsById[settingDefinition.identifier!!]
-
-
-            const defaultValue = setting?.value?.__typename === "LiteralValue" ? typeof setting?.value == "object" ? JSON.stringify(setting?.value) : setting?.value : typeof setting?.value == "object" ? JSON.stringify(setting?.value) : setting?.value
-
-            const submitValue = (value: NodeParameterValue) => {
-                startTransition(async () => {
-                    if (value?.__typename == "LiteralValue" && settingDefinition.identifier) {
-                        await flowService.setSettingValue(props.instance.id, String(settingDefinition.identifier), value.value)
-                    } else if (settingDefinition.identifier) {
-                        await flowService.setSettingValue(props.instance.id, String(settingDefinition.identifier), value)
-                    }
-                })
-
-            }
-
-            const submitValueEvent = (event: any) => {
-                try {
-                    const value = JSON.parse(event.target.value) as Scalars['JSON']['output']
-                    if (value.__typename == "LiteralValue") {
-                        submitValue(value.value)
-                        return
-                    }
-                    submitValue(value)
-                } catch (e) {
-                    submitValue({
-                        value: event.target.innerText,
-                        __typename: "LiteralValue"
-                    } as LiteralValue)
-                }
-            }
 
             return <div>
-                <DataTypeTextInputComponent flowId={undefined}
-                                            nodeId={undefined}
-                                            parameterIndex={0}
-                                            title={title}
-                                            description={description}
-                                            clearable
-                                            key={settingDefinition.identifier}
-                                            defaultValue={defaultValue}
-                                            onBlur={submitValueEvent}
-                                            onClear={submitValueEvent}
-                                            onSuggestionSelect={(suggestion) => {
-                                                submitValue(suggestion.value)
-                                            }}
-                                            suggestions={toInputSuggestions(result)}
+                {/*@ts-ignore*/}
+                <DataTypeInputComponent flowId={instance.id}
+                                        nodeId={undefined}
+                                        parameterIndex={index}
+                                        title={title}
+                                        description={description}
+                                        clearable
+                                        onChange={() => {
+                                            //TODO this should be debounced
+                                            changedParameters.current.add(index)
+                                            validate()
+                                        }}
+                                        {...inputs.getInputProps(index)}
                 />
             </div>
+
         })}
     </Flex>
 }
