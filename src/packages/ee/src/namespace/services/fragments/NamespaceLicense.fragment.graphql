@@ -11,6 +11,7 @@ fragment NamespaceLicense on NamespaceLicense {
     licensee
 
     userAbilities {
+        __typename
         deleteNamespaceLicense
     }
 }
