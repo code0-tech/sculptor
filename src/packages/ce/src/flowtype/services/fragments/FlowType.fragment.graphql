@@ -4,7 +4,6 @@ fragment FlowType on FlowType {
     updatedAt
     createdAt
     identifier
-
     names {
         code
         content
@@ -28,8 +27,7 @@ fragment FlowType on FlowType {
     runtime {
         id
     }
-    inputType
-    returnType
+    signature
     flowTypeSettings {
         __typename
         id
@@ -37,14 +35,6 @@ fragment FlowType on FlowType {
         updatedAt
         identifier
         unique
-        type
-        linkedDataTypes {
-            count
-            nodes {
-                id
-                identifier
-            }
-        }
         names {
             __typename
             code
@@ -55,14 +45,9 @@ fragment FlowType on FlowType {
             code
             content
         }
-
     }
     editable
-    linkedDataTypes {
-        count
-        nodes {
-            id
-            identifier
-        }
-    }
+    definitionSource
+    displayIcon
+    version
 }

@@ -45,9 +45,10 @@ export const useSuggestions = (
     )
 
     React.useEffect(() => {
+        if (!node) return
         const timeout = setTimeout(() => {
             execute({
-                node: node!,
+                node: node,
                 dataTypes: dataTypes,
                 functions: functions
             }).then(value => {

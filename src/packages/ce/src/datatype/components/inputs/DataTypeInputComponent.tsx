@@ -10,7 +10,7 @@ import {DataTypeJSONInputComponent} from "@edition/datatype/components/inputs/js
 
 export interface DataTypeInputComponentProps extends Omit<InputProps<any | null>, "wrapperComponent" | "type"> {
     flowId: Flow['id']
-    nodeId: NodeFunction['id']
+    nodeId?: NodeFunction['id'] //TODO if undefined we need to get infos from trigger
     parameterIndex: number
     clearable?: boolean
     onClear?: (event: React.MouseEvent<HTMLButtonElement>) => void
@@ -27,23 +27,28 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
     const functionStore = useStore(FunctionService)
     const functionService = useService(FunctionService)
 
+    const flow = React.useMemo(
+        () => flowId ? flowService.getById(flowId) : undefined,
+        [flowStore, flowId]
+    )
+
     const node = React.useMemo(
-        () => flowService.getNodeById(flowId, nodeId),
+        () => nodeId && flowId ? flowService.getNodeById(flowId, nodeId) : undefined,
         [flowStore, flowId, nodeId]
     )
 
     const functionDefinition = React.useMemo(
-        () => functionService.getById(node?.functionDefinition?.id),
+        () => node ? functionService.getById(node?.functionDefinition?.id) : undefined,
         [functionStore, node]
     )
 
     const types = React.useMemo(
-        () => getTypesFromFunction(functionDefinition!),
-        [functionDefinition]
+        () => nodeId ? getTypesFromFunction(functionDefinition!) : undefined,
+        [functionDefinition, nodeId]
     )
 
     const dataTypeVariant = React.useMemo(
-        () => getTypeVariant(types.parameters[parameterIndex], dataTypeService.values())[0].variant,
+        () => types ? getTypeVariant(types.parameters[parameterIndex], dataTypeService.values())[0].variant : undefined,
         [dataTypeStore, types]
     )
 

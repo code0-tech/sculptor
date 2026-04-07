@@ -3,9 +3,13 @@ fragment BasicDataType on DataType {
     id
     createdAt
     updatedAt
+
     identifier
     genericKeys
     type
+    definitionSource
+    version
+
     name {
         __typename
         code
@@ -21,7 +25,6 @@ fragment BasicDataType on DataType {
         code
         content
     }
-
     runtime {
         id
     }

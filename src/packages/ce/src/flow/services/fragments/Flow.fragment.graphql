@@ -3,8 +3,7 @@ fragment Flow on Flow {
     id
     createdAt
     name
-    inputType
-    returnType
+    signature
     nodes (first: $firstNode, after: $afterNode) {
         __typename
         nodes {
@@ -92,6 +91,8 @@ fragment Flow on Flow {
     type {
         id
     }
+    validationStatus
+    disabledReason
     updatedAt
     userAbilities {
         deleteFlow
