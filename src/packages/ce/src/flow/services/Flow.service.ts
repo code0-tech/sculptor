@@ -145,7 +145,6 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         const payload: FlowInput = {
             name: flow?.name!,
             type: flow?.type?.id!,
-            inputType: flow?.inputType,
             settings: flow?.settings?.nodes?.map(setting => {
                 return {
                     flowSettingIdentifier: setting?.flowSettingIdentifier!,
@@ -278,30 +277,28 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         if (!flow) return
 
         flow.editedAt = new Date().toISOString()
-        flow.inputType = type
 
         this.set(index, new View(flow))
         await this.syncFlow(flowId)
 
     }
 
-    async setSettingValue(flowId: FlowView['id'], settingIdentifier: Maybe<Scalars['String']['output']>, value: FlowSetting['value']): Promise<void> {
+    async setSettingValue(flowId: FlowView['id'], parameterIndex: number, value: FlowSetting['value']): Promise<void> {
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
         if (!flow) return
 
         flow.editedAt = new Date().toISOString()
 
-        const setting: Maybe<FlowSetting> | undefined = flow.settings?.nodes?.find(s => s?.flowSettingIdentifier === settingIdentifier)
+        const setting: Maybe<FlowSetting> | undefined = flow.settings?.nodes?.[parameterIndex]
 
         if (!setting) {
             const localSetting = {
-                flowSettingIdentifier: settingIdentifier,
                 value: null
             }
             localSetting.value = value
             if (flow.settings && flow.settings.nodes)
-                flow.settings.nodes.push(localSetting)
+                flow.settings.nodes[parameterIndex] = localSetting
             else {
                 flow.settings = {nodes: [localSetting]}
             }
@@ -320,7 +317,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         const node = this.getNodeById(flowId, nodeId)
         if (!node) return
         const parameter = node.parameters?.nodes?.[parameterIndex]
-        if (!parameter && parameterDefinitionId) {
+        if (!parameter && parameterDefinitionId && node.parameters && node.parameters.nodes) {
             //TODO: needs a parameterDefinitionId
             const localParameter: NodeParameter = {
                 __typename: "NodeParameter",
@@ -348,7 +345,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
 
             flow.editedAt = new Date().toISOString()
 
-            node.parameters?.nodes?.push(localParameter)
+            node.parameters.nodes[parameterIndex] = (localParameter)
         } else if (parameter) {
             this.removeParameterNode(flow, parameter)
             if (value?.__typename === "NodeFunction") {
