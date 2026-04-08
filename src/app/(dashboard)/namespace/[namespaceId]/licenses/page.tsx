@@ -1,3 +1,3 @@
-import {NamespaceLicensesPage} from "@edition/namespace/pages/NamespaceLicensesPage";
+import {LicensesPage} from "@edition/namespace/pages/LicensesPage";
 
-export default NamespaceLicensesPage
+export default LicensesPage
