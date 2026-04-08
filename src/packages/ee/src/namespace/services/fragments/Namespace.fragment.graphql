@@ -1,0 +1,47 @@
+#import "@edition/organization/services/fragments/Organization.id.fragment.graphql"
+#import "@edition/user/services/fragments/User.id.fragment.graphql"
+#import "@edition/namespace/services/fragments/NamespaceLicense.fragment.graphql"
+fragment Namespace on Namespace {
+    __typename
+    id
+    updatedAt
+    createdAt
+    roles {
+        count
+    }
+    members {
+        count
+    }
+    projects {
+        count
+    }
+    runtimes {
+        count
+    }
+    parent {
+        __typename
+        ...on Organization {
+            ...OrganizationId
+        }
+        ...on User{
+            ...UserId
+        }
+    }
+    currentNamespaceLicense {
+        ...NamespaceLicense
+    }
+    namespaceLicenses {
+        __typename
+        count
+        nodes {
+            ...NamespaceLicense
+        }
+    }
+    userAbilities {
+        createNamespaceProject
+        createNamespaceRole
+        createRuntime
+        inviteMember
+        __typename
+    }
+}

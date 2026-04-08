@@ -1,0 +1,17 @@
+fragment NamespaceLicense on NamespaceLicense {
+    __typename
+    id
+
+    createdAt
+    updatedAt
+
+    startDate
+    endDate
+
+    licensee
+
+    userAbilities {
+        __typename
+        deleteNamespaceLicense
+    }
+}
