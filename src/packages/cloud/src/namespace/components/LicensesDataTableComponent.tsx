@@ -1,3 +1,5 @@
+"use client"
+
 import React from "react";
 import {
     AuroraBackground,
@@ -33,12 +35,12 @@ export const LicensesDataTableComponent: React.FC<LicensesDataTableComponentProp
     const namespaceStore = useStore(NamespaceService)
 
     const licenses = React.useMemo(
-        () => namespaceService.getById(namespaceId)?.namespaceLicenses?.nodes as NamespaceLicense[],
+        () => namespaceService.getById(namespaceId)?.namespaceLicenses?.nodes as NamespaceLicense[] ?? [],
         [namespaceStore]
     )
 
-    return <DataTable filter={filter}
-                      sort={sort}
+    return <DataTable filter={{}}
+                      sort={{}}
                       emptyComponent={<DataTableColumn>
                           <Flex align={"center"} justify={"center"}
                                 style={{textAlign: "center", flexDirection: "column"}}>
@@ -68,9 +70,9 @@ export const LicensesDataTableComponent: React.FC<LicensesDataTableComponentProp
 
                       </DataTableColumn>}
                       onSelect={(item) => item && onSelect?.(item)}
-                      data={licenses.filter(preFilter)}>
+                      data={licenses?.filter(preFilter)}>
         {(license, index) => {
-            return <LicensesDataTableRowComponent namespaceId={namespaceId} licenseId={license.id}/>
+            return <LicensesDataTableRowComponent namespaceId={namespaceId} licenseId={license?.id}/>
         }}
     </DataTable>
 
