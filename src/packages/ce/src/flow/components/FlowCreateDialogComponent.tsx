@@ -116,7 +116,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                 }
             })
         })
-    }, [])
+    }, [flowService])
 
     React.useEffect(() => {
         setCreateDialogOpen(open)
