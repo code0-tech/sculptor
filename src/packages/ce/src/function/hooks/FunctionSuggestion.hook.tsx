@@ -63,7 +63,7 @@ export const useSuggestions = (
 
     const valueSuggestions = useValueSuggestions(types?.parameters?.[parameterIndex ?? 0])
     const refObjectSuggestions = useReferenceSuggestions(flowId, nodeId, parameterIndex)
-    const functionSuggestions = useNodeSuggestions(types?.parameters?.[parameterIndex ?? 0])
+    const functionSuggestions = (node && parameterIndex ) || (!node && typeof parameterIndex != "number") ? useNodeSuggestions(types?.parameters?.[parameterIndex ?? 0]) : []
 
     return React.useMemo(() => {
         return [
