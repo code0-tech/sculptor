@@ -14,6 +14,7 @@ import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeC
 import {FunctionFileDefaultComponent} from "@edition/function/components/files/FunctionFileDefaultComponent";
 import {NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {underlineBySeverity} from "@core/util/inspection";
+import {icon, IconString} from "@core/util/icons";
 
 export type FunctionNodeDefaultComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
 
@@ -145,6 +146,8 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
 
     }, [flowStore, activeTabId, data.flowId, node])
 
+    const DisplayIcon = icon(definition?.displayIcon as IconString)
+
     return (
         <Card
             key={id}
@@ -192,7 +195,7 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
 
 
             <Flex align={"center"} style={{gap: "0.7rem"}}>
-                <IconNote color={data.color} size={16}/>
+                <DisplayIcon color={data.color} size={16}/>
                 <Text size={"md"}>{displayMessage}</Text>
             </Flex>
         </Card>
