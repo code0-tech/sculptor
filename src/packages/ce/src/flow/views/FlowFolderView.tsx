@@ -63,11 +63,11 @@ export const FlowFolderView: React.FC = () => {
                         color: "success",
                         dismissible: true,
                     })
-                    router.push(`/namespace/${namespaceIndex}/project/${projectIndex}/`)
+                    router.push(`/namespace/${namespaceIndex}/project/${projectIndex}/flow`)
                 }
             })
         })
-    }, [])
+    }, [flowService])
 
     return <>
 
