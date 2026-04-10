@@ -287,7 +287,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
 
     }
 
-    async setSettingValue(flowId: FlowView['id'], parameterIndex: number, value: FlowSetting['value']): Promise<void> {
+    async setSettingValue(flowId: FlowView['id'], parameterIndex: number, value: FlowSetting['value'], flowSettingsIdentifier: FlowSetting['flowSettingIdentifier']): Promise<void> {
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
         if (!flow) return
@@ -298,7 +298,8 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
 
         if (!setting) {
             const localSetting = {
-                value: null
+                value: null,
+                flowSettingsIdentifier: flowSettingsIdentifier
             }
             localSetting.value = value
             if (flow.settings && flow.settings.nodes)
@@ -307,6 +308,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
                 flow.settings = {nodes: [localSetting]}
             }
         } else {
+            setting.flowSettingIdentifier = flowSettingsIdentifier
             setting.value = value
         }
 
