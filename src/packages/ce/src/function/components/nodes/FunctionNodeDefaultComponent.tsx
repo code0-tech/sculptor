@@ -5,7 +5,7 @@ import {FunctionNodeComponentProps} from "./FunctionNodeComponent";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
 import {Badge, Card, Flex, Text, useService, useStore as usePictorStore} from "@code0-tech/pictor";
 import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
-import {IconNote, IconVariable} from "@tabler/icons-react";
+import {IconVariable} from "@tabler/icons-react";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {LiteralBadgeComponent} from "@edition/datatype/components/badges/LiteralBadgeComponent";
@@ -36,6 +36,8 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
         () => node ? functionService.getById(node.functionDefinition?.id!!) : undefined,
         [functionStore, data, node]
     )
+
+    const DisplayIcon = icon(definition?.displayIcon as IconString)
 
     const validation = useFlowValidation(data.flowId)
 
@@ -123,7 +125,7 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
             active: false,
             closeable: true,
             children: <>
-                <IconNote color={data.color} size={12}/>
+                <DisplayIcon color={data.color} size={12}/>
                 <Text size={"sm"}>{definition?.names!![0]?.content}</Text>
             </>,
             content: <FunctionFileDefaultComponent flowId={props.data.flowId} node={node}/>
@@ -145,8 +147,6 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
         return undefined
 
     }, [flowStore, activeTabId, data.flowId, node])
-
-    const DisplayIcon = icon(definition?.displayIcon as IconString)
 
     return (
         <Card
