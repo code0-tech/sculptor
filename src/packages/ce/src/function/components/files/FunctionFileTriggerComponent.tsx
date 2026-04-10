@@ -70,11 +70,11 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
                 const syntaxValue = syntaxSegment?.[0]?.value ?? syntaxSegment?.value ?? syntaxSegment ?? null as LiteralValue | null
 
                 if (!syntaxValue || !syntaxSegment || (Array.isArray(syntaxValue) && Array.from(syntaxValue).length <= 0)) {
-                    await flowService.setSettingValue(instance.id, index, null)
+                    await flowService.setSettingValue(instance.id, index, null, flowTypeSetting.identifier)
                     continue;
                 }
 
-                await flowService.setSettingValue(props.instance.id, index, syntaxValue)
+                await flowService.setSettingValue(props.instance.id, index, syntaxValue, flowTypeSetting.identifier)
             }
             changedParameters.current.clear()
         })
