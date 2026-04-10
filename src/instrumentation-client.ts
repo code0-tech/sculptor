@@ -4,6 +4,7 @@ import initializeTraces, {openTelemetryClientTracesProvider} from "@core/util/op
 import {logs} from "@opentelemetry/api-logs"
 import {trace} from "@opentelemetry/api"
 
+if (process.env)
 initializeLogs("client")
 logs.setGlobalLoggerProvider(openTelemetryClientLogsProvider)
 
