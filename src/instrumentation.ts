@@ -6,16 +6,14 @@ import initializeTraces, {openTelemetryServerTracesProvider} from "@core/util/op
 
 export function register() {
 
-
-    metrics.setGlobalMeterProvider(openTelemetryMetricProvider)
+    if (openTelemetryMetricProvider) metrics.setGlobalMeterProvider(openTelemetryMetricProvider)
     initializeMetrics()
 
-    logs.setGlobalLoggerProvider(openTelemetryServerLogsProvider)
+    if (openTelemetryServerLogsProvider) logs.setGlobalLoggerProvider(openTelemetryServerLogsProvider)
     initializeLogs()
 
-    trace.setGlobalTracerProvider(openTelemetryServerTracesProvider)
+    if (openTelemetryServerTracesProvider) trace.setGlobalTracerProvider(openTelemetryServerTracesProvider)
     initializeTraces()
-
 
 }
 
