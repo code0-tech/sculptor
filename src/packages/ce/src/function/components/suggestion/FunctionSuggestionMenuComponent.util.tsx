@@ -24,7 +24,7 @@ export const toInputSuggestions = (suggestions: FunctionSuggestion[]): InputSugg
         }
 
         const children: React.ReactNode = <>
-            {iconMap[suggestion.type]}
+            {suggestion.icon ?? iconMap[suggestion.type]}
             {
                 suggestion.type === FunctionSuggestionType.REF_OBJECT ? (
                     <ReferenceBadgeComponent value={suggestion.value as ReferenceValue}/>
