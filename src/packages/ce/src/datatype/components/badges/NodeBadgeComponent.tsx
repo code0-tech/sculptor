@@ -12,6 +12,7 @@ import {FlowService} from "@edition/flow/services/Flow.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {useParams} from "next/navigation";
 import {icon, IconString} from "@core/util/icons";
+import {FALLBACK_FLOW_TYPE_NAME, FALLBACK_FUNCTION_NAME} from "@core/util/fallback-translations";
 
 export interface NodeBadgeComponentProps extends Omit<BadgeType, 'value' | 'children'> {
     value: NodeFunction | NodeFunctionIdWrapper
@@ -45,11 +46,11 @@ export const NodeBadgeComponent: React.FC<NodeBadgeComponentProps> = (props) => 
 
     const name = React.useMemo(() => {
         if (definition) {
-            return definition.names?.[0]?.content
+            return definition.names?.[0]?.content ?? definition.__typename === "FunctionDefinition" ? FALLBACK_FUNCTION_NAME : FALLBACK_FLOW_TYPE_NAME
         } else if (isTrigger && node?.__typename === "FlowType") {
-            return node.names?.[0]?.content
+            return node.names?.[0]?.content ?? FALLBACK_FLOW_TYPE_NAME
         }
-        return (functionService as FunctionService).getById((node as NodeFunction)?.functionDefinition?.id)?.names?.[0]?.content
+        return (functionService as FunctionService).getById((node as NodeFunction)?.functionDefinition?.id)?.names?.[0]?.content ?? FALLBACK_FUNCTION_NAME
     }, [functionStore, node])
 
     const lDefinition = React.useMemo(

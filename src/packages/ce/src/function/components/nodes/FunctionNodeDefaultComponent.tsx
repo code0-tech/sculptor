@@ -15,6 +15,7 @@ import {FunctionFileDefaultComponent} from "@edition/function/components/files/F
 import {NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {underlineBySeverity} from "@core/util/inspection";
 import {icon, IconString} from "@core/util/icons";
+import {FALLBACK_FUNCTION_DISPLAY_MESSAGE, FALLBACK_FUNCTION_NAME} from "@core/util/fallback-translations";
 
 export type FunctionNodeDefaultComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
 
@@ -70,7 +71,7 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
                         .flatMap(p => p.trim() === "," ? [","] : p.trim() ? [p.trim()] : [])
             );
 
-    const displayMessage = React.useMemo(() => splitTemplate(definition?.displayMessages!![0]?.content ?? "").map(item => {
+    const displayMessage = React.useMemo(() => splitTemplate(definition?.displayMessages?.[0]?.content ?? FALLBACK_FUNCTION_DISPLAY_MESSAGE).map(item => {
         const nodeParameter = node?.parameters?.nodes?.find(p => {
             const parameterDefinition = definition?.parameterDefinitions?.nodes?.find(pd => pd?.id == p?.parameterDefinition?.id)
             return parameterDefinition?.identifier == item
@@ -126,7 +127,7 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
             closeable: true,
             children: <>
                 <DisplayIcon color={data.color} size={12}/>
-                <Text size={"sm"}>{definition?.names!![0]?.content}</Text>
+                <Text size={"sm"}>{definition?.names?.[0]?.content ?? FALLBACK_FUNCTION_NAME}</Text>
             </>,
             content: <FunctionFileDefaultComponent flowId={props.data.flowId} node={node}/>
         })

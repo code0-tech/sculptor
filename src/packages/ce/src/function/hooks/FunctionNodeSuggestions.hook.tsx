@@ -8,6 +8,7 @@ import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import React, {startTransition} from "react";
 import {useNodeSuggestionsAction} from "@edition/flow/components/FlowWorkerProvider";
 import {icon, IconString} from "@core/util/icons";
+import {FALLBACK_FUNCTION_NAME} from "@core/util/fallback-translations";
 
 export const useNodeSuggestions = (
     type?: string,
@@ -59,7 +60,7 @@ export const useNodeSuggestions = (
         return {
             path: [],
             type: FunctionSuggestionType.FUNCTION,
-            displayText: [functionDefinition?.names![0]?.content as string],
+            displayText: [functionDefinition?.names?.[0]?.content ?? FALLBACK_FUNCTION_NAME],
             value: suggestion,
             icon: <DisplayIcon color="#70ffb2" size={16}/>
         }

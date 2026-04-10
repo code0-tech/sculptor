@@ -12,6 +12,10 @@ import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent";
+import {
+    FALLBACK_FUNCTION_PARAMETER_DESCRIPTION,
+    FALLBACK_FUNCTION_PARAMETER_NAME
+} from "@core/util/fallback-translations";
 
 export interface FunctionFileDefaultComponentProps {
     node: NodeFunction
@@ -51,7 +55,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
             values[index] = (_: any) => {
                 const validationForParameter = validation?.find(v => v.parameterIndex === index && v.nodeId === node.id)
                 if (validationForParameter) {
-                    return validationForParameter.message!![0]?.content || "Invalid value"
+                    return validationForParameter.message?.[0]?.content ?? "Invalid value"
                 }
                 return null
             }
@@ -121,8 +125,8 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
 
             if (!parameterDefinition) return null
 
-            const title = parameterDefinition?.names ? parameterDefinition?.names!![0]?.content : parameterDefinition?.id
-            const description = parameterDefinition?.descriptions ? parameterDefinition?.descriptions!![0]?.content : JSON.stringify(parameterDefinition.identifier)
+            const title = parameterDefinition?.names?.[0]?.content ?? FALLBACK_FUNCTION_PARAMETER_NAME
+            const description = parameterDefinition?.descriptions?.[0]?.content ?? FALLBACK_FUNCTION_PARAMETER_DESCRIPTION
 
             return <div>
                 {/*@ts-ignore*/}

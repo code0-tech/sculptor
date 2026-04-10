@@ -16,6 +16,7 @@ import {
 } from "@code0-tech/pictor/dist/components/context-menu/ContextMenu";
 import {Flex, Text, useService, useStore} from "@code0-tech/pictor";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
+import {FALLBACK_FLOW_TYPE_NAME} from "@core/util/fallback-translations";
 
 export interface FlowFolderContextMenuComponentGroupData {
     name: string
@@ -63,7 +64,7 @@ export const FlowFolderContextMenuComponent: React.FC<FlowFolderContextMenuCompo
                                 return <ContextMenuItem key={flowType.id} onSelect={() => {
                                     props.onCreate?.(flowType.id)
                                 }}>
-                                    {flowType.names!![0]?.content ?? flowType.id}
+                                    {flowType.names?.[0]?.content ?? FALLBACK_FLOW_TYPE_NAME}
                                 </ContextMenuItem>
                             })}
                         </ContextMenuSubContent>

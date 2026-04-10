@@ -6,6 +6,7 @@ import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {DataTypeVariant, getTypesFromFunction, getTypesFromNode, getTypeVariant} from "@code0-tech/triangulum";
+import {FALLBACK_FUNCTION_PARAMETER_NAME} from "@core/util/fallback-translations";
 
 // @ts-ignore
 export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], projectId?: NamespaceProject['id']): Edge<DFlowEdgeDataProps>[] => {
@@ -108,7 +109,7 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                             deletable: false,
                             selectable: false,
                             animated: true,
-                            label: parameterDefinition?.names!![0]?.content ?? index,
+                            label: parameterDefinition?.names!![0]?.content ?? FALLBACK_FUNCTION_PARAMETER_NAME,
                             data: {
                                 color: hashToColor(parameterValue?.id || ""),
                                 type: 'group',

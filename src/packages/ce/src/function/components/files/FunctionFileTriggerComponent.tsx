@@ -7,6 +7,11 @@ import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
 import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent";
 import {getTypesFromFunction} from "@code0-tech/triangulum";
 import {DataTypeTypeInputComponent} from "@edition/datatype/components/inputs/datatype/DataTypeTypeInputComponent";
+import {
+    FALLBACK_FLOW_TYPE_DESCRIPTION,
+    FALLBACK_FLOW_TYPE_SETTING_DESCRIPTION,
+    FALLBACK_FLOW_TYPE_SETTING_NAME
+} from "@core/util/fallback-translations";
 
 export interface FunctionFileTriggerComponentProps {
     instance: Flow
@@ -48,7 +53,7 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
             values[index] = (_: any) => {
                 const validationForSetting = validation?.find(v => v.parameterIndex === index && !v.nodeId)
                 if (validationForSetting) {
-                    return validationForSetting.message!![0]?.content || "Invalid value"
+                    return validationForSetting.message?.[0]?.content || "Invalid value"
                 }
                 return null
             }
@@ -104,8 +109,8 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
 
             if (!settingDefinition) return null
 
-            const title = settingDefinition.names!![0]?.content ?? ""
-            const description = settingDefinition?.descriptions!![0]?.content ?? ""
+            const title = settingDefinition.names?.[0]?.content ?? FALLBACK_FLOW_TYPE_SETTING_NAME
+            const description = settingDefinition?.descriptions?.[0]?.content ?? FALLBACK_FLOW_TYPE_SETTING_DESCRIPTION
 
             return <div>
                 {/*@ts-ignore*/}

@@ -9,6 +9,7 @@ import {IconVariable} from "@tabler/icons-react";
 import {FunctionFileTriggerComponent} from "@edition/function/components/files/FunctionFileTriggerComponent";
 import {NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {icon, IconString} from "@core/util/icons";
+import {FALLBACK_FLOW_TYPE_DISPLAY_MESSAGE, FALLBACK_FLOW_TYPE_NAME} from "@core/util/fallback-translations";
 
 
 export type FunctionNodeTriggerComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
@@ -35,7 +36,7 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
             closeable: true,
             children: <>
                 <DisplayIcon color={data.color} size={12}/>
-                <Text size={"sm"}>{definition?.names!![0]?.content}</Text>
+                <Text size={"sm"}>{definition?.names?.[0]?.content ?? FALLBACK_FLOW_TYPE_NAME}</Text>
             </>,
             content: <FunctionFileTriggerComponent instance={flow}/>,
             show: true
@@ -82,7 +83,7 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
         <Flex style={{gap: "0.7rem"}} align={"center"}>
             <DisplayIcon color={data.color} size={16}/>
             <Text display={"block"}>
-                {definition?.displayMessages!![0]?.content ?? definition?.id}
+                {definition?.displayMessages?.[0]?.content ?? FALLBACK_FLOW_TYPE_DISPLAY_MESSAGE}
             </Text>
         </Flex>
 
