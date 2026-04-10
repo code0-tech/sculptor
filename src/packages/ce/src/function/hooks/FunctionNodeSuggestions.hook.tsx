@@ -7,6 +7,7 @@ import {FunctionService} from "@edition/function/services/Function.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import React, {startTransition} from "react";
 import {useNodeSuggestionsAction} from "@edition/flow/components/FlowWorkerProvider";
+import {icon, IconString} from "@core/util/icons";
 
 export const useNodeSuggestions = (
     type?: string,
@@ -54,12 +55,13 @@ export const useNodeSuggestions = (
     }).map(suggestion => {
 
         const functionDefinition = functionService.getById(suggestion.functionDefinition?.id)
-
+        const DisplayIcon = icon(functionDefinition?.displayIcon as IconString)
         return {
             path: [],
             type: FunctionSuggestionType.FUNCTION,
             displayText: [functionDefinition?.names![0]?.content as string],
             value: suggestion,
+            icon: <DisplayIcon color="#70ffb2" size={16}/>
         }
     }), [suggestions]);
 }

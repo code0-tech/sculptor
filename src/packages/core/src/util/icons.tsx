@@ -14,8 +14,6 @@ export const icon = (icon?: IconString): React.FC<TablerIcons.IconProps & React.
         .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
         .join("")}`
 
-    console.log(normalizedIconName)
-
     const resolvedIcon = normalizedIconName in TablerIcons
         ? TablerIcons[normalizedIconName as keyof typeof TablerIcons]
         : fallbackIcon

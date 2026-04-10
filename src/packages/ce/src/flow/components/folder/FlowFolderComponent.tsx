@@ -24,6 +24,8 @@ import {
     useStore
 } from "@code0-tech/pictor";
 import {FlowService} from "@edition/flow/services/Flow.service";
+import {icon, IconString} from "@core/util/icons";
+import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 
 
 export interface FlowFolderComponentProps {
@@ -292,6 +294,14 @@ export const DFlowFolderItem: React.FC<FlowFolderComponentItemProps> = (props) =
     } = props
 
     const wrapperRef = React.useRef<HTMLDivElement>(null)
+    const flowTypeService = useService(FlowTypeService)
+    const flowTypeStore = useStore(FlowTypeService)
+
+    const flowType = React.useMemo(
+        () => flowTypeService.getById(flow.type?.id),
+        [flowTypeStore, flow]
+    )
+
     const [text, setText] = React.useState(name)
 
     React.useEffect(() => {
@@ -311,6 +321,7 @@ export const DFlowFolderItem: React.FC<FlowFolderComponentItemProps> = (props) =
 
 
     const contextMenuProps = {onCreate, onDelete, onRename, activeFlowId, namespaceId, projectId}
+    const DisplayIcon = icon(flowType?.displayIcon as IconString)
 
     return <FlowFolderContextMenuComponent contextData={{
         name: path,
@@ -324,7 +335,7 @@ export const DFlowFolderItem: React.FC<FlowFolderComponentItemProps> = (props) =
                         ref={wrapperRef} {...mergeCode0Props(`d-folder__item ${active ? "d-folder__item--active" : ""}`, code0Props)}
                         onClick={() => onSelect?.(flow)}>
                         <Flex align={"center"} style={{gap: "0.35rem"}}>
-                            <IconFile color={hashToColor(path + name)} size={12}/>
+                            <DisplayIcon color={hashToColor(flow?.id ?? "")} size={12}/>
                             <Text>{text}</Text>
                         </Flex>
                     </div>
@@ -334,7 +345,7 @@ export const DFlowFolderItem: React.FC<FlowFolderComponentItemProps> = (props) =
                         <div {...mergeCode0Props(`d-folder__item-hover-card`, code0Props)}
                              onClick={() => onSelect?.(flow)} style={{padding: "0.35rem 0.7rem"}}>
                             <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                <IconFile color={hashToColor(path + name)} size={12}/>
+                                <DisplayIcon color={hashToColor(flow?.id ?? "")} size={12}/>
                                 <Text>{props.name}</Text>
                             </Flex>
                         </div>

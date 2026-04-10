@@ -204,7 +204,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                                         style={{justifyContent: "start"}}>
                                     {selectedFlowTypeId ?
                                         <IconFile size={13} color={hashToColor(selectedFlowTypeId)}/> : null}
-                                    {selectedFlowType ? selectedFlowType?.names?.[0].content : "Select flow type"}
+                                    {selectedFlowType ? selectedFlowType?.names?.[0]?.content ?? "Missing name" : "Select flow type"}
                                 </Button>
                             </MenuTrigger>
                             <MenuPortal>
@@ -217,7 +217,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                                                 inputs.getInputProps("flowTypeId").formValidation?.setValue(flowType.id)
                                                 setSelectedFlowTypeId(flowType.id)
                                             }}>
-                                                {flowType.names?.[0].content}
+                                                {flowType.names?.[0]?.content ?? "Missing name"}
                                             </MenuItem>
                                         ))}
                                     </Card>

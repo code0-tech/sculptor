@@ -5,9 +5,10 @@ import {FunctionNodeComponentProps} from "@edition/function/components/nodes/Fun
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import {IconBolt, IconVariable} from "@tabler/icons-react";
+import {IconVariable} from "@tabler/icons-react";
 import {FunctionFileTriggerComponent} from "@edition/function/components/files/FunctionFileTriggerComponent";
 import {NodeFunction} from "@code0-tech/sagittarius-graphql-types";
+import {icon, IconString} from "@core/util/icons";
 
 
 export type FunctionNodeTriggerComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
@@ -24,6 +25,7 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
 
     const flow = React.useMemo(() => flowService.getById(data.flowId), [flowStore, data])
     const definition = React.useMemo(() => flow ? flowTypeService.getById(flow.type?.id) : undefined, [flowTypeStore, flow])
+    const DisplayIcon = icon(definition?.displayIcon as IconString)
 
     React.useEffect(() => {
         if (!id || !flow) return
@@ -32,7 +34,7 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
             active: true,
             closeable: true,
             children: <>
-                <IconBolt size={12}/>
+                <DisplayIcon color={data.color} size={12}/>
                 <Text size={"sm"}>{definition?.names!![0]?.content}</Text>
             </>,
             content: <FunctionFileTriggerComponent instance={flow}/>,
@@ -78,7 +80,7 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
         </Badge>
 
         <Flex style={{gap: "0.7rem"}} align={"center"}>
-            <IconBolt size={16}/>
+            <DisplayIcon color={data.color} size={16}/>
             <Text display={"block"}>
                 {definition?.displayMessages!![0]?.content ?? definition?.id}
             </Text>

@@ -6,18 +6,12 @@ import {
     NodeFunctionIdWrapper
 } from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
-import {IconBolt, IconNote} from "@tabler/icons-react";
-import {
-    Badge,
-    BadgeType,
-    hashToColor, Text,
-    useService,
-    useStore
-} from "@code0-tech/pictor";
+import {Badge, BadgeType, hashToColor, Text, useService, useStore} from "@code0-tech/pictor";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {useParams} from "next/navigation";
+import {icon, IconString} from "@core/util/icons";
 
 export interface NodeBadgeComponentProps extends Omit<BadgeType, 'value' | 'children'> {
     value: NodeFunction | NodeFunctionIdWrapper
@@ -58,15 +52,25 @@ export const NodeBadgeComponent: React.FC<NodeBadgeComponentProps> = (props) => 
         return (functionService as FunctionService).getById((node as NodeFunction)?.functionDefinition?.id)?.names?.[0]?.content
     }, [functionStore, node])
 
+    const lDefinition = React.useMemo(
+        () => {
+            if (definition) {
+                return definition
+            } else if (isTrigger && node?.__typename === "FlowType") {
+                return node
+            }
+            return (functionService as FunctionService).getById((node as NodeFunction)?.functionDefinition?.id)
+        },
+        [functionStore, node]
+    )
+
+    const DisplayIcon = icon(lDefinition?.displayIcon as IconString)
+
     return <Badge style={{verticalAlign: "middle", textWrap: "nowrap"}}
                   color={isTrigger ? "info" : hashToColor(value.id || "")}
                   border
                   {...rest}>
-        {
-            isTrigger
-            ? <IconBolt size={12}/>
-            : <IconNote size={12}/>
-        }
+        <DisplayIcon size={12}/>
         <Text size={"sm"} style={{color: "inherit"}}>
             {String(name)}
         </Text>

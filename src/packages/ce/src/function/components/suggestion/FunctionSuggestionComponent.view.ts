@@ -3,6 +3,7 @@ import type {
     NodeFunction,
     ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
+import React from "react";
 
 export enum FunctionSuggestionType {
     REF_OBJECT,
@@ -18,4 +19,5 @@ export interface FunctionSuggestion {
     path: number[]
     value: LiteralValue | ReferenceValue | NodeFunction
     type: FunctionSuggestionType
+    icon?: React.ReactNode
 }
