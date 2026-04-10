@@ -1,6 +1,6 @@
 import React, {startTransition} from "react";
-import {FlowType, Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
-import {IconArrowDown, IconArrowUp, IconCornerDownLeft, IconFile} from "@tabler/icons-react";
+import {FlowType, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
+import {IconArrowDown, IconArrowUp, IconCornerDownLeft} from "@tabler/icons-react";
 import {
     Badge,
     Button,
@@ -31,11 +31,12 @@ import {
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FlowNameInputComponent} from "@edition/flow/components/FlowNameInputComponent";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
-import {useParams, useRouter} from "next/navigation";
+import {useParams} from "next/navigation";
 import {ProjectService} from "@edition/project/services/Project.service";
 import {RuntimeService} from "@edition/runtime/services/Runtime.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import Link from "next/link";
+import {icon, IconString} from "@core/util/icons";
 
 export interface FlowCreateDialogComponentProps {
     open?: boolean
@@ -48,7 +49,6 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
     const {open, onOpenChange, flowTypeId} = props
 
     const params = useParams()
-    const router = useRouter()
     const flowService = useService(FlowService)
     const flowTypeService = useService(FlowTypeService)
     const flowTypeStore = useStore(FlowTypeService)
@@ -58,7 +58,6 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
     const runtimeStore = useStore(RuntimeService)
 
     const namespaceIndex = params.namespaceId as any as number
-    const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
     const projectIndex = params.projectId as any as number
     const projectId: NamespaceProject['id'] = `gid://sagittarius/NamespaceProject/${projectIndex}`
 
@@ -130,7 +129,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                 return null
             },
             flowTypeId: (value) => {
-                if (!value) return "Flow type is required"
+                if (!value) return "Trigger is required"
                 return null
             }
         },
@@ -140,11 +139,13 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
         }
     })
 
+    const SelectedFlowTypeDisplayIcon = icon(flowTypes.find(flowType => flowType.id == selectedFlowTypeId)?.displayIcon as IconString)
+
     return <Dialog open={createDialogOpen} onOpenChange={(open) => onOpenChange?.(open)}>
         <DialogPortal>
             <DialogOverlay/>
             <DialogContent autoFocus showCloseButton
-                           title={"Create new flow"}>
+                           title={!primaryRuntime ? "Missing primary runtime" : flowTypes.length <= 0 ? "No triggers available" : "Create new flow"}>
                 <Spacing spacing={"xl"}/>
                 {!primaryRuntime ? <>
                     <Text size={"md"}>
@@ -170,8 +171,9 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                     </Flex>
                 </> : flowTypes.length <= 0 ? (
                     <>
+                        <Spacing spacing={"xl"}/>
                         <Text size={"md"}>
-                            Their is no flow type available for the primary runtime, assign and/or create another
+                            Their is no trigger available for the primary runtime, assign and/or create another
                             runtime to be able to create flows.
                         </Text>
                         <Spacing spacing={"xl"}/>
@@ -195,16 +197,17 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                     </>
                 ) : (
                     <>
-                        <InputLabel>Type of flow</InputLabel>
-                        <InputDescription>You can choose a flow type here</InputDescription>
+                        <InputLabel>Trigger</InputLabel>
+                        <InputDescription>You can choose a trigger here</InputDescription>
                         <Menu>
                             <MenuTrigger asChild>
                                 <Button w={"100%"}
                                         color={inputs.getInputProps("flowTypeId").formValidation?.valid ? "tertiary" : "error"}
                                         style={{justifyContent: "start"}}>
                                     {selectedFlowTypeId ?
-                                        <IconFile size={13} color={hashToColor(selectedFlowTypeId)}/> : null}
-                                    {selectedFlowType ? selectedFlowType?.names?.[0]?.content ?? "Missing name" : "Select flow type"}
+                                        <SelectedFlowTypeDisplayIcon size={12}
+                                                                     color={hashToColor(selectedFlowTypeId)}/> : null}
+                                    {selectedFlowType ? selectedFlowType?.names?.[0]?.content ?? "Missing name" : "Select trigger"}
                                 </Button>
                             </MenuTrigger>
                             <MenuPortal>
@@ -212,14 +215,18 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                                              color={"secondary"}
                                              sideOffset={8}>
                                     <Card paddingSize={"xxs"} mt={-0.2} mx={-0.2}>
-                                        {flowTypes.map((flowType) => (
-                                            <MenuItem key={flowType.id} onSelect={() => {
+                                        {flowTypes.map((flowType) => {
+
+                                            const DisplayIcon = icon(flowType?.displayIcon as IconString)
+
+                                            return <MenuItem key={flowType.id} onSelect={() => {
                                                 inputs.getInputProps("flowTypeId").formValidation?.setValue(flowType.id)
                                                 setSelectedFlowTypeId(flowType.id)
                                             }}>
+                                                <DisplayIcon size={16}/>
                                                 {flowType.names?.[0]?.content ?? "Missing name"}
                                             </MenuItem>
-                                        ))}
+                                        })}
                                     </Card>
                                     <MenuLabel>
                                         <Flex style={{gap: ".35rem"}}>
