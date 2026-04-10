@@ -46,79 +46,100 @@ export default (level: 'server' | "client" = "server") => {
     }
 
     console.log = function (...args: any[]) {
-        const message = args
-            .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
-            .join(" ")
 
-        logger.emit({
-            severityNumber: SeverityNumber.INFO,
-            severityText: "INFO",
-            body: message,
-            attributes: {},
-        })
+        try {
+            const message = args
+                .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
+                .join(" ")
+
+            logger.emit({
+                severityNumber: SeverityNumber.INFO,
+                severityText: "INFO",
+                body: message,
+                attributes: {},
+            })
+        } catch (e) {
+        }
+
 
         originalConsole.log.apply(console, args)
     }
 
     console.info = function (...args: any[]) {
-        const message = args
-            .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
-            .join(" ")
 
-        logger.emit({
-            severityNumber: SeverityNumber.INFO,
-            severityText: "INFO",
-            body: message,
-            attributes: {},
-        })
+        try {
+            const message = args
+                .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
+                .join(" ")
+
+            logger.emit({
+                severityNumber: SeverityNumber.INFO,
+                severityText: "INFO",
+                body: message,
+                attributes: {},
+            })
+        } catch (e) {
+        }
 
         originalConsole.info.apply(console, args)
     }
 
     console.warn = function (...args: any[]) {
-        const message = args
-            .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
-            .join(" ")
 
-        logger.emit({
-            severityNumber: SeverityNumber.WARN,
-            severityText: "WARN",
-            body: message,
-            attributes: {},
-        })
+        try {
+            const message = args
+                .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
+                .join(" ")
+
+            logger.emit({
+                severityNumber: SeverityNumber.WARN,
+                severityText: "WARN",
+                body: message,
+                attributes: {},
+            })
+        } catch (e) {
+        }
 
         originalConsole.warn.apply(console, args)
     }
 
     console.error = function (...args: any[]) {
-        const message = args
-            .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
-            .join(" ")
 
-        logger.emit({
-            severityNumber: SeverityNumber.ERROR,
-            severityText: "ERROR",
-            body: message,
-            attributes: {},
-        })
+        try {
+            const message = args
+                .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
+                .join(" ")
+
+            logger.emit({
+                severityNumber: SeverityNumber.ERROR,
+                severityText: "ERROR",
+                body: message,
+                attributes: {},
+            })
+        } catch (e) {
+        }
 
         const errorArg = args.find((arg) => arg instanceof Error)
-        recordException(errorArg || new Error(message))
+        recordException(errorArg || `${args}`)
 
         originalConsole.error.apply(console, args)
     }
 
     console.debug = function (...args: any[]) {
-        const message = args
-            .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
-            .join(" ")
 
-        logger.emit({
-            severityNumber: SeverityNumber.DEBUG,
-            severityText: "DEBUG",
-            body: message,
-            attributes: {},
-        })
+        try {
+            const message = args
+                .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
+                .join(" ")
+
+            logger.emit({
+                severityNumber: SeverityNumber.DEBUG,
+                severityText: "DEBUG",
+                body: message,
+                attributes: {},
+            })
+        } catch (e) {
+        }
 
         originalConsole.debug.apply(console, args)
     }
