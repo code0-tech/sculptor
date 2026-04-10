@@ -5,7 +5,7 @@ import {logs} from "@opentelemetry/api-logs"
 import {trace} from "@opentelemetry/api"
 
 initializeLogs("client")
-logs.setGlobalLoggerProvider(openTelemetryClientLogsProvider)
+if (openTelemetryClientLogsProvider) logs.setGlobalLoggerProvider(openTelemetryClientLogsProvider)
 
 initializeTraces("client")
-trace.setGlobalTracerProvider(openTelemetryClientTracesProvider)
+if (openTelemetryClientTracesProvider) trace.setGlobalTracerProvider(openTelemetryClientTracesProvider)

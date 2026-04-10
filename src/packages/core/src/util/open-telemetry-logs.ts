@@ -4,31 +4,34 @@ import {resource, serverResource} from "@core/util/open-telemetry"
 import {recordException} from "@core/util/open-telemetry-exceptions"
 import {parseHeaders} from "@core/util/headers";
 
-export const openTelemetryServerLogsReader = new OTLPLogExporter({
+export const openTelemetryServerLogsReader = process.env.OTEL_LOGS_ENDPOINT ? new OTLPLogExporter({
     url: process.env.OTEL_LOGS_ENDPOINT,
     headers: parseHeaders(process.env.OTEL_HEADER),
-})
+}) : undefined
 
-export const openTelemetryClientLogsReader = new OTLPLogExporter({
+export const openTelemetryClientLogsReader = process.env.NEXT_PUBLIC_OTEL_LOGS_ENDPOINT ? new OTLPLogExporter({
     url: process.env.NEXT_PUBLIC_OTEL_LOGS_ENDPOINT,
     headers: parseHeaders(process.env.NEXT_PUBLIC_OTEL_HEADER),
-})
+}) : undefined
 
-export const openTelemetryServerLogsProvider = new LoggerProvider({
+export const openTelemetryServerLogsProvider = openTelemetryServerLogsReader ? new LoggerProvider({
     resource: serverResource,
     processors: [new BatchLogRecordProcessor(openTelemetryServerLogsReader)]
-})
+}) : undefined
 
-export const openTelemetryClientLogsProvider = new LoggerProvider({
+export const openTelemetryClientLogsProvider = openTelemetryClientLogsReader ? new LoggerProvider({
     resource: resource,
     processors: [new BatchLogRecordProcessor(openTelemetryClientLogsReader)]
-})
+}) : undefined
 
 export default (level: 'server' | "client" = "server") => {
 
+    if (level === 'server' && !openTelemetryServerLogsProvider) return
+    if (level === 'client' && !openTelemetryClientLogsProvider) return
+
     const logger = level === "server" ?
-        openTelemetryServerLogsProvider.getLogger("default", "1.0.0") :
-        openTelemetryClientLogsProvider.getLogger("default", "1.0.0")
+        openTelemetryServerLogsProvider?.getLogger("default", "1.0.0") :
+        openTelemetryClientLogsProvider?.getLogger("default", "1.0.0")
 
     const originalConsole = {
         log: console.log,
@@ -52,7 +55,7 @@ export default (level: 'server' | "client" = "server") => {
                 .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
                 .join(" ")
 
-            logger.emit({
+            logger?.emit({
                 severityNumber: SeverityNumber.INFO,
                 severityText: "INFO",
                 body: message,
@@ -72,7 +75,7 @@ export default (level: 'server' | "client" = "server") => {
                 .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
                 .join(" ")
 
-            logger.emit({
+            logger?.emit({
                 severityNumber: SeverityNumber.INFO,
                 severityText: "INFO",
                 body: message,
@@ -91,7 +94,7 @@ export default (level: 'server' | "client" = "server") => {
                 .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
                 .join(" ")
 
-            logger.emit({
+            logger?.emit({
                 severityNumber: SeverityNumber.WARN,
                 severityText: "WARN",
                 body: message,
@@ -110,7 +113,7 @@ export default (level: 'server' | "client" = "server") => {
                 .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
                 .join(" ")
 
-            logger.emit({
+            logger?.emit({
                 severityNumber: SeverityNumber.ERROR,
                 severityText: "ERROR",
                 body: message,
@@ -132,7 +135,7 @@ export default (level: 'server' | "client" = "server") => {
                 .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
                 .join(" ")
 
-            logger.emit({
+            logger?.emit({
                 severityNumber: SeverityNumber.DEBUG,
                 severityText: "DEBUG",
                 body: message,

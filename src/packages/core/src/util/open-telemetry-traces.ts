@@ -8,33 +8,33 @@ import {FetchInstrumentation} from '@opentelemetry/instrumentation-fetch'
 import {ZoneContextManager} from '@opentelemetry/context-zone'
 import {parseHeaders} from "@core/util/headers";
 
-export const openTelemetryServerTracesReader = new OTLPTraceExporter({
+export const openTelemetryServerTracesReader = process.env.OTEL_TRACES_ENDPOINT ? new OTLPTraceExporter({
     url: process.env.OTEL_TRACES_ENDPOINT,
     headers: parseHeaders(process.env.OTEL_HEADER),
-})
+}) : undefined
 
-export const openTelemetryClientTracesReader = new OTLPTraceExporter({
-    url: process.env.NEXT_PUBLIC_OTEL_TRACES_ENDPOINT,
+export const openTelemetryClientTracesReader = process.env.NEXT_PUBLIC_OTEL_TRACES_ENDPOINT ? new OTLPTraceExporter({
+    url: process.env.NEXT_PUBLIC_OTEL_TRACES_ENDPOINT || "",
     headers: parseHeaders(process.env.NEXT_PUBLIC_OTEL_HEADER),
-})
+}) : undefined
 
-export const openTelemetryServerTracesProvider = new WebTracerProvider({
+export const openTelemetryServerTracesProvider = openTelemetryServerTracesReader ? new WebTracerProvider({
     resource: serverResource,
     spanProcessors: [new BatchSpanProcessor(openTelemetryServerTracesReader)],
-})
+}) : undefined
 
-export const openTelemetryClientTracesProvider = new WebTracerProvider({
+export const openTelemetryClientTracesProvider = openTelemetryClientTracesReader ? new WebTracerProvider({
     resource: resource,
     spanProcessors: [new BatchSpanProcessor(openTelemetryClientTracesReader)],
-})
+}) : undefined
 
 export default (level: 'server' | "client" = "server") => {
 
-    if (level === 'server') {
+    if (level === 'server' && openTelemetryServerTracesProvider) {
         openTelemetryServerTracesProvider.register({
             contextManager: new ZoneContextManager(),
         })
-    } else if (level === 'client') {
+    } else if (level === 'client' && openTelemetryClientTracesProvider) {
         openTelemetryClientTracesProvider.register({
             contextManager: new ZoneContextManager(),
         })

@@ -4,21 +4,24 @@ import {OTLPMetricExporter} from "@opentelemetry/exporter-metrics-otlp-http"
 import {parseHeaders} from "@core/util/headers";
 
 
-export const openTelemetryMetricReader = new PeriodicExportingMetricReader({
+export const openTelemetryMetricReader = process.env.OTEL_METRICS_ENDPOINT ? new PeriodicExportingMetricReader({
     exporter: new OTLPMetricExporter({
 
         url: process.env.OTEL_METRICS_ENDPOINT,
         headers: parseHeaders(process.env.OTEL_HEADER),
     }),
     exportIntervalMillis: 10000,
-})
+}) : undefined
 
-export const openTelemetryMetricProvider = new MeterProvider({
+export const openTelemetryMetricProvider = openTelemetryMetricReader ? new MeterProvider({
     resource: serverResource,
     readers: [openTelemetryMetricReader],
-})
+}) : undefined
 
 export default () => {
+
+
+    if (!openTelemetryMetricProvider) return
 
     const g = globalThis as any
     const proc = g['process']
