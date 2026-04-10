@@ -37,6 +37,7 @@ import {RuntimeService} from "@edition/runtime/services/Runtime.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import Link from "next/link";
 import {icon, IconString} from "@core/util/icons";
+import {FALLBACK_FLOW_TYPE_NAME} from "@core/util/fallback-translations";
 
 export interface FlowCreateDialogComponentProps {
     open?: boolean
@@ -207,7 +208,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                                     {selectedFlowTypeId ?
                                         <SelectedFlowTypeDisplayIcon size={12}
                                                                      color={hashToColor(selectedFlowTypeId)}/> : null}
-                                    {selectedFlowType ? selectedFlowType?.names?.[0]?.content ?? "Missing name" : "Select trigger"}
+                                    {selectedFlowType ? selectedFlowType?.names?.[0]?.content ?? FALLBACK_FLOW_TYPE_NAME : "Select trigger"}
                                 </Button>
                             </MenuTrigger>
                             <MenuPortal>
@@ -224,7 +225,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                                                 setSelectedFlowTypeId(flowType.id)
                                             }}>
                                                 <DisplayIcon size={16}/>
-                                                {flowType.names?.[0]?.content ?? "Missing name"}
+                                                {flowType.names?.[0]?.content ?? FALLBACK_FLOW_TYPE_NAME}
                                             </MenuItem>
                                         })}
                                     </Card>
