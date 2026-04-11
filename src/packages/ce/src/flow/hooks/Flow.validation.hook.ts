@@ -1,4 +1,4 @@
-import React, {startTransition} from "react"
+import React from "react"
 import type {Flow} from "@code0-tech/sagittarius-graphql-types"
 import {useService, useStore} from "@code0-tech/pictor";
 import {FunctionService} from "@edition/function/services/Function.service";
@@ -7,11 +7,7 @@ import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {ValidationResult} from "@core/util/inspection";
 import {useFlowValidationAction} from "@edition/flow/components/FlowWorkerProvider";
 
-declare global {
-    interface Window {
-        lastValidatedFlows?: Record<string, { lastValidated: string, validation: ValidationResult[] }>;
-    }
-}
+const globalPendingValidations = new Map<string, Promise<ValidationResult[]>>()
 
 export const useFlowValidation = (
     flowId: Flow['id']
@@ -31,40 +27,37 @@ export const useFlowValidation = (
         () => flowService.getById(flowId),
         [flowStore, flowId, flowService]
     )
-
     const functions = React.useMemo(() => functionService.values(), [functionStore]);
     const dataTypes = React.useMemo(() => dataTypeService.values(), [dataTypeStore]);
 
     React.useEffect(() => {
         if (!flow) return;
 
-        // Skip if already validated for this version
-        if (flow.editedAt && window.lastValidatedFlows?.[flowId as string]?.lastValidated === flow.editedAt) {
-            setValidationResult(window.lastValidatedFlows?.[flowId as string].validation!)
-            return;
-        }
-
         const timeout = setTimeout(() => {
-            execute({
+            const key = flowId as string;
+
+            if (globalPendingValidations.has(key)) {
+                globalPendingValidations.get(key)!.then(value => {
+                    setValidationResult(value as ValidationResult[])
+                });
+                return;
+            }
+
+            const promise = execute({
                 flow,
                 functions,
                 dataTypes
             }).then(value => {
-                startTransition(() => {
-                    setValidationResult(value as ValidationResult[])
-                    window.lastValidatedFlows = {
-                        ...window.lastValidatedFlows,
-                        [flowId as string]: {
-                            lastValidated: flow.editedAt!,
-                            validation: value as ValidationResult[]
-                        }
-                    }
-                })
+                setValidationResult(value as ValidationResult[])
+                globalPendingValidations.delete(key);
+                return value;
             });
+
+            globalPendingValidations.set(key, promise as Promise<ValidationResult[]>);
         }, 200);
 
         return () => clearTimeout(timeout);
-    }, [flow, functions, dataTypes, flowStore])
+    }, [flow?.editedAt, functions.length, dataTypes.length])
 
     return validationResult
 }

@@ -4,7 +4,7 @@ import {
 } from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
 import {useService, useStore} from "@code0-tech/pictor";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
-import React, {startTransition} from "react";
+import React from "react";
 import {useValueSuggestionsAction} from "@edition/flow/components/FlowWorkerProvider";
 
 export const useValueSuggestions = (
@@ -30,9 +30,7 @@ export const useValueSuggestions = (
                 type,
                 dataTypes
             }).then(value => {
-                startTransition(() => {
-                    setSuggestions(value as any[])
-                })
+                setSuggestions(value as any[])
             })
         }, 200);
 

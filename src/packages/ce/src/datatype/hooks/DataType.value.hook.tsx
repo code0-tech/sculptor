@@ -4,7 +4,7 @@ import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {useNodeTypeExtractionAction, useValueExtractionAction} from "@edition/flow/components/FlowWorkerProvider";
-import React, {startTransition} from "react";
+import React from "react";
 
 export const useValue = (
     flowId: Flow['id'],
@@ -47,9 +47,7 @@ export const useValue = (
                 dataTypes: dataTypes,
                 functions: functions
             }).then(value => {
-                startTransition(() => {
-                    setTypes(value)
-                })
+                setTypes(value)
             })
         }, 200);
 
@@ -63,9 +61,7 @@ export const useValue = (
                 type: types?.parameters?.[parameterIndex ?? 0],
                 dataTypes: dataTypes
             }).then(value => {
-                startTransition(() => {
-                    setValue(value)
-                })
+                setValue(value)
             })
         }, 200);
 

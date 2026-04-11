@@ -14,7 +14,6 @@ export enum FunctionSuggestionType {
 }
 
 export interface FunctionSuggestion {
-
     displayText: string[]
     path: number[]
     value: LiteralValue | ReferenceValue | NodeFunction

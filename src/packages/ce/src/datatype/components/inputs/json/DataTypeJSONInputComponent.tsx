@@ -24,7 +24,6 @@ import {
     DataTypeJSONInputEditDialogComponent
 } from "@edition/datatype/components/inputs/json/DataTypeJSONInputEditDialogComponent";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import {FunctionService} from "@edition/function/services/Function.service";
 import {useValue} from "@edition/datatype/hooks/DataType.value.hook";
 
 export interface EditableJSONEntry {
@@ -42,10 +41,9 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
 
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
-    const functionService = useService(FunctionService)
-    const functionStore = useStore(FunctionService)
 
     const initialNullValue = useValue(flowId, nodeId, parameterIndex)
+    const suggestions = useSuggestions(flowId, nodeId, parameterIndex)
 
     const node = React.useMemo(
         () => flowService.getNodeById(flowId, nodeId),
@@ -54,24 +52,12 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
 
     const parameter = node?.parameters?.nodes?.[parameterIndex]
 
-    const functionDefinition = React.useMemo(
-        () => functionService.getById(node?.functionDefinition?.id!),
-        [functionStore, node]
-    )
-
-    const parameterDefinition = React.useMemo(
-        () => functionDefinition?.parameterDefinitions?.nodes?.find(pd => pd?.id === parameter?.parameterDefinition?.id),
-        [functionDefinition, parameter]
-    )
-
     const initialValue: NodeParameterValue | null = React.useMemo(() => {
         if (!parameter?.value || (parameter?.value?.__typename === "LiteralValue" && parameter.value.value == null)) {
             return initialNullValue
         }
         return parameter?.value
     }, [initialNullValue])
-
-    const suggestions = useSuggestions(flowId, nodeId, parameterIndex)
 
     const [value, setValue] = React.useState<NodeParameterValue | NodeFunction | null>(initialValue)
     const [editDialogOpen, setEditDialogOpen] = React.useState(false)

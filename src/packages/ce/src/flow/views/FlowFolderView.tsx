@@ -37,8 +37,6 @@ export const FlowFolderView: React.FC = () => {
     const projectIndex = params.projectId as any as number
     const flowIndex = params.flowId as any as number
     const flowId: Flow['id'] = `gid://sagittarius/Flow/${flowIndex}`
-
-    const [, startTransition] = React.useTransition()
     const ref = React.useRef<FlowFolderComponentHandle>(null)
 
     const [createDialogOpen, setCreateDialogOpen] = React.useState(false)
@@ -53,19 +51,17 @@ export const FlowFolderView: React.FC = () => {
 
     const deleteFlow = React.useCallback((flow: Flow) => {
         if (!flow?.id) return
-        startTransition(() => {
-            flowService.flowDelete({
-                flowId: flow.id!
-            }).then(payload => {
-                if ((payload?.errors?.length ?? 0) <= 0) {
-                    toast({
-                        title: "The flow was successfully deleted.",
-                        color: "success",
-                        dismissible: true,
-                    })
-                    router.push(`/namespace/${namespaceIndex}/project/${projectIndex}/flow`)
-                }
-            })
+        flowService.flowDelete({
+            flowId: flow.id!
+        }).then(payload => {
+            if ((payload?.errors?.length ?? 0) <= 0) {
+                toast({
+                    title: "The flow was successfully deleted.",
+                    color: "success",
+                    dismissible: true,
+                })
+                router.push(`/namespace/${namespaceIndex}/project/${projectIndex}/flow`)
+            }
         })
     }, [flowService])
 

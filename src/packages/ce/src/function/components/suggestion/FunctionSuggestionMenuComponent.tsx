@@ -4,7 +4,8 @@ import {toInputSuggestions} from "./FunctionSuggestionMenuComponent.util";
 import {FunctionSuggestionSearchBarComponent} from "./FunctionSuggestionSearchBarComponent";
 import {
     Card,
-    InputSuggestionMenuContent, InputSuggestionMenuContentItems,
+    InputSuggestionMenuContent,
+    InputSuggestionMenuContentItems,
     InputSuggestionMenuContentItemsHandle,
     Menu,
     MenuPortal,
@@ -19,10 +20,7 @@ export interface FunctionSuggestionMenuComponentProps {
 
 export const FunctionSuggestionMenuComponent: React.FC<FunctionSuggestionMenuComponentProps> = (props) => {
 
-    const {
-        suggestions = [], triggerContent, onSuggestionSelect = () => {
-        }
-    } = props
+    const {suggestions = [], triggerContent, onSuggestionSelect = () => null} = props
 
     const menuRef = React.useRef<InputSuggestionMenuContentItemsHandle | null>(null); // Ref to suggestion list
     const [stateSuggestions, setStateSuggestions] = React.useState(suggestions)
