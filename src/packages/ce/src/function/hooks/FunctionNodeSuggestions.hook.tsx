@@ -5,7 +5,7 @@ import {
 import {useService, useStore} from "@code0-tech/pictor";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
-import React, {startTransition} from "react";
+import React from "react";
 import {useNodeSuggestionsAction} from "@edition/flow/components/FlowWorkerProvider";
 import {icon, IconString} from "@core/util/icons";
 import {FALLBACK_FUNCTION_NAME} from "@core/util/fallback-translations";
@@ -33,9 +33,7 @@ export const useNodeSuggestions = (
                 functions,
                 dataTypes
             }).then(value => {
-                startTransition(() => {
-                    setSuggestions(value as any[])
-                })
+                setSuggestions(value as any[])
             })
         }, 200);
 
