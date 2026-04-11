@@ -1,4 +1,4 @@
-import React from "react";
+import React, {startTransition} from "react";
 import {Flex, InputSyntaxSegment, useForm, useService, useStore} from "@code0-tech/pictor";
 import {
     Flow,
@@ -29,12 +29,10 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
     const functionService = useService(FunctionService)
     const functionStore = useStore(FunctionService)
     const flowService = useService(FlowService)
-    const flowStore = useStore(FlowService)
     const fileTabsService = useService(FileTabsService)
     const validation = useFlowValidation(flowId)
 
     const changedParameters = React.useRef<Set<number>>(new Set())
-    const [, startTransition] = React.useTransition()
 
     const definition = React.useMemo(() => {
         return functionService.getById(node.functionDefinition?.id!!)
@@ -53,9 +51,9 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
         const values: Record<string, any> = {}
         node.parameters?.nodes?.forEach((parameter, index) => {
             values[index] = (_: any) => {
-                const validationForParameter = validation?.find(v => v.parameterIndex === index && v.nodeId === node.id)
+                const validationForParameter = validation?.find(v => v?.parameterIndex === index && v?.nodeId === node.id)
                 if (validationForParameter) {
-                    return validationForParameter.message?.[0]?.content ?? "Invalid value"
+                    return validationForParameter?.message?.[0]?.content ?? "Invalid value"
                 }
                 return null
             }
@@ -111,7 +109,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
             }
             changedParameters.current.clear()
         })
-    }, [flowStore])
+    }, [flowService])
 
     const [inputs, validate] = useForm<Record<number, InputSyntaxSegment[]>>({
         initialValues: initialValues,
