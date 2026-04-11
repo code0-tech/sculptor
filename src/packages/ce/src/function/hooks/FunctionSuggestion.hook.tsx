@@ -1,4 +1,4 @@
-import React, {startTransition} from "react";
+import React from "react";
 import type {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {useValueSuggestions} from "./FunctionValueSuggestions.hook";
 import {useReferenceSuggestions} from "./FunctionReferenceSuggestions.hook";
@@ -52,14 +52,12 @@ export const useSuggestions = (
                 dataTypes: dataTypes,
                 functions: functions
             }).then(value => {
-                startTransition(() => {
-                    setTypes(value)
-                })
+                setTypes(value)
             })
         }, 200);
 
         return () => clearTimeout(timeout);
-    }, [(node?.parameters?.nodes?.map(p => p?.value) ?? []), functions, dataTypes])
+    }, [node, functions, dataTypes])
 
     const valueSuggestions = useValueSuggestions(types?.parameters?.[parameterIndex ?? 0])
     const refObjectSuggestions = useReferenceSuggestions(flowId, nodeId, parameterIndex)
