@@ -7,7 +7,7 @@ import {useService, useStore} from "@code0-tech/pictor";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import React, {startTransition} from "react";
+import React from "react";
 import {useReferenceSuggestionsAction} from "@edition/flow/components/FlowWorkerProvider";
 
 export const useReferenceSuggestions = (
@@ -44,9 +44,7 @@ export const useReferenceSuggestions = (
                 functions,
                 dataTypes
             }).then(value => {
-                startTransition(() => {
-                    setSuggestions(value as any[])
-                })
+                setSuggestions(value as any[])
             })
         }, 200);
 
