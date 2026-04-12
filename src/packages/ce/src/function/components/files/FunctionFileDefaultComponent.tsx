@@ -67,9 +67,9 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                 if (typeof parameterIndex !== "number") return
                 if (!changedParameters.current.has(parameterIndex)) continue;
                 const nodeParameter = node.parameters?.nodes?.find(p => p?.parameterDefinition?.id === parameterDefinition?.id)
-                const syntaxSegment = values[parameterDefinition!.id!]
+                const value = values[parameterDefinition!.id!]
                 const previousValue = nodeParameter?.value as NodeParameterValue
-                const syntaxValue = syntaxSegment?.[0]?.value ?? syntaxSegment?.value ?? syntaxSegment ?? null as NodeFunction | LiteralValue | ReferenceValue | null
+                const syntaxValue = (value?.[0]?.type == "block" || value?.[0]?.type == "text" ? value?.[0]?.value : value) ?? null as NodeFunction | LiteralValue | ReferenceValue | null
 
                 if (previousValue && previousValue.__typename === "NodeFunctionIdWrapper" && previousValue.id) {
                     const linkedNodes = flowService.getLinkedNodesById(flowId, previousValue.id)
@@ -78,7 +78,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                     })
                 }
 
-                if (!syntaxValue || !syntaxSegment || (Array.isArray(syntaxValue) && Array.from(syntaxValue).length <= 0)) {
+                if (!syntaxValue || !value || (Array.isArray(syntaxValue) && Array.from(syntaxValue).length <= 0)) {
                     await flowService.setParameterValue(flowId, node.id!!, parameterIndex, undefined, parameterDefinition?.id);
                     continue;
                 }
