@@ -1,13 +1,26 @@
-import React from "react"
+import React, {useMemo} from "react"
 import {IconEdit, IconX} from "@tabler/icons-react"
 import "../type/DataTypeTypeInputComponent.style.scss"
 import {Flow, LiteralValue} from "@code0-tech/sagittarius-graphql-types";
-import {Button, Card, Flex, InputDescription, InputLabel, InputMessage, InputProps, Text} from "@code0-tech/pictor";
+import {
+    Button,
+    Card,
+    Flex,
+    InputDescription,
+    InputLabel,
+    InputMessage,
+    InputProps,
+    Text,
+    useService,
+    useStore
+} from "@code0-tech/pictor";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import {
     DataTypeTypeInputEditDialogComponent
 } from "@edition/datatype/components/inputs/datatype/DataTypeTypeInputEditDialogComponent";
-import {DataTypeTypeEditorInput} from "@edition/datatype/components/inputs/datatype/DataTypeTypeEditorInput";
+import {DataTypeJSONInputTreeComponent} from "@edition/datatype/components/inputs/json/DataTypeJSONInputTreeComponent";
+import {useValueExtractionAction} from "@edition/flow/components/FlowWorkerProvider";
+import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 
 
 export interface DataTypeJSONInputComponentProps extends Omit<InputProps<any | null>, "wrapperComponent" | "type"> {
@@ -21,27 +34,43 @@ export const DataTypeTypeInputComponent: React.FC<DataTypeJSONInputComponentProp
 
     const {initialValue, title, description, formValidation, onChange} = props
 
+    const dataTypeService = useService(DatatypeService)
+    const dataTypeStore = useStore(DatatypeService)
+    const valueFromTypeAction = useValueExtractionAction()
 
-    const [literalValue, setLiteralValue] = React.useState<string | null>(initialValue)
+    const [type, setType] = React.useState<string | null>(initialValue)
+    const [literalValue, setLiteralValue] = React.useState<LiteralValue>()
     const [editDialogOpen, setEditDialogOpen] = React.useState(false)
 
+    const dataTypes = useMemo(
+        () => dataTypeService.values(),
+        [dataTypeStore]
+    )
+
     const handleClear = React.useCallback(
-        () => {
-            setLiteralValue("")
-        },
-        [null]
+        () => setType(""),
+        []
     )
 
     React.useEffect(() => {
-        formValidation?.setValue(literalValue)
+        formValidation?.setValue(type)
         const timeout = setTimeout(() => {
             // @ts-ignore
             onChange?.()
         }, 200)
 
+        if (type) {
+            valueFromTypeAction.execute({
+                type: type,
+                dataTypes: dataTypes
+            }).then(val => {
+                setLiteralValue(val as LiteralValue)
+            })
+        }
+
         return () => clearTimeout(timeout);
 
-    }, [literalValue])
+    }, [type])
 
     return (
         <>
@@ -50,9 +79,7 @@ export const DataTypeTypeInputComponent: React.FC<DataTypeJSONInputComponentProp
                 open={editDialogOpen}
                 value={initialValue}
                 onOpenChange={open => setEditDialogOpen(open)}
-                onTypeChange={v => {
-                    setLiteralValue(v ?? null)
-                }}
+                onTypeChange={v => setType(v ?? null)}
             />
             <div>
                 <InputLabel>{title}</InputLabel>
@@ -75,7 +102,7 @@ export const DataTypeTypeInputComponent: React.FC<DataTypeJSONInputComponentProp
                     </ButtonGroup>
                 </Flex>
                 <Card paddingSize="xs" mt={0.7} mb={-0.55} mx={-0.55}>
-                    <></>
+                    <DataTypeJSONInputTreeComponent object={literalValue ?? {}}/>
                 </Card>
             </Card>
             {!formValidation?.valid && formValidation?.notValidMessage && (

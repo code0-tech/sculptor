@@ -8,9 +8,9 @@ export interface DataTypeJSONInputTreeComponentProps {
     object: LiteralValue
     parentKey?: string
     isRoot?: boolean
-    onEntryClick: (entry: EditableJSONEntry) => void
-    collapsedState: Record<string, boolean>
-    setCollapsedState: (path: string[], collapsed: boolean) => void
+    onEntryClick?: (entry: EditableJSONEntry) => void
+    collapsedState?: Record<string, boolean>
+    setCollapsedState?: (path: string[], collapsed: boolean) => void
     path?: string[]
     activePath?: string[] | null
     onDoubleClick?: (path: string[], isCollapsed: boolean) => void
@@ -40,7 +40,7 @@ export const DataTypeJSONInputTreeComponent: React.FC<DataTypeJSONInputTreeCompo
     const handleClick = (entry: EditableJSONEntry) => {
         if (clickTimeout.current) clearTimeout(clickTimeout.current)
         clickTimeout.current = setTimeout(() => {
-            onEntryClick(entry)
+            onEntryClick?.(entry)
             clickTimeout.current = null
         }, CLICK_DELAY)
     }
@@ -53,22 +53,22 @@ export const DataTypeJSONInputTreeComponent: React.FC<DataTypeJSONInputTreeCompo
         if (onDoubleClick) {
             onDoubleClick(currentPath, isCollapsed)
         } else {
-            setCollapsedState(currentPath, !isCollapsed)
+            setCollapsedState?.(currentPath, !isCollapsed)
         }
     }
 
     React.useEffect(() => {
         const currentPath = path ?? []
         const pathKey = (isRoot ? ["root"] : currentPath).join(".")
-        if (currentPath.length > 1 && collapsedState[pathKey] === undefined) {
-            setCollapsedState(currentPath.length === 0 ? ["root"] : currentPath, true)
+        if (currentPath.length > 1 && collapsedState?.[pathKey] === undefined) {
+            setCollapsedState?.(currentPath.length === 0 ? ["root"] : currentPath, true)
         }
     }, [path, isRoot, collapsedState, setCollapsedState])
 
     const renderRoot = () => {
         const currentPath = [...path]
         const pathKey = "root"
-        const isCollapsed = collapsedState[pathKey] || false
+        const isCollapsed = collapsedState?.[pathKey] || false
         const isCollapsable = typeof value === "object" && value !== null && (Array.isArray(value) ? value.length > 0 : Object.keys(value).length > 0)
         const isActive = Array.isArray(activePath) && activePath.length === 0 && parentKey === undefined
         const icon = isCollapsable ? (isCollapsed ? <IconChevronUp size={13}/> : <IconChevronDown size={13}/>) : null
@@ -98,7 +98,7 @@ export const DataTypeJSONInputTreeComponent: React.FC<DataTypeJSONInputTreeCompo
         ? Object.entries(value as Record<string, unknown>).map(([key, val]) => {
             const currentPath = [...path, key]
             const pathKey = currentPath.join(".")
-            const isCollapsed = collapsedState[pathKey] || false
+            const isCollapsed = collapsedState?.[pathKey] || false
             const isActive = activePath && activePath.length > 0 && currentPath.join(".") === activePath.join(".")
             const parentColorValue = parentColor ?? hashToColor("root")
             const isCollapsable = typeof (val as any) === "object" && (val as any) !== null && (Array.isArray((val as any)) ? (val as any).length > 0 : Object.keys((val as any) ?? {}).length > 0)
