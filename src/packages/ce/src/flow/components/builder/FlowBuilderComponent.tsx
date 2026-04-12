@@ -751,6 +751,7 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
             nodes={nodes}
             edges={edges}
             panOnDrag={showTree}
+            selectionKeyCode={null}
             zoomOnScroll={showTree}
             zoomOnPinch={showTree}
             zoomOnDoubleClick={showTree}
