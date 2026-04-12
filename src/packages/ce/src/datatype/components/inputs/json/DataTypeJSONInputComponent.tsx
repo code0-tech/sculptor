@@ -44,25 +44,30 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
 
     const initialNullValue = useValue(flowId, nodeId, parameterIndex)
     const suggestions = useSuggestions(flowId, nodeId, parameterIndex)
+    const [editDialogOpen, setEditDialogOpen] = React.useState(false)
+    const [editEntry, setEditEntry] = React.useState<EditableJSONEntry | null>(null)
+    const [collapsedState, setCollapsedStateRaw] = React.useState<Record<string, boolean>>({})
 
     const node = React.useMemo(
         () => flowService.getNodeById(flowId, nodeId),
         [flowStore, flowId, nodeId]
     )
 
-    const parameter = node?.parameters?.nodes?.[parameterIndex]
+    const parameter = React.useMemo(
+        () => node?.parameters?.nodes?.[parameterIndex],
+        [node]
+    )
 
     const initialValue: NodeParameterValue | null = React.useMemo(() => {
-        if (!parameter?.value || (parameter?.value?.__typename === "LiteralValue" && parameter.value.value == null)) {
+        if (parameter?.parameterDefinition?.defaultValue && (!parameter?.value || (parameter?.value?.__typename === "LiteralValue" && parameter.value.value == null))) {
+            return parameter.parameterDefinition.defaultValue
+        } else if (!parameter?.value || (parameter?.value?.__typename === "LiteralValue" && parameter.value.value == null)) {
             return initialNullValue
         }
         return parameter?.value
-    }, [initialNullValue])
+    }, [initialNullValue, parameter])
 
     const [value, setValue] = React.useState<NodeParameterValue | NodeFunction | null>(initialValue)
-    const [editDialogOpen, setEditDialogOpen] = React.useState(false)
-    const [editEntry, setEditEntry] = React.useState<EditableJSONEntry | null>(null)
-    const [collapsedState, setCollapsedStateRaw] = React.useState<Record<string, boolean>>({})
 
     const setCollapsedState = (path: string[], collapsed: boolean) => {
         setCollapsedStateRaw(prev => ({...prev, [path.join(".")]: collapsed}))
@@ -73,15 +78,18 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
         setEditDialogOpen(true)
     }
 
+    React.useEffect(() => {
+        if (!parameter?.value || (parameter?.value?.__typename === "LiteralValue" && parameter.value.value == null)) {
+            formValidation?.setValue(initialNullValue)
+            setValue(initialNullValue)
+            // @ts-ignore
+            onChange?.()
+        }
+    }, [initialNullValue])
+
     const handleClear = React.useCallback(() => {
-        formValidation?.setValue({
-            __typename: "LiteralValue",
-            value: null
-        })
-        setValue({
-            __typename: "LiteralValue",
-            value: null
-        })
+        formValidation?.setValue(initialNullValue)
+        setValue(initialNullValue)
         setEditEntry(null)
         // @ts-ignore
         onChange?.()
