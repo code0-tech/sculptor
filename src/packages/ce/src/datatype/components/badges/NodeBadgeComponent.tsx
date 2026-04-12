@@ -46,7 +46,7 @@ export const NodeBadgeComponent: React.FC<NodeBadgeComponentProps> = (props) => 
 
     const name = React.useMemo(() => {
         if (definition) {
-            return definition.names?.[0]?.content ?? definition.__typename === "FunctionDefinition" ? FALLBACK_FUNCTION_NAME : FALLBACK_FLOW_TYPE_NAME
+            return definition.names?.[0]?.content ?? (definition.__typename === "FunctionDefinition" ? FALLBACK_FUNCTION_NAME : FALLBACK_FLOW_TYPE_NAME)
         } else if (isTrigger && node?.__typename === "FlowType") {
             return node.names?.[0]?.content ?? FALLBACK_FLOW_TYPE_NAME
         }

@@ -55,7 +55,10 @@ export const toInputSuggestions = (suggestions: FunctionSuggestion[]): InputSugg
         return {
             children,
             insertMode: "replace",
-            valueData: suggestion,
+            valueData: {
+                ...suggestion,
+                icon: ""
+            },
             value: suggestion.value,
             groupBy: groupLabel,
         };
