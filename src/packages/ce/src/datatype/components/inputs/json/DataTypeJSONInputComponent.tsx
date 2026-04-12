@@ -59,9 +59,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
     )
 
     const initialValue: NodeParameterValue | null = React.useMemo(() => {
-        if (parameter?.parameterDefinition?.defaultValue && (!parameter?.value || (parameter?.value?.__typename === "LiteralValue" && parameter.value.value == null))) {
-            return parameter.parameterDefinition.defaultValue
-        } else if (!parameter?.value || (parameter?.value?.__typename === "LiteralValue" && parameter.value.value == null)) {
+        if (!parameter?.value || (parameter?.value?.__typename === "LiteralValue" && parameter.value.value == null)) {
             return initialNullValue
         }
         return parameter?.value
