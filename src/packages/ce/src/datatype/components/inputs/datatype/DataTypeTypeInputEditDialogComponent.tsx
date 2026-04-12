@@ -392,11 +392,8 @@ export const DataTypeTypeInputEditDialogComponent: React.FC<DataTypeJSONInputEdi
     const typeFromValueAction = useTypeExtractionAction()
     const [humanValue, setHumanValue] = useState("")
     const [tsValue, setTsValue] = useState(value ?? "")
-    const [literalValue, setLiteralValue] = useState<LiteralValue>({
-        __typename: "LiteralValue",
-        value: {}
-    } as LiteralValue)
-    const [editVariant, setEditVariant] = useState<"manual" | "value">("manual")
+    const [literalValue, setLiteralValue] = useState<LiteralValue>()
+    const [editVariant, setEditVariant] = useState<"manual" | "value">("value")
 
     const dataTypes = useMemo(
         () => dataTypeService.values(),
@@ -414,7 +411,9 @@ export const DataTypeTypeInputEditDialogComponent: React.FC<DataTypeJSONInputEdi
             valueFromTypeAction.execute({
                 type: initialTs,
                 dataTypes: dataTypes
-            }).then(val => setLiteralValue(val as any))
+            }).then(val => {
+                setLiteralValue(val as any)
+            })
         }
     }, [open])
 
@@ -461,12 +460,15 @@ export const DataTypeTypeInputEditDialogComponent: React.FC<DataTypeJSONInputEdi
             onChange={handleSchemaChange}/>
     }, [humanValue, handleSchemaChange])
 
-    const jsonInput = <Editor
-        showValidation={false}
-        language={"json"}
-        initialValue={literalValue.value}
-        onChange={handleJsonChange}
-        showTooltips={false}/>
+    const jsonInput = React.useMemo(() => {
+        return <Editor
+            key={String(literalValue)}
+            showValidation={true}
+            language={"json"}
+            initialValue={literalValue?.value}
+            onChange={handleJsonChange}
+            showTooltips={false}/>
+    }, [open, literalValue, handleJsonChange])
 
     return (
         <Dialog open={editOpen} onOpenChange={(open) => onOpenChange?.(open)}>
@@ -491,7 +493,7 @@ export const DataTypeTypeInputEditDialogComponent: React.FC<DataTypeJSONInputEdi
                             }>
                         <ResizablePanelGroup style={{borderRadius: "1rem"}}>
                             <ResizablePanel color="primary">
-                                <DataTypeJSONInputTreeComponent object={literalValue}
+                                <DataTypeJSONInputTreeComponent object={literalValue ?? {}}
                                                                 onEntryClick={() => {
                                                                 }}
                                                                 collapsedState={{}}
@@ -508,9 +510,9 @@ export const DataTypeTypeInputEditDialogComponent: React.FC<DataTypeJSONInputEdi
                                                   value={editVariant}
                                                   onValueChange={v => v && setEditVariant(v as any)}
                                                   style={{transform: "translateX(-50%)", zIndex: 99}}>
-                                    <SegmentedControlItem value={"manual"}>
+                                    {/*<SegmentedControlItem value={"manual"}>
                                         Schema
-                                    </SegmentedControlItem>
+                                    </SegmentedControlItem>*/}
                                     <SegmentedControlItem value={"value"}>
                                         From Value
                                     </SegmentedControlItem>
