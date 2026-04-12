@@ -16,7 +16,7 @@
   "dependencies": {
     "@apollo/client": "^4.0.9",
     "@code0-tech/pictor": "^0.6.0",
-    "@code0-tech/triangulum": "^0.11.0",
+    "@code0-tech/triangulum": "^0.11.1",
     "@opentelemetry/api": "^1.9.1",
     "@opentelemetry/context-zone": "^2.6.1",
     "@opentelemetry/exporter-logs-otlp-http": "^0.214.0",
