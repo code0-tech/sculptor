@@ -124,7 +124,10 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                                                                                  onClick={() => setEditDialogOpen(true)}>
                                                              <IconAlignLeft size={13}/>
                                                          </Button>}/>
-                        <Button paddingSize="xxs" variant="filled" color="secondary"
+                        <Button paddingSize="xxs"
+                                variant="filled"
+                                disabled={value?.__typename != "LiteralValue"}
+                                color="secondary"
                                 onClick={() => setEditDialogOpen(true)}>
                             <IconEdit size={13}/>
                         </Button>
