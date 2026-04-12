@@ -36,21 +36,21 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
     const flowInputType = getTypesFromFunction({signature: instance.signature}).returnType
     const flowTypeInputType = getTypesFromFunction({signature: definition?.signature}).returnType
 
-    const initialValues: Record<number | "inputType", any> = React.useMemo(() => {
-        const values: Record<number | "inputType", any> = {
+    const initialValues: Record<string | "inputType", any> = React.useMemo(() => {
+        const values: Record<string | "inputType", any> = {
             "inputType": flowInputType || flowTypeInputType
         }
         definition?.flowTypeSettings?.forEach((setting, index) => {
             const flowSetting = instance.settings?.nodes?.[index]
-            values[index] = flowSetting?.value?.__typename === "LiteralValue" ? (flowSetting?.value.value) : (flowSetting?.value)
+            values[setting.id!] = flowSetting?.value?.__typename === "LiteralValue" ? (flowSetting?.value.value) : (flowSetting?.value)
         })
         return values
     }, [definition, instance])
 
     const validations = React.useMemo(() => {
         const values: Record<string, any> = {}
-        instance.settings?.nodes?.forEach((flowSetting, index) => {
-            values[index] = (_: any) => {
+        definition?.flowTypeSettings?.forEach((setting, index) => {
+            values[setting!.id!] = (_: any) => {
                 const validationForSetting = validation?.find(v => v.parameterIndex === index && !v.nodeId)
                 if (validationForSetting) {
                     return validationForSetting.message?.[0]?.content || "Invalid value"
@@ -71,7 +71,7 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
                 if (typeof index !== "number") return
                 if (!changedParameters.current.has(index)) continue;
 
-                const syntaxSegment = values[index]
+                const syntaxSegment = values[flowTypeSetting.id!]
                 const syntaxValue = syntaxSegment?.[0]?.value ?? syntaxSegment?.value ?? syntaxSegment ?? null as LiteralValue | null
 
                 if (!syntaxValue || !syntaxSegment || (Array.isArray(syntaxValue) && Array.from(syntaxValue).length <= 0)) {
@@ -85,13 +85,17 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
         })
     }, [definition, changedParameters])
 
-    const [inputs, validate] = useForm<Record<number | "inputType", InputSyntaxSegment[]>>({
+    const [inputs, validate] = useForm<Record<string | "inputType", InputSyntaxSegment[]>>({
         initialValues: initialValues,
         validate: validations,
         truthyValidationBeforeSubmit: false,
         useInitialValidation: true,
         onSubmit: onSubmit
     })
+
+    React.useEffect(() => {
+        validate()
+    }, [validation])
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
         {
@@ -125,7 +129,7 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
                                             changedParameters.current.add(index)
                                             validate()
                                         }}
-                                        {...inputs.getInputProps(index)}
+                                        {...inputs.getInputProps(settingDefinition.id!)}
                 />
             </div>
 

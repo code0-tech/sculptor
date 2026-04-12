@@ -145,9 +145,10 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         const payload: FlowInput = {
             name: flow?.name!,
             type: flow?.type?.id!,
+            /*@ts-ignore*/
             settings: flow?.settings?.nodes?.map(setting => {
                 return {
-                    flowSettingIdentifier: setting?.flowSettingIdentifier!,
+                    //flowSettingIdentifier: setting?.flowSettingIdentifier!,
                     value: setting?.value!,
                 }
             }) ?? [],

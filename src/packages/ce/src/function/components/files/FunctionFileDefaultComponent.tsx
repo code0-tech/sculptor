@@ -4,7 +4,7 @@ import {
     Flow,
     LiteralValue,
     NodeFunction,
-    NodeParameterValue,
+    NodeParameterValue, ParameterDefinition,
     ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
@@ -30,9 +30,8 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
     const functionStore = useStore(FunctionService)
     const flowService = useService(FlowService)
     const fileTabsService = useService(FileTabsService)
-    const validation = useFlowValidation(flowId)
-
     const changedParameters = React.useRef<Set<number>>(new Set())
+    const validation = useFlowValidation(flowId)
 
     const definition = React.useMemo(() => {
         return functionService.getById(node.functionDefinition?.id!!)
@@ -42,16 +41,16 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
         const values: Record<string, any> = {}
         definition?.parameterDefinitions?.nodes?.forEach((parameter, index) => {
             const nodeParameter = node.parameters?.nodes?.[index]
-            values[index] = nodeParameter?.value?.__typename === "LiteralValue" ? (typeof nodeParameter.value?.value === "object" && nodeParameter.value?.value != null ? JSON.stringify(nodeParameter.value?.value) : nodeParameter.value.value) : nodeParameter?.value != null ? JSON.stringify(nodeParameter?.value) : nodeParameter?.value
+            values[parameter!.id!] = nodeParameter?.value?.__typename === "LiteralValue" ? (typeof nodeParameter.value?.value === "object" && nodeParameter.value?.value != null ? JSON.stringify(nodeParameter.value?.value) : nodeParameter.value.value) : nodeParameter?.value != null ? JSON.stringify(nodeParameter?.value) : nodeParameter?.value
         })
         return values
-    }, [node])
+    }, [node, definition])
 
     const validations = React.useMemo(() => {
         const values: Record<string, any> = {}
-        node.parameters?.nodes?.forEach((parameter, index) => {
-            values[index] = (_: any) => {
-                const validationForParameter = validation?.find(v => v?.parameterIndex === index && v?.nodeId === node.id)
+        definition?.parameterDefinitions?.nodes?.forEach((parameter, index) => {
+            values[parameter!.id!] = (_: any) => {
+                const validationForParameter = validation?.find(v => v.parameterIndex === index && v.nodeId === node.id)
                 if (validationForParameter) {
                     return validationForParameter?.message?.[0]?.content ?? "Invalid value"
                 }
@@ -59,7 +58,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
             }
         })
         return values
-    }, [node, validation])
+    }, [validation, flowId, node, definition])
 
     const onSubmit = React.useCallback((values: any) => {
         startTransition(async () => {
@@ -68,7 +67,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                 if (typeof parameterIndex !== "number") return
                 if (!changedParameters.current.has(parameterIndex)) continue;
                 const nodeParameter = node.parameters?.nodes?.find(p => p?.parameterDefinition?.id === parameterDefinition?.id)
-                const syntaxSegment = values[parameterIndex]
+                const syntaxSegment = values[parameterDefinition!.id!]
                 const previousValue = nodeParameter?.value as NodeParameterValue
                 const syntaxValue = syntaxSegment?.[0]?.value ?? syntaxSegment?.value ?? syntaxSegment ?? null as NodeFunction | LiteralValue | ReferenceValue | null
 
@@ -111,12 +110,17 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
         })
     }, [flowService])
 
-    const [inputs, validate] = useForm<Record<number, InputSyntaxSegment[]>>({
+    const [inputs, validate] = useForm<Record<string, InputSyntaxSegment[]>>({
+        useInitialValidation: true,
+        truthyValidationBeforeSubmit: false,
         initialValues: initialValues,
         validate: validations,
-        truthyValidationBeforeSubmit: false,
         onSubmit: onSubmit
     })
+
+    React.useEffect(() => {
+        validate()
+    }, [validation])
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
         {definition?.parameterDefinitions?.nodes?.map((parameterDefinition, index) => {
@@ -139,7 +143,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                                             changedParameters.current.add(index)
                                             validate()
                                         }}
-                                        {...inputs.getInputProps(index)}
+                                        {...inputs.getInputProps(parameterDefinition.id!)}
                 />
             </div>
         })}
