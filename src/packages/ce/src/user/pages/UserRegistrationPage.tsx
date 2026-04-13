@@ -6,7 +6,7 @@ import {
     EmailInput,
     emailValidation,
     Flex,
-    PasswordInput,
+    PasswordInput, passwordValidation,
     Text,
     TextInput,
     useForm,
@@ -27,6 +27,7 @@ export const UserRegistrationPage: React.FC = () => {
     const callbackUrl = query.get("callbackUrl")
 
     const [inputs, validate] = useForm({
+        useInitialValidation: false,
         initialValues: {
             email: null,
             username: null,
@@ -43,12 +44,10 @@ export const UserRegistrationPage: React.FC = () => {
                 if (!value) return "Username is required"
                 return null
             },
-            password: (value) => {
-                if (!value) return "Password is required"
-                return null
-            },
-            repeatPassword: (value) => {
-                if (!value) return "Repeat password is required"
+            password: passwordValidation,
+            repeatPassword: (value, values) => {
+                if (passwordValidation(value) != null) return passwordValidation(value)
+                if (value != values?.password) return "Passwords do not match"
                 return null
             }
         },
@@ -93,9 +92,13 @@ export const UserRegistrationPage: React.FC = () => {
                        w={"100%"} {...inputs.getInputProps("username")}/>
         </Flex>
         <div style={{marginBottom: "1.3rem"}}/>
-        <PasswordInput placeholder={"Password"} {...inputs.getInputProps("password")}/>
+        <PasswordInput placeholder={"Password"}
+                       onChange={() => validate("password")}
+                       {...inputs.getInputProps("password")}/>
         <div style={{marginBottom: "1.3rem"}}/>
-        <PasswordInput placeholder={"Repeat password"} {...inputs.getInputProps("repeatPassword")}/>
+        <PasswordInput placeholder={"Repeat password"}
+                       onChange={() => validate("repeatPassword")}
+                       {...inputs.getInputProps("repeatPassword")}/>
         <div style={{marginBottom: "1.3rem"}}/>
         <Button color={"info"} w={"100%"} mb={1.3} onClick={validate}>
             Sign up
