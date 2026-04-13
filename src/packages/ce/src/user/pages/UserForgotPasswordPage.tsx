@@ -14,6 +14,7 @@ export const UserForgotPasswordPage: React.FC = () => {
     const router = useRouter()
 
     const [inputs, validate] = useForm({
+        useInitialValidation: false,
         initialValues: {
             email: null,
         },

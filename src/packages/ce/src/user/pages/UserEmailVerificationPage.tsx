@@ -14,6 +14,7 @@ export const UserEmailVerificationPage: React.FC = () => {
     const router = useRouter()
 
     const [inputs, validate] = useForm({
+        useInitialValidation: false,
         initialValues: {
             code: null,
         },

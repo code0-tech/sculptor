@@ -1,7 +1,17 @@
 "use client";
 
 import React from "react";
-import {Alert, Button, PasswordInput, Spacing, Text, TextInput, useForm, useService} from "@code0-tech/pictor";
+import {
+    Alert,
+    Button,
+    PasswordInput,
+    passwordValidation,
+    Spacing,
+    Text,
+    TextInput,
+    useForm,
+    useService
+} from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import Link from "next/link";
 import {useRouter, useSearchParams} from "next/navigation";
@@ -14,6 +24,7 @@ export const UserResetPasswordPage: React.FC = () => {
     const router = useRouter()
 
     const [inputs, validate] = useForm({
+        useInitialValidation: false,
         initialValues: {
             code: null,
             password: null,
@@ -24,12 +35,10 @@ export const UserResetPasswordPage: React.FC = () => {
                 if (!value) return "Code is required"
                 return null
             },
-            password: (value) => {
-                if (!value) return "Password is required"
-                return null
-            },
-            repeatPassword: (value) => {
-                if (!value) return "Repeat password is required"
+            password: passwordValidation,
+            repeatPassword: (value, values) => {
+                if (passwordValidation(value) != null) return passwordValidation(value)
+                if (value != values?.password) return "Passwords do not match"
                 return null
             }
         },
@@ -65,9 +74,13 @@ export const UserResetPasswordPage: React.FC = () => {
         ) : null}
         <TextInput placeholder={"Code"} {...inputs.getInputProps("code")}/>
         <div style={{marginBottom: "1.3rem"}}/>
-        <PasswordInput placeholder={"Password"} {...inputs.getInputProps("password")}/>
+        <PasswordInput placeholder={"Password"}
+                       onChange={() => validate("password")}
+                       {...inputs.getInputProps("password")}/>
         <div style={{marginBottom: "1.3rem"}}/>
-        <PasswordInput placeholder={"Repeat password"} {...inputs.getInputProps("repeatPassword")}/>
+        <PasswordInput placeholder={"Repeat password"}
+                       onChange={() => validate("repeatPassword")}
+                       {...inputs.getInputProps("repeatPassword")}/>
         <div style={{marginBottom: "1.3rem"}}/>
         <Button color={"info"} w={"100%"} mb={1.3} onClick={validate}>
             Reset password
