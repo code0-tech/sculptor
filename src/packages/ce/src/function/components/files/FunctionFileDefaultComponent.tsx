@@ -13,6 +13,7 @@ import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent";
 import {
+    FALLBACK_FUNCTION_DESCRIPTION, FALLBACK_FUNCTION_NAME,
     FALLBACK_FUNCTION_PARAMETER_DESCRIPTION,
     FALLBACK_FUNCTION_PARAMETER_NAME
 } from "@core/util/fallback-translations";
@@ -128,9 +129,9 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
     }, [validation])
 
     return <>
-        <Text size={"md"}>{definition?.names?.[0].content}</Text>
+        <Text size={"md"}>{definition?.names?.[0]?.content ?? FALLBACK_FUNCTION_NAME}</Text>
         <Spacing spacing={"xs"}/>
-        <Text hierarchy={"tertiary"}>{definition?.descriptions?.[0].content}</Text>
+        <Text hierarchy={"tertiary"}>{definition?.descriptions?.[0]?.content ?? FALLBACK_FUNCTION_DESCRIPTION}</Text>
         {
             nodeValidation && <>
                 <Spacing spacing={"xl"}/>

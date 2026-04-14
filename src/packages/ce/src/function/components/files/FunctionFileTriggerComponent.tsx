@@ -8,6 +8,8 @@ import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTy
 import {getTypesFromFunction} from "@code0-tech/triangulum";
 import {DataTypeTypeInputComponent} from "@edition/datatype/components/inputs/datatype/DataTypeTypeInputComponent";
 import {
+    FALLBACK_FLOW_TYPE_DESCRIPTION,
+    FALLBACK_FLOW_TYPE_NAME,
     FALLBACK_FLOW_TYPE_SETTING_DESCRIPTION,
     FALLBACK_FLOW_TYPE_SETTING_NAME
 } from "@core/util/fallback-translations";
@@ -102,9 +104,9 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
     }, [validation])
 
     return <>
-        <Text size={"md"}>{definition?.names?.[0].content}</Text>
+        <Text size={"md"}>{definition?.names?.[0]?.content ?? FALLBACK_FLOW_TYPE_NAME}</Text>
         <Spacing spacing={"xs"}/>
-        <Text hierarchy={"tertiary"}>{definition?.descriptions?.[0].content}</Text>
+        <Text hierarchy={"tertiary"}>{definition?.descriptions?.[0]?.content ?? FALLBACK_FLOW_TYPE_DESCRIPTION}</Text>
         {
             triggerValidation && <>
                 <Spacing spacing={"xl"}/>
