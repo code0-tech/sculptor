@@ -1,5 +1,5 @@
 import React from "react";
-import {Flex, InputSyntaxSegment, useForm, useService, useStore} from "@code0-tech/pictor";
+import {Alert, InputSyntaxSegment, Spacing, Text, useForm, useService, useStore} from "@code0-tech/pictor";
 import {Flow, LiteralValue} from "@code0-tech/sagittarius-graphql-types";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
@@ -8,7 +8,6 @@ import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTy
 import {getTypesFromFunction} from "@code0-tech/triangulum";
 import {DataTypeTypeInputComponent} from "@edition/datatype/components/inputs/datatype/DataTypeTypeInputComponent";
 import {
-    FALLBACK_FLOW_TYPE_DESCRIPTION,
     FALLBACK_FLOW_TYPE_SETTING_DESCRIPTION,
     FALLBACK_FLOW_TYPE_SETTING_NAME
 } from "@core/util/fallback-translations";
@@ -47,7 +46,12 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
         return values
     }, [definition, instance])
 
-    const validations = React.useMemo(() => {
+    const triggerValidation = React.useMemo(
+        () => validation?.find(v => v.nodeId === null && v.parameterIndex === null),
+        [validation]
+    )
+
+    const settingsValidations = React.useMemo(() => {
         const values: Record<string, any> = {}
         definition?.flowTypeSettings?.forEach((setting, index) => {
             values[setting!.id!] = (_: any) => {
@@ -87,7 +91,7 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
 
     const [inputs, validate] = useForm<Record<string | "inputType", InputSyntaxSegment[]>>({
         initialValues: initialValues,
-        validate: validations,
+        validate: settingsValidations,
         truthyValidationBeforeSubmit: false,
         useInitialValidation: true,
         onSubmit: onSubmit
@@ -97,18 +101,34 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
         validate()
     }, [validation])
 
-    return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
+    return <>
+        <Text size={"md"}>{definition?.names?.[0].content}</Text>
+        <Spacing spacing={"xs"}/>
+        <Text hierarchy={"tertiary"}>{definition?.descriptions?.[0].content}</Text>
+        {
+            triggerValidation && <>
+                <Spacing spacing={"xl"}/>
+                <Alert color={"error"}>
+                    {triggerValidation?.message?.[0]?.content as string}
+                </Alert>
+            </>
+        }
+        <Spacing spacing={"xl"}/>
+        <Text size={"md"}>Settings</Text>
+        <Spacing spacing={"xs"}/>
         {
 
-            (flowInputType && flowInputType != "void") && (flowTypeInputType && flowTypeInputType != "void") ? <DataTypeTypeInputComponent
-                flowId={instance.id}
-                title={"Input type"}
-                description={"The type of the input that will be provided to the flow when it is triggered."}
-                onChange={() =>  validate()}
-                {...inputs.getInputProps("inputType")}
-            /> : null
+            (flowInputType && flowInputType != "void") && (flowTypeInputType && flowTypeInputType != "void") ?
+                <DataTypeTypeInputComponent
+                    flowId={instance.id}
+                    title={"Input type"}
+                    description={"The type of the input that will be provided to the flow when it is triggered."}
+                    onChange={() => validate()}
+                    {...inputs.getInputProps("inputType")}
+                /> : null
 
         }
+        <Spacing spacing={"xl"}/>
         {definition?.flowTypeSettings?.map((settingDefinition, index) => {
 
             if (!settingDefinition) return null
@@ -131,8 +151,9 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
                                         }}
                                         {...inputs.getInputProps(settingDefinition.id!)}
                 />
+                <Spacing spacing={"xl"}/>
             </div>
 
         })}
-    </Flex>
+    </>
 }
