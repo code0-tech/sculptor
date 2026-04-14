@@ -4,7 +4,7 @@ import {
     Flow,
     LiteralValue,
     NodeFunction,
-    NodeParameterValue, ParameterDefinition,
+    NodeParameterValue,
     ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
@@ -66,7 +66,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                 const parameterIndex = definition?.parameterDefinitions?.nodes?.findIndex(p => p?.id === parameterDefinition?.id)
                 if (typeof parameterIndex !== "number") return
                 if (!changedParameters.current.has(parameterIndex)) continue;
-                const nodeParameter = node.parameters?.nodes?.find(p => p?.parameterDefinition?.id === parameterDefinition?.id)
+                const nodeParameter = node.parameters?.nodes?.[parameterIndex]
                 const value = values[parameterDefinition!.id!]
                 const previousValue = nodeParameter?.value as NodeParameterValue
                 const syntaxValue = (value?.[0]?.type == "block" || value?.[0]?.type == "text" ? value?.[0]?.value : value) ?? null as NodeFunction | LiteralValue | ReferenceValue | null
@@ -79,7 +79,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                 }
 
                 if (!syntaxValue || !value || (Array.isArray(syntaxValue) && Array.from(syntaxValue).length <= 0)) {
-                    await flowService.setParameterValue(flowId, node.id!!, parameterIndex, undefined, parameterDefinition?.id);
+                    await flowService.setParameterValue(flowId, node.id!!, parameterIndex, undefined, definition);
                     continue;
                 }
 
@@ -89,7 +89,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                         await flowService.setParameterValue(flowId, node.id!!, parameterIndex, syntaxValue ? {
                             __typename: "LiteralValue",
                             value: parsedSyntaxValue
-                        } : undefined, parameterDefinition?.id);
+                        } : undefined, definition);
                         continue;
                     }
                 } catch (e) {
@@ -97,14 +97,14 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                         await flowService.setParameterValue(flowId, node.id!!, parameterIndex, syntaxValue ? {
                             __typename: "LiteralValue",
                             value: syntaxValue,
-                        } : undefined, parameterDefinition?.id);
+                        } : undefined, definition);
                         continue;
                     }
                 }
 
                 const parsedSyntaxValue = typeof syntaxValue === "object" ? syntaxValue : JSON.parse(syntaxValue)
 
-                await flowService.setParameterValue(flowId, node.id!!, parameterIndex, parsedSyntaxValue.__typename === "LiteralValue" ? (!!parsedSyntaxValue.value ? parsedSyntaxValue : undefined) : parsedSyntaxValue, parameterDefinition?.id);
+                await flowService.setParameterValue(flowId, node.id!!, parameterIndex, parsedSyntaxValue.__typename === "LiteralValue" ? (!!parsedSyntaxValue.value ? parsedSyntaxValue : undefined) : parsedSyntaxValue, definition);
             }
             changedParameters.current.clear()
         })
@@ -117,6 +117,8 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
         validate: validations,
         onSubmit: onSubmit
     })
+
+    console.log(initialValues, node.id)
 
     React.useEffect(() => {
         validate()

@@ -2,6 +2,7 @@ import {ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor";
 import {
     FlowInput,
     FlowSetting,
+    FunctionDefinition,
     LiteralValue,
     Maybe,
     Mutation,
@@ -16,11 +17,10 @@ import {
     NodeFunction,
     NodeFunctionIdWrapper,
     NodeParameter,
-    NodeParameterValueInput, ParameterDefinition,
+    NodeParameterValueInput,
     Query,
     ReferencePathInput,
-    ReferenceValue,
-    Scalars
+    ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
 import {GraphqlClient} from "@core/util/graphql-client";
 import flowsQuery from "@edition/flow/services/queries/Flows.query.graphql";
@@ -317,21 +317,43 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         await this.syncFlow(flowId)
     }
 
-    async setParameterValue(flowId: FlowView['id'], nodeId: NodeFunction['id'], parameterIndex: number, value?: LiteralValue | ReferenceValue | NodeFunction, parameterDefinitionId?: ParameterDefinition['id']): Promise<void> {
+    async setParameterValue(flowId: FlowView['id'], nodeId: NodeFunction['id'], parameterIndex: number, value?: LiteralValue | ReferenceValue | NodeFunction, functionDefinition?: FunctionDefinition): Promise<void> {
+
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
         if (!flow) return
         const node = this.getNodeById(flowId, nodeId)
         if (!node) return
+
+        if (!node.parameters) {
+            node.parameters = {
+                nodes: []
+            }
+        }
+
+        if (!node.parameters.nodes) {
+            node.parameters.nodes = []
+        }
+
+        functionDefinition?.parameterDefinitions?.nodes?.forEach((pD, index) => {
+            const nodeParameter = node.parameters?.nodes?.[index]
+            if (!nodeParameter) {
+
+                node!.parameters!.nodes![parameterIndex] = {
+                    __typename: "NodeParameter",
+                    value: null,
+                    parameterDefinition: {
+                        id: pD?.id
+                    }
+                }
+            }
+        })
+
         const parameter = node.parameters?.nodes?.[parameterIndex]
-        if (!parameter && parameterDefinitionId && node.parameters && node.parameters.nodes) {
-            //TODO: needs a parameterDefinitionId
+        if (!parameter && node.parameters && node.parameters.nodes) {
+
             const localParameter: NodeParameter = {
                 __typename: "NodeParameter",
-                parameterDefinition: {
-                    __typename: "ParameterDefinition",
-                    id: parameterDefinitionId
-                },
                 value: null
             }
 

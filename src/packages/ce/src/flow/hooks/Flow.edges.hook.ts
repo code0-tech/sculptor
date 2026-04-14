@@ -93,7 +93,7 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
 
             node.parameters?.nodes?.forEach((param, index) => {
                 const parameterValue = param?.value;
-                const parameterDefinition = functionService.getById(node.functionDefinition?.id!!)?.parameterDefinitions?.nodes?.find(p => p?.id === param?.parameterDefinition?.id);
+                const parameterDefinition = functionService.getById(node.functionDefinition?.id!!)?.parameterDefinitions?.nodes?.[index];
                 const variant = getTypeVariant(types.parameters[index], dataTypeService.values())[0].variant;
                 if (!parameterValue) return
 

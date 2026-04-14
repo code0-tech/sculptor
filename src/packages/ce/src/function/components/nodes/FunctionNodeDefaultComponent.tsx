@@ -72,8 +72,8 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
             );
 
     const displayMessage = React.useMemo(() => splitTemplate(definition?.displayMessages?.[0]?.content ?? FALLBACK_FUNCTION_DISPLAY_MESSAGE).map(item => {
-        const nodeParameter = node?.parameters?.nodes?.find(p => {
-            const parameterDefinition = definition?.parameterDefinitions?.nodes?.find(pd => pd?.id == p?.parameterDefinition?.id)
+        const nodeParameter = node?.parameters?.nodes?.find((_, index) => {
+            const parameterDefinition = definition?.parameterDefinitions?.nodes?.[index]
             return parameterDefinition?.identifier == item
         })
 
