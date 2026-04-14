@@ -42,6 +42,16 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
 
     const validation = useFlowValidation(data.flowId)
 
+    const nodeValidations = React.useMemo(
+        () => validation?.filter(v => v.nodeId === data.nodeId && v.parameterIndex === null),
+        [validation]
+    )
+
+    const nodeValidationStyle: CSSProperties =
+        nodeValidations?.length
+            ? underlineBySeverity[nodeValidations[0].type]
+            : {};
+
     const activeTabId = React.useMemo(() => {
         return fileTabsService.getActiveTab()?.id
     }, [fileTabsStore, fileTabsService]);
@@ -195,7 +205,7 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
             }
 
 
-            <Flex align={"center"} style={{gap: "0.7rem"}}>
+            <Flex align={"center"} style={{gap: "0.7rem", ...nodeValidationStyle}}>
                 <DisplayIcon color={data.color} size={16}/>
                 <Text size={"md"}>{displayMessage}</Text>
             </Flex>
