@@ -40,7 +40,10 @@ export const UserLoginPage: React.FC = () => {
                 if (!emailValidation(value)) return "Please provide a valid email"
                 return null
             },
-            password: passwordValidation
+            password: (value) => {
+                if (!value) return "Password is required"
+                return null
+            }
         },
         onSubmit: (values) => {
             if (!values.password || !values.email || !emailValidation(values.email)) return
@@ -94,7 +97,6 @@ export const UserLoginPage: React.FC = () => {
         <EmailInput placeholder={"Email"} {...inputs.getInputProps("email")}/>
         <div style={{marginBottom: "1.3rem"}}/>
         <PasswordInput placeholder={"Password"}
-                       onChange={() => validate("password")}
                        {...inputs.getInputProps("password")}/>
         <div style={{marginBottom: "1.3rem"}}/>
         <Button color={"success"} w={"100%"} mb={1.3} onClick={validate}>
