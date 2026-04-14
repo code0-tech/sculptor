@@ -1,5 +1,5 @@
 import React, {startTransition} from "react";
-import {Flex, InputSyntaxSegment, useForm, useService, useStore} from "@code0-tech/pictor";
+import {Alert, InputSyntaxSegment, Spacing, Text, useForm, useService, useStore} from "@code0-tech/pictor";
 import {
     Flow,
     LiteralValue,
@@ -13,6 +13,7 @@ import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent";
 import {
+    FALLBACK_FUNCTION_DESCRIPTION, FALLBACK_FUNCTION_NAME,
     FALLBACK_FUNCTION_PARAMETER_DESCRIPTION,
     FALLBACK_FUNCTION_PARAMETER_NAME
 } from "@core/util/fallback-translations";
@@ -46,7 +47,12 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
         return values
     }, [node, definition])
 
-    const validations = React.useMemo(() => {
+    const nodeValidation = React.useMemo(
+        () => validation?.find(v => v.nodeId === node.id && v.parameterIndex === null),
+        [validation]
+    )
+
+    const parameterValidations = React.useMemo(() => {
         const values: Record<string, any> = {}
         definition?.parameterDefinitions?.nodes?.forEach((parameter, index) => {
             values[parameter!.id!] = (_: any) => {
@@ -114,17 +120,29 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
         useInitialValidation: true,
         truthyValidationBeforeSubmit: false,
         initialValues: initialValues,
-        validate: validations,
+        validate: parameterValidations,
         onSubmit: onSubmit
     })
-
-    console.log(initialValues, node.id)
 
     React.useEffect(() => {
         validate()
     }, [validation])
 
-    return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
+    return <>
+        <Text size={"md"}>{definition?.names?.[0]?.content ?? FALLBACK_FUNCTION_NAME}</Text>
+        <Spacing spacing={"xs"}/>
+        <Text hierarchy={"tertiary"}>{definition?.descriptions?.[0]?.content ?? FALLBACK_FUNCTION_DESCRIPTION}</Text>
+        {
+            nodeValidation && <>
+                <Spacing spacing={"xl"}/>
+                <Alert color={"error"}>
+                    {nodeValidation?.message?.[0]?.content as string}
+                </Alert>
+            </>
+        }
+        <Spacing spacing={"xl"}/>
+        <Text size={"md"}>Parameters</Text>
+        <Spacing spacing={"xs"}/>
         {definition?.parameterDefinitions?.nodes?.map((parameterDefinition, index) => {
 
             if (!parameterDefinition) return null
@@ -147,7 +165,8 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                                         }}
                                         {...inputs.getInputProps(parameterDefinition.id!)}
                 />
+                <Spacing spacing={"xl"}/>
             </div>
         })}
-    </Flex>
+    </>
 }

@@ -1,4 +1,4 @@
-import React, {memo} from "react";
+import React, {CSSProperties, memo} from "react";
 import {Handle, Node, NodeProps, Position} from "@xyflow/react";
 import {Badge, Card, Flex, Text, useService, useStore as usePictorStore} from "@code0-tech/pictor";
 import {FunctionNodeComponentProps} from "@edition/function/components/nodes/FunctionNodeComponent";
@@ -10,6 +10,8 @@ import {FunctionFileTriggerComponent} from "@edition/function/components/files/F
 import {NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {icon, IconString} from "@core/util/icons";
 import {FALLBACK_FLOW_TYPE_DISPLAY_MESSAGE, FALLBACK_FLOW_TYPE_NAME} from "@core/util/fallback-translations";
+import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
+import {underlineBySeverity} from "@core/util/inspection";
 
 
 export type FunctionNodeTriggerComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
@@ -27,6 +29,17 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
     const flow = React.useMemo(() => flowService.getById(data.flowId), [flowStore, data])
     const definition = React.useMemo(() => flow ? flowTypeService.getById(flow.type?.id) : undefined, [flowTypeStore, flow])
     const DisplayIcon = icon(definition?.displayIcon as IconString)
+    const validation = useFlowValidation(data.flowId)
+
+    const triggerValidations = React.useMemo(
+        () => validation?.filter(v => v.nodeId === null && v.parameterIndex === null),
+        [validation]
+    )
+
+    const triggerValidationStyle: CSSProperties =
+        triggerValidations?.length
+            ? underlineBySeverity[triggerValidations[0].type]
+            : {};
 
     React.useEffect(() => {
         if (!id || !flow) return
@@ -80,7 +93,7 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
             Starting node
         </Badge>
 
-        <Flex style={{gap: "0.7rem"}} align={"center"}>
+        <Flex style={{gap: "0.7rem", ...triggerValidationStyle}} align={"center"}>
             <DisplayIcon color={data.color} size={16}/>
             <Text display={"block"}>
                 {definition?.displayMessages?.[0]?.content ?? FALLBACK_FLOW_TYPE_DISPLAY_MESSAGE}
