@@ -33,6 +33,7 @@ export const FlowRenameDialogComponent: React.FC<FlowRenameDialogComponentProps>
     }, [open])
 
     const [inputs, validate] = useForm({
+        useInitialValidation: false,
         initialValues: initialValues,
         validate: {
             path: (value) => {

@@ -40,6 +40,7 @@ export const RuntimeSettingsPage: React.FC = () => {
     }), [runtime])
 
     const [inputs, validate] = useForm({
+        useInitialValidation: false,
         initialValues: initialValues,
         validate: {
             name: (value) => {

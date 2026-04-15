@@ -41,6 +41,7 @@ export const ProjectSettingsGeneralView: React.FC = () => {
     )
 
     const [inputs, validate] = useForm({
+        useInitialValidation: false,
         initialValues: initialValues,
         validate: {
             name: (value) => {

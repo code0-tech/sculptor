@@ -123,6 +123,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
     }, [open])
 
     const [inputs, validate] = useForm({
+        useInitialValidation: false,
         initialValues: initialValues,
         validate: {
             name: (value) => {

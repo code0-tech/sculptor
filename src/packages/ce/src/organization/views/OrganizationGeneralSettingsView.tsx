@@ -29,6 +29,7 @@ export const OrganizationGeneralSettingsView: React.FC = () => {
     }), [parentOrganization])
 
     const [inputs, validate] = useForm({
+        useInitialValidation: false,
         initialValues: initialValues,
         validate: {
             name: (value) => {
