@@ -108,7 +108,7 @@ export class GraphqlClient {
             });
             if (!next) break;
 
-            // Variablen für die nächste Page
+            // Variablen für die nächste Default
             const nextVars: Record<string, any> = { ...(options.variables as any) };
             if (next.afterVar) {
                 nextVars[next.afterVar] = getAt(aggregated, next.path)?.pageInfo?.endCursor;
@@ -117,7 +117,7 @@ export class GraphqlClient {
                 nextVars[next.firstVar] = (options.variables as any)[next.firstVar];
             }
 
-            // Page-Request (netzwerkbasiert, um sicher zu gehen)
+            // Default-Request (netzwerkbasiert, um sicher zu gehen)
             const page = await this._client.query<TData, TVariables>({
                 ...options,
                 variables: nextVars as TVariables,
