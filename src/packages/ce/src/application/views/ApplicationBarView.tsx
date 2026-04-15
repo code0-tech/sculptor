@@ -5,7 +5,7 @@ import {UserService} from "@edition/user/services/User.service";
 import {useRouter} from "next/navigation";
 import React from "react";
 import Link from "next/link";
-import {IconBuilding, IconFolders, IconInbox, IconLogout, IconSearch} from "@tabler/icons-react";
+import {IconBuilding, IconFolders, IconInbox, IconLogout, IconSearch, IconUser} from "@tabler/icons-react";
 import {ApplicationBreadcrumbView} from "@edition/application/views/ApplicationBreadcrumbView";
 import UserMenuComponent from "@edition/user/components/UserMenuComponent";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
@@ -20,6 +20,7 @@ export const ApplicationBarView: React.FC = () => {
 
     const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [userStore, currentSession])
     const namespaceIndex = React.useMemo(() => currentUser?.namespace?.id?.match(/Namespace\/(\d+)$/)?.[1], [currentUser])
+    const userIndex = currentUser?.id?.match(/User\/(\d+)$/)?.[1]
 
     const userMenu = React.useMemo(() => {
 
@@ -39,6 +40,12 @@ export const ApplicationBarView: React.FC = () => {
         }
 
         return <UserMenuComponent userId={currentSession.user?.id!!}>
+            <Link href={`/users/${userIndex}`}>
+                <MenuItem>
+                    <IconUser size={16}/>Profile
+                </MenuItem>
+            </Link>
+            <MenuSeparator/>
             <Link href={"/organizations"}>
                 <MenuItem>
                     <IconBuilding size={16}/>Organizations

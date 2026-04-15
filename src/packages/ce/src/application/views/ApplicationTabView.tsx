@@ -28,7 +28,6 @@ export const ApplicationTabView: React.FC = () => {
                 : pathname.includes("runtimes") ? "runtimes"
                     : "overview"
 
-
     const adminLinks = React.useMemo(() => {
         return currentUser && currentUser.admin ? (
             <>
@@ -54,7 +53,7 @@ export const ApplicationTabView: React.FC = () => {
         ) : null
     }, [currentUser, runtimeStore, organizationStore])
 
-    return <Tab defaultValue={defaultValue} orientation={"vertical"}>
+    return <Tab defaultValue={defaultValue} key={defaultValue} orientation={"vertical"}>
         <TabList>
             <TabTrigger value={"overview"} asChild={true}>
                 <Button variant={"none"} color={"primary"} paddingSize={"xs"} onClick={() => router.push("/")}>
