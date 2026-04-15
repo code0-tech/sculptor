@@ -32,6 +32,7 @@ export const RoleGeneralAdjustmentView: React.FC = () => {
     }, [role])
 
     const [inputs, validate] = useForm({
+        useInitialValidation: false,
         initialValues: initialValues,
         validate: {
             name: (value) => {

@@ -46,6 +46,7 @@ export const RuntimeCreatePage: React.FC = () => {
     // if (namespace.)
 
     const [inputs, validate] = useForm({
+        useInitialValidation: false,
         initialValues: {
             name: null,
             description: null,

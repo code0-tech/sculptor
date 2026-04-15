@@ -33,6 +33,7 @@ export const MemberAddPage: React.FC = () => {
     }, [members])
 
     const [inputs, validate] = useForm<{ users: null | InputSyntaxSegment[] }>({
+        useInitialValidation: false,
         initialValues: formInitialValues,
         validate: {
             users: (value) => {

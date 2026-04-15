@@ -13,6 +13,7 @@ export const OrganizationCreatePage = () => {
     const router = useRouter()
 
     const [inputs, validate] = useForm({
+        useInitialValidation: false,
         initialValues: {
             name: null,
         },

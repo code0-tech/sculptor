@@ -20,6 +20,7 @@ export const NamespaceProjectsCreatePage: React.FC = () => {
     //TODO: user abilities for project creation within namespace
 
     const [inputs, validate] = useForm({
+        useInitialValidation: false,
         initialValues: {
             name: null,
             description: null,

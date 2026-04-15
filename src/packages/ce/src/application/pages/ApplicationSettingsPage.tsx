@@ -65,6 +65,7 @@ export const ApplicationSettingsPage: React.FC = () => {
     )
 
     const [inputs, validate] = useForm({
+        useInitialValidation: false,
         initialValues: initialValues,
         validate: {},
         onSubmit: (values) => {
