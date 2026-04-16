@@ -30,6 +30,7 @@ import {FlowPanelControlComponent} from "@edition/flow/components/panels/FlowPan
 import {FlowPanelUpdateComponent} from "@edition/flow/components/panels/FlowPanelUpdateComponent";
 import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
 import {FlowPanelExportComponent} from "@edition/flow/components/panels/FlowPanelExportComponent";
+import {FunctionNodeSquareComponent} from "@edition/function/components/nodes/FunctionNodeSquareComponent";
 
 /**
  * Dynamically layouts a tree of nodes and their parameter nodes for a flow-based editor.
@@ -622,6 +623,7 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
 
     const nodeTypes = React.useMemo(() => ({
         default: FunctionNodeDefaultComponent,
+        square: FunctionNodeSquareComponent,
         group: FunctionNodeGroupComponent,
         trigger: FunctionNodeTriggerComponent,
     }), [])
