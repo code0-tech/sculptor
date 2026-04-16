@@ -11,11 +11,11 @@ import {
     useService,
     useStore
 } from "@code0-tech/pictor";
-import {useSuggestions} from "@edition/function/hooks/FunctionSuggestion.hook";
 import {Panel} from "@xyflow/react";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import {FunctionSuggestionMenuComponent} from "@edition/function/components/suggestion/FunctionSuggestionMenuComponent";
 import {FlowService} from "@edition/flow/services/Flow.service";
+import {useNodeSuggestions} from "@edition/function/hooks/FunctionNodeSuggestions.hook";
 
 export interface FlowPanelControlComponentProps {
     flowId: Flow['id']
@@ -38,7 +38,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
         return fileTabsService.values().find((t: any) => (t as any).active)
     }, [fileTabsStore, fileTabsService])
 
-    const result = useSuggestions(flowId, undefined)
+    const result = useNodeSuggestions(null)
 
     //callbacks
     const deleteActiveNode = React.useCallback(() => {
@@ -89,14 +89,14 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
             <FunctionSuggestionMenuComponent suggestions={result}
                                              onSuggestionSelect={addNodeToFlow}
                                              triggerContent={
-                                     <Button data-qa-selector={"flow-builder-control-panel-add"}
-                                             disabled={!activeTab}
-                                             paddingSize={"xxs"}
-                                             variant={"filled"}
-                                             color={"secondary"}>
-                                         <Text>Add next node</Text>
-                                     </Button>
-                                 }/>
+                                                 <Button data-qa-selector={"flow-builder-control-panel-add"}
+                                                         disabled={!activeTab}
+                                                         paddingSize={"xxs"}
+                                                         variant={"filled"}
+                                                         color={"secondary"}>
+                                                     <Text>Add next node</Text>
+                                                 </Button>
+                                             }/>
         </ButtonGroup>
     </Panel>
 

@@ -6,12 +6,12 @@ import {useService, useStore} from "@code0-tech/pictor";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import React from "react";
-import {useNodeSuggestionsAction} from "@edition/flow/components/FlowWorkerProvider";
+import {useNodeSuggestionsAction, useTypeVariantAction} from "@edition/flow/components/FlowWorkerProvider";
 import {icon, IconString} from "@core/util/icons";
 import {FALLBACK_FUNCTION_NAME} from "@core/util/fallback-translations";
 
 export const useNodeSuggestions = (
-    type?: string,
+    type?: string | null,
 ): FunctionSuggestion[] => {
 
     const functionStore = useStore(FunctionService)
@@ -20,25 +20,63 @@ export const useNodeSuggestions = (
     const dataTypeService = useService(DatatypeService)
 
     const [suggestions, setSuggestions] = React.useState<any[]>([])
+    const [typeVariant, setTypeVariant] = React.useState<number | undefined>(undefined)
     const {execute} = useNodeSuggestionsAction()
+    const variantAction = useTypeVariantAction()
 
     const functions = React.useMemo(() => functionService.values(), [functionStore]);
     const dataTypes = React.useMemo(() => dataTypeService.values(), [dataTypeStore]);
 
     React.useEffect(() => {
 
+        if (type === null) return
+
         const timeout = setTimeout(() => {
-            execute({
+            variantAction.execute({
                 type: type as string,
-                functions,
                 dataTypes
             }).then(value => {
-                setSuggestions(value as any[])
+                setTypeVariant(value?.[0]?.variant)
             })
         }, 200);
 
         return () => clearTimeout(timeout);
-    }, [type, functions, dataTypes])
+
+    }, [type, dataTypes])
+
+    React.useEffect(() => {
+
+        if (type !== null && typeVariant === undefined) return
+        if (type !== null && typeVariant != 4) return
+
+        const nodes = functionService.values().map(f => ({
+            __typename: "NodeFunction",
+            id: `gid://sagittarius/NodeFunction/1`,
+            functionDefinition: {
+                __typename: "FunctionDefinition",
+                id: f.id,
+                identifier: f.identifier,
+            },
+            parameters: {
+                __typename: "NodeParameterConnection",
+                nodes: (f.parameterDefinitions?.nodes || []).map(p => ({
+                    __typename: "NodeParameter",
+                    parameterDefinition: {
+                        __typename: "ParameterDefinition",
+                        id: p?.id,
+                        identifier: p?.identifier
+                    },
+                    value: p?.defaultValue ? {
+                        __typename: "LiteralValue",
+                        value: p.defaultValue.value
+                    } : null
+                }))
+            }
+        }))
+
+        setSuggestions(nodes)
+
+    }, [type, typeVariant, functions, dataTypes])
 
     return React.useMemo(() => suggestions.sort((a, b) => {
         const [rA, pA, fA] = a?.functionDefinition!!.identifier!!.split("::");
