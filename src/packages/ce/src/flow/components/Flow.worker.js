@@ -2,7 +2,7 @@ import {
     getFlowValidation,
     getNodeSuggestions,
     getReferenceSuggestions, getTypeFromValue,
-    getTypesFromNode, getValueFromType,
+    getTypesFromNode, getTypeVariant, getValueFromType,
     getValueSuggestions
 } from "@code0-tech/triangulum";
 import {InspectionSeverity} from "../../../../core/src/util/inspection";
@@ -22,7 +22,7 @@ const errorResult = (
 })
 
 addEventListener("message", (event) => {
-    const { id, action, payload } = event.data; // id extrahieren
+    const { id, action, payload } = event.data;
     let result;
 
     try {
@@ -50,8 +50,11 @@ addEventListener("message", (event) => {
             case 'value_extraction':
                 result = getValueFromType(payload.type, payload.dataTypes);
                 break;
+            case 'type_variant':
+                result = getTypeVariant(payload.type, payload.dataTypes);
+                break;
         }
-        // Wichtig: id mitsenden!
+
         postMessage({ id, data: result });
     } catch (error) {
         postMessage({ id, error: error.message });
