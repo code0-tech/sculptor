@@ -2,7 +2,7 @@ import {ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor";
 import {
     Mutation,
     Query,
-    User,
+    User, UsersDeleteInput, UsersDeletePayload,
     UsersEmailVerificationInput,
     UsersEmailVerificationPayload,
     UsersIdentityLinkInput,
@@ -37,9 +37,11 @@ import registerMutation from "./mutations/User.register.mutation.graphql";
 import emailVerificationMutation from "./mutations/User.emailVerification.mutation.graphql";
 import passwordResetMutation from "./mutations/User.passwordReset.mutation.graphql"
 import passwordResetRequestMutation from "./mutations/User.passwordResetRequest.mutation.graphql"
+import deleteMutation from "./mutations/User.delete.mutation.graphql"
 import usersQuery from "./queries/Users.query.graphql";
 import userByUsernameQuery from "./queries/User.byUsername.query.graphql";
 import userByIdQuery from "./queries/User.byId.query.graphql";
+
 import {View} from "@code0-tech/pictor/dist/utils/view";
 import {UserView} from "@edition/user/services/User.view";
 
@@ -237,6 +239,26 @@ export class UserService extends ReactiveArrayService<UserView> {
         }
 
         return result.data?.usersRegister ?? undefined
+    }
+
+    async userDelete(payload: UsersDeleteInput): Promise<UsersDeletePayload | undefined> {
+
+        const result = await this.client.mutate<Mutation, UsersDeleteInput>({
+            mutation: deleteMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        if (result.data && result.data.usersDelete && result.data.usersDelete.user) {
+            const user = result.data.usersDelete.user
+            const index = this.values().findIndex(u => u.id === user.id)
+            this.delete(index)
+
+        }
+
+        return result.data?.usersDelete ?? undefined
+
     }
 
 }
