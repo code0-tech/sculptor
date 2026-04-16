@@ -98,13 +98,15 @@ export const RuntimeCreatePage: React.FC = () => {
                 <Spacing spacing={"xl"}/>
                 {!token ? (
                     <>
-                        <TextInput required
+                        <TextInput data-qa-selector={"dashboard-runtime-create-name"}
+                                   required
                                    title={"Name"}
                                    description={"Provide a simple runtime name"}
                                    placeholder={"E.g. CodeZero Runtime #1"}
                                    {...inputs.getInputProps("name")}/>
                         <Spacing spacing={"xl"}/>
-                        <TextInput required
+                        <TextInput data-qa-selector={"dashboard-runtime-create-description"}
+                                   required
                                    title={"Description"}
                                    description={"Provide a simple runtime description"}
                                    placeholder={"E.g. CodeZero main http runtime"}
@@ -113,7 +115,8 @@ export const RuntimeCreatePage: React.FC = () => {
                     </>
                 ) : (
                     <>
-                        <TextInput required
+                        <TextInput data-qa-selector={"dashboard-runtime-create-token"}
+                                   required
                                    title={"Copy token"}
                                    value={token}
                                    description={"This token is used to link your runtime to our internal system."}/>
@@ -127,7 +130,7 @@ export const RuntimeCreatePage: React.FC = () => {
                         </Button>
                     </Link>
                     {!token ? (
-                        <Button color={"success"} onClick={validate}>
+                        <Button data-qa-selector={"dashboard-runtime-create-send"} color={"success"} onClick={validate}>
                             Create runtime
                         </Button>
                     ) : null}

@@ -161,6 +161,7 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
 
     return (
         <Card
+            data-qa-selector={"flow-builder-node"}
             key={id}
             data-flow-refernce={id}
             paddingSize={"xs"}

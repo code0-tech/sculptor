@@ -67,11 +67,12 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
         }
     }, [flowId, flowService, flowStore, activeTab])
 
-    return <Panel position={"bottom-center"}>
+    return <Panel position={"bottom-center"} data-qa-selector={"flow-builder-control-panel"}>
         <ButtonGroup style={{textWrap: "nowrap"}}>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button disabled={!activeTab || !(activeTab?.content?.props.flowId as Flow['id'])}
+                    <Button data-qa-selector={"flow-builder-control-panel-delete"}
+                            disabled={!activeTab || !(activeTab?.content?.props.flowId as Flow['id'])}
                             onClick={deleteActiveNode}
                             paddingSize={"xxs"}
                             variant={"filled"}
@@ -88,7 +89,8 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
             <FunctionSuggestionMenuComponent suggestions={result}
                                              onSuggestionSelect={addNodeToFlow}
                                              triggerContent={
-                                     <Button disabled={!activeTab}
+                                     <Button data-qa-selector={"flow-builder-control-panel-add"}
+                                             disabled={!activeTab}
                                              paddingSize={"xxs"}
                                              variant={"filled"}
                                              color={"secondary"}>

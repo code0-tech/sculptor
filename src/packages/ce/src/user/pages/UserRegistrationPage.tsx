@@ -86,21 +86,21 @@ export const UserRegistrationPage: React.FC = () => {
         </Text>
         <Flex style={{gap: "1.3rem"}}>
             {/**@ts-ignore**/}
-            <EmailInput wrapperComponent={{style: {flex: 1}}} placeholder={"Email"} {...inputs.getInputProps("email")}/>
+            <EmailInput data-qa-selector={"auth-register-email"} wrapperComponent={{style: {flex: 1}}} placeholder={"Email"} {...inputs.getInputProps("email")}/>
             {/**@ts-ignore**/}
-            <TextInput wrapperComponent={{style: {flex: 1}}} placeholder={"Username"}
+            <TextInput data-qa-selector={"auth-register-username"} wrapperComponent={{style: {flex: 1}}} placeholder={"Username"}
                        w={"100%"} {...inputs.getInputProps("username")}/>
         </Flex>
         <div style={{marginBottom: "1.3rem"}}/>
-        <PasswordInput placeholder={"Password"}
+        <PasswordInput data-qa-selector={"auth-register-password"} placeholder={"Password"}
                        onChange={() => validate("password")}
                        {...inputs.getInputProps("password")}/>
         <div style={{marginBottom: "1.3rem"}}/>
-        <PasswordInput placeholder={"Repeat password"}
+        <PasswordInput data-qa-selector={"auth-register-repeat-password"} placeholder={"Repeat password"}
                        onChange={() => validate("repeatPassword")}
                        {...inputs.getInputProps("repeatPassword")}/>
         <div style={{marginBottom: "1.3rem"}}/>
-        <Button color={"info"} w={"100%"} mb={1.3} onClick={validate}>
+        <Button data-qa-selector={"auth-register-send"} color={"info"} w={"100%"} mb={1.3} onClick={validate}>
             Sign up
         </Button>
         <Text display={"flex"} hierarchy={"tertiary"} size={"md"}>

@@ -152,7 +152,8 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
 
             return <div>
                 {/*@ts-ignore*/}
-                <DataTypeInputComponent flowId={flowId}
+                <DataTypeInputComponent data-qa-selector={"flow-builder-parameter"}
+                                        flowId={flowId}
                                         nodeId={node.id}
                                         parameterIndex={index}
                                         title={title}

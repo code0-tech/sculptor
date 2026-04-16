@@ -72,17 +72,17 @@ export const UserResetPasswordPage: React.FC = () => {
                 <Spacing spacing={"xl"}/>
             </>
         ) : null}
-        <TextInput placeholder={"Code"} {...inputs.getInputProps("code")}/>
+        <TextInput data-qa-selector={"auth-password-reset-code"} placeholder={"Code"} {...inputs.getInputProps("code")}/>
         <div style={{marginBottom: "1.3rem"}}/>
-        <PasswordInput placeholder={"Password"}
+        <PasswordInput data-qa-selector={"auth-password-reset-password"} placeholder={"Password"}
                        onChange={() => validate("password")}
                        {...inputs.getInputProps("password")}/>
         <div style={{marginBottom: "1.3rem"}}/>
-        <PasswordInput placeholder={"Repeat password"}
+        <PasswordInput data-qa-selector={"auth-password-reset-repeat-password"} placeholder={"Repeat password"}
                        onChange={() => validate("repeatPassword")}
                        {...inputs.getInputProps("repeatPassword")}/>
         <div style={{marginBottom: "1.3rem"}}/>
-        <Button color={"info"} w={"100%"} mb={1.3} onClick={validate}>
+        <Button data-qa-selector={"auth-password-reset-send"} color={"info"} w={"100%"} mb={1.3} onClick={validate}>
             Reset password
         </Button>
         <Text display={"flex"} hierarchy={"tertiary"} size={"md"}>
