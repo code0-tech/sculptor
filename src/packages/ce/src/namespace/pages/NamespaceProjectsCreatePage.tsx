@@ -75,13 +75,15 @@ export const NamespaceProjectsCreatePage: React.FC = () => {
                     Global runtimes are shared runtimes that can be used across multiple organizations.
                 </Text>
                 <Spacing spacing={"xl"}/>
-                <TextInput required
+                <TextInput data-qa-selector={"dashboard-namespace-project-create-name"}
+                           required
                            title={"Name"}
                            description={"Provide a simple project name"}
                            placeholder={"E.g. User management"}
                            {...inputs.getInputProps("name")}/>
                 <Spacing spacing={"xl"}/>
-                <TextInput required
+                <TextInput data-qa-selector={"dashboard-namespace-project-create-description"}
+                           required
                            title={"Description"}
                            description={"Provide a simple project description"}
                            placeholder={"E.g. Manage and authenticate users with rest routes"}
@@ -93,7 +95,7 @@ export const NamespaceProjectsCreatePage: React.FC = () => {
                             Go back to projects
                         </Button>
                     </Link>
-                    <Button color={"success"} onClick={validate}>
+                    <Button data-qa-selector={"dashboard-namespace-project-create-send"} color={"success"} onClick={validate}>
                         Create project
                     </Button>
                 </Flex>

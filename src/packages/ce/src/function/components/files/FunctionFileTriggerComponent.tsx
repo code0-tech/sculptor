@@ -140,7 +140,8 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
 
             return <div>
                 {/*@ts-ignore*/}
-                <DataTypeInputComponent flowId={instance.id}
+                <DataTypeInputComponent data-qa-selector={"flow-builder-setting"}
+                                        flowId={instance.id}
                                         nodeId={undefined}
                                         parameterIndex={index}
                                         title={title}

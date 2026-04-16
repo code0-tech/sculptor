@@ -34,7 +34,7 @@ export const FunctionSuggestionMenuComponent: React.FC<FunctionSuggestionMenuCom
             {triggerContent}
         </MenuTrigger>
         <MenuPortal>
-            <InputSuggestionMenuContent align={"center"} color={"secondary"}>
+            <InputSuggestionMenuContent align={"center"} color={"secondary"} data-qa-selector={"flow-builder-suggestions"}>
                 <FunctionSuggestionSearchBarComponent onType={event => {
 
                     if (event.key === "ArrowDown") {

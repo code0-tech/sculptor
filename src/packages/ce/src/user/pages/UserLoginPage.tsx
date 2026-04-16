@@ -94,12 +94,12 @@ export const UserLoginPage: React.FC = () => {
                 <Spacing spacing={"xl"}/>
             </>
         ) : null}
-        <EmailInput placeholder={"Email"} {...inputs.getInputProps("email")}/>
+        <EmailInput data-qa-selector={"auth-login-email"} placeholder={"Email"} {...inputs.getInputProps("email")}/>
         <div style={{marginBottom: "1.3rem"}}/>
-        <PasswordInput placeholder={"Password"}
+        <PasswordInput data-qa-selector={"auth-login-password"} placeholder={"Password"}
                        {...inputs.getInputProps("password")}/>
         <div style={{marginBottom: "1.3rem"}}/>
-        <Button color={"success"} w={"100%"} mb={1.3} onClick={validate}>
+        <Button data-qa-selector={"auth-login-send"} color={"success"} w={"100%"} mb={1.3} onClick={validate}>
             Login
         </Button>
         <Link href={`/password?${query.toString()}`}>

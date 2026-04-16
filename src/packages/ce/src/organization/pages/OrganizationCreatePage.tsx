@@ -47,7 +47,8 @@ export const OrganizationCreatePage = () => {
                     Organizations are helpfully if managing a group of users and plenty of projects.
                 </Text>
                 <Spacing spacing={"xl"}/>
-                <TextInput required
+                <TextInput data-qa-selector={"dashboard-organization-create-name"}
+                           required
                            title={"Name"}
                            description={"Provide a simple organization name"}
                            placeholder={"E.g. CodeZero"}
@@ -59,7 +60,7 @@ export const OrganizationCreatePage = () => {
                             Go back to organizations
                         </Button>
                     </Link>
-                    <Button color={"success"} onClick={validate}>
+                    <Button data-qa-selector={"dashboard-organization-create-send"} color={"success"} onClick={validate}>
                         Create organization
                     </Button>
                 </Flex>

@@ -77,7 +77,8 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
 
     }, [flowStore, activeTabId, data.flowId])
 
-    return <Card variant={"normal"}
+    return <Card data-qa-selector={"flow-builder-trigger"}
+                 variant={"normal"}
                  color={"info"}
                  paddingSize={"xs"}
                  key={id}

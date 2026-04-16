@@ -160,7 +160,8 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
             </FileTabsList>}>
                 <>
                     {fileTabsService.values().map((tab: FileTabsView) => (
-                        <FileTabsContent display={tab.active ? "block" : "none"}
+                        <FileTabsContent data-qa-selector={"flow-builder-file-content"}
+                                         display={tab.active ? "block" : "none"}
                                          key={`content-${tab.id}`}
                                          value={tab.id!}>
                             {tab.content}

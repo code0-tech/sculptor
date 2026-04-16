@@ -203,7 +203,8 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                         <InputDescription>You can choose a trigger here</InputDescription>
                         <Menu>
                             <MenuTrigger asChild>
-                                <Button w={"100%"}
+                                <Button data-qa-selector={"flow-create-trigger-select"}
+                                        w={"100%"}
                                         color={inputs.getInputProps("flowTypeId").formValidation?.valid ? "tertiary" : "error"}
                                         style={{justifyContent: "start"}}>
                                     {selectedFlowTypeId ?
@@ -221,7 +222,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
 
                                             const DisplayIcon = icon(flowType?.displayIcon as IconString)
 
-                                            return <MenuItem key={flowType.id} onSelect={() => {
+                                            return <MenuItem data-qa-selector={"flow-create-trigger-select-item"} key={flowType.id} onSelect={() => {
                                                 inputs.getInputProps("flowTypeId").formValidation?.setValue(flowType.id)
                                                 setSelectedFlowTypeId(flowType.id)
                                             }}>
@@ -253,6 +254,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                             <InputMessage>{inputs.getInputProps("flowTypeId").formValidation?.notValidMessage!}</InputMessage> : null}
                         <Spacing spacing={"md"}/>
                         <FlowNameInputComponent
+                            data-qa-selector={"flow-create-name"}
                             description={"You can choose a name here and only use alphanumeric names."}
                             title={"Name of the flow"}
                             {...inputs.getInputProps("name")}/>
@@ -261,7 +263,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                             <DialogClose asChild>
                                 <Button color={"tertiary"} variant={"filled"}>No, go back!</Button>
                             </DialogClose>
-                            <Button color={"success"} variant={"filled"} onClick={validate}>Yes, create!</Button>
+                            <Button data-qa-selector={"flow-create-send"} color={"success"} variant={"filled"} onClick={validate}>Yes, create!</Button>
                         </Flex>
                     </>
                 )}

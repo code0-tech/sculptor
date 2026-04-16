@@ -46,9 +46,9 @@ export const UserEmailVerificationPage: React.FC = () => {
         <Text mb={1.3} size={"md"} hierarchy={"tertiary"} display={"block"}>
             Build high-class workflows, endpoints and software without coding
         </Text>
-        <TextInput placeholder={"Code"} {...inputs.getInputProps("code")}/>
+        <TextInput data-qa-selector={"auth-email-code"} placeholder={"Code"} {...inputs.getInputProps("code")}/>
         <div style={{marginBottom: "1.3rem"}}/>
-        <Button color={"info"} w={"100%"} mb={1.3} onClick={validate}>
+        <Button data-qa-selector={"auth-email-send"} color={"info"} w={"100%"} mb={1.3} onClick={validate}>
             Verify
         </Button>
         <Text display={"flex"} hierarchy={"tertiary"} size={"md"}>

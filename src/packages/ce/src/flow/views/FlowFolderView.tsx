@@ -79,7 +79,7 @@ export const FlowFolderView: React.FC = () => {
         <Layout layoutGap={"0.7rem"} showLayoutSplitter={false} topContent={
             <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
                 <Flex style={{gap: "0.35rem"}} align={"center"} justify={"space-between"}>
-                    <Button color={"tertiary"} paddingSize={"xxs"} style={{textWrap: "nowrap"}} onClick={() => {
+                    <Button data-qa-selector={"flow-send"} color={"tertiary"} paddingSize={"xxs"} style={{textWrap: "nowrap"}} onClick={() => {
                         setCreateDialogOpen(true)
                         setFlowTypeId(undefined)
                     }}>
