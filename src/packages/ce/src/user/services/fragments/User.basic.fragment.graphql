@@ -16,5 +16,6 @@ fragment UserBasic on User {
     userAbilities {
         updateUser
         manageMfa
+        deleteUser
     }
 }
