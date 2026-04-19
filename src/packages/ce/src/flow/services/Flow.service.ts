@@ -153,6 +153,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
                 }
             }) ?? [],
             signature: flow?.signature,
+            /*@ts-ignore*/
             nodes: (flow?.nodes?.nodes ?? []).map(node => ({
                 id: node?.id!,
                 nextNodeId: node?.nextNodeId!,
@@ -195,7 +196,6 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
                     }
 
                     return {
-                        parameterDefinitionId: parameter?.parameterDefinition?.id!,
                         value,
                     }
                 }),
@@ -342,9 +342,6 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
                 node!.parameters!.nodes![parameterIndex] = {
                     __typename: "NodeParameter",
                     value: null,
-                    parameterDefinition: {
-                        id: pD?.id
-                    }
                 }
             }
         })
