@@ -98,7 +98,8 @@ export const useNodeSuggestions = (
             displayText: [functionDefinition?.names?.[0]?.content ?? FALLBACK_FUNCTION_NAME],
             value: suggestion,
             icon: functionDefinition?.displayIcon || "",
-            aliases: functionDefinition?.aliases?.map((a) => a.content).flatMap(a => a?.split(";") ?? "")
+            aliases: functionDefinition?.aliases?.map((a) => a.content).flatMap(a => a?.split(";") ?? ""),
+            description: functionDefinition?.descriptions?.[0]?.content || "",
         }
     }), [suggestions]);
 }
