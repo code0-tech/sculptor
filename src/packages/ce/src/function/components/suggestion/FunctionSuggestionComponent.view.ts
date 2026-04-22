@@ -20,5 +20,6 @@ export interface FunctionSuggestion {
     type: FunctionSuggestionType
     icon?: string
     aliases?: string[]
+    description?: string
     definitionSource?: string
 }

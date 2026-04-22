@@ -4,16 +4,17 @@ import React from "react";
 
 export interface Suggestion {
     value: LiteralValue | ReferenceValue | NodeFunction
-    icon?: string
     displayMessage: string
     definitionSource: string
     aliases: string[]
+    icon?: string
+    description?: string
 }
 
 export interface SuggestionGroup {
     suggestions: Suggestion[]
-    icon?: string
     displayMessage?: string
+    icon?: string
 }
 
 export const getMappedSuggestions = (suggestions: FunctionSuggestion[]): SuggestionGroup[] => {
@@ -25,6 +26,7 @@ export const getMappedSuggestions = (suggestions: FunctionSuggestion[]): Suggest
             displayMessage: suggestion.displayText.join(" "),
             aliases: suggestion.aliases || [],
             definitionSource: suggestion.definitionSource || "All",
+            description: suggestion.description,
         }
     })
 
