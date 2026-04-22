@@ -116,8 +116,8 @@ export default function FlowLayout({bar, tab, children}: {
                 {tab}
             </Flex>
         }>
-            <Layout px={0.7} layoutGap={"0"} topContent={<>{bar}</>}>
-                <Layout>
+            <Layout px={0.7} showLayoutSplitter={false} layoutGap={"0"} topContent={<>{bar}</>}>
+                <Layout showLayoutSplitter={false}>
                     <>
                         {children}
                     </>
