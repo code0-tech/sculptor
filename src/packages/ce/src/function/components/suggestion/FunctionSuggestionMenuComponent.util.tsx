@@ -4,6 +4,7 @@ import {IconCircleDot, IconNote, IconVariable} from "@tabler/icons-react";
 import {InputSuggestion, Text} from "@code0-tech/pictor";
 import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
 import {LiteralValue, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
+import {icon, IconString} from "@core/util/icons";
 
 export const toInputSuggestions = (suggestions: FunctionSuggestion[]): InputSuggestion[] => {
 
@@ -23,8 +24,10 @@ export const toInputSuggestions = (suggestions: FunctionSuggestion[]): InputSugg
             [FunctionSuggestionType.DATA_TYPE]: <IconCircleDot color="#D90429" size={16}/>,
         }
 
+        const DisplayIcon = icon(suggestion?.icon as IconString)
+
         const children: React.ReactNode = <>
-            {suggestion.icon ?? iconMap[suggestion.type]}
+            {suggestion?.icon ? <DisplayIcon color={"#70ffb2"} size={16}/> : iconMap[suggestion.type]}
             {
                 suggestion.type === FunctionSuggestionType.REF_OBJECT ? (
                     <ReferenceBadgeComponent value={suggestion.value as ReferenceValue}/>

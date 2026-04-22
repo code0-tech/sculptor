@@ -57,7 +57,7 @@ export default function AuthLayout({children}: Readonly<{ children: React.ReactN
                 left: 0
             }}>
                 <Flex justify={"center"} align={"center"} w={"100%"} style={{gap: "1.3rem"}}>
-                    <Text>All rights reserved &copy; Code0 UG (haftungsbeschränkt) i.G.</Text>
+                    <Text>All rights reserved &copy; Code0 UG (haftungsbeschränkt)</Text>
                 </Flex>
             </div>
 

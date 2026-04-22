@@ -83,7 +83,7 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
                 fileTabsService.activateTab(value);
             }}
         >
-            <Layout layoutGap={"0"} topContent={<FileTabsList
+            <Layout showLayoutSplitter={false} layoutGap={"0"} topContent={<FileTabsList
                 controls={
                     <ButtonGroup color={"primary"} p={0} style={{boxShadow: "none"}}>
                         <Menu>

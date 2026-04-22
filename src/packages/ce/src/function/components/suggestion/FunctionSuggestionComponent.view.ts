@@ -18,5 +18,7 @@ export interface FunctionSuggestion {
     path: number[]
     value: LiteralValue | ReferenceValue | NodeFunction
     type: FunctionSuggestionType
-    icon?: React.ReactNode
+    icon?: string
+    aliases?: string[]
+    definitionSource?: string
 }

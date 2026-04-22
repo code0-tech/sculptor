@@ -92,13 +92,13 @@ export const useNodeSuggestions = (
     }).map(suggestion => {
 
         const functionDefinition = functionService.getById(suggestion.functionDefinition?.id)
-        const DisplayIcon = icon(functionDefinition?.displayIcon as IconString)
         return {
             path: [],
             type: FunctionSuggestionType.FUNCTION,
             displayText: [functionDefinition?.names?.[0]?.content ?? FALLBACK_FUNCTION_NAME],
             value: suggestion,
-            icon: <DisplayIcon color="#70ffb2" size={16}/>
+            icon: functionDefinition?.displayIcon || "",
+            aliases: functionDefinition?.aliases?.map((a) => a.content).flatMap(a => a?.split(";") ?? "")
         }
     }), [suggestions]);
 }

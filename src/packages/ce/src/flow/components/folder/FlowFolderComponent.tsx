@@ -11,10 +11,10 @@ import {
 } from "./FlowFolderContextMenuComponent";
 import {HoverCard, HoverCardContent, HoverCardPortal, HoverCardTrigger} from "@radix-ui/react-hover-card";
 import {
-    Code0Component,
+    Component,
     Flex,
     hashToColor,
-    mergeCode0Props,
+    mergeComponentProps,
     ScrollArea,
     ScrollAreaScrollbar,
     ScrollAreaThumb,
@@ -46,14 +46,14 @@ export type FlowFolderComponentHandle = {
 
 type OpenMode = "default" | "allOpen" | "allClosed" | "activePath"
 
-export interface FlowFolderComponentGroupProps extends FlowFolderComponentProps, Omit<Code0Component<HTMLDivElement>, "onSelect"> {
+export interface FlowFolderComponentGroupProps extends FlowFolderComponentProps, Omit<Component<HTMLDivElement>, "onSelect"> {
     name: string
     children: React.ReactElement<FlowFolderComponentItemProps> | React.ReactElement<FlowFolderComponentItemProps>[] | React.ReactElement<FlowFolderComponentGroupProps> | React.ReactElement<FlowFolderComponentGroupProps>[]
     defaultOpen?: boolean
     flows: Flow[]
 }
 
-export interface FlowFolderComponentItemProps extends FlowFolderComponentProps, Omit<Code0Component<HTMLDivElement>, "onSelect"> {
+export interface FlowFolderComponentItemProps extends FlowFolderComponentProps, Omit<Component<HTMLDivElement>, "onSelect"> {
     name: string
     path: string
     active?: boolean
@@ -263,7 +263,7 @@ export const DFlowFolderGroup: React.FC<FlowFolderComponentGroupProps> = (props)
             flow: flows,
             type: "folder"
         }} {...contextMenuProps}>
-            <div onClick={() => setOpen(prevState => !prevState)} {...mergeCode0Props(`d-folder`, code0Props)}>
+            <div onClick={() => setOpen(prevState => !prevState)} {...mergeComponentProps(`d-folder`, code0Props)}>
                 <Flex align={"center"} justify={"space-between"} style={{gap: "0.35rem"}}>
                     {open ? <IconFolderOpen size={12}/> : <IconFolderFilled size={12}/>}
                     <Text>{name}</Text>
@@ -332,7 +332,7 @@ export const DFlowFolderItem: React.FC<FlowFolderComponentItemProps> = (props) =
             <HoverCard open={props.name === text ? false : undefined} openDelay={500} closeDelay={0}>
                 <HoverCardTrigger asChild>
                     <div
-                        ref={wrapperRef} {...mergeCode0Props(`d-folder__item ${active ? "d-folder__item--active" : ""}`, code0Props)}
+                        ref={wrapperRef} {...mergeComponentProps(`d-folder__item ${active ? "d-folder__item--active" : ""}`, code0Props)}
                         onClick={() => onSelect?.(flow)}>
                         <Flex align={"center"} style={{gap: "0.35rem"}}>
                             <DisplayIcon color={hashToColor(flow?.id ?? "")} size={12}/>
@@ -342,7 +342,7 @@ export const DFlowFolderItem: React.FC<FlowFolderComponentItemProps> = (props) =
                 </HoverCardTrigger>
                 <HoverCardPortal>
                     <HoverCardContent side={"top"} align={"start"} sideOffset={-26}>
-                        <div {...mergeCode0Props(`d-folder__item-hover-card`, code0Props)}
+                        <div {...mergeComponentProps(`d-folder__item-hover-card`, code0Props)}
                              onClick={() => onSelect?.(flow)} style={{padding: "0.35rem 0.7rem"}}>
                             <Flex align={"center"} style={{gap: "0.35rem"}}>
                                 <DisplayIcon color={hashToColor(flow?.id ?? "")} size={12}/>
