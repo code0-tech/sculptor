@@ -797,7 +797,6 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
                     <FlowPanelLayoutComponent/>
                     <FlowPanelControlComponent flowId={flowId}/>
                     <FlowPanelUpdateComponent flowId={flowId}/>
-                    <FlowPanelExportComponent flowId={flowId}/>
                 </>
             ) : null}
         </ReactFlow>
