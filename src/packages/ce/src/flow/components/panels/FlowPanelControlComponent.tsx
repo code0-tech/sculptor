@@ -75,7 +75,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
         }
     }, [flowId, flowService, flowStore, activeTab])
 
-    useHotkeys('mod+k', (keyboardEvent) => {
+    useHotkeys('shift+a', (keyboardEvent) => {
         if (activeTab) setSuggestionDialogOpen(true)
         else setAddNextNodeTooltipOpen(true)
         keyboardEvent.stopPropagation()
@@ -119,8 +119,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                             color={"secondary"}>
                         <Text display={"flex"} align={"center"} style={{gap: "0.35rem"}}>
                             Add next node (experimental)
-                            <Badge style={{gap: 0}}>{navigator !== undefined && /Mac/.test(navigator.userAgent) ?
-                                <IconCommand size={13}/> : "strg"} + K</Badge>
+                            <Badge style={{gap: 0}}>Shift + A</Badge>
                         </Text>
                     </Button>
                 </TooltipTrigger>
