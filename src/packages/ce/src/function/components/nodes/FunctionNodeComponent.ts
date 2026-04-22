@@ -1,7 +1,7 @@
 import {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
-import {Code0Component} from "@code0-tech/pictor";
+import {Component} from "@code0-tech/pictor";
 
-export interface FunctionNodeComponentProps extends Record<string, unknown>, Code0Component<HTMLDivElement> {
+export interface FunctionNodeComponentProps extends Record<string, unknown>, Component<HTMLDivElement> {
     nodeId: NodeFunction['id']
     flowId: Flow['id']
     color: string

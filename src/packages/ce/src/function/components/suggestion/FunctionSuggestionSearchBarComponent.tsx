@@ -1,9 +1,9 @@
 import React from "react";
 import {FunctionSuggestionSearchInputComponent} from "./FunctionSuggestionSearchInputComponent";
 import {IconSearch} from "@tabler/icons-react";
-import {Code0Component} from "@code0-tech/pictor";
+import {Component} from "@code0-tech/pictor";
 
-export interface FunctionSuggestionSearchBarProps extends Code0Component<HTMLDivElement> {
+export interface FunctionSuggestionSearchBarProps extends Component<HTMLDivElement> {
     onType: (event: React.KeyboardEvent<HTMLInputElement>) => void
 }
 

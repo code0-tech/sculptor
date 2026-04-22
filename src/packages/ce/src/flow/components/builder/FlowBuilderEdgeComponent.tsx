@@ -1,9 +1,9 @@
 import {BaseEdge, Edge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath, Position} from "@xyflow/react";
 import React, {memo} from "react";
 import {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
-import {Badge, Code0Component} from "@code0-tech/pictor";
+import {Badge, Component} from "@code0-tech/pictor";
 
-export interface FlowBuilderEdgeDataProps extends Code0Component<HTMLDivElement> {
+export interface FlowBuilderEdgeDataProps extends Component<HTMLDivElement> {
     //some data we will use
     color?: string
     type: 'parameter' | 'suggestion' | 'group' | 'default'

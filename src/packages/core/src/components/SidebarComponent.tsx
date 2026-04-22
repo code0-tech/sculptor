@@ -1,11 +1,11 @@
 import React from "react";
-import {Button, Code0ComponentProps, Color, Flex, Text} from "@code0-tech/pictor";
+import {Button, Color, ComponentProps, Flex, Text} from "@code0-tech/pictor";
 import {PanelProps, usePanelRef} from "react-resizable-panels";
 import {ResizablePanel} from "@code0-tech/pictor/dist/components/resizable/Resizable";
 import {IconLayoutSidebar} from "@tabler/icons-react";
 
 
-type ResizablePanelProps = Code0ComponentProps & PanelProps & { color?: Color }
+type ResizablePanelProps = ComponentProps & PanelProps & { color?: Color }
 
 export interface SidebarComponentProps extends ResizablePanelProps {
     title?: string

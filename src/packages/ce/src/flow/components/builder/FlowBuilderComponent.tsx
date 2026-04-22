@@ -19,7 +19,7 @@ import {Flow, type Namespace, type NamespaceProject} from "@code0-tech/sagittari
 import {LineWobble} from 'ldrs/react'
 import 'ldrs/react/LineWobble.css'
 import {useFlowNodes} from "@edition/flow/hooks/Flow.nodes.hook";
-import {Code0ComponentProps, mergeCode0Props, Spacing, Text, useService} from "@code0-tech/pictor";
+import {ComponentProps, mergeComponentProps, Spacing, Text, useService} from "@code0-tech/pictor";
 import {FunctionNodeDefaultComponent} from "@edition/function/components/nodes/FunctionNodeDefaultComponent";
 import {FunctionNodeGroupComponent} from "@edition/function/components/nodes/FunctionNodeGroupComponent";
 import {FunctionNodeTriggerComponent} from "@edition/function/components/nodes/FunctionNodeTriggerComponent";
@@ -603,7 +603,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
 
 const getCachedLayoutElements = React.cache(getLayoutElements)
 
-export interface FlowBuilderProps extends Code0ComponentProps {
+export interface FlowBuilderProps extends ComponentProps {
     flowId: Flow['id']
     namespaceId: Namespace['id']
     projectId: NamespaceProject['id']
@@ -727,7 +727,7 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
             edgeTypes={edgeTypes}
             onNodesChange={nodeChangeEvent}
             onEdgesChange={edgeChangeEvent}
-            {...mergeCode0Props("flow", rest)}
+            {...mergeComponentProps("flow", rest)}
             data-tree-visibility={showTree}
             proOptions={{hideAttribution: true}}
             onNodeClick={(_, clickedNode) => {
