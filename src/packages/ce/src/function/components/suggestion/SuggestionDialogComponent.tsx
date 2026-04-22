@@ -9,13 +9,14 @@ import {
     CommandEmpty,
     CommandInput,
     CommandItem,
-    CommandList,
+    CommandList, CommandSeparator,
     Flex,
     hashToColor,
     ScrollArea,
     ScrollAreaScrollbar,
     ScrollAreaThumb,
     ScrollAreaViewport,
+    Spacing,
     Text
 } from "@code0-tech/pictor";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
@@ -70,8 +71,7 @@ export const SuggestionDialogComponent: React.FC<SuggestionDialogComponentProps>
                         if (currentTab != "group-0") setHoldCurrentTab(currentTab)
                         if (currentTab != "group-0") setCurrentTab("group-0")
                     }
-                }} left={<IconSearch size={13}/>}
-                                                                                   placeholder="Type a command or search..."/>
+                }} left={<IconSearch size={13}/>} placeholder="Search for nodes, variables and more..."/>
                 </div>}>
             <Card m={0.1} h={"100%"} paddingSize={"md"}>
                 <Tab h={"100%"} orientation={"vertical"} value={currentTab} key={"d"}
@@ -103,7 +103,7 @@ export const SuggestionDialogComponent: React.FC<SuggestionDialogComponentProps>
                                 </ScrollAreaScrollbar>
                             </ScrollArea>}>
                         <ScrollArea h={"100%"} w={"100%"} type={"always"}>
-                            <ScrollAreaViewport>
+                            <ScrollAreaViewport style={{minWidth: "auto"}}>
                                 <CommandList w={"100%"}>
                                     <CommandEmpty>No results found.</CommandEmpty>
                                     {suggestions.map((group, index) => {
@@ -112,14 +112,26 @@ export const SuggestionDialogComponent: React.FC<SuggestionDialogComponentProps>
 
                                                 const DisplayIcon = icon(suggestion.icon as IconString)
 
-                                                return <CommandItem keywords={suggestion.aliases} value={suggestion.displayMessage} onSelect={() => {
-                                                    onSuggestionSelect?.(suggestion)
-                                                    props.onOpenChange?.(false)
+                                                return <>
+                                                    <CommandItem keywords={suggestion.aliases}
+                                                                 display={"block"}
+                                                                 my={0.7}
+                                                                 style={{boxSizing: "border-box", overflow: "hidden"}}
+                                                                 value={suggestion.displayMessage} onSelect={() => {
+                                                        onSuggestionSelect?.(suggestion)
+                                                        props.onOpenChange?.(false)
 
-                                                }}>
-                                                    <DisplayIcon color={"#70ffb2"} size={16}/>
-                                                    <Text size={"sm"}>{suggestion.displayMessage}</Text>
-                                                </CommandItem>
+                                                    }}>
+                                                        <Flex style={{gap: "0.35rem"}} align={"center"}>
+                                                            <DisplayIcon color={hashToColor(`group-${index}`)} size={16}/>
+                                                            <Text size={"sm"}>{suggestion.displayMessage}</Text>
+                                                        </Flex>
+                                                        <Spacing spacing={"xxs"}/>
+                                                        <Text hierarchy={"tertiary"}
+                                                              size={"sm"}>{suggestion.description}</Text>
+                                                    </CommandItem>
+                                                    <CommandSeparator/>
+                                                </>
                                             })}
                                         </>
                                     })}
