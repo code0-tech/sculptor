@@ -6,8 +6,7 @@ import {useService, useStore} from "@code0-tech/pictor";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import React from "react";
-import {useNodeSuggestionsAction, useTypeVariantAction} from "@edition/flow/components/FlowWorkerProvider";
-import {icon, IconString} from "@core/util/icons";
+import {useTypeVariantAction} from "@edition/flow/components/FlowWorkerProvider";
 import {FALLBACK_FUNCTION_NAME} from "@core/util/fallback-translations";
 
 export const useNodeSuggestions = (
@@ -21,7 +20,7 @@ export const useNodeSuggestions = (
 
     const [suggestions, setSuggestions] = React.useState<any[]>([])
     const [typeVariant, setTypeVariant] = React.useState<number | undefined>(undefined)
-    const {execute} = useNodeSuggestionsAction()
+    //const {execute} = useNodeSuggestionsAction()
     const variantAction = useTypeVariantAction()
 
     const functions = React.useMemo(() => functionService.values(), [functionStore]);
