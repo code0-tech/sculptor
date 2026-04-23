@@ -2,7 +2,6 @@ import {Handle, Node, NodeProps, Position, useStore} from "@xyflow/react";
 import React, {CSSProperties, memo} from "react";
 import "./FunctionNodeComponent.style.scss";
 import {FunctionNodeComponentProps} from "./FunctionNodeComponent";
-import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
 import {Badge, Card, Flex, Text, useService, useStore as usePictorStore} from "@code0-tech/pictor";
 import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
 import {IconVariable} from "@tabler/icons-react";
@@ -11,19 +10,17 @@ import {FunctionService} from "@edition/function/services/Function.service";
 import {LiteralBadgeComponent} from "@edition/datatype/components/badges/LiteralBadgeComponent";
 import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
 import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeComponent";
-import {FunctionFileDefaultComponent} from "@edition/function/components/files/FunctionFileDefaultComponent";
 import {NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {underlineBySeverity} from "@core/util/inspection";
 import {icon, IconString} from "@core/util/icons";
-import {FALLBACK_FUNCTION_DISPLAY_MESSAGE, FALLBACK_FUNCTION_NAME} from "@core/util/fallback-translations";
+import {FALLBACK_FUNCTION_DISPLAY_MESSAGE} from "@core/util/fallback-translations";
+import {useSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
 
 export type FunctionNodeDefaultComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
 
 export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponentProps> = memo((props) => {
-    const {data, id} = props
+    const {data, id, selected} = props
 
-    const fileTabsService = useService(FileTabsService)
-    const fileTabsStore = usePictorStore(FileTabsService)
     const flowService = useService(FlowService)
     const flowStore = usePictorStore(FlowService)
     const functionService = useService(FunctionService)
@@ -33,6 +30,9 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
         () => flowService.getNodeById(data.flowId, data.nodeId),
         [flowStore, data]
     )
+
+    const selectedNode = useSelectedFunctionNode()
+
     const definition = React.useMemo(
         () => node ? functionService.getById(node.functionDefinition?.id!!) : undefined,
         [functionStore, data, node]
@@ -51,10 +51,6 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
         nodeValidations?.length
             ? underlineBySeverity[nodeValidations[0].type]
             : {};
-
-    const activeTabId = React.useMemo(() => {
-        return fileTabsService.getActiveTab()?.id
-    }, [fileTabsStore, fileTabsService]);
 
     const firstItem = useStore((s) => {
         const children = s.nodes.filter((n) => n.parentId === props.parentId);
@@ -129,35 +125,21 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
         return " " + String(item) + " "
     }), [flowStore, functionStore, data, definition, validation])
 
-    React.useEffect(() => {
-        if (!node?.id) return
-        fileTabsService.registerTab({
-            id: node.id,
-            active: false,
-            closeable: true,
-            children: <>
-                <DisplayIcon color={data.color} size={12}/>
-                <Text size={"sm"}>{definition?.names?.[0]?.content ?? FALLBACK_FUNCTION_NAME}</Text>
-            </>,
-            content: <FunctionFileDefaultComponent flowId={props.data.flowId} node={node}/>
-        })
-    }, [])
-
     const isReferenced = React.useMemo(() => {
 
-        const activeNode = flowService.getNodeById(data.flowId, activeTabId as NodeFunction['id'])
+        const activeNode = flowService.getNodeById(data.flowId, selectedNode?.id as NodeFunction['id'])
         const isActiveNodeReferencingCurrentNode = activeNode?.parameters?.nodes?.some(p => p?.value?.__typename === "ReferenceValue" && p.value.nodeFunctionId === node?.id)
         const hasReferences = activeNode?.parameters?.nodes?.some(p => p?.value?.__typename === "ReferenceValue")
 
         if (isActiveNodeReferencingCurrentNode) {
             return true
-        } else if (hasReferences && !isActiveNodeReferencingCurrentNode && activeTabId !== data.nodeId) {
+        } else if (hasReferences && !isActiveNodeReferencingCurrentNode && selectedNode?.id !== data.nodeId) {
             return false
         }
 
         return undefined
 
-    }, [flowStore, activeTabId, data.flowId, node])
+    }, [flowStore, selectedNode, data.flowId, node])
 
     return (
         <Card
@@ -167,8 +149,8 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
             paddingSize={"xs"}
             py={"0.35"}
             outline={firstItem.id === id}
-            borderColor={activeTabId == id ? "info" : undefined}
-            className={`d-flow-node ${activeTabId == id ? "d-flow-node--active" : ""} ${isReferenced === false ? "d-flow-node--notReferenced" : ""}`}
+            borderColor={selected ? "info" : undefined}
+            className={`d-flow-node ${selected ? "d-flow-node--active" : ""} ${isReferenced === false ? "d-flow-node--notReferenced" : ""}`}
             color={"primary"} style={{
             ...(isReferenced === true ? {boxShadow: `0 0 5rem 0 ${withAlpha(data.color, 0.25)}`} : {}),
         }}>
@@ -249,18 +231,6 @@ const parseCssColorToRgba = (color: string): RGBA => {
         b: Math.round(Number(match[3])),
         a: match[4] !== undefined ? Number(match[4]) : 1,
     }
-}
-
-const mixColorRgb = (color: string, level: number) => {
-    const w = clamp01(level * 0.1)
-
-    const c1 = parseCssColorToRgba(color)
-    const c2 = parseCssColorToRgba("#070514")
-
-    const mix = (a: number, b: number) =>
-        Math.round(a * (1 - w) + b * w)
-
-    return `rgb(${mix(c1.r, c2.r)}, ${mix(c1.g, c2.g)}, ${mix(c1.b, c2.b)})`
 }
 
 const withAlpha = (color: string, alpha: number) => {

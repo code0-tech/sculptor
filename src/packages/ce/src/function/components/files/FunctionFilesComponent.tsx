@@ -1,25 +1,37 @@
 import React from "react";
-import {Flow, Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
+import {Flow, Namespace, NamespaceProject, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {
     Button,
-    Menu, MenuContent, MenuItem, MenuLabel, MenuPortal, MenuSeparator,
+    hashToColor,
+    Menu,
+    MenuContent,
+    MenuItem,
+    MenuLabel,
+    MenuPortal,
+    MenuSeparator,
     MenuTrigger,
+    Text,
     useService,
     useStore
 } from "@code0-tech/pictor";
-import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
-import {FileTabsView} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.view";
 import {
     FileTabs,
     FileTabsContent,
     FileTabsList,
     FileTabsTrigger
 } from "@code0-tech/pictor/dist/components/file-tabs/FileTabs";
-import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
-import {IconDotsVertical, IconPlus} from "@tabler/icons-react";
+import {IconPlus} from "@tabler/icons-react";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
+import {setSelectedFunctionNode, useSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
+import {useReactFlow} from "@xyflow/react";
+import {FunctionFileDefaultComponent} from "@edition/function/components/files/FunctionFileDefaultComponent";
+import {FunctionFileTriggerComponent} from "@edition/function/components/files/FunctionFileTriggerComponent";
+import {FALLBACK_FLOW_TYPE_NAME, FALLBACK_FUNCTION_NAME} from "@core/util/fallback-translations";
+import {FunctionService} from "@edition/function/services/Function.service";
+import {FlowView} from "@edition/flow/services/Flow.view";
+import {icon, IconString} from "@core/util/icons";
 
 export interface FunctionFilesComponentProps {
     flowId: Flow['id']
@@ -31,38 +43,49 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
 
     const {flowId, namespaceId, projectId} = props
 
-    const fileTabsService = useService(FileTabsService)
-    const fileTabsStore = useStore(FileTabsService)
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
     const flowTypeService = useService(FlowTypeService)
     const flowTypeStore = useStore(FlowTypeService)
+    const functionService = useService(FunctionService)
+    const functionStore = useStore(FunctionService)
+
     const id = React.useId()
+    const [activeTab, setActiveTab] = React.useState<string>()
+    const reactFlow = useReactFlow()
+    const selectedNode = useSelectedFunctionNode()
 
-    const flow = React.useMemo(() => flowService.getById(flowId, {namespaceId, projectId}), [flowStore])
-    const flowType = React.useMemo(() => flowTypeService.getById(flow?.type?.id!!), [flowTypeStore, flow])
-    const activeTabId = React.useMemo(() => {
-        return fileTabsStore.find((t: any) => (t as any).active)?.id ?? fileTabsService.getActiveTab()?.id;
-    }, [fileTabsStore, fileTabsService])
+    const flow: FlowView = React.useMemo(
+        () => {
 
-    const triggerTab = React.useMemo(() => {
-        if (!flowType?.id) return undefined
-        return fileTabsService.values().find((tab: FileTabsView) => tab.id === flowType.id)
-    }, [fileTabsStore, flowType])
+            const flow = flowService.getById(flowId, {namespaceId, projectId})
+            return {
+                ...flow,
+                type: flowTypeService.getById(flow?.type?.id)
+            }
+        },
+        [flowStore, flowTypeStore]
+    )
 
-    const visibleTabs = React.useMemo(() => {
-        return fileTabsService.values().filter((tab: FileTabsView) => tab.show)
-    }, [fileTabsStore, triggerTab])
+    const DisplayIcon = React.useMemo(
+        () => icon(flow?.type?.displayIcon as IconString),
+        [flow]
+    )
 
-    const hiddenTabs = React.useMemo(() => {
-        return fileTabsService.values().filter((tab: FileTabsView) => !tab.show && tab.id !== triggerTab?.id)
-    }, [fileTabsStore, triggerTab])
+    const nodes: NodeFunction[] = React.useMemo(
+        () => flow?.nodes?.nodes?.map(node => ({
+            ...node,
+            functionDefinition: functionService.getById(node?.functionDefinition?.id!)
+        })) || [],
+        [flow, functionStore]
+    )
 
     React.useEffect(() => {
+        if (activeTab) setSelectedFunctionNode(activeTab, reactFlow);
         setTimeout(() => {
             const parent = document.querySelector("[data-id=" + '"' + id + '"' + "]") as HTMLDivElement
-            const tabList = parent.querySelector(".file-tabs__list-content") as HTMLDivElement
-            const trigger = tabList.querySelector("[data-value=" + '"' + fileTabsService.getActiveTab()?.id + '"' + "]") as HTMLDivElement
+            const tabList = parent?.querySelector(".file-tabs__list-content") as HTMLDivElement
+            const trigger = tabList?.querySelector("[data-value=" + '"' + activeTab + '"' + "]") as HTMLDivElement
 
             if (tabList && trigger) {
                 const offset = (trigger.offsetLeft + (trigger.offsetWidth / 2)) - (tabList.offsetWidth / 2)
@@ -73,100 +96,89 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
                 });
             }
         }, 0)
-    }, [activeTabId, id])
+    }, [activeTab, id])
+
+    React.useEffect(() => {
+        if (selectedNode) setActiveTab(selectedNode.id)
+    }, [selectedNode])
 
     return (
         <FileTabs
             data-id={id}
-            value={activeTabId}
-            onValueChange={(value) => {
-                fileTabsService.activateTab(value);
-            }}
+            value={activeTab}
+            onValueChange={setActiveTab}
         >
             <Layout showLayoutSplitter={false} layoutGap={"0"} topContent={<FileTabsList
                 controls={
-                    <ButtonGroup color={"primary"} p={0} style={{boxShadow: "none"}}>
-                        <Menu>
-                            <MenuTrigger asChild>
-                                <Button variant="none" paddingSize={"xxs"} color="primary">
-                                    <IconPlus size={12}/>
-                                </Button>
-                            </MenuTrigger>
-                            <MenuPortal>
-                                <MenuContent align="start" sideOffset={8}>
-                                    <MenuLabel>Starting Node</MenuLabel>
-                                    {triggerTab &&
-                                        <MenuItem onSelect={() => fileTabsService.activateTab(triggerTab.id!!)}>
-                                            {triggerTab.children}
-                                        </MenuItem>}
-                                    <MenuSeparator/>
-                                    <MenuLabel>Opened Nodes</MenuLabel>
-                                    {visibleTabs.map((tab: FileTabsView) => (
-                                        <MenuItem key={`menu-${tab.id}`}
-                                                  onSelect={() => {
-                                                      fileTabsService.activateTab(tab.id!)
-                                                  }}>
-                                            {tab.children}
-                                        </MenuItem>
-                                    ))}
-                                    <MenuSeparator/>
-                                    <MenuLabel>Available Node</MenuLabel>
-                                    {hiddenTabs.map((tab: FileTabsView) => (
-                                        <MenuItem key={`menu-${tab.id}`}
-                                                  onSelect={() => {
-                                                      fileTabsService.activateTab(tab.id!)
-                                                  }}>
-                                            {tab.children}
-                                        </MenuItem>
-                                    ))}
-                                </MenuContent>
-                            </MenuPortal>
-                        </Menu>
+                    <Menu>
+                        <MenuTrigger asChild>
+                            <Button variant="none" paddingSize={"xxs"} color="primary">
+                                <IconPlus size={12}/>
+                            </Button>
+                        </MenuTrigger>
+                        <MenuPortal>
+                            <MenuContent align="start" sideOffset={8}>
+                                <MenuLabel>Starting Node</MenuLabel>
+                                <MenuItem onSelect={() => setActiveTab(flowId!)}>
+                                    <DisplayIcon color={hashToColor(flowId!)} size={13}/>
+                                    <Text
+                                        size={"sm"}>{flow?.type?.names?.[0]?.content || FALLBACK_FLOW_TYPE_NAME}</Text>
+                                </MenuItem>
+                                <MenuSeparator/>
+                                <MenuLabel>Available Node</MenuLabel>
+                                {
+                                    nodes?.map(node => {
 
-                        <Menu>
-                            <MenuTrigger asChild>
-                                <Button variant="none" paddingSize={"xxs"} color="primary">
-                                    <IconDotsVertical size={12}/>
-                                </Button>
-                            </MenuTrigger>
-                            <MenuPortal>
-                                <MenuContent align="end" sideOffset={8}>
-                                    <MenuItem onClick={() => fileTabsService.clearAll()}>Close all tabs</MenuItem>
-                                    <MenuItem onClick={() => fileTabsService.clearWithoutActive()}>Close other
-                                        tabs</MenuItem>
-                                    <MenuSeparator/>
-                                    <MenuItem onClick={() => fileTabsService.clearLeft()}>Close all tabs to
-                                        left</MenuItem>
-                                    <MenuItem onClick={() => fileTabsService.clearRight()}>Close all tabs to
-                                        right</MenuItem>
-                                </MenuContent>
-                            </MenuPortal>
-                        </Menu>
-                    </ButtonGroup>
+                                        const DisplayIcon = icon(node?.functionDefinition?.displayIcon as IconString)
+
+                                        return <MenuItem key={node?.id} onSelect={() => {
+                                            setActiveTab(node?.id!)
+                                        }}>
+                                            <DisplayIcon color={hashToColor(node?.id!)} size={13}/>
+                                            <Text
+                                                size={"sm"}>{node?.functionDefinition?.names?.[0]?.content || FALLBACK_FUNCTION_NAME}</Text>
+                                        </MenuItem>
+                                    })
+                                }
+                            </MenuContent>
+                        </MenuPortal>
+                    </Menu>
                 }
             >
-                {visibleTabs.map((tab: FileTabsView, _: number) => {
-                    return tab.show && <FileTabsTrigger
-                        key={`trigger-${tab.id}`}
-                        closable={tab.closeable}
-                        value={tab.id!}
-                        onClose={() => {
-                            fileTabsService.removeTabById(tab.id!!)
-                        }}
-                    >
-                        {tab.children}
-                    </FileTabsTrigger>
-                })}
+                <FileTabsTrigger value={flowId!}
+                                 key={flowId!}>
+                    <DisplayIcon color={hashToColor(flowId!)} size={13}/>
+                    <Text size={"sm"}>{flow?.type?.names?.[0]?.content || FALLBACK_FLOW_TYPE_NAME}</Text>
+                </FileTabsTrigger>
+                {
+                    nodes?.map(node => {
+
+                        const DisplayIcon = icon(node?.functionDefinition?.displayIcon as IconString)
+
+                        return <FileTabsTrigger value={node?.id!}
+                                                key={node?.id!}>
+                            <DisplayIcon color={hashToColor(node?.id!)} size={13}/>
+                            <Text
+                                size={"sm"}>{node?.functionDefinition?.names?.[0]?.content || FALLBACK_FUNCTION_NAME}</Text>
+                        </FileTabsTrigger>
+                    })
+                }
             </FileTabsList>}>
                 <>
-                    {fileTabsService.values().map((tab: FileTabsView) => (
-                        <FileTabsContent data-qa-selector={"flow-builder-file-content"}
-                                         display={tab.active ? "block" : "none"}
-                                         key={`content-${tab.id}`}
-                                         value={tab.id!}>
-                            {tab.content}
-                        </FileTabsContent>
-                    ))}
+                    <FileTabsContent data-qa-selector={"flow-builder-file-content"}
+                                     value={flowId!}
+                                     key={flowId!}>
+                        <FunctionFileTriggerComponent instance={flow!}/>
+                    </FileTabsContent>
+                    {
+                        nodes?.map(node => {
+                            return <FileTabsContent data-qa-selector={"flow-builder-file-content"}
+                                                    value={node?.id!}
+                                                    key={node?.id!}>
+                                <FunctionFileDefaultComponent node={node!} flowId={flowId}/>
+                            </FileTabsContent>
+                        })
+                    }
                 </>
             </Layout>
         </FileTabs>

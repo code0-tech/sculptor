@@ -2,11 +2,7 @@
 
 import {useApolloClient} from "@apollo/client/react";
 import {useParams, useRouter} from "next/navigation";
-import {
-    AuroraBackground,
-    ContextStoreProvider,
-    Flex,
-} from "@code0-tech/pictor";
+import {AuroraBackground, ContextStoreProvider, Flex,} from "@code0-tech/pictor";
 import React from "react";
 import {GraphqlClient} from "@core/util/graphql-client";
 import {
@@ -15,7 +11,8 @@ import {
     FlowType,
     FunctionDefinition,
     Namespace,
-    NamespaceProject, Runtime
+    NamespaceProject,
+    Runtime
 } from "@code0-tech/sagittarius-graphql-types";
 import {usePersistentReactiveArrayService} from "@/hooks/usePersistentReactiveArrayService";
 import {UserService} from "@edition/user/services/User.service";
@@ -29,8 +26,6 @@ import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
-import {FileTabsView} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.view";
-import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
 import Image from "next/image";
 import {UserView} from "@edition/user/services/User.view";
 import {OrganizationView} from "@edition/organization/services/Organization.view";
@@ -39,6 +34,7 @@ import {ProjectView} from "@edition/project/services/Project.view";
 import {RoleView} from "@edition/role/services/Role.view";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
+import {ReactFlowProvider} from "@xyflow/react";
 
 export default function FlowLayout({bar, tab, children}: {
     bar: React.ReactNode,
@@ -72,7 +68,6 @@ export default function FlowLayout({bar, tab, children}: {
     const functions = usePersistentReactiveArrayService<FunctionDefinition, FunctionService>(`dashboard::functions::${currentSession?.id}`, (store) => new FunctionService(graphqlClient, store))
     const datatype = usePersistentReactiveArrayService<DataType, DatatypeService>(`dashboard::datatypes::${currentSession?.id}`, (store) => new DatatypeService(graphqlClient, store))
     const flowtype = usePersistentReactiveArrayService<FlowType, FlowTypeService>(`dashboard::flowtypes::${currentSession?.id}`, (store) => new FlowTypeService(graphqlClient, store))
-    const file = usePersistentReactiveArrayService<FileTabsView, FileTabsService>(`dashboard::files::${flowId}`, FileTabsService, [])
 
 
     const runtimeId = React.useMemo(() => project[1].getById(projectId, {namespaceId})?.primaryRuntime?.id, [projectId, project[0], namespaceId])
@@ -87,7 +82,7 @@ export default function FlowLayout({bar, tab, children}: {
     }, [runtimeId, namespaceId, projectId, currentSession, flow, functions, datatype, flowtype])
 
     return <ContextStoreProvider
-        services={[user, organization, member, namespace, runtime, project, role, flow, functions, datatype, flowtype, file]}>
+        services={[user, organization, member, namespace, runtime, project, role, flow, functions, datatype, flowtype]}>
         <Layout layoutGap={0} style={{zIndex: 0}} showLayoutSplitter={false} leftContent={
             <Flex p={0.7} pt={1} align={"center"} style={{flexDirection: "column", gap: "0.7rem"}}>
                 <div style={{
@@ -118,9 +113,9 @@ export default function FlowLayout({bar, tab, children}: {
         }>
             <Layout px={0.7} showLayoutSplitter={false} layoutGap={"0"} topContent={<>{bar}</>}>
                 <Layout showLayoutSplitter={false}>
-                    <>
+                    <ReactFlowProvider>
                         {children}
-                    </>
+                    </ReactFlowProvider>
                 </Layout>
             </Layout>
         </Layout>

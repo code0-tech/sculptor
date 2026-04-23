@@ -161,7 +161,7 @@ export default function RootLayout({children}: Readonly<{ children: React.ReactN
                         return []
                     }
 
-                    findErrors(result).map((error) => toastHandler(error))
+                    findErrors(result)?.map((error) => toastHandler(error))
                     observer.next(result);
                 },
                 error: (err) => observer.error(err),
