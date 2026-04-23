@@ -610,16 +610,13 @@ export interface FlowBuilderProps extends ComponentProps {
 }
 
 export const FlowBuilderComponent: React.FC<FlowBuilderProps> = (props) => {
-    return <ReactFlowProvider>
-        <InternalFlowBuilder {...props}/>
-    </ReactFlowProvider>
+    return <InternalFlowBuilder {...props}/>
 }
 
 const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
     const {flowId, namespaceId, projectId, ...rest} = props
 
     const { setCenter, getInternalNode, getZoom } = useReactFlow();
-    const fileTabsService = useService(FileTabsService)
 
     const nodeTypes = React.useMemo(() => ({
         default: FunctionNodeDefaultComponent,
@@ -634,7 +631,7 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
     const initialNodes = useFlowNodes(flowId, namespaceId, projectId)
     const initialEdges = useEdges(flowId, namespaceId, projectId)
 
-    const [nodes, setNodes] = useNodesState<Node>([])
+    const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
     const [edges, setEdges, edgeChangeEvent] = useEdgesState<Edge>([])
     const [showTree, setShowTree] = React.useState<boolean>(false)
 
@@ -650,6 +647,9 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
     }, [updateNodeInternals])
 
     const nodeChangeEvent = React.useCallback((changes: any) => {
+
+        onNodesChange(changes)
+
         const changedIds: string[] = Array.from(new Set(
             changes
                 .filter((c: any) => c.type === 'dimensions' || c.type === 'position')
@@ -745,10 +745,6 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
                         duration: 250,
                     }).then();
                 }
-                fileTabsService.activateTab(node?.id ?? "")
-            }}
-            onPaneClick={_ => {
-                fileTabsService.activateTab("")
             }}
             nodes={nodes}
             edges={edges}
