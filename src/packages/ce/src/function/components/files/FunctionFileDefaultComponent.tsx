@@ -1,5 +1,5 @@
 import React, {startTransition} from "react";
-import {Alert, InputSyntaxSegment, Spacing, Text, useForm, useService, useStore} from "@code0-tech/pictor";
+import {Alert, InputSyntaxSegment, Spacing, Text, useForm, useService} from "@code0-tech/pictor";
 import {
     Flow,
     LiteralValue,
@@ -7,13 +7,12 @@ import {
     NodeParameterValue,
     ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
-import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
 import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
-import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent";
 import {
-    FALLBACK_FUNCTION_DESCRIPTION, FALLBACK_FUNCTION_NAME,
+    FALLBACK_FUNCTION_DESCRIPTION,
+    FALLBACK_FUNCTION_NAME,
     FALLBACK_FUNCTION_PARAMETER_DESCRIPTION,
     FALLBACK_FUNCTION_PARAMETER_NAME
 } from "@core/util/fallback-translations";
@@ -27,16 +26,14 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
 
     const {node, flowId} = props
 
-    const functionService = useService(FunctionService)
-    const functionStore = useStore(FunctionService)
     const flowService = useService(FlowService)
-    const fileTabsService = useService(FileTabsService)
     const changedParameters = React.useRef<Set<number>>(new Set())
     const validation = useFlowValidation(flowId)
 
-    const definition = React.useMemo(() => {
-        return functionService.getById(node.functionDefinition?.id!!)
-    }, [functionStore])
+    const definition = React.useMemo(
+        () => node.functionDefinition!,
+        [node]
+    )
 
     const initialValues = React.useMemo(() => {
         const values: Record<string, any> = {}
@@ -76,13 +73,6 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                 const value = values[parameterDefinition!.id!]
                 const previousValue = nodeParameter?.value as NodeParameterValue
                 const syntaxValue = (value?.[0]?.type == "block" || value?.[0]?.type == "text" ? value?.[0]?.value : value) ?? null as NodeFunction | LiteralValue | ReferenceValue | null
-
-                if (previousValue && previousValue.__typename === "NodeFunctionIdWrapper" && previousValue.id) {
-                    const linkedNodes = flowService.getLinkedNodesById(flowId, previousValue.id)
-                    linkedNodes.reverse().forEach(node => {
-                        if (node.id) fileTabsService.deleteById(node.id)
-                    })
-                }
 
                 if (!syntaxValue || !value || (Array.isArray(syntaxValue) && Array.from(syntaxValue).length <= 0)) {
                     await flowService.setParameterValue(flowId, node.id!!, parameterIndex, undefined, definition);
