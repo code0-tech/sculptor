@@ -17,6 +17,7 @@ import {
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {useParams} from "next/navigation";
 import {ProjectService} from "@edition/project/services/Project.service";
+import {Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 
 export const ProjectSettingsGeneralView: React.FC = () => {
 
@@ -24,11 +25,16 @@ export const ProjectSettingsGeneralView: React.FC = () => {
     const projectService = useService(ProjectService)
     const projectStore = useStore(ProjectService)
 
-    const projectId = params.projectId as any as number
+    const projectIndex = params.projectId as any as number
+    const namespaceIndex = params.namespaceId as any as number
+    const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
+    const projectId: NamespaceProject['id'] = `gid://sagittarius/NamespaceProject/${projectIndex}`
 
     const project = React.useMemo(
-        () => projectService.getById(`gid://sagittarius/NamespaceProject/${projectId}`),
-        [projectStore, projectId]
+        () => projectService.getById(projectId, {
+            namespaceId: namespaceId
+        }),
+        [projectStore, projectService]
     )
 
     const initialValues = React.useMemo(
@@ -46,6 +52,13 @@ export const ProjectSettingsGeneralView: React.FC = () => {
         validate: {
             name: (value) => {
                 if (!value) return "Name is required"
+                if (value.length < 3) return "Name needs to be at least 3 characters"
+                if (value.length > 50) return "Name needs to be less than 50 characters"
+                return null
+            },
+            description: (value) => {
+                if (!value) return "Description is required"
+                if (value.length > 50) return "Description needs to be less than 50 characters"
                 return null
             },
             slug: (value) => {
@@ -61,7 +74,7 @@ export const ProjectSettingsGeneralView: React.FC = () => {
                     slug: values.slug,
                     name: values.name,
                     description: values.description,
-                    namespaceProjectId: `gid://sagittarius/NamespaceProject/${projectId}`
+                    namespaceProjectId: projectId
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
                         toast({

@@ -28,12 +28,15 @@ export const NamespaceProjectsCreatePage: React.FC = () => {
         validate: {
             name: (value) => {
                 if (!value) return "Name is required"
+                if ((value as string).length < 3) return "Name needs to be at least 3 characters"
+                if ((value as string).length > 50) return "Name needs to be less than 50 characters"
                 return null
             },
             description: (value) => {
                 if (!value) return "Description is required"
+                if ((value as string).length > 50) return "Description needs to be less than 50 characters"
                 return null
-            }
+            },
         },
         onSubmit: (values) => {
             startTransition(() => {
