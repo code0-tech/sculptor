@@ -159,7 +159,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                             <Button color={"tertiary"}>No, go back!</Button>
                         </DialogClose>
                         <ButtonGroup color={"tertiary"}>
-                            <Link href={`/namespace/${namespaceIndex}/project/${projectIndex}/settings`}>
+                            <Link href={`/namespace/${namespaceIndex}/project/${projectIndex}/runtime`}>
                                 <Button color={"info"} variant={"none"}>
                                     <Text>Assign</Text>
                                 </Button>
@@ -184,7 +184,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                                 <Button color={"tertiary"}>No, go back!</Button>
                             </DialogClose>
                             <ButtonGroup color={"tertiary"}>
-                                <Link href={`/namespace/${namespaceIndex}/project/${projectIndex}/settings`}>
+                                <Link href={`/namespace/${namespaceIndex}/project/${projectIndex}/runtime`}>
                                     <Button color={"info"} variant={"none"}>
                                         <Text>Assign</Text>
                                     </Button>

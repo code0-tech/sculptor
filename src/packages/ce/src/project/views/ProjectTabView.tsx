@@ -1,19 +1,16 @@
-"use client"
-
-import {Tab, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
-import {Button, Text, Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from "@code0-tech/pictor";
-import {IconHome, IconSettings} from "@tabler/icons-react";
 import React from "react";
 import {useParams, usePathname, useRouter} from "next/navigation";
+import {Tab, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
+import {Button, Text, Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from "@code0-tech/pictor";
+import {IconHome, IconServer, IconSettings} from "@tabler/icons-react";
 
-export default function Page() {
-
-
+export const ProjectTabView: React.FC = () => {
     const pathname = usePathname()
     const router = useRouter()
     const params = useParams()
     const defaultValue = pathname.includes("flow") ? "flow"
-        : "settings"
+        : pathname.includes("runtime") ? "runtime":
+            "settings"
 
     const namespaceId = params.namespaceId as any
     const projectId = params.projectId as any
@@ -37,7 +34,22 @@ export default function Page() {
                 </TooltipTrigger>
                 <TooltipPortal>
                     <TooltipContent side={"right"} sideOffset={8} color={"primary"}>
-                        <Text>Flow builder</Text>
+                        <Text>Project Flows</Text>
+                    </TooltipContent>
+                </TooltipPortal>
+            </Tooltip>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <TabTrigger value={"runtime"} asChild={true}>
+                        <Button variant={"none"} paddingSize={"xs"}
+                                onClick={() => router.push(`/namespace/${namespaceId}/project/${projectId}/runtime`)}>
+                            <IconServer size={16}/>
+                        </Button>
+                    </TabTrigger>
+                </TooltipTrigger>
+                <TooltipPortal>
+                    <TooltipContent side={"right"} sideOffset={8} color={"primary"}>
+                        <Text>Project assigned runtimes</Text>
                     </TooltipContent>
                 </TooltipPortal>
             </Tooltip>
@@ -52,7 +64,7 @@ export default function Page() {
                 </TooltipTrigger>
                 <TooltipPortal>
                     <TooltipContent side={"right"} sideOffset={8} color={"primary"}>
-                        <Text>Settings</Text>
+                        <Text>Project settings</Text>
                     </TooltipContent>
                 </TooltipPortal>
             </Tooltip>

@@ -1,32 +1,27 @@
 "use client"
 
-import React, {startTransition} from "react"
+import React, {startTransition} from "react";
+import {useParams} from "next/navigation";
 import {
-    Avatar,
+    Avatar, Badge,
     Button,
-    Flex,
-    hashToColor,
+    Flex, hashToColor,
     Menu,
     MenuContent,
     MenuItem,
-    MenuPortal,
-    MenuSeparator,
-    MenuTrigger,
-    Spacing,
-    Badge,
+    MenuPortal, MenuSeparator,
+    MenuTrigger, Spacing,
     Text,
     useService,
     useStore
 } from "@code0-tech/pictor";
-import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
-import {useParams} from "next/navigation";
-import {RuntimeProjectDataTableComponent} from "@edition/runtime/components/RuntimeProjectDataTableComponent";
 import {RuntimeService} from "@edition/runtime/services/Runtime.service";
 import {ProjectService} from "@edition/project/services/Project.service";
 import {Runtime} from "@code0-tech/sagittarius-graphql-types";
 import {formatDistanceToNow} from "date-fns";
+import {RuntimeProjectDataTableComponent} from "@edition/runtime/components/RuntimeProjectDataTableComponent";
 
-export const ProjectSettingsRuntimesView: React.FC = () => {
+export const RuntimeAssignPage: React.FC = () => {
 
     const params = useParams()
     const runtimeService = useService(RuntimeService)
@@ -65,9 +60,15 @@ export const ProjectSettingsRuntimesView: React.FC = () => {
         })
     }, [projectService, projectId, project])
 
-    return <TabContent value={"access"}>
+    return <div style={{
+        background: "#070514",
+        height: "100%",
+        padding: "1rem",
+        borderTopLeftRadius: "1rem",
+        borderTopRightRadius: "1rem"
+    }}>
         <Flex justify={"space-between"} align={"start"}>
-            <Text size={"xl"} hierarchy={"primary"}>Runtimes</Text>
+            <Text size={"xl"} hierarchy={"primary"}>Assigned runtimes</Text>
             <Menu>
                 <MenuTrigger asChild>
                     <Button color={"success"}>
@@ -112,6 +113,5 @@ export const ProjectSettingsRuntimesView: React.FC = () => {
         </Flex>
         <Spacing spacing={"xl"}/>
         <RuntimeProjectDataTableComponent projectId={`gid://sagittarius/NamespaceProject/${projectId}`}/>
-
-    </TabContent>
+    </div>
 }
