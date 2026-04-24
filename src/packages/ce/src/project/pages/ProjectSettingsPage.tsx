@@ -2,10 +2,8 @@
 
 import {Tab, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import React from "react";
-import {Button, Flex, Text} from "@code0-tech/pictor";
-import {IconLayoutSidebar} from "@tabler/icons-react";
+import {Button, Text} from "@code0-tech/pictor";
 import {ProjectSettingsGeneralView} from "@edition/project/views/ProjectSettingsGeneralView";
-import {ProjectSettingsRuntimesView} from "@edition/project/views/ProjectSettingsRuntimesView";
 import {ProjectSettingsDeleteView} from "@edition/project/views/ProjectSettingsDeleteView";
 import {
     ResizableHandle,
@@ -26,11 +24,6 @@ export const ProjectSettingsPage: React.FC = () => {
                             <Text size={"md"}>General</Text>
                         </Button>
                     </TabTrigger>
-                    <TabTrigger value={"access"} w={"100%"} asChild>
-                        <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                            <Text size={"md"}>Runtimes</Text>
-                        </Button>
-                    </TabTrigger>
                     <TabTrigger value={"delete"} w={"100%"} asChild>
                         <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
                             <Text size={"md"}>Delete</Text>
@@ -43,7 +36,6 @@ export const ProjectSettingsPage: React.FC = () => {
                             style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
                 <>
                     <ProjectSettingsGeneralView/>
-                    <ProjectSettingsRuntimesView/>
                     <ProjectSettingsDeleteView/>
                 </>
             </ResizablePanel>
