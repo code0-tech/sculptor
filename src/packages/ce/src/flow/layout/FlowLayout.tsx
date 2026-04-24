@@ -3,6 +3,7 @@ import {ResizableHandle, ResizablePanelGroup} from "@code0-tech/pictor/dist/comp
 import {SidebarComponent} from "@core/components/SidebarComponent";
 import {FlowFolderView} from "@edition/flow/views/FlowFolderView";
 import {WorkerProvider} from "@edition/flow/components/FlowWorkerProvider";
+import {ReactFlowProvider} from "@xyflow/react";
 
 interface FlowLayoutProps {
     children: React.ReactNode
@@ -16,7 +17,9 @@ export const FlowLayout: React.FC<FlowLayoutProps> = ({children}) => {
         </SidebarComponent>
         <ResizableHandle/>
         <WorkerProvider>
-            {children}
+            <ReactFlowProvider>
+                {children}
+            </ReactFlowProvider>
         </WorkerProvider>
     </ResizablePanelGroup>
 }

@@ -34,7 +34,6 @@ import {ProjectView} from "@edition/project/services/Project.view";
 import {RoleView} from "@edition/role/services/Role.view";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
-import {ReactFlowProvider} from "@xyflow/react";
 
 export default function FlowLayout({bar, tab, children}: {
     bar: React.ReactNode,
@@ -113,9 +112,9 @@ export default function FlowLayout({bar, tab, children}: {
         }>
             <Layout px={0.7} showLayoutSplitter={false} layoutGap={"0"} topContent={<>{bar}</>}>
                 <Layout showLayoutSplitter={false}>
-                    <ReactFlowProvider>
+                    <>
                         {children}
-                    </ReactFlowProvider>
+                    </>
                 </Layout>
             </Layout>
         </Layout>
