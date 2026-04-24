@@ -65,7 +65,7 @@ export const ProjectSettingsGeneralView: React.FC = () => {
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
                         toast({
-                            title: "The project was successfully deleted.",
+                            title: "The project was successfully updated.",
                             color: "success",
                             dismissible: true,
                         })
