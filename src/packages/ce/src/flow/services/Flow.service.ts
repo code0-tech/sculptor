@@ -97,11 +97,11 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         return this.values(dependencies).find(value => value.id === id);
     }
 
-    protected removeParameterNode(flow: FlowView, parameter: NodeParameter): void {
-        if (parameter?.value?.__typename === "NodeFunctionIdWrapper") {
-            const parameterNode = flow?.nodes?.nodes?.find(n => n?.id === (parameter.value as NodeFunction)?.id)
+    protected removeParameterNode(flow: FlowView, node: NodeParameter): void {
+        if (node?.value?.__typename === "NodeFunctionIdWrapper") {
+            const parameterNode = flow?.nodes?.nodes?.find(n => n?.id === (node.value as NodeFunction)?.id)
             if (parameterNode) {
-                flow!.nodes!.nodes = flow!.nodes!.nodes!.filter(n => n?.id !== (parameter.value as NodeFunction)?.id)
+                flow!.nodes!.nodes = flow!.nodes!.nodes!.filter(n => n?.id !== (node.value as NodeFunction)?.id)
                 let nextNodeId = parameterNode.nextNodeId
                 while (nextNodeId) {
                     const nextNode = flow!.nodes!.nodes!.find(n => n?.id === nextNodeId)
@@ -117,22 +117,6 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
                 })
             }
         }
-    }
-
-    getLinkedNodesById(flowId: FlowView['id'], nodeId: NodeFunction['id']): NodeFunction[] {
-        const parentNode = this.getNodeById(flowId, nodeId)
-        //const nextNodes = parentNode ? this.getLinkedNodesById(flowId, parentNode.nextNodeId) : []
-        const parameterNodes: NodeFunction[] = []
-        parentNode?.parameters?.nodes?.forEach(p => {
-            if (p?.value?.__typename === "NodeFunctionIdWrapper") {
-                const parameterNode = this.getNodeById(flowId, (p.value as NodeFunctionIdWrapper)?.id!!)
-                if (parameterNode) {
-                    parameterNodes.push(parameterNode)
-                    //parameterNodes.push(...(parameterNode ? this.getLinkedNodesById(flowId, parameterNode.nextNodeId) : []))
-                }
-            }
-        })
-        return [...(parentNode ? [parentNode] : []), ...parameterNodes]
     }
 
     getNodeById(flowId: FlowView['id'], nodeId: NodeFunction['id']): NodeFunction | undefined {
@@ -224,7 +208,9 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
 
         if (parentNode) {
             const parameter = parentNode.parameters?.nodes?.find(p => p?.value?.__typename === "NodeFunctionIdWrapper" && (p.value as NodeFunction)?.id === nodeId)
-            if (parameter) {
+            if (parameter && parameter.value?.__typename === "NodeFunctionIdWrapper" && node.nextNodeId) {
+                parameter.value.id = node.nextNodeId
+            } else if (parameter) {
                 parameter.value = undefined
             }
         }

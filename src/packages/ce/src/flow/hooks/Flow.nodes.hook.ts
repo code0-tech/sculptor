@@ -101,7 +101,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                                 parentNodeId: nodeId,
                                 nodeId: nodeId,
                                 flowId: flowId,
-                                color: hashToColor(value.id!),
+                                color: hashToColor(value?.id ?? ""),
                             },
                         });
                     }
