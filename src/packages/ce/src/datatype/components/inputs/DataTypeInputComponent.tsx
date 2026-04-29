@@ -4,7 +4,7 @@ import {InputProps} from "@code0-tech/pictor";
 import {DataTypeJSONInputComponent} from "@edition/datatype/components/inputs/json/DataTypeJSONInputComponent";
 import {NodeSchema} from "@code0-tech/triangulum";
 
-export interface DataTypeInputComponentProps extends Omit<InputProps<any | null>, "wrapperComponent" | "type"> {
+export interface DataTypeInputComponentProps extends Omit<InputProps<any | null>, "wrapperComponent"> {
     schema: NodeSchema
     clearable?: boolean
     onClear?: (event: React.MouseEvent<HTMLButtonElement>) => void
