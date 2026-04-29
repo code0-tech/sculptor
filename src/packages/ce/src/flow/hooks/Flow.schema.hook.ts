@@ -38,6 +38,12 @@ export const useFlowSchema = (
     React.useEffect(() => {
         if (!flow) return
 
+        const triggerSchema = execute({
+            flow,
+            dataTypes,
+            functions
+        })
+
         const schemas = flow.nodes?.nodes?.map(node => {
             return execute({
                 flow,
@@ -47,9 +53,12 @@ export const useFlowSchema = (
             })
         })
 
-        Promise.all(schemas!).then((value) => setSchema(value as NodeSchema[]))
+        Promise.all([triggerSchema!, ...schemas!]).then((value) => {
+            console.log(value)
+            setSchema(value as NodeSchema[])
+        })
 
-    }, [flow, dataTypes, functions])
+    }, [flow, flowStore, dataTypes, functions])
 
     return schema
 }
