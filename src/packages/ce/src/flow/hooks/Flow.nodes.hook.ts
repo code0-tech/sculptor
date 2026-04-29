@@ -19,11 +19,12 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
         [flowId, flowStore]
     )
 
-    const flowSchema = useFlowSchema(flowId)
+    const flowSchema = useFlowSchema(flowId, namespaceId, projectId)
 
     return React.useMemo(() => {
         if (!flow) return []
         if (functionStore.length <= 0) return []
+        if ((flowSchema?.length ?? 0) <= 0) return []
 
         const nodes: Node<FunctionNodeComponentProps>[] = [];
         const visited = new Set<string>();
@@ -41,7 +42,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                 flowId: flowId,
                 nodeId: undefined,
                 color: hashToColor(flowId!),
-                schema: flowSchema?.find(nodeSchema => !nodeSchema.nodeId)!
+                schema: flowSchema?.filter(nodeSchema => nodeSchema.some(schema => !schema.nodeId))?.flat()!
             },
         });
 

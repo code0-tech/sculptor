@@ -5,7 +5,6 @@ import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
 import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent";
-import {DataTypeTypeInputComponent} from "@edition/datatype/components/inputs/datatype/DataTypeTypeInputComponent";
 import {
     FALLBACK_FLOW_TYPE_DESCRIPTION,
     FALLBACK_FLOW_TYPE_NAME,
@@ -100,6 +99,8 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
         validate()
     }, [validation])
 
+    console.log(flowNode)
+
     return <>
         <Text size={"md"}>{definition?.names?.[0]?.content ?? FALLBACK_FLOW_TYPE_NAME}</Text>
         <Spacing spacing={"xs"}/>
@@ -125,11 +126,8 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
             return <div>
                 {/*@ts-ignore*/}
                 <DataTypeInputComponent data-qa-selector={"flow-builder-setting"}
-                                        flowId={instance.id}
-                                        nodeId={undefined}
-                                        parameterIndex={index}
                                         title={title}
-                                        schema={flowNode?.data.schema}
+                                        schema={flowNode?.data?.schema?.[index]}
                                         description={description}
                                         clearable
                                         onChange={() => {

@@ -167,7 +167,7 @@ export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProp
                       enforceUniqueSuggestions
                       validationUsesSyntax
                       transformSyntax={transformSyntax}
-                      suggestions={rest.suggestions ? rest.suggestions : toInputSuggestions([])}
+                      suggestions={rest.suggestions ? rest.suggestions : toInputSuggestions(suggestions)}
                       {...rest}
 
     />
