@@ -1,4 +1,4 @@
-import type {Flow} from "@code0-tech/sagittarius-graphql-types";
+import type {Flow, Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {useService, useStore} from "@code0-tech/pictor";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import React from "react";
@@ -8,8 +8,10 @@ import {FunctionService} from "@edition/function/services/Function.service";
 import {NodeSchema} from "@code0-tech/triangulum";
 
 export const useFlowSchema = (
-    flowId: Flow['id']
-): NodeSchema[] | undefined => {
+    flowId: Flow['id'],
+    namespaceId: Namespace['id'],
+    projectId: NamespaceProject['id'],
+): NodeSchema[][] | undefined => {
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
     const dataTypeStore = useStore(DatatypeService)
@@ -18,10 +20,10 @@ export const useFlowSchema = (
     const functionStore = useStore(FunctionService)
     const {execute} = useSchemaAction()
 
-    const [schema, setSchema] = React.useState<NodeSchema[] | undefined>([]);
+    const [schema, setSchema] = React.useState<NodeSchema[][] | undefined>([]);
 
     const flow = React.useMemo(
-        () => flowService.getById(flowId),
+        () => flowService.getById(flowId, {namespaceId, projectId}),
         [flowId, flowService, flowStore]
     )
 
@@ -54,11 +56,10 @@ export const useFlowSchema = (
         })
 
         Promise.all([triggerSchema!, ...schemas!]).then((value) => {
-            console.log(value)
-            setSchema(value as NodeSchema[])
+            setSchema(value as NodeSchema[][])
         })
 
-    }, [flow, flowStore, dataTypes, functions])
+    }, [functions, dataTypes, flow])
 
     return schema
 }
