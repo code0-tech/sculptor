@@ -5,6 +5,7 @@ import {hashToColor, useService, useStore} from "@code0-tech/pictor";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FunctionNodeComponentProps} from "@edition/function/components/nodes/FunctionNodeComponent";
+import {useFlowSchema} from "@edition/flow/hooks/Flow.schema.hook";
 
 export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], projectId?: NamespaceProject["id"]): Node<FunctionNodeComponentProps>[] => {
 
@@ -17,6 +18,8 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
         () => flowService.getById(flowId, {namespaceId, projectId}),
         [flowId, flowStore]
     )
+
+    const flowSchema = useFlowSchema(flowId)
 
     return React.useMemo(() => {
         if (!flow) return []
@@ -38,6 +41,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                 flowId: flowId,
                 nodeId: undefined,
                 color: hashToColor(flowId!),
+                schema: flowSchema?.find(nodeSchema => !nodeSchema.nodeId)!
             },
         });
 
@@ -65,6 +69,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                         flowId: flowId,
                         index: ++globalIndex,
                         color: hashToColor(nodeId),
+                        schema: flowSchema?.find(nodeSchema => nodeSchema?.nodeId == node.id)!
                     },
                 });
             }
@@ -87,10 +92,11 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                         extent: parentGroup ? "parent" : undefined,
                         data: {
                             isParameter: true,
-                            parentNodeId: nodeId,
+                            //parentNodeId: nodeId,
                             nodeId: nodeId,
                             flowId: flowId,
                             color: hashToColor(value?.id ?? ""),
+                            schema: flowSchema?.find(nodeSchema => nodeSchema?.nodeId == node.id)!
                         },
                     });
                 }

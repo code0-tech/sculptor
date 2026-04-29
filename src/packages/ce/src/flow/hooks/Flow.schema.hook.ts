@@ -9,7 +9,7 @@ import {NodeSchema} from "@code0-tech/triangulum";
 
 export const useFlowSchema = (
     flowId: Flow['id']
-) => {
+): NodeSchema[] | undefined => {
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
     const dataTypeStore = useStore(DatatypeService)
