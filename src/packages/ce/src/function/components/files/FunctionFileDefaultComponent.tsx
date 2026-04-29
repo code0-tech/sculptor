@@ -148,6 +148,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                                         parameterIndex={index}
                                         title={title}
                                         description={description}
+                                        schema={{}}
                                         clearable
                                         onChange={() => {
                                             //TODO this should be debounced
