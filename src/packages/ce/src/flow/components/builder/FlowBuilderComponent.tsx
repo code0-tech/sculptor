@@ -4,11 +4,9 @@ import {
     Edge,
     Node,
     ReactFlow,
-    ReactFlowProvider,
     useEdgesState,
     useNodesState,
-    useReactFlow, useStore,
-    useUpdateNodeInternals,
+    useReactFlow, useUpdateNodeInternals,
     ViewportPortal
 } from "@xyflow/react";
 import React from "react";
@@ -19,7 +17,7 @@ import {Flow, type Namespace, type NamespaceProject} from "@code0-tech/sagittari
 import {LineWobble} from 'ldrs/react'
 import 'ldrs/react/LineWobble.css'
 import {useFlowNodes} from "@edition/flow/hooks/Flow.nodes.hook";
-import {ComponentProps, mergeComponentProps, Spacing, Text, useService} from "@code0-tech/pictor";
+import {ComponentProps, mergeComponentProps, Spacing, Text} from "@code0-tech/pictor";
 import {FunctionNodeDefaultComponent} from "@edition/function/components/nodes/FunctionNodeDefaultComponent";
 import {FunctionNodeGroupComponent} from "@edition/function/components/nodes/FunctionNodeGroupComponent";
 import {FunctionNodeTriggerComponent} from "@edition/function/components/nodes/FunctionNodeTriggerComponent";
@@ -28,8 +26,6 @@ import {FlowPanelSizeComponent} from "@edition/flow/components/panels/FlowPanelS
 import {FlowPanelLayoutComponent} from "@edition/flow/components/panels/FlowPanelLayoutComponent";
 import {FlowPanelControlComponent} from "@edition/flow/components/panels/FlowPanelControlComponent";
 import {FlowPanelUpdateComponent} from "@edition/flow/components/panels/FlowPanelUpdateComponent";
-import {FileTabsService} from "@code0-tech/pictor/dist/components/file-tabs/FileTabs.service";
-import {FlowPanelExportComponent} from "@edition/flow/components/panels/FlowPanelExportComponent";
 import {FunctionNodeSquareComponent} from "@edition/function/components/nodes/FunctionNodeSquareComponent";
 
 /**
@@ -616,7 +612,7 @@ export const FlowBuilderComponent: React.FC<FlowBuilderProps> = (props) => {
 const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
     const {flowId, namespaceId, projectId, ...rest} = props
 
-    const { setCenter, getInternalNode, getZoom } = useReactFlow();
+    const {setCenter, getInternalNode, getZoom} = useReactFlow();
 
     const nodeTypes = React.useMemo(() => ({
         default: FunctionNodeDefaultComponent,
