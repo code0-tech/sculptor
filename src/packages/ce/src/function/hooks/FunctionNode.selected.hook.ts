@@ -8,20 +8,16 @@ export const useSelectedFunctionNode = () => {
 }
 
 export const setSelectedFunctionNode = (nodeId: string, reactFlow: ReturnType<typeof useReactFlow>) => {
-
     reactFlow.setNodes((nodes) =>
         nodes.map((node) => ({
             ...node,
             selected: node.id === nodeId,
         }))
     )
-
     reactFlow.fitView({
         nodes: [{id: nodeId}],
         duration: 250,
         maxZoom: reactFlow.getZoom(),
         minZoom: 1,
     });
-
-
 }

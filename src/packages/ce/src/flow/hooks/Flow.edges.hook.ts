@@ -4,29 +4,25 @@ import type {Flow, Namespace, NamespaceProject, NodeFunction} from "@code0-tech/
 import {hashToColor, useService, useStore} from "@code0-tech/pictor";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
-import {DatatypeService} from "@edition/datatype/services/Datatype.service";
-import {DataTypeVariant, getTypesFromFunction, getTypesFromNode, getTypeVariant} from "@code0-tech/triangulum";
 import {FALLBACK_FUNCTION_PARAMETER_NAME} from "@core/util/fallback-translations";
+import {FlowBuilderEdgeDataProps} from "@edition/flow/components/builder/FlowBuilderEdgeComponent";
 
 // @ts-ignore
-export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], projectId?: NamespaceProject['id']): Edge<DFlowEdgeDataProps>[] => {
+export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], projectId?: NamespaceProject['id']): Edge<FlowBuilderEdgeDataProps>[] => {
 
     const flowService = useService(FlowService);
     const flowStore = useStore(FlowService)
     const functionService = useService(FunctionService);
     const functionStore = useStore(FunctionService)
-    const dataTypeService = useService(DatatypeService);
-    const dataTypeStore = useStore(DatatypeService)
 
     const flow = React.useMemo(() => flowService.getById(flowId, {namespaceId, projectId}), [flowId, flowStore])
 
     return React.useMemo(() => {
         if (!flow) return []
         if (functionStore.length <= 0) return []
-        if (dataTypeStore.length <= 0) return []
 
         // @ts-ignore
-        const edges: Edge<DFlowEdgeDataProps>[] = []
+        const edges: Edge<FlowBuilderEdgeDataProps>[] = []
 
         const groupsWithValue = new Map<string, string[]>();
 
@@ -89,65 +85,38 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                 }
             }
 
-            const types = getTypesFromFunction(functionService.getById(node.functionDefinition?.id)!);
-
             node.parameters?.nodes?.forEach((param, index) => {
                 const parameterValue = param?.value;
                 const parameterDefinition = functionService.getById(node.functionDefinition?.id!!)?.parameterDefinitions?.nodes?.[index];
-                const variant = getTypeVariant(types.parameters[index], dataTypeService.values())[0].variant;
                 if (!parameterValue) return
 
-                if (variant === DataTypeVariant.NODE) {
-                    if (parameterValue && parameterValue.__typename === "NodeFunctionIdWrapper") {
+                if (parameterValue && parameterValue.__typename === "NodeFunctionIdWrapper") {
 
-                        const groupId = `${node.id}-group-${idCounter++}`;
-
-                        edges.push({
-                            id: `${node.id}-${groupId}-param-${index}`,
-                            source: node.id!,
-                            target: groupId,
-                            deletable: false,
-                            selectable: false,
-                            animated: true,
-                            label: parameterDefinition?.names!![0]?.content ?? FALLBACK_FUNCTION_PARAMETER_NAME,
-                            data: {
-                                color: hashToColor(parameterValue?.id || ""),
-                                type: 'group',
-                                flowId: flowId,
-                                parentNodeId: parentNode?.id
-                            },
-                        });
-
-                        (groupsWithValue.get(node.id!) ?? (groupsWithValue.set(node.id!, []), groupsWithValue.get(node.id!)!)).push(groupId);
-
-                        traverse(
-                            flowService.getNodeById(flowId, parameterValue.id)!,
-                            node,
-                            true
-                        );
-                    }
-                } else if (parameterValue && parameterValue.__typename === "NodeFunctionIdWrapper") {
-                    const subFnId = traverse(
-                        flowService.getNodeById(flowId, parameterValue.id)!,
-                        node,
-                        true
-                    );
+                    const groupId = `${node.id}-group-${idCounter++}`;
 
                     edges.push({
-                        id: `${subFnId}-${node.id}-param-${index}`,
-                        source: subFnId,
-                        target: node.id!,
-                        targetHandle: `param-${index}`,
-                        animated: true,
+                        id: `${node.id}-${groupId}-param-${index}`,
+                        source: node.id!,
+                        target: groupId,
                         deletable: false,
                         selectable: false,
+                        animated: true,
+                        label: parameterDefinition?.names!![0]?.content ?? FALLBACK_FUNCTION_PARAMETER_NAME,
                         data: {
                             color: hashToColor(parameterValue?.id || ""),
-                            type: 'parameter',
+                            type: 'group',
                             flowId: flowId,
                             parentNodeId: parentNode?.id
                         },
                     });
+
+                    (groupsWithValue.get(node.id!) ?? (groupsWithValue.set(node.id!, []), groupsWithValue.get(node.id!)!)).push(groupId);
+
+                    traverse(
+                        flowService.getNodeById(flowId, parameterValue.id)!,
+                        node,
+                        true
+                    );
                 }
             });
 
@@ -163,5 +132,5 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
         }
 
         return edges
-    }, [flow, flowStore, functionStore, dataTypeStore]);
+    }, [flow, flowStore, functionStore]);
 };

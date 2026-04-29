@@ -1,6 +1,6 @@
 import React from "react"
 import {DataType, Flow, FunctionDefinition, LiteralValue, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
-import {TypeVariantResult} from "@code0-tech/triangulum/dist/extraction/getTypeVariant";
+import {NodeSchema} from "@code0-tech/triangulum";
 
 interface Deferred {
     resolve: (value: any) => void
@@ -16,6 +16,7 @@ type FlowWorkerActions =
     | "type_extraction"
     | "value_extraction"
     | "type_variant"
+    | "schema"
 
 interface FlowWorkerValidationPayload {
     flow: Flow
@@ -61,6 +62,13 @@ interface FlowWorkerTypeVariantPayload {
 interface FlowWorkerTypeExtractionPayload {
     value: LiteralValue
     dataTypes: DataType[]
+}
+
+interface FlowWorkerSchemaPayload {
+    flow: Flow
+    dataTypes: DataType[]
+    functions: FunctionDefinition[]
+    nodeId?: NodeFunction['id']
 }
 
 type FlowWorkerPayload =
@@ -173,5 +181,5 @@ export const useTypeExtractionAction = () =>
 export const useValueExtractionAction = () =>
     useWorkerAction<any[], FlowWorkerValueExtractionPayload>("value_extraction");
 
-export const useTypeVariantAction = () =>
-    useWorkerAction<TypeVariantResult[], FlowWorkerValueExtractionPayload>("type_variant");
+export const useSchemaAction = () =>
+    useWorkerAction<NodeSchema, FlowWorkerSchemaPayload>("schema");

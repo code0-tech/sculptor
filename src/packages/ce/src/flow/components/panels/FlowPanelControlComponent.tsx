@@ -15,7 +15,6 @@ import {Panel} from "@xyflow/react";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import {FunctionSuggestionMenuComponent} from "@edition/function/components/suggestion/FunctionSuggestionMenuComponent";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import {useNodeSuggestions} from "@edition/function/hooks/FunctionNodeSuggestions.hook";
 import {SuggestionDialogComponent} from "@edition/function/components/suggestion/SuggestionDialogComponent";
 import {FunctionSuggestion} from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
 import {Suggestion} from "@edition/function/components/suggestion/Suggestion.util";

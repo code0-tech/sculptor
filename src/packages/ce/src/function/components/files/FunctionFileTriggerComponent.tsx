@@ -5,7 +5,6 @@ import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
 import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent";
-import {getTypesFromFunction} from "@code0-tech/triangulum";
 import {DataTypeTypeInputComponent} from "@edition/datatype/components/inputs/datatype/DataTypeTypeInputComponent";
 import {
     FALLBACK_FLOW_TYPE_DESCRIPTION,

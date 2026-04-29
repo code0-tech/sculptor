@@ -6,7 +6,6 @@ import {DataTypeInputComponentProps} from "../DataTypeInputComponent";
 import {LiteralValue, NodeFunction, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
 import {NodeBadgeComponent} from "../../badges/NodeBadgeComponent";
 import {ReferenceBadgeComponent} from "../../badges/ReferenceBadgeComponent";
-import {useSuggestions} from "@edition/function/hooks/FunctionSuggestion.hook";
 import {
     Button,
     Card,

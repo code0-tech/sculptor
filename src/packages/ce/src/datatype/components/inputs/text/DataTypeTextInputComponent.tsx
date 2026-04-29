@@ -1,18 +1,14 @@
 import React from "react";
-import {ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
 import {NodeBadgeComponent} from "../../badges/NodeBadgeComponent";
 import {ReferenceBadgeComponent} from "../../badges/ReferenceBadgeComponent";
 import {DataTypeInputComponentProps} from "../DataTypeInputComponent";
 import {InputSyntaxSegment, MenuItem, Text, TextInput, useService} from "@code0-tech/pictor";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
-import {useSuggestions} from "@edition/function/hooks/FunctionSuggestion.hook";
 import {
     FunctionSuggestionMenuFooterComponent
 } from "@edition/function/components/suggestion/FunctionSuggestionMenuFooterComponent";
 import {toInputSuggestions} from "@edition/function/components/suggestion/FunctionSuggestionMenuComponent.util";
-import {FunctionSuggestion} from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
 
 export type DataTypeTextInputComponentProps = DataTypeInputComponentProps
 
@@ -101,13 +97,6 @@ export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProp
 
     const functionService = useService(FunctionService)
     const flowService = useService(FlowService)
-    const flowTypeService = useService(FlowTypeService)
-
-    const flow = React.useMemo(() => {
-        return flowService.getById(flowId)
-    }, [flowService, flowId])
-
-    const suggestions = rest.suggestions || useSuggestions(flowId, nodeId, parameterIndex)
 
     const transformSyntax = React.useCallback((value: string | null): InputSyntaxSegment[] => {
 
@@ -147,18 +136,15 @@ export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProp
             }
 
             if (value?.__typename === "NodeFunctionIdWrapper" || value?.__typename === "NodeFunction") {
-                const node = value?.__typename === "NodeFunction" ? value : flowService.getNodeById(flowId, value.id)
                 return buildBlockSegment(
-                    <NodeBadgeComponent value={value}
-                                        definition={functionService.getById(node?.functionDefinition.id)}/>,
+                    <NodeBadgeComponent value={value}/>,
                     value
                 )
             }
 
             if (value?.__typename === "ReferenceValue") {
-                const node = (value as ReferenceValue).nodeFunctionId === "gid://sagittarius/NodeFunction/-1" ? flowTypeService.getById(flow?.type?.id) : functionService.getById(flowService.getNodeById(flowId, (value as ReferenceValue).nodeFunctionId)?.functionDefinition?.id)
                 return buildBlockSegment(
-                    <ReferenceBadgeComponent definition={node} value={value}/>,
+                    <ReferenceBadgeComponent value={value}/>,
                     value
                 )
             }
@@ -177,7 +163,7 @@ export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProp
                       enforceUniqueSuggestions
                       validationUsesSyntax
                       transformSyntax={transformSyntax}
-                      suggestions={rest.suggestions ? rest.suggestions : toInputSuggestions(suggestions as FunctionSuggestion[])}
+                      suggestions={rest.suggestions ? rest.suggestions : toInputSuggestions([])}
                       {...rest}
 
     />

@@ -1,10 +1,4 @@
-import {
-    getFlowValidation,
-    getNodeSuggestions,
-    getReferenceSuggestions, getTypeFromValue,
-    getTypesFromNode, getTypeVariant, getValueFromType,
-    getValueSuggestions
-} from "@code0-tech/triangulum";
+import {getFlowValidation, getSignatureSchema, getTypeFromValue, getValueFromType} from "@code0-tech/triangulum";
 import {InspectionSeverity} from "../../../../core/src/util/inspection";
 
 const errorResult = (
@@ -22,7 +16,7 @@ const errorResult = (
 })
 
 addEventListener("message", (event) => {
-    const { id, action, payload } = event.data;
+    const {id, action, payload} = event.data;
     let result;
 
     try {
@@ -33,16 +27,16 @@ addEventListener("message", (event) => {
                         errorResult(diagnostic.nodeId, diagnostic.parameterIndex, diagnostic.message));
                 break;
             case 'value_suggestions':
-                result = getValueSuggestions(payload.type, payload.dataTypes);
+                result = [];
                 break;
             case 'reference_suggestions':
-                result = getReferenceSuggestions(payload.flow, payload.nodeId, payload.parameterIndex, payload.functions, payload.dataTypes);
+                result = [];
                 break;
             case 'node_suggestions':
-                result = getNodeSuggestions(payload.type, payload.functions, payload.dataTypes);
+                result = [];
                 break;
             case 'node_type_extraction':
-                result = getTypesFromNode(payload.node, payload.functions, payload.dataTypes);
+                result = {};
                 break;
             case 'type_extraction':
                 result = getTypeFromValue(payload.value, payload.dataTypes);
@@ -51,13 +45,16 @@ addEventListener("message", (event) => {
                 result = getValueFromType(payload.type, payload.dataTypes);
                 break;
             case 'type_variant':
-                result = getTypeVariant(payload.type, payload.dataTypes);
+                result = 0;
+                break;
+            case 'schema':
+                result = getSignatureSchema(payload.flow, payload.dataTypes, payload.functions, payload.nodeId);
                 break;
         }
 
-        postMessage({ id, data: result });
+        postMessage({id, data: result});
     } catch (error) {
-        postMessage({ id, error: error.message });
+        postMessage({id, error: error.message});
     }
 });
 
