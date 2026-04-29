@@ -5,7 +5,7 @@ import {NodeSchema} from "@code0-tech/triangulum";
 export interface FunctionNodeComponentProps extends Record<string, unknown>, Component<HTMLDivElement> {
     nodeId?: NodeFunction['id']
     flowId: Flow['id']
-    schema: NodeSchema
+    schema: NodeSchema[]
     color: string
     parentNodeId?: NodeFunction['id']
     isParameter?: boolean
