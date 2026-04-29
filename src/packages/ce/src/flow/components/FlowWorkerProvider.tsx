@@ -182,4 +182,4 @@ export const useValueExtractionAction = () =>
     useWorkerAction<any[], FlowWorkerValueExtractionPayload>("value_extraction");
 
 export const useSchemaAction = () =>
-    useWorkerAction<NodeSchema, FlowWorkerSchemaPayload>("schema");
+    useWorkerAction<NodeSchema[], FlowWorkerSchemaPayload>("schema");
