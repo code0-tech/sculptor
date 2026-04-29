@@ -93,10 +93,14 @@ export const splitTextAndObjects = (input: string) => {
 
 export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProps> = (props) => {
 
-    const {flowId, nodeId, parameterIndex, ...rest} = props
+    const {flowId, nodeId, parameterIndex, schema, ...rest} = props
 
     const functionService = useService(FunctionService)
     const flowService = useService(FlowService)
+
+    const suggestions = schema?.schema?.suggestions
+
+    console.log(suggestions)
 
     const transformSyntax = React.useCallback((value: string | null): InputSyntaxSegment[] => {
 
