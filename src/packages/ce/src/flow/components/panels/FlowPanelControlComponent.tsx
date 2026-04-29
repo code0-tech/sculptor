@@ -20,6 +20,7 @@ import {FunctionSuggestion} from "@edition/function/components/suggestion/Functi
 import {Suggestion} from "@edition/function/components/suggestion/Suggestion.util";
 import {useHotkeys} from "react-hotkeys-hook";
 import {useSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
+import {useFunctionSuggestions} from "@edition/function/hooks/Function.suggestion.hook";
 
 export interface FlowPanelControlComponentProps {
     flowId: Flow['id']
@@ -40,7 +41,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
     //memoized values
     const selectedNode = useSelectedFunctionNode()
 
-    const result = useNodeSuggestions(null)
+    const result = useFunctionSuggestions()
 
     //callbacks
     const deleteActiveNode = React.useCallback(() => {
@@ -54,7 +55,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
     const addNodeToFlow = React.useCallback((suggestion: FunctionSuggestion | Suggestion) => {
         if (flowId && suggestion.value.__typename === "NodeFunction" && selectedNode?.id.includes("NodeFunction")) {
             startTransition(async () => {
-                await flowService.addNextNodeById(flowId, selectedNode.id as NodeFunction['id'], suggestion.value as NodeFunction)
+                await flowService.addNextNodeById(flowId, selectedNode?.id as NodeFunction['id'], suggestion.value as NodeFunction)
             })
         } else if (suggestion.value.__typename === "NodeFunction") {
             startTransition(async () => {
