@@ -12,6 +12,7 @@ import {
     FALLBACK_FLOW_TYPE_SETTING_DESCRIPTION,
     FALLBACK_FLOW_TYPE_SETTING_NAME
 } from "@core/util/fallback-translations";
+import {useNodes} from "@xyflow/react";
 
 export interface FunctionFileTriggerComponentProps {
     instance: Flow
@@ -41,6 +42,8 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
         })
         return values
     }, [definition, instance])
+
+    const flowNode = useNodes().find(value => value.id == instance.id)
 
     const triggerValidation = React.useMemo(
         () => validation?.find(v => v.nodeId === null && v.parameterIndex === null),
@@ -126,6 +129,7 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
                                         nodeId={undefined}
                                         parameterIndex={index}
                                         title={title}
+                                        schema={flowNode?.data.schema}
                                         description={description}
                                         clearable
                                         onChange={() => {
