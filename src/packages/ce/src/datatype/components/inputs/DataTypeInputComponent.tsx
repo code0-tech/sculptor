@@ -14,7 +14,7 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
 
     const {schema, ...rest} = props
 
-    switch (schema.schema.input) {
+    switch (schema?.schema?.input) {
         case "data":
         case "list":
             return <DataTypeJSONInputComponent
