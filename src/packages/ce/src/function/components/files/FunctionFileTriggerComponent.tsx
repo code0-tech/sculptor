@@ -33,13 +33,8 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
         [flowTypeStore, instance]
     )
 
-    const flowInputType = getTypesFromFunction({signature: instance.signature}).returnType
-    const flowTypeInputType = getTypesFromFunction({signature: definition?.signature}).returnType
-
     const initialValues: Record<string | "inputType", any> = React.useMemo(() => {
-        const values: Record<string | "inputType", any> = {
-            "inputType": flowInputType || flowTypeInputType
-        }
+        const values: Record<string, any> = {}
         definition?.flowTypeSettings?.forEach((setting, index) => {
             const flowSetting = instance.settings?.nodes?.[index]
             values[setting.id!] = flowSetting?.value?.__typename === "LiteralValue" ? (flowSetting?.value.value) : (flowSetting?.value)
@@ -116,19 +111,6 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
         }
         <Spacing spacing={"xl"}/>
         <Text size={"md"}>Settings</Text>
-        <Spacing spacing={"xs"}/>
-        {
-
-            (flowInputType && flowInputType != "void") && (flowTypeInputType && flowTypeInputType != "void") ?
-                <DataTypeTypeInputComponent
-                    flowId={instance.id}
-                    title={"Input type"}
-                    description={"The type of the input that will be provided to the flow when it is triggered."}
-                    onChange={() => validate()}
-                    {...inputs.getInputProps("inputType")}
-                /> : null
-
-        }
         <Spacing spacing={"xl"}/>
         {definition?.flowTypeSettings?.map((settingDefinition, index) => {
 
