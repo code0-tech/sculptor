@@ -16,7 +16,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
 
     const flow = React.useMemo(
         () => flowService.getById(flowId, {namespaceId, projectId}),
-        [flowId, flowStore]
+        [flowId, flowStore, flowService]
     )
 
     const flowSchema = useFlowSchema(flowId, namespaceId, projectId)
@@ -24,7 +24,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
     return React.useMemo(() => {
         if (!flow) return []
         if (functionStore.length <= 0) return []
-        if ((flowSchema?.length ?? 0) <= 0) return []
+        if ((flowSchema?.some(s => !s))) return []
 
         const nodes: Node<FunctionNodeComponentProps>[] = [];
         const visited = new Set<string>();
@@ -42,7 +42,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                 flowId: flowId,
                 nodeId: undefined,
                 color: hashToColor(flowId!),
-                schema: flowSchema?.filter(nodeSchema => nodeSchema.some(schema => !schema.nodeId))?.flat()!
+                schema: flowSchema?.filter(nodeSchema => nodeSchema?.some(schema => !schema.nodeId))?.flat()!
             },
         });
 
@@ -70,7 +70,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                         flowId: flowId,
                         index: ++globalIndex,
                         color: hashToColor(nodeId),
-                        schema: flowSchema?.find(nodeSchema => nodeSchema?.nodeId == node.id)!
+                        schema: flowSchema?.filter(nodeSchema => nodeSchema?.some(schema => schema.nodeId === node.id))?.flat()!
                     },
                 });
             }
@@ -97,7 +97,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                             nodeId: nodeId,
                             flowId: flowId,
                             color: hashToColor(value?.id ?? ""),
-                            schema: flowSchema?.find(nodeSchema => nodeSchema?.nodeId == node.id)!
+                            schema: []
                         },
                     });
                 }
