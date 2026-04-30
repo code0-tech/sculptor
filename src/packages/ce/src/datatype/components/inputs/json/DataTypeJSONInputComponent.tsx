@@ -42,7 +42,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
     const flowStore = useStore(FlowService)
 
     const initialNullValue = useValue(flowId, nodeId, parameterIndex)
-    const suggestions = useSuggestions(flowId, nodeId, parameterIndex)
+    const suggestions = []
     const [editDialogOpen, setEditDialogOpen] = React.useState(false)
     const [editEntry, setEditEntry] = React.useState<EditableJSONEntry | null>(null)
     const [collapsedState, setCollapsedStateRaw] = React.useState<Record<string, boolean>>({})
