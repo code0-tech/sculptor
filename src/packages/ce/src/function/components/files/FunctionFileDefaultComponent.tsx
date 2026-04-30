@@ -16,6 +16,7 @@ import {
     FALLBACK_FUNCTION_PARAMETER_DESCRIPTION,
     FALLBACK_FUNCTION_PARAMETER_NAME
 } from "@core/util/fallback-translations";
+import {useNodes} from "@xyflow/react";
 
 export interface FunctionFileDefaultComponentProps {
     node: NodeFunction
@@ -43,6 +44,8 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
         })
         return values
     }, [node, definition])
+
+    const flowNode = useNodes().find(value => value.id == node.id)
 
     const nodeValidation = React.useMemo(
         () => validation?.find(v => v.nodeId === node.id && v.parameterIndex === null),
@@ -143,12 +146,9 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
             return <div>
                 {/*@ts-ignore*/}
                 <DataTypeInputComponent data-qa-selector={"flow-builder-parameter"}
-                                        flowId={flowId}
-                                        nodeId={node.id}
-                                        parameterIndex={index}
                                         title={title}
+                                        schema={flowNode?.data?.schema?.[index]}
                                         description={description}
-                                        schema={{}}
                                         clearable
                                         onChange={() => {
                                             //TODO this should be debounced

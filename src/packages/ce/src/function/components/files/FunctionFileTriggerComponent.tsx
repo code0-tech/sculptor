@@ -99,8 +99,6 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
         validate()
     }, [validation])
 
-    console.log(flowNode)
-
     return <>
         <Text size={"md"}>{definition?.names?.[0]?.content ?? FALLBACK_FLOW_TYPE_NAME}</Text>
         <Spacing spacing={"xs"}/>

@@ -174,6 +174,8 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
                         nodes?.map(node => {
                             return <FileTabsContent data-qa-selector={"flow-builder-file-content"}
                                                     value={node?.id!}
+                                                    forceMount={true}
+                                                    style={{display: activeTab == node.id ? "block" : "none"}}
                                                     key={node?.id!}>
                                 <FunctionFileDefaultComponent node={node!} flowId={flowId}/>
                             </FileTabsContent>
