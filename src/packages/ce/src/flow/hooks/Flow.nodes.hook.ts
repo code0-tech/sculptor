@@ -118,5 +118,5 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
         }
 
         return nodes;
-    }, [flow, flowStore, functionStore, flowSchema]);
+    }, [flow?.id, functionStore?.lenght, flowSchema?.length]);
 };

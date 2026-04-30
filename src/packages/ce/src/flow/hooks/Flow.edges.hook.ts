@@ -132,5 +132,5 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
         }
 
         return edges
-    }, [flow, flowStore, functionStore]);
+    }, [functionStore?.lenght]);
 };
