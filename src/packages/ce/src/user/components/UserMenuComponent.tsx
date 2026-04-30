@@ -3,7 +3,7 @@
 import React from "react"
 import {Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {
-    Avatar,
+    Avatar, Button,
     Flex,
     Menu,
     MenuContent,
@@ -29,19 +29,21 @@ const UserMenuComponent: React.FC<UserMenuComponentProps> = props => {
         return (
             <Menu {...props}>
                 <MenuTrigger asChild>
-                    <Flex align={"center"} style={{gap: ".5rem"}}>
-                        <Avatar src={currentUser?.avatarPath ?? ""} type={"character"}
-                                identifier={currentUser?.username ?? ""}/>
-                        <Flex style={{flexDirection: "column"}}>
-                            <Text size={"md"} hierarchy={"secondary"}>
-                                {currentUser?.username}
-                            </Text>
-                            <Text size={"xs"} hierarchy={"tertiary"}>
-                                {currentUser?.email}
-                            </Text>
-                        </Flex>
+                    <Button p={0.35} pr={0.7}  color={"secondary"} variant={"none"} style={{textAlign: "unset"}}>
+                        <Flex align={"center"} style={{gap: ".5rem"}}>
+                            <Avatar src={currentUser?.avatarPath ?? ""} type={"character"}
+                                    identifier={currentUser?.username ?? ""}/>
+                            <Flex style={{flexDirection: "column"}}>
+                                <Text size={"md"} hierarchy={"secondary"}>
+                                    {currentUser?.username}
+                                </Text>
+                                <Text size={"xs"} hierarchy={"tertiary"}>
+                                    {currentUser?.email}
+                                </Text>
+                            </Flex>
 
-                    </Flex>
+                        </Flex>
+                    </Button>
                 </MenuTrigger>
                 <MenuPortal>
                     <MenuContent side={"bottom"} align={"start"} sideOffset={8}>
