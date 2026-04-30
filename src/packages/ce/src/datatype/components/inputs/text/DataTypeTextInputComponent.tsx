@@ -98,10 +98,6 @@ export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProp
     const functionService = useService(FunctionService)
     const flowService = useService(FlowService)
 
-    const suggestions = schema?.schema?.suggestions
-
-    console.log(suggestions)
-
     const transformSyntax = React.useCallback((value: string | null): InputSyntaxSegment[] => {
 
         const textValue = (value === null || value === undefined ? value : String(value ?? ""))!
@@ -167,7 +163,6 @@ export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProp
                       enforceUniqueSuggestions
                       validationUsesSyntax
                       transformSyntax={transformSyntax}
-                      suggestions={rest.suggestions ? rest.suggestions : toInputSuggestions(suggestions)}
                       {...rest}
 
     />
