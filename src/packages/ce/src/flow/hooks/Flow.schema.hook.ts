@@ -39,6 +39,8 @@ export const useFlowSchema = (
 
     React.useEffect(() => {
         if (!flow) return
+        if (dataTypes.length <= 0) return
+        if (functions.length <= 0) return
 
         const triggerSchema = execute({
             flow,
@@ -61,5 +63,5 @@ export const useFlowSchema = (
 
     }, [functions, dataTypes, flow])
 
-    return schema
+    return React.useMemo(() => schema, [])
 }
