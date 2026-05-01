@@ -1,6 +1,6 @@
 import {Node} from "@xyflow/react";
 import type {Flow, Namespace, NamespaceProject, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
-import React from "react";
+import React, {useState} from "react";
 import {hashToColor, useService, useStore} from "@code0-tech/pictor";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
@@ -14,26 +14,26 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
     const functionService = useService(FunctionService)
     const functionStore = useStore(FunctionService)
 
+    const [nodes, setNodes] = useState<Node<FunctionNodeComponentProps>[]>([])
+
     const flow = React.useMemo(
         () => flowService.getById(flowId, {namespaceId, projectId}),
-        [flowId, flowStore, flowService]
+        [flowId, flowStore.length, flowService]
     )
 
     const flowSchema = useFlowSchema(flowId, namespaceId, projectId)
 
-    return React.useMemo(() => {
-        if (!flow) return []
-        if (functionStore.length <= 0) return []
-        if ((flowSchema?.some(s => !s))) return []
+    React.useEffect(() => {
+        if (!flow) return
+        if (functionStore.length <= 0) return
 
-        const nodes: Node<FunctionNodeComponentProps>[] = [];
         const visited = new Set<string>();
 
         let groupCounter = 0;
         let globalIndex = 0;
 
         // Trigger node (ID == flow.id -> edge compatible)
-        nodes.push({
+        setNodes(prevState => [{
             id: `${flow.id}`,
             type: "trigger",
             position: {x: 0, y: 0},
@@ -44,13 +44,13 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                 color: hashToColor(flowId!),
                 schema: flowSchema?.filter(nodeSchema => nodeSchema?.some(schema => !schema.nodeId))?.flat()!
             },
-        });
+        }])
 
         const traverse = (
             node: NodeFunction,
             parentGroup?: string
         ) => {
-            if (!node?.id) return;
+            if (!node?.id) return
 
             const functionDefinition = functionService.getById(node.functionDefinition?.id)
             const nodeId = node.id;
@@ -58,7 +58,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
             if (!visited.has(nodeId)) {
                 visited.add(nodeId);
 
-                nodes.push({
+                setNodes(prevState => [...prevState, {
                     id: nodeId,
                     type: functionDefinition && "design" in functionDefinition ? functionDefinition?.design as string : "default",
                     position: {x: 0, y: 0},
@@ -72,7 +72,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                         color: hashToColor(nodeId),
                         schema: flowSchema?.filter(nodeSchema => nodeSchema?.some(schema => schema.nodeId === node.id))?.flat()!
                     },
-                });
+                }])
             }
 
             node.parameters?.nodes?.forEach((param) => {
@@ -84,7 +84,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                 if (!visited.has(groupId)) {
                     visited.add(groupId);
 
-                    nodes.push({
+                    setNodes(prevState => [...prevState, {
                         id: groupId,
                         type: "group",
                         position: {x: 0, y: 0},
@@ -99,7 +99,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                             color: hashToColor(value?.id ?? ""),
                             schema: []
                         },
-                    });
+                    }])
                 }
 
                 const child = flowService.getNodeById(flowId, value.id);
@@ -116,7 +116,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
             const start = flowService.getNodeById(flow.id, flow.startingNodeId);
             if (start) traverse(start);
         }
+    }, [flowStore, functionStore.length, flowSchema?.length]);
 
-        return nodes;
-    }, [flow?.id, functionStore?.lenght, flowSchema?.length]);
+    return nodes
 };
