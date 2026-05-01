@@ -61,7 +61,7 @@ export const useFlowSchema = (
             setSchema(value as NodeSchema[][])
         })
 
-    }, [functions.length, dataTypes.length])
+    }, [functions.length, dataTypes.length, flowStore])
 
-    return React.useMemo(() => schema, [])
+    return schema
 }
