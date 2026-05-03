@@ -17,6 +17,7 @@ import {
     FALLBACK_FUNCTION_PARAMETER_NAME
 } from "@core/util/fallback-translations";
 import {useNodes} from "@xyflow/react";
+import {NodeSchema} from "@code0-tech/triangulum";
 
 export interface FunctionFileDefaultComponentProps {
     node: NodeFunction
@@ -72,10 +73,10 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                 const parameterIndex = definition?.parameterDefinitions?.nodes?.findIndex(p => p?.id === parameterDefinition?.id)
                 if (typeof parameterIndex !== "number") return
                 if (!changedParameters.current.has(parameterIndex)) continue;
-                const nodeParameter = node.parameters?.nodes?.[parameterIndex]
                 const value = values[parameterDefinition!.id!]
-                const previousValue = nodeParameter?.value as NodeParameterValue
                 const syntaxValue = (value?.[0]?.type == "block" || value?.[0]?.type == "text" ? value?.[0]?.value : value) ?? null as NodeFunction | LiteralValue | ReferenceValue | null
+
+                console.log(syntaxValue)
 
                 if (!syntaxValue || !value || (Array.isArray(syntaxValue) && Array.from(syntaxValue).length <= 0)) {
                     await flowService.setParameterValue(flowId, node.id!!, parameterIndex, undefined, definition);
@@ -147,7 +148,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                 {/*@ts-ignore*/}
                 <DataTypeInputComponent data-qa-selector={"flow-builder-parameter"}
                                         title={title}
-                                        schema={flowNode?.data?.schema?.[index]}
+                                        schema={(flowNode?.data?.schema as NodeSchema[])?.[index]}
                                         description={description}
                                         clearable
                                         onChange={() => {
