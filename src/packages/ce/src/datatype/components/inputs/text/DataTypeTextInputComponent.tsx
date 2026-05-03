@@ -8,7 +8,6 @@ import {FlowService} from "@edition/flow/services/Flow.service";
 import {
     FunctionSuggestionMenuFooterComponent
 } from "@edition/function/components/suggestion/FunctionSuggestionMenuFooterComponent";
-import {toInputSuggestions} from "@edition/function/components/suggestion/FunctionSuggestionMenuComponent.util";
 
 export type DataTypeTextInputComponentProps = DataTypeInputComponentProps
 
@@ -93,7 +92,7 @@ export const splitTextAndObjects = (input: string) => {
 
 export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProps> = (props) => {
 
-    const {flowId, nodeId, parameterIndex, schema, ...rest} = props
+    const {schema, ...rest} = props
 
     const functionService = useService(FunctionService)
     const flowService = useService(FlowService)
