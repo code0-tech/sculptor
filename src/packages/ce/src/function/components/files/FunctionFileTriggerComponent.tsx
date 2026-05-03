@@ -12,6 +12,7 @@ import {
     FALLBACK_FLOW_TYPE_SETTING_NAME
 } from "@core/util/fallback-translations";
 import {useNodes} from "@xyflow/react";
+import {NodeSchema} from "@code0-tech/triangulum";
 
 export interface FunctionFileTriggerComponentProps {
     instance: Flow
@@ -125,7 +126,7 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
                 {/*@ts-ignore*/}
                 <DataTypeInputComponent data-qa-selector={"flow-builder-setting"}
                                         title={title}
-                                        schema={flowNode?.data?.schema?.[index]}
+                                        schema={(flowNode?.data?.schema as NodeSchema[])?.[index]}
                                         description={description}
                                         clearable
                                         onChange={() => {
