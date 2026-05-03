@@ -26,6 +26,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
     React.useEffect(() => {
         if (!flow) return
         if (functionStore.length <= 0) return
+        if ((flowSchema?.length ?? 0) < (flow.nodes?.nodes?.length ?? 1)) return;
 
         const visited = new Set<string>();
 
@@ -33,7 +34,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
         let globalIndex = 0;
 
         // Trigger node (ID == flow.id -> edge compatible)
-        setNodes(prevState => [{
+        setNodes(() => [{
             id: `${flow.id}`,
             type: "trigger",
             position: {x: 0, y: 0},
@@ -116,7 +117,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
             const start = flowService.getNodeById(flow.id, flow.startingNodeId);
             if (start) traverse(start);
         }
-    }, [flowStore, functionStore.length, flowSchema?.length]);
+    }, [flowStore, flow?.editedAt, functionStore.length, flowSchema]);
 
     return nodes
 };
