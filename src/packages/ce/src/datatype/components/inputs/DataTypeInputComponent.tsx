@@ -10,6 +10,7 @@ import {
 } from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
 import {toInputSuggestions} from "@edition/function/components/suggestion/FunctionSuggestionMenuComponent.util";
 import {FALLBACK_FUNCTION_NAME} from "@core/util/fallback-translations";
+import {DataTypeBooleanInputComponent} from "@edition/datatype/components/inputs/boolean/DataTypeBooleanInputComponent";
 
 export interface DataTypeInputComponentProps extends Omit<InputProps<any | null>, "wrapperComponent"> {
     schema: NodeSchema
@@ -27,7 +28,7 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
         return {
             type: suggest.__typename === "NodeFunction" ? FunctionSuggestionType.FUNCTION : suggest.__typename === "ReferenceValue" ? FunctionSuggestionType.REF_OBJECT : FunctionSuggestionType.VALUE,
             value: suggest,
-            displayText: suggest.__typename === "NodeFunction" ? suggest.functionDefinition?.names?.[0]?.content ?? FALLBACK_FUNCTION_NAME : suggest?.value,
+            displayText: suggest.__typename === "NodeFunction" ? suggest.functionDefinition?.names?.[0]?.content ?? FALLBACK_FUNCTION_NAME : suggest.__typename === "LiteralValue" ? suggest?.value : "",
             path: []
         }
 
@@ -37,6 +38,13 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
         case "data":
         case "list":
             return <DataTypeJSONInputComponent
+                schema={schema}
+                suggestions={toInputSuggestions(functionSuggestions)}
+                {...rest}
+            />
+        case "boolean":
+        case "select":
+            return <DataTypeBooleanInputComponent
                 schema={schema}
                 suggestions={toInputSuggestions(functionSuggestions)}
                 {...rest}
