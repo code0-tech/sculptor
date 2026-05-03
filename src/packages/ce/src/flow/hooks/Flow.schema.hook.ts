@@ -61,7 +61,7 @@ export const useFlowSchema = (
             setSchema(value as NodeSchema[][])
         })
 
-    }, [functions.length, dataTypes.length, flowStore])
+    }, [functions.length, dataTypes.length, flowStore, flow?.editedAt, flow?.nodes?.nodes?.length])
 
     return schema
 }
