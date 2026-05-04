@@ -1,6 +1,6 @@
 import {DataTypeInputComponentProps} from "@edition/datatype/components/inputs/DataTypeInputComponent";
 import React from "react";
-import {useDebounce} from "use-debounce";
+import {useDebounce, useDebouncedCallback} from "use-debounce";
 import {
     Button,
     Flex,
@@ -17,8 +17,7 @@ import {
 } from "@code0-tech/pictor";
 import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeComponent";
 import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
-import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
-import {IconChevronDown, IconVariable, IconX} from "@tabler/icons-react";
+import {IconChevronDown, IconX} from "@tabler/icons-react";
 
 
 export type DataTypeSelectInputComponentProps = DataTypeInputComponentProps
@@ -28,11 +27,9 @@ export const DataTypeSelectInputComponent: React.FC<DataTypeSelectInputComponent
     const {formValidation, title, initialValue, description, suggestions, onChange} = props
 
     const defaultValue = React.useMemo(() => initialValue, [])
-    const [value, setValue] = useDebounce(defaultValue, 200)
-
-    React.useEffect(() => {
+    const onChangeDebounced = useDebouncedCallback(() => {
         onChange?.({} as any)
-    }, [value])
+    }, 200)
 
     return React.useMemo(() => <>
         <InputLabel>{title}</InputLabel>
@@ -42,10 +39,7 @@ export const DataTypeSelectInputComponent: React.FC<DataTypeSelectInputComponent
         ) : initialValue?.__typename === "ReferenceValue" ? (
             <ReferenceBadgeComponent value={initialValue}/>
         ) : (
-            <SelectInput value={value} formValidation={formValidation} maw={"100%"} onValueChange={(value) => {
-                formValidation?.setValue(value);
-                setValue(value ?? "")
-            }} placeholder={"sd"} right={
+            <SelectInput defaultValue={defaultValue} formValidation={formValidation} maw={"100%"} onValueChange={onChangeDebounced} placeholder={"sd"} right={
                 <Button color={"primary"} paddingSize={"xxs"}>
                     <IconX size={13}/>
                 </Button>
