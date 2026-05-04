@@ -7,7 +7,7 @@ import {StreamLanguage} from "@codemirror/language";
 import {tags} from "@lezer/highlight";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import {IconVariable, IconX} from "@tabler/icons-react";
-import {useDebounce} from "use-debounce";
+import {useDebounce, useDebouncedCallback} from "use-debounce";
 
 export type DataTypeTextInputComponentProps = DataTypeInputComponentProps
 
@@ -15,12 +15,10 @@ export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProp
 
     const {formValidation, title, initialValue, description, suggestions, onChange} = props
 
-    const defaultValue = React.useMemo(() => initialValue, [])
-    const [value, setValue] = useDebounce(defaultValue, 200)
-
-    React.useEffect(() => {
+    const defaultValue = React.useMemo(() => initialValue ?? "", [])
+    const onChangeDebounced = useDebouncedCallback(() => {
         onChange?.({} as any)
-    }, [value])
+    }, 200)
 
     return React.useMemo(() => <>
         <InputLabel>{title}</InputLabel>
@@ -30,10 +28,7 @@ export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProp
         ) : initialValue?.__typename === "ReferenceValue" ? (
             <ReferenceBadgeComponent value={initialValue}/>
         ) : (
-            <EditorInput value={String(value)} formValidation={formValidation} maw={"100%"} onChange={(value) => {
-                formValidation?.setValue(value);
-                setValue(value ?? "")
-            }} placeholder={"sd"} language={StreamLanguage.define({
+            <EditorInput value={String(defaultValue)} onChange={onChangeDebounced} formValidation={formValidation} maw={"100%"} placeholder={"sd"} language={StreamLanguage.define({
                 token(stream) {
                     stream.next()
                     return null;
