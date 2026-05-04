@@ -37,11 +37,11 @@ export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProp
                 {tag: tags.keyword, color: hashToColor("bracket")},
             ]} right={
                 (suggestions?.length ?? 0) > 0 ? (
-                    <ButtonGroup bg={"transparent"}>
-                        <Button color={"primary"} paddingSize={"xxs"}>
+                    <ButtonGroup color={"primary"}>
+                        <Button paddingSize={"xxs"}>
                             <IconVariable size={13}/>
                         </Button>
-                        <Button color={"primary"} paddingSize={"xxs"}>
+                        <Button paddingSize={"xxs"}>
                             <IconX size={13}/>
                         </Button>
                     </ButtonGroup>
