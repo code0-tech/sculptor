@@ -11,6 +11,7 @@ import {
 import {toInputSuggestions} from "@edition/function/components/suggestion/FunctionSuggestionMenuComponent.util";
 import {FALLBACK_FUNCTION_NAME} from "@core/util/fallback-translations";
 import {DataTypeBooleanInputComponent} from "@edition/datatype/components/inputs/boolean/DataTypeBooleanInputComponent";
+import {DataTypeSelectInputComponent} from "@edition/datatype/components/inputs/select/DataTypeSelectInputComponent";
 
 export interface DataTypeInputComponentProps extends Omit<InputProps<any | null>, "wrapperComponent"> {
     schema: NodeSchema
@@ -43,12 +44,16 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
                 {...rest}
             />
         case "boolean":
-        case "select":
             return <DataTypeBooleanInputComponent
                 schema={schema}
                 suggestions={toInputSuggestions(functionSuggestions)}
                 {...rest}
             />
+        case "select":
+            return <DataTypeSelectInputComponent
+                schema={schema}
+                suggestions={toInputSuggestions(functionSuggestions)}
+                {...rest}/>
         default:
             return <DataTypeTextInputComponent
                 suggestions={toInputSuggestions(functionSuggestions)}

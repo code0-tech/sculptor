@@ -19,3 +19,7 @@ a {
     text-decoration: underline;
   }
 }
+
+.scroll-area__viewport > div {
+  display: block !important;
+}
