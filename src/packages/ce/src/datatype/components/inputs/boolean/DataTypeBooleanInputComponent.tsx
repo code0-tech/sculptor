@@ -6,6 +6,7 @@ import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/Refer
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import {IconVariable, IconX} from "@tabler/icons-react";
 import {InputWrapper} from "@code0-tech/pictor/dist/components/form/InputWrapper";
+import {useDebouncedCallback} from "use-debounce";
 
 export type DataTypeBooleanInputComponentProps = DataTypeInputComponentProps
 
@@ -13,7 +14,14 @@ export const DataTypeBooleanInputComponent: React.FC<DataTypeBooleanInputCompone
 
     const {suggestions, initialValue, title, description, formValidation, onChange} = props
 
-    return <>
+    const defaultValue = React.useMemo(() => typeof initialValue === "boolean" ? (initialValue ? "true" : "false") : undefined , [])
+    const onChangeDebounced = useDebouncedCallback(() => {
+        onChange?.({} as any)
+    }, 200)
+
+    console.log("booldefault", defaultValue)
+
+    return React.useMemo(() => <>
         <InputLabel>{title}</InputLabel>
         <InputDescription>{description}</InputDescription>
         <InputWrapper formValidation={formValidation} right={
@@ -42,9 +50,10 @@ export const DataTypeBooleanInputComponent: React.FC<DataTypeBooleanInputCompone
                                       h={"100%"}
                                       bg={"transparent"}
                                       style={{boxShadow: "none"}}
+                                      defaultValue={defaultValue}
                                       onValueChange={(value) => {
-                                          formValidation?.setValue(value === "true" ? "true" : (value == "false") ? "false" : undefined)
-                                          onChange?.({} as any)
+                                          formValidation?.setValue(value)
+                                          onChangeDebounced()
                                       }}>
                         <SegmentedControlItem w={"100%"} value={"true"}>
                             True
@@ -56,6 +65,6 @@ export const DataTypeBooleanInputComponent: React.FC<DataTypeBooleanInputCompone
                 </div>
             )}
         </InputWrapper>
-    </>
+    </>, [formValidation])
 
 }
