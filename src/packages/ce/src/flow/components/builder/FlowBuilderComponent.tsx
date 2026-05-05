@@ -6,7 +6,8 @@ import {
     ReactFlow,
     useEdgesState,
     useNodesState,
-    useReactFlow, useUpdateNodeInternals,
+    useReactFlow,
+    useUpdateNodeInternals,
     ViewportPortal
 } from "@xyflow/react";
 import React from "react";
@@ -674,28 +675,28 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
             return layouted.nodes as Node[];
         })
 
+
         revalidateHandles(changedIds)
     }, [revalidateHandles])
 
     React.useEffect(() => {
-        const localNodes = initialNodes.map(value => {
-            const nodeEls = !value.measured ? document.querySelectorAll("[data-id='" + value.id + "']") : [];
-            return {
-                ...value,
-                measured: {
-                    width: value.measured?.width ?? (nodeEls[0] as any)?.clientWidth ?? 0,
-                    height: value.measured?.height ?? (nodeEls[0] as any)?.clientHeight ?? 0,
+        const layouted = getCachedLayoutElements(initialNodes, new Set(initialNodes.map(n => n.id)))
+        setNodes(prevState => {
+            return initialNodes.map((n, i) => {
+                if (prevState[i]) {
+                    return {
+                        ...prevState[i],
+                        data: initialNodes[i].data
+                    }
                 }
-            } as unknown as Node
+                return n
+            })
         })
-
-        const layouted = getCachedLayoutElements(localNodes, new Set(localNodes.map(n => n.id)))
-        setNodes(layouted.nodes as Node[])
         setEdges(initialEdges as Edge[])
 
         revalidateHandles((layouted.nodes as Node[]).map(n => n.id))
 
-    }, [initialNodes.length, initialEdges.length, revalidateHandles])
+    }, [initialNodes, initialEdges.length, revalidateHandles])
 
     React.useEffect(() => {
         if (didFitViewRef.current) return
@@ -711,7 +712,7 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
                         maxZoom: 1
                     })
                     setShowTree(true)
-                }, 1000)
+                }, 0)
             })
         })
     }, [nodes, didFitViewRef])
@@ -727,20 +728,12 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
             data-tree-visibility={showTree}
             proOptions={{hideAttribution: true}}
             onNodeClick={(_, clickedNode) => {
-
-                const node = getInternalNode(clickedNode.id);
-
-                if (node && node.measured.width && node.measured.height) {
-                    const centerX = node.internals.positionAbsolute.x + node.measured.width / 2;
-                    const centerY = node.internals.positionAbsolute.y + node.measured.height / 2;
-
-                    const currentZoom = getZoom();
-
-                    setCenter(centerX, centerY, {
-                        zoom: Math.max(currentZoom, 1),
-                        duration: 250,
-                    }).then();
-                }
+                fitView({
+                    nodes: [{id: clickedNode.id}],
+                    duration: 250,
+                    maxZoom: getZoom(),
+                    minZoom: 1,
+                });
             }}
             nodes={nodes}
             edges={edges}
