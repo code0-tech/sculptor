@@ -9,6 +9,7 @@ import {useFlowValidationAction} from "@edition/flow/components/FlowWorkerProvid
 
 const globalPendingValidations = new Map<string, Promise<ValidationResult[]>>()
 
+//TODO: use context
 export const useFlowValidation = (
     flowId: Flow['id']
 ): ValidationResult[] | null => {
@@ -32,16 +33,16 @@ export const useFlowValidation = (
 
     React.useEffect(() => {
         if (!flow) return;
+        const key = flowId as string;
+
+        if (globalPendingValidations.has(key)) {
+            globalPendingValidations.get(key)!.then(value => {
+                setValidationResult(value as ValidationResult[])
+            });
+            return;
+        }
 
         const timeout = setTimeout(() => {
-            const key = flowId as string;
-
-            if (globalPendingValidations.has(key)) {
-                globalPendingValidations.get(key)!.then(value => {
-                    setValidationResult(value as ValidationResult[])
-                });
-                return;
-            }
 
             const promise = execute({
                 flow,
@@ -59,5 +60,5 @@ export const useFlowValidation = (
         return () => clearTimeout(timeout);
     }, [flow?.editedAt, functions.length, dataTypes.length])
 
-    return validationResult
+    return React.useMemo(() => validationResult, [validationResult])
 }
