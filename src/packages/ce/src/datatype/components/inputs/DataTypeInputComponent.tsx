@@ -16,7 +16,7 @@ import {InputWrapperProps} from "@code0-tech/pictor/dist/components/form/InputWr
 export interface DataTypeInputComponentProps extends Omit<InputWrapperProps<NodeParameterValue | NodeFunction>, "wrapperComponent"> {
     schema: NodeSchema
     clearable?: boolean
-    suggestions?: any[]
+    suggestions?: (NodeFunction | ReferenceValue | LiteralValue)[]
     onClear?: (event: React.MouseEvent<HTMLButtonElement>) => void
 }
 
@@ -25,39 +25,29 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
     const {schema, ...rest} = props
 
     const suggestions = schema?.schema?.suggestions as (NodeFunction | ReferenceValue | LiteralValue)[]
-    const functionSuggestions: FunctionSuggestion[] = suggestions?.map((suggest: (NodeFunction | ReferenceValue | LiteralValue)) => {
-
-        return {
-            type: suggest.__typename === "NodeFunction" ? FunctionSuggestionType.FUNCTION : suggest.__typename === "ReferenceValue" ? FunctionSuggestionType.REF_OBJECT : FunctionSuggestionType.VALUE,
-            value: suggest,
-            displayText: suggest.__typename === "NodeFunction" ? suggest.functionDefinition?.names?.[0]?.content ?? FALLBACK_FUNCTION_NAME : suggest.__typename === "LiteralValue" ? suggest?.value : "",
-            path: []
-        }
-
-    }) ?? []
 
     switch (schema?.schema?.input) {
         case "data":
         case "list":
             return <DataTypeJSONInputComponent
                 schema={schema}
-                suggestions={toInputSuggestions(functionSuggestions)}
+                suggestions={suggestions}
                 {...rest}
             />
         case "boolean":
             return <DataTypeBooleanInputComponent
                 schema={schema}
-                suggestions={toInputSuggestions(functionSuggestions)}
+                suggestions={suggestions}
                 {...rest}
             />
         case "select":
             return <DataTypeSelectInputComponent
                 schema={schema}
-                suggestions={toInputSuggestions(functionSuggestions)}
+                suggestions={suggestions}
                 {...rest}/>
         default:
             return <DataTypeTextInputComponent
-                suggestions={toInputSuggestions(functionSuggestions)}
+                suggestions={suggestions}
                 schema={schema}
                 {...rest}
             />
