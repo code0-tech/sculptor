@@ -223,7 +223,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                                             const DisplayIcon = icon(flowType?.displayIcon as IconString)
 
                                             return <MenuItem data-qa-selector={"flow-create-trigger-select-item"} key={flowType.id} onSelect={() => {
-                                                inputs.getInputProps("flowTypeId").formValidation?.setValue(flowType.id)
+                                                inputs.getInputProps("flowTypeId").formValidation?.setValue?.(flowType.id)
                                                 setSelectedFlowTypeId(flowType.id)
                                             }}>
                                                 <DisplayIcon size={16}/>
