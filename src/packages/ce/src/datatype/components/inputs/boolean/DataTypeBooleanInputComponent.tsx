@@ -15,16 +15,16 @@ export const DataTypeBooleanInputComponent: React.FC<DataTypeBooleanInputCompone
 
     const {suggestions, initialValue, title, description, formValidation, onChange} = props
 
-    const defaultValue = React.useMemo(() => initialValue, [])
-    const onChangeDebounced = useDebouncedCallback((value: string) => {
-        formValidation?.setValue?.({
+    const defaultValue = React.useMemo(() => initialValue, [initialValue])
+    const onChangeDebounced = useDebouncedCallback((value: string | undefined) => {
+
+        const boolValue: LiteralValue | undefined = value && ["true", "false"].includes(value) ? {
             __typename: "LiteralValue",
-            value: value === "true" ? true : value === "false" ? false : undefined
-        })
-        onChange?.({
-            __typename: "LiteralValue",
-            value: value === "true" ? true : value === "false" ? false : undefined
-        })
+            value: value === "true"
+        } : undefined
+
+        formValidation?.setValue?.(boolValue)
+        onChange?.(boolValue)
     }, 200)
 
     return React.useMemo(() => <>
@@ -36,12 +36,16 @@ export const DataTypeBooleanInputComponent: React.FC<DataTypeBooleanInputCompone
                     <Button paddingSize={"xxs"}>
                         <IconVariable size={13}/>
                     </Button>
-                    <Button paddingSize={"xxs"}>
+                    <Button paddingSize={"xxs"} onClick={() => {
+                        onChangeDebounced(undefined)
+                    }}>
                         <IconX size={13}/>
                     </Button>
                 </ButtonGroup>
             ) : (
-                <Button color={"primary"} paddingSize={"xxs"}>
+                <Button color={"primary"} paddingSize={"xxs"} onClick={() => {
+                    onChangeDebounced(undefined)
+                }}>
                     <IconX size={13}/>
                 </Button>
             )
@@ -68,6 +72,6 @@ export const DataTypeBooleanInputComponent: React.FC<DataTypeBooleanInputCompone
                 </div>
             )}
         </InputWrapper>
-    </>, [formValidation])
+    </>, [formValidation, defaultValue])
 
 }

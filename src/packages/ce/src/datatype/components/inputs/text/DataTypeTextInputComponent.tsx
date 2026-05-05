@@ -16,8 +16,8 @@ export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProp
 
     const {formValidation, title, initialValue, description, suggestions, onChange} = props
 
-    const defaultValue: NodeParameterValue | NodeFunction | undefined = React.useMemo(() => initialValue ?? undefined, [])
-    const onChangeDebounced = useDebouncedCallback((value: string) => {
+    const defaultValue: NodeParameterValue | NodeFunction | undefined = React.useMemo(() => initialValue ?? undefined, [initialValue])
+    const onChangeDebounced = useDebouncedCallback((value: string | undefined) => {
         formValidation?.setValue?.(value ? {__typename: "LiteralValue", value: value} : undefined)
         onChange?.(value ? {__typename: "LiteralValue", value: value} : undefined)
     }, 200)
@@ -50,17 +50,21 @@ export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProp
                                      <Button paddingSize={"xxs"}>
                                          <IconVariable size={13}/>
                                      </Button>
-                                     <Button paddingSize={"xxs"}>
+                                     <Button paddingSize={"xxs"} onClick={() => {
+                                         onChangeDebounced(undefined)
+                                     }}>
                                          <IconX size={13}/>
                                      </Button>
                                  </ButtonGroup>
                              ) : (
-                                 <Button color={"primary"} paddingSize={"xxs"}>
+                                 <Button color={"primary"} paddingSize={"xxs"} onClick={() => {
+                                     onChangeDebounced(undefined)
+                                 }}>
                                      <IconX size={13}/>
                                  </Button>
                              )
                          }
                          rightType={"action"}/>
         )}
-    </>, [formValidation])
+    </>, [formValidation, defaultValue])
 }

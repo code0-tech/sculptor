@@ -23,13 +23,14 @@ import lodash from "lodash"
 
 export type DataTypeSelectInputComponentProps = DataTypeInputComponentProps
 
+
 export const DataTypeSelectInputComponent: React.FC<DataTypeSelectInputComponentProps> = (props) => {
 
     const {formValidation, title, initialValue, description, suggestions, onChange} = props
 
-    const defaultValue = React.useMemo(() => suggestions?.findIndex(suggest => {
-        return initialValue && lodash.isMatch(suggest, initialValue)
-    }), [suggestions])
+    const defaultValue: number = React.useMemo(() => suggestions?.findIndex(suggest => {
+        return initialValue && lodash.isMatch(initialValue, suggest)
+    }), [suggestions])!
 
     const onChangeDebounced = useDebouncedCallback((value: string | undefined) => {
         formValidation?.setValue?.(suggestions?.[Number(value)] ?? undefined)
@@ -39,7 +40,7 @@ export const DataTypeSelectInputComponent: React.FC<DataTypeSelectInputComponent
     return React.useMemo(() => <>
         <InputLabel>{title}</InputLabel>
         <InputDescription>{description}</InputDescription>
-        <SelectInput defaultValue={defaultValue?.toString() ?? undefined}
+        <SelectInput defaultValue={defaultValue >= 0 ?defaultValue?.toString() : undefined}
                      formValidation={{...formValidation, setValue: undefined}}
                      maw={"100%"}
                      key={formValidation?.notValidMessage}
@@ -55,7 +56,9 @@ export const DataTypeSelectInputComponent: React.FC<DataTypeSelectInputComponent
                      rightType={"action"}>
             <SelectTrigger asChild>
                 <Flex justify={"space-between"} align={"center"}>
-                    <Text><SelectValue placeholder={"Select an option"}/></Text>
+                    <Text hierarchy={defaultValue < 0 ? "tertiary" : "secondary"}>
+                        <SelectValue placeholder={title}/>
+                    </Text>
                     <IconChevronDown size={13}/>
                 </Flex>
             </SelectTrigger>
