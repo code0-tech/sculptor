@@ -14,11 +14,12 @@ export type DataTypeTextInputComponentProps = DataTypeInputComponentProps
 
 export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProps> = (props) => {
 
-    const {formValidation, title, initialValue, description, suggestions} = props
+    const {formValidation, title, initialValue, description, suggestions, onChange} = props
 
     const defaultValue: NodeParameterValue | NodeFunction | undefined = React.useMemo(() => initialValue ?? undefined, [])
     const onChangeDebounced = useDebouncedCallback((value: string) => {
         formValidation?.setValue?.(value ? {__typename: "LiteralValue", value: value} : undefined)
+        onChange?.(value ? {__typename: "LiteralValue", value: value} : undefined)
     }, 200)
 
     return React.useMemo(() => <>
