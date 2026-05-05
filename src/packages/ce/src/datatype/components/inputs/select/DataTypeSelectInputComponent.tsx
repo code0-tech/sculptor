@@ -25,14 +25,15 @@ export type DataTypeSelectInputComponentProps = DataTypeInputComponentProps
 
 export const DataTypeSelectInputComponent: React.FC<DataTypeSelectInputComponentProps> = (props) => {
 
-    const {formValidation, title, initialValue, description, suggestions} = props
+    const {formValidation, title, initialValue, description, suggestions, onChange} = props
 
     const defaultValue = React.useMemo(() => suggestions?.findIndex(suggest => {
-        return lodash.isEqual(suggest, initialValue)
+        return initialValue && lodash.isMatch(suggest, initialValue)
     }), [suggestions])
 
-    const onChangeDebounced = useDebouncedCallback((value: string) => {
+    const onChangeDebounced = useDebouncedCallback((value: string | undefined) => {
         formValidation?.setValue?.(suggestions?.[Number(value)] ?? undefined)
+        onChange?.(suggestions?.[Number(value)] ?? undefined)
     }, 200)
 
     return React.useMemo(() => <>
@@ -41,10 +42,13 @@ export const DataTypeSelectInputComponent: React.FC<DataTypeSelectInputComponent
         <SelectInput defaultValue={defaultValue?.toString() ?? undefined}
                      formValidation={{...formValidation, setValue: undefined}}
                      maw={"100%"}
+                     key={formValidation?.notValidMessage}
                      onValueChange={onChangeDebounced}
                      placeholder={"sd"}
                      right={
-                         <Button color={"primary"} paddingSize={"xxs"}>
+                         <Button color={"primary"} onClick={() => {
+                             onChangeDebounced(undefined)
+                         }} paddingSize={"xxs"}>
                              <IconX size={13}/>
                          </Button>
                      }
@@ -77,7 +81,6 @@ export const DataTypeSelectInputComponent: React.FC<DataTypeSelectInputComponent
                                     </SelectItemText>
                                 </SelectItem>
                             }
-
                         })}
                     </SelectViewport>
                 </SelectContent>
