@@ -81,8 +81,8 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
     )
 
     React.useEffect(() => {
-        if (activeTab) setSelectedFunctionNode(activeTab, reactFlow);
-        setTimeout(() => {
+        //if (activeTab) setSelectedFunctionNode(activeTab, reactFlow);
+        /*setTimeout(() => {
             const parent = document.querySelector("[data-id=" + '"' + id + '"' + "]") as HTMLDivElement
             const tabList = parent?.querySelector(".file-tabs__list-content") as HTMLDivElement
             const trigger = tabList?.querySelector("[data-value=" + '"' + activeTab + '"' + "]") as HTMLDivElement
@@ -95,18 +95,21 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
                     behavior: 'smooth'
                 });
             }
-        }, 0)
-    }, [activeTab, id])
+        }, 0)*/
+    }, [activeTab])
 
     React.useEffect(() => {
         if (selectedNode) setActiveTab(selectedNode.id)
-    }, [selectedNode])
+    }, [selectedNode?.id])
 
     return (
         <FileTabs
             data-id={id}
             value={activeTab}
-            onValueChange={setActiveTab}
+            onValueChange={(value) => {
+                setActiveTab(value)
+                setSelectedFunctionNode(value, reactFlow)
+            }}
         >
             <Layout showLayoutSplitter={false} layoutGap={"0"} topContent={<FileTabsList
                 controls={
