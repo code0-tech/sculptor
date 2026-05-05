@@ -79,7 +79,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
         }
     }, [flowService, definition])
 
-    const [inputs, validate, values] = useForm<Record<string, NodeParameterValue | NodeFunction | undefined>>({
+    const [inputs, validate] = useForm<Record<string, NodeParameterValue | NodeFunction | undefined>>({
         useInitialValidation: true,
         truthyValidationBeforeSubmit: false,
         initialValues: initialValues,
@@ -88,8 +88,8 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
     })
 
     React.useEffect(
-        () => validate(),
-        [validation?.length, values]
+        () => validate(undefined, false),
+        [validation]
     )
 
     return <>
@@ -120,6 +120,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                                         schema={(flowNode?.data?.schema as NodeSchema[])?.[index]}
                                         description={description}
                                         clearable
+                                        onChange={() => validate()}
                                         {...inputs.getInputProps(parameterDefinition.id!)}
                 />
                 <Spacing spacing={"xl"}/>
