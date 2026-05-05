@@ -7,24 +7,26 @@ import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/Butto
 import {IconVariable, IconX} from "@tabler/icons-react";
 import {InputWrapper} from "@code0-tech/pictor/dist/components/form/InputWrapper";
 import {useDebouncedCallback} from "use-debounce";
+import {LiteralValue} from "@code0-tech/sagittarius-graphql-types";
 
 export type DataTypeBooleanInputComponentProps = DataTypeInputComponentProps
 
 export const DataTypeBooleanInputComponent: React.FC<DataTypeBooleanInputComponentProps> = (props) => {
 
-    const {suggestions, initialValue, title, description, formValidation, onChange} = props
+    const {suggestions, initialValue, title, description, formValidation} = props
 
-    const defaultValue = React.useMemo(() => typeof initialValue === "boolean" ? (initialValue ? "true" : "false") : undefined , [])
-    const onChangeDebounced = useDebouncedCallback(() => {
-        onChange?.({} as any)
+    const defaultValue = React.useMemo(() => initialValue, [])
+    const onChangeDebounced = useDebouncedCallback((value: string) => {
+        formValidation?.setValue?.({
+            __typename: "LiteralValue",
+            value: value === "true" ? true : value === "false" ? false : undefined
+        })
     }, 200)
-
-    console.log("booldefault", defaultValue)
 
     return React.useMemo(() => <>
         <InputLabel>{title}</InputLabel>
         <InputDescription>{description}</InputDescription>
-        <InputWrapper formValidation={formValidation} right={
+        <InputWrapper formValidation={{...formValidation, setValue: undefined}} right={
             (suggestions?.length ?? 0) > 0 ? (
                 <ButtonGroup color={"primary"}>
                     <Button paddingSize={"xxs"}>
@@ -40,21 +42,18 @@ export const DataTypeBooleanInputComponent: React.FC<DataTypeBooleanInputCompone
                 </Button>
             )
         } rightType={"action"}>
-            {initialValue?.__typename === "NodeFunction" || initialValue?.__typename === "NodeFunctionIdWrapper" ? (
-                <NodeBadgeComponent value={initialValue}/>
-            ) : initialValue?.__typename === "ReferenceValue" ? (
-                <ReferenceBadgeComponent value={initialValue}/>
+            {defaultValue?.__typename === "NodeFunction" || defaultValue?.__typename === "NodeFunctionIdWrapper" ? (
+                <NodeBadgeComponent value={defaultValue}/>
+            ) : defaultValue?.__typename === "ReferenceValue" ? (
+                <ReferenceBadgeComponent value={defaultValue}/>
             ) : (
                 <div style={{alignSelf: "stretch", flex: "1 1 auto", padding: "0.175rem 0 0.175rem 0.175rem"}}>
                     <SegmentedControl type={"single"}
                                       h={"100%"}
                                       bg={"transparent"}
                                       style={{boxShadow: "none"}}
-                                      defaultValue={defaultValue}
-                                      onValueChange={(value) => {
-                                          formValidation?.setValue(value)
-                                          onChangeDebounced()
-                                      }}>
+                                      defaultValue={(defaultValue as LiteralValue)?.value?.toString() ?? undefined}
+                                      onValueChange={onChangeDebounced}>
                         <SegmentedControlItem w={"100%"} value={"true"}>
                             True
                         </SegmentedControlItem>
