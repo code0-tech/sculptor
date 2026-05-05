@@ -13,11 +13,15 @@ export type DataTypeBooleanInputComponentProps = DataTypeInputComponentProps
 
 export const DataTypeBooleanInputComponent: React.FC<DataTypeBooleanInputComponentProps> = (props) => {
 
-    const {suggestions, initialValue, title, description, formValidation} = props
+    const {suggestions, initialValue, title, description, formValidation, onChange} = props
 
     const defaultValue = React.useMemo(() => initialValue, [])
     const onChangeDebounced = useDebouncedCallback((value: string) => {
         formValidation?.setValue?.({
+            __typename: "LiteralValue",
+            value: value === "true" ? true : value === "false" ? false : undefined
+        })
+        onChange?.({
             __typename: "LiteralValue",
             value: value === "true" ? true : value === "false" ? false : undefined
         })
