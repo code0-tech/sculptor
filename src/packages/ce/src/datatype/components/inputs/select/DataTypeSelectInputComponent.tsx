@@ -13,12 +13,12 @@ import {
     SelectPortal,
     SelectTrigger,
     SelectValue,
-    SelectViewport
+    SelectViewport,
+    Text
 } from "@code0-tech/pictor";
-import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeComponent";
 import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
 import {IconChevronDown, IconX} from "@tabler/icons-react";
-import {LiteralValue} from "@code0-tech/sagittarius-graphql-types";
+import lodash from "lodash"
 
 
 export type DataTypeSelectInputComponentProps = DataTypeInputComponentProps
@@ -27,52 +27,61 @@ export const DataTypeSelectInputComponent: React.FC<DataTypeSelectInputComponent
 
     const {formValidation, title, initialValue, description, suggestions} = props
 
-    const defaultValue = React.useMemo(() => initialValue, [])
+    const defaultValue = React.useMemo(() => suggestions?.findIndex(suggest => {
+        return lodash.isEqual(suggest, initialValue)
+    }), [suggestions])
+
     const onChangeDebounced = useDebouncedCallback((value: string) => {
-        formValidation?.setValue?.({__typename: "LiteralValue", value: value})
+        formValidation?.setValue?.(suggestions?.[Number(value)] ?? undefined)
     }, 200)
 
     return React.useMemo(() => <>
         <InputLabel>{title}</InputLabel>
         <InputDescription>{description}</InputDescription>
-        {initialValue?.__typename === "NodeFunction" || initialValue?.__typename === "NodeFunctionIdWrapper" ? (
-            <NodeBadgeComponent value={initialValue}/>
-        ) : initialValue?.__typename === "ReferenceValue" ? (
-            <ReferenceBadgeComponent value={initialValue}/>
-        ) : (
-            <SelectInput defaultValue={(defaultValue as LiteralValue)?.value}
-                         formValidation={{...formValidation, setValue: undefined}}
-                         maw={"100%"}
-                         onValueChange={onChangeDebounced}
-                         placeholder={"sd"}
-                         right={
-                             <Button color={"primary"} paddingSize={"xxs"}>
-                                 <IconX size={13}/>
-                             </Button>
-                         }
-                         rightType={"action"}>
-                <SelectTrigger asChild>
-                    <Flex justify={"space-between"} align={"center"}>
-                        <SelectValue placeholder={"Select an option"}/>
-                        <IconChevronDown size={13}/>
-                    </Flex>
-                </SelectTrigger>
-                <SelectPortal>
-                    <SelectContent position={"item-aligned"}>
-                        <SelectViewport>
-                            {suggestions?.filter((suggest) => suggest?.value.__typename === "LiteralValue").map((suggest) => {
-                                return <SelectItem value={suggest?.value?.value}>
+        <SelectInput defaultValue={defaultValue?.toString() ?? undefined}
+                     formValidation={{...formValidation, setValue: undefined}}
+                     maw={"100%"}
+                     onValueChange={onChangeDebounced}
+                     placeholder={"sd"}
+                     right={
+                         <Button color={"primary"} paddingSize={"xxs"}>
+                             <IconX size={13}/>
+                         </Button>
+                     }
+                     rightType={"action"}>
+            <SelectTrigger asChild>
+                <Flex justify={"space-between"} align={"center"}>
+                    <Text><SelectValue placeholder={"Select an option"}/></Text>
+                    <IconChevronDown size={13}/>
+                </Flex>
+            </SelectTrigger>
+            <SelectPortal>
+                <SelectContent position={"item-aligned"}>
+                    <SelectViewport>
+                        {suggestions?.map((suggest, index) => {
+
+                            if (suggest.__typename === "LiteralValue") {
+                                return <SelectItem value={index.toString()}>
                                     <SelectItemText>
                                         <Flex style={{gap: "0.35rem"}} align={"center"}>
-                                            {suggest?.children}
+                                            {(suggest)?.value}
                                         </Flex>
                                     </SelectItemText>
                                 </SelectItem>
-                            })}
-                        </SelectViewport>
-                    </SelectContent>
-                </SelectPortal>
-            </SelectInput>
-        )}
-    </>, [formValidation])
+                            }
+
+                            if (suggest.__typename === "ReferenceValue") {
+                                return <SelectItem value={index.toString()}>
+                                    <SelectItemText>
+                                        <ReferenceBadgeComponent value={suggest}/>
+                                    </SelectItemText>
+                                </SelectItem>
+                            }
+
+                        })}
+                    </SelectViewport>
+                </SelectContent>
+            </SelectPortal>
+        </SelectInput>
+    </>, [formValidation, defaultValue])
 }
