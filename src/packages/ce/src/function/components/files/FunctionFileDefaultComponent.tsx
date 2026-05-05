@@ -31,6 +31,8 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
     const flowService = useService(FlowService)
     const validation = useFlowValidation(flowId)
 
+    const changedValue = React.useRef(false)
+
     const definition = React.useMemo(
         () => node.functionDefinition!,
         [node]
@@ -79,13 +81,21 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
         }
     }, [flowService, definition])
 
-    const [inputs, validate] = useForm<Record<string, NodeParameterValue | NodeFunction | undefined>>({
+    const [inputs, validate, values] = useForm<Record<string, NodeParameterValue | NodeFunction | undefined>>({
         useInitialValidation: true,
         truthyValidationBeforeSubmit: false,
         initialValues: initialValues,
         validate: parameterValidations,
         onSubmit: onSubmit
     })
+
+    React.useEffect(
+        () => {
+            if (changedValue.current)
+                validate()
+        },
+        [values]
+    )
 
     React.useEffect(
         () => validate(undefined, false),
@@ -120,7 +130,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                                         schema={(flowNode?.data?.schema as NodeSchema[])?.[index]}
                                         description={description}
                                         clearable
-                                        onChange={() => validate()}
+                                        onChange={() => changedValue.current = true}
                                         {...inputs.getInputProps(parameterDefinition.id!)}
                 />
                 <Spacing spacing={"xl"}/>
