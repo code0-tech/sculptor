@@ -2,7 +2,7 @@ import React from "react";
 import {DataTypeTextInputComponent} from "./text/DataTypeTextInputComponent";
 import {DataTypeJSONInputComponent} from "@edition/datatype/components/inputs/json/DataTypeJSONInputComponent";
 import {NodeSchema} from "@code0-tech/triangulum";
-import {LiteralValue, NodeFunction, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
+import {LiteralValue, NodeFunction, NodeParameterValue, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
 import {
     FunctionSuggestion,
     FunctionSuggestionType
@@ -13,7 +13,7 @@ import {DataTypeBooleanInputComponent} from "@edition/datatype/components/inputs
 import {DataTypeSelectInputComponent} from "@edition/datatype/components/inputs/select/DataTypeSelectInputComponent";
 import {InputWrapperProps} from "@code0-tech/pictor/dist/components/form/InputWrapper";
 
-export interface DataTypeInputComponentProps extends Omit<InputWrapperProps, "wrapperComponent"> {
+export interface DataTypeInputComponentProps extends Omit<InputWrapperProps<NodeParameterValue | NodeFunction>, "wrapperComponent"> {
     schema: NodeSchema
     clearable?: boolean
     suggestions?: any[]
