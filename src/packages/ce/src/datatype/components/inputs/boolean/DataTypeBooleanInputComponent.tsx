@@ -1,26 +1,12 @@
 import React from "react";
 import {DataTypeInputComponentProps} from "@edition/datatype/components/inputs/DataTypeInputComponent";
-import {
-    Button,
-    Flex,
-    InputDescription,
-    InputLabel,
-    Menu,
-    MenuContent,
-    MenuItem,
-    MenuPortal,
-    MenuTrigger,
-    SegmentedControl,
-    SegmentedControlItem,
-    Text
-} from "@code0-tech/pictor";
+import {InputDescription, InputLabel, SegmentedControl, SegmentedControlItem} from "@code0-tech/pictor";
 import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeComponent";
 import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
-import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
-import {IconVariable, IconX} from "@tabler/icons-react";
 import {InputWrapper} from "@code0-tech/pictor/dist/components/form/InputWrapper";
 import {useDebouncedCallback} from "use-debounce";
-import {LiteralValue} from "@code0-tech/sagittarius-graphql-types";
+import {LiteralValue, NodeFunction, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
+import {DataTypeInputControlsComponent} from "@edition/datatype/components/inputs/DataTypeInputControlsComponent";
 
 export type DataTypeBooleanInputComponentProps = DataTypeInputComponentProps
 
@@ -28,62 +14,28 @@ export const DataTypeBooleanInputComponent: React.FC<DataTypeBooleanInputCompone
 
     const {suggestions, initialValue, title, description, formValidation, onChange} = props
 
-    const onChangeDebounced = useDebouncedCallback((value: string | undefined) => {
+    const onChangeDebounced = useDebouncedCallback((value: string | LiteralValue | NodeFunction | ReferenceValue | undefined) => {
 
-        const boolValue: LiteralValue | undefined = value && ["true", "false"].includes(value) ? {
-            __typename: "LiteralValue",
-            value: value === "true"
-        } : undefined
+        if (typeof value === "string") {
+            const boolValue: LiteralValue | undefined = value && ["true", "false"].includes(value) ? {
+                __typename: "LiteralValue",
+                value: value === "true"
+            } : undefined
 
-        formValidation?.setValue?.(boolValue)
-        onChange?.(boolValue)
+            formValidation?.setValue?.(boolValue)
+            onChange?.(boolValue)
+        } else {
+            formValidation?.setValue?.(value)
+            onChange?.(value)
+        }
+
     }, 200)
 
     return React.useMemo(() => <>
         <InputLabel>{title}</InputLabel>
         <InputDescription>{description}</InputDescription>
         <InputWrapper formValidation={{...formValidation, setValue: undefined}} right={
-            (suggestions?.length ?? 0) > 0 ? (
-                <ButtonGroup color={"primary"}>
-                    <Menu>
-                        <MenuTrigger asChild>
-                            <Button paddingSize={"xxs"}>
-                                <IconVariable size={13}/>
-                            </Button>
-                        </MenuTrigger>
-                        <MenuPortal>
-                            <MenuContent>
-                                {suggestions?.map((suggest, index) => {
-                                    if (suggest.__typename === "LiteralValue") {
-                                        return <MenuItem>
-                                            <Flex style={{gap: "0.35rem"}} align={"center"}>
-                                                {(suggest)?.value.toString()}
-                                            </Flex>
-                                        </MenuItem>
-                                    }
-
-                                    if (suggest.__typename === "ReferenceValue") {
-                                        return <MenuItem>
-                                            <ReferenceBadgeComponent value={suggest}/>
-                                        </MenuItem>
-                                    }
-                                })}
-                            </MenuContent>
-                        </MenuPortal>
-                    </Menu>
-                    <Button paddingSize={"xxs"} onClick={() => {
-                        onChangeDebounced(undefined)
-                    }}>
-                        <IconX size={13}/>
-                    </Button>
-                </ButtonGroup>
-            ) : (
-                <Button color={"primary"} paddingSize={"xxs"} onClick={() => {
-                    onChangeDebounced(undefined)
-                }}>
-                    <IconX size={13}/>
-                </Button>
-            )
+            <DataTypeInputControlsComponent suggestions={suggestions} onSelect={onChangeDebounced}/>
         } rightType={"action"}>
             {initialValue?.__typename === "NodeFunction" || initialValue?.__typename === "NodeFunctionIdWrapper" ? (
                 <NodeBadgeComponent value={initialValue}/>
