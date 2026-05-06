@@ -1,6 +1,19 @@
 import React from "react";
 import {DataTypeInputComponentProps} from "@edition/datatype/components/inputs/DataTypeInputComponent";
-import {Button, InputDescription, InputLabel, SegmentedControl, SegmentedControlItem} from "@code0-tech/pictor";
+import {
+    Button,
+    Flex,
+    InputDescription,
+    InputLabel,
+    Menu,
+    MenuContent,
+    MenuItem,
+    MenuPortal,
+    MenuTrigger,
+    SegmentedControl,
+    SegmentedControlItem,
+    Text
+} from "@code0-tech/pictor";
 import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeComponent";
 import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
@@ -15,7 +28,6 @@ export const DataTypeBooleanInputComponent: React.FC<DataTypeBooleanInputCompone
 
     const {suggestions, initialValue, title, description, formValidation, onChange} = props
 
-    const defaultValue = React.useMemo(() => initialValue, [initialValue])
     const onChangeDebounced = useDebouncedCallback((value: string | undefined) => {
 
         const boolValue: LiteralValue | undefined = value && ["true", "false"].includes(value) ? {
@@ -33,9 +45,32 @@ export const DataTypeBooleanInputComponent: React.FC<DataTypeBooleanInputCompone
         <InputWrapper formValidation={{...formValidation, setValue: undefined}} right={
             (suggestions?.length ?? 0) > 0 ? (
                 <ButtonGroup color={"primary"}>
-                    <Button paddingSize={"xxs"}>
-                        <IconVariable size={13}/>
-                    </Button>
+                    <Menu>
+                        <MenuTrigger asChild>
+                            <Button paddingSize={"xxs"}>
+                                <IconVariable size={13}/>
+                            </Button>
+                        </MenuTrigger>
+                        <MenuPortal>
+                            <MenuContent>
+                                {suggestions?.map((suggest, index) => {
+                                    if (suggest.__typename === "LiteralValue") {
+                                        return <MenuItem>
+                                            <Flex style={{gap: "0.35rem"}} align={"center"}>
+                                                {(suggest)?.value.toString()}
+                                            </Flex>
+                                        </MenuItem>
+                                    }
+
+                                    if (suggest.__typename === "ReferenceValue") {
+                                        return <MenuItem>
+                                            <ReferenceBadgeComponent value={suggest}/>
+                                        </MenuItem>
+                                    }
+                                })}
+                            </MenuContent>
+                        </MenuPortal>
+                    </Menu>
                     <Button paddingSize={"xxs"} onClick={() => {
                         onChangeDebounced(undefined)
                     }}>
@@ -50,17 +85,17 @@ export const DataTypeBooleanInputComponent: React.FC<DataTypeBooleanInputCompone
                 </Button>
             )
         } rightType={"action"}>
-            {defaultValue?.__typename === "NodeFunction" || defaultValue?.__typename === "NodeFunctionIdWrapper" ? (
-                <NodeBadgeComponent value={defaultValue}/>
-            ) : defaultValue?.__typename === "ReferenceValue" ? (
-                <ReferenceBadgeComponent value={defaultValue}/>
+            {initialValue?.__typename === "NodeFunction" || initialValue?.__typename === "NodeFunctionIdWrapper" ? (
+                <NodeBadgeComponent value={initialValue}/>
+            ) : initialValue?.__typename === "ReferenceValue" ? (
+                <ReferenceBadgeComponent value={initialValue}/>
             ) : (
                 <div style={{alignSelf: "stretch", flex: "1 1 auto", padding: "0.175rem 0 0.175rem 0.175rem"}}>
                     <SegmentedControl type={"single"}
                                       h={"100%"}
                                       bg={"transparent"}
                                       style={{boxShadow: "none"}}
-                                      defaultValue={(defaultValue as LiteralValue)?.value?.toString() ?? undefined}
+                                      value={(initialValue as LiteralValue)?.value?.toString() ?? ""}
                                       onValueChange={onChangeDebounced}>
                         <SegmentedControlItem w={"100%"} value={"true"}>
                             True
@@ -72,6 +107,6 @@ export const DataTypeBooleanInputComponent: React.FC<DataTypeBooleanInputCompone
                 </div>
             )}
         </InputWrapper>
-    </>, [formValidation, defaultValue])
+    </>, [formValidation, initialValue])
 
 }
