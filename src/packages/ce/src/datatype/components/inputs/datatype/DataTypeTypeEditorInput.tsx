@@ -1,12 +1,12 @@
 import React, {useCallback, useMemo} from "react";
 import {tags as t} from "@lezer/highlight";
 import {Badge, hashToColor, useService, useStore} from "@code0-tech/pictor";
-import {Editor, EditorInputProps, EditorTokenHighlights} from "@code0-tech/pictor/dist/components/editor/Editor";
+import {Editor, EditorProps, EditorTokenHighlights} from "@code0-tech/pictor/dist/components/editor/Editor";
 import {StreamLanguage} from "@codemirror/language";
 import {CompletionContext, CompletionResult} from "@codemirror/autocomplete";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 
-export interface DataTypeTypeEditorInputProps extends EditorInputProps {
+export interface DataTypeTypeEditorInputProps extends EditorProps {
     value: string | null
     isTechnicalType?: boolean
 }
