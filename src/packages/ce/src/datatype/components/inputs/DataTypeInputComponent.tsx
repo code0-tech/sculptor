@@ -9,7 +9,7 @@ import {InputWrapperProps} from "@code0-tech/pictor/dist/components/form/InputWr
 export interface DataTypeInputComponentProps extends Omit<InputWrapperProps<NodeParameterValue | NodeFunction>, "wrapperComponent" | "onChange"> {
     schema: NodeSchema
     clearable?: boolean
-    onChange?: (value: NodeParameterValue | NodeFunction | undefined) => void
+    onChange?: (value: ReferenceValue | LiteralValue | NodeFunction | undefined) => void
     suggestions?: (NodeFunction | ReferenceValue | LiteralValue)[]
     onClear?: (event: React.MouseEvent<HTMLButtonElement>) => void
 }
