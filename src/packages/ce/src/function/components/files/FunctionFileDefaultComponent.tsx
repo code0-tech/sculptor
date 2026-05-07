@@ -1,5 +1,5 @@
-import React, {startTransition} from "react";
-import {Alert, InputSyntaxSegment, Spacing, Text, useForm, useService} from "@code0-tech/pictor";
+import React from "react";
+import {Alert, Spacing, Text, useForm, useService} from "@code0-tech/pictor";
 import {
     Flow,
     LiteralValue,
@@ -16,6 +16,8 @@ import {
     FALLBACK_FUNCTION_PARAMETER_DESCRIPTION,
     FALLBACK_FUNCTION_PARAMETER_NAME
 } from "@core/util/fallback-translations";
+import {useNodes} from "@xyflow/react";
+import {NodeSchema} from "@code0-tech/triangulum";
 
 export interface FunctionFileDefaultComponentProps {
     node: NodeFunction
@@ -27,8 +29,9 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
     const {node, flowId} = props
 
     const flowService = useService(FlowService)
-    const changedParameters = React.useRef<Set<number>>(new Set())
     const validation = useFlowValidation(flowId)
+
+    const changedValue = React.useRef(false)
 
     const definition = React.useMemo(
         () => node.functionDefinition!,
@@ -39,10 +42,12 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
         const values: Record<string, any> = {}
         definition?.parameterDefinitions?.nodes?.forEach((parameter, index) => {
             const nodeParameter = node.parameters?.nodes?.[index]
-            values[parameter!.id!] = nodeParameter?.value?.__typename === "LiteralValue" ? (typeof nodeParameter.value?.value === "object" && nodeParameter.value?.value != null ? JSON.stringify(nodeParameter.value?.value) : nodeParameter.value.value) : nodeParameter?.value != null ? JSON.stringify(nodeParameter?.value) : nodeParameter?.value
+            values[parameter!.id!] = nodeParameter?.value
         })
         return values
     }, [node, definition])
+
+    const flowNode = useNodes().find(value => value.id == node.id)
 
     const nodeValidation = React.useMemo(
         () => validation?.find(v => v.nodeId === node.id && v.parameterIndex === null),
@@ -63,50 +68,20 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
         return values
     }, [validation, flowId, node, definition])
 
-    const onSubmit = React.useCallback((values: any) => {
-        startTransition(async () => {
-            for (const parameterDefinition of definition?.parameterDefinitions?.nodes!) {
-                const parameterIndex = definition?.parameterDefinitions?.nodes?.findIndex(p => p?.id === parameterDefinition?.id)
-                if (typeof parameterIndex !== "number") return
-                if (!changedParameters.current.has(parameterIndex)) continue;
-                const nodeParameter = node.parameters?.nodes?.[parameterIndex]
-                const value = values[parameterDefinition!.id!]
-                const previousValue = nodeParameter?.value as NodeParameterValue
-                const syntaxValue = (value?.[0]?.type == "block" || value?.[0]?.type == "text" ? value?.[0]?.value : value) ?? null as NodeFunction | LiteralValue | ReferenceValue | null
+    const onSubmit = React.useCallback((values: Record<string, NodeParameterValue | NodeFunction | undefined>) => {
+        for (const parameterDefinition of definition?.parameterDefinitions?.nodes ?? []) {
 
-                if (!syntaxValue || !value || (Array.isArray(syntaxValue) && Array.from(syntaxValue).length <= 0)) {
-                    await flowService.setParameterValue(flowId, node.id!!, parameterIndex, undefined, definition);
-                    continue;
-                }
+            const parameterIndex = definition?.parameterDefinitions?.nodes?.findIndex(p => p?.id === parameterDefinition?.id)
+            if (typeof parameterIndex !== "number") return
 
-                try {
-                    const parsedSyntaxValue = JSON.parse(syntaxValue)
-                    if (!parsedSyntaxValue?.__typename) {
-                        await flowService.setParameterValue(flowId, node.id!!, parameterIndex, syntaxValue ? {
-                            __typename: "LiteralValue",
-                            value: parsedSyntaxValue
-                        } : undefined, definition);
-                        continue;
-                    }
-                } catch (e) {
-                    if (!syntaxValue?.__typename) {
-                        await flowService.setParameterValue(flowId, node.id!!, parameterIndex, syntaxValue ? {
-                            __typename: "LiteralValue",
-                            value: syntaxValue,
-                        } : undefined, definition);
-                        continue;
-                    }
-                }
+            const value = values[parameterDefinition!.id!]
+            if (value?.__typename === "NodeFunctionIdWrapper") return
 
-                const parsedSyntaxValue = typeof syntaxValue === "object" ? syntaxValue : JSON.parse(syntaxValue)
+            flowService.setParameterValue(flowId, node.id!!, parameterIndex, (value ?? undefined) as NodeFunction | ReferenceValue | LiteralValue | undefined, definition);
+        }
+    }, [flowService, definition])
 
-                await flowService.setParameterValue(flowId, node.id!!, parameterIndex, parsedSyntaxValue.__typename === "LiteralValue" ? (!!parsedSyntaxValue.value ? parsedSyntaxValue : undefined) : parsedSyntaxValue, definition);
-            }
-            changedParameters.current.clear()
-        })
-    }, [flowService])
-
-    const [inputs, validate] = useForm<Record<string, InputSyntaxSegment[]>>({
+    const [inputs, validate, values] = useForm<Record<string, NodeParameterValue | NodeFunction | undefined>>({
         useInitialValidation: true,
         truthyValidationBeforeSubmit: false,
         initialValues: initialValues,
@@ -114,9 +89,18 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
         onSubmit: onSubmit
     })
 
-    React.useEffect(() => {
-        validate()
-    }, [validation])
+    React.useEffect(
+        () => {
+            if (changedValue.current)
+                validate()
+        },
+        [values]
+    )
+
+    React.useEffect(
+        () => validate(undefined, false),
+        [validation]
+    )
 
     return <>
         <Text size={"md"}>{definition?.names?.[0]?.content ?? FALLBACK_FUNCTION_NAME}</Text>
@@ -141,19 +125,12 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
             const description = parameterDefinition?.descriptions?.[0]?.content ?? FALLBACK_FUNCTION_PARAMETER_DESCRIPTION
 
             return <div>
-                {/*@ts-ignore*/}
                 <DataTypeInputComponent data-qa-selector={"flow-builder-parameter"}
-                                        flowId={flowId}
-                                        nodeId={node.id}
-                                        parameterIndex={index}
                                         title={title}
+                                        schema={(flowNode?.data?.schema as NodeSchema[])?.[index]}
                                         description={description}
                                         clearable
-                                        onChange={() => {
-                                            //TODO this should be debounced
-                                            changedParameters.current.add(index)
-                                            validate()
-                                        }}
+                                        onChange={() => changedValue.current = true}
                                         {...inputs.getInputProps(parameterDefinition.id!)}
                 />
                 <Spacing spacing={"xl"}/>

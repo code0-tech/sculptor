@@ -15,8 +15,8 @@
   },
   "dependencies": {
     "@apollo/client": "^4.0.9",
-    "@code0-tech/pictor": "^0.6.4",
-    "@code0-tech/triangulum": "^0.13.3",
+    "@code0-tech/pictor": "^0.7.2",
+    "@code0-tech/triangulum": "^0.14.3",
     "@codemirror/lang-javascript": "^6.2.5",
     "@codemirror/lint": "^6.9.5",
     "@opentelemetry/api": "^1.9.1",
@@ -32,6 +32,7 @@
     "graphql": "^16.12.0",
     "graphql-tag": "^2.12.6",
     "ldrs": "^1.1.9",
+    "lodash": "^4.18.1",
     "next": "16.2.3",
     "prettier": "^3.8.1",
     "react": "19.2.5",
@@ -42,6 +43,7 @@
     "use-debounce": "^10.1.1"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.24",
     "@types/node": "^24.0.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",

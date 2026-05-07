@@ -1,71 +1,47 @@
-import {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
 import {DataTypeTextInputComponent} from "./text/DataTypeTextInputComponent";
-import {InputProps, useService, useStore} from "@code0-tech/pictor";
-import {FlowService} from "@edition/flow/services/Flow.service";
-import {DatatypeService} from "@edition/datatype/services/Datatype.service";
-import {FunctionService} from "@edition/function/services/Function.service";
-import {DataTypeVariant, getTypesFromFunction, getTypeVariant} from "@code0-tech/triangulum";
-import {DataTypeJSONInputComponent} from "@edition/datatype/components/inputs/json/DataTypeJSONInputComponent";
+import {NodeSchema} from "@code0-tech/triangulum";
+import {LiteralValue, NodeFunction, NodeParameterValue, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
+import {DataTypeBooleanInputComponent} from "@edition/datatype/components/inputs/boolean/DataTypeBooleanInputComponent";
+import {DataTypeSelectInputComponent} from "@edition/datatype/components/inputs/select/DataTypeSelectInputComponent";
+import {InputWrapperProps} from "@code0-tech/pictor/dist/components/form/InputWrapper";
+import {DataTypeNumberInputComponent} from "@edition/datatype/components/inputs/number/DataTypeNumberInputComponent";
 
-export interface DataTypeInputComponentProps extends Omit<InputProps<any | null>, "wrapperComponent" | "type"> {
-    flowId: Flow['id']
-    nodeId?: NodeFunction['id'] //TODO if undefined we need to get infos from trigger
-    parameterIndex: number
+export interface DataTypeInputComponentProps extends Omit<InputWrapperProps<NodeParameterValue | NodeFunction>, "wrapperComponent" | "onChange"> {
+    schema: NodeSchema
     clearable?: boolean
+    onChange?: (value: ReferenceValue | LiteralValue | NodeFunction | undefined) => void
+    suggestions?: (NodeFunction | ReferenceValue | LiteralValue)[]
     onClear?: (event: React.MouseEvent<HTMLButtonElement>) => void
 }
 
 export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (props) => {
 
-    const {flowId, nodeId, parameterIndex, ...rest} = props
+    const {schema, ...rest} = props
 
-    const flowService = useService(FlowService)
-    const flowStore = useStore(FlowService)
-    const dataTypeStore = useStore(DatatypeService)
-    const dataTypeService = useService(DatatypeService)
-    const functionStore = useStore(FunctionService)
-    const functionService = useService(FunctionService)
+    const suggestions = schema?.schema?.suggestions as (NodeFunction | ReferenceValue | LiteralValue)[]
 
-    const flow = React.useMemo(
-        () => flowId ? flowService.getById(flowId) : undefined,
-        [flowStore, flowId]
-    )
-
-    const node = React.useMemo(
-        () => nodeId && flowId ? flowService.getNodeById(flowId, nodeId) : undefined,
-        [flowStore, flowId, nodeId]
-    )
-
-    const functionDefinition = React.useMemo(
-        () => node ? functionService.getById(node?.functionDefinition?.id) : undefined,
-        [functionStore, node]
-    )
-
-    const types = React.useMemo(
-        () => nodeId ? getTypesFromFunction(functionDefinition!) : undefined,
-        [functionDefinition, nodeId]
-    )
-
-    const dataTypeVariant = React.useMemo(
-        () => types ? getTypeVariant(types.parameters[parameterIndex], dataTypeService.values())[0].variant : undefined,
-        [dataTypeStore, types]
-    )
-
-    switch (dataTypeVariant) {
-        case DataTypeVariant.ARRAY:
-        case DataTypeVariant.OBJECT:
-            return <DataTypeJSONInputComponent
-                flowId={flowId}
-                nodeId={nodeId}
-                parameterIndex={parameterIndex}
+    switch (schema?.schema?.input) {
+        case "boolean":
+            return <DataTypeBooleanInputComponent
+                schema={schema}
+                suggestions={suggestions}
                 {...rest}
             />
+        case "select":
+            return <DataTypeSelectInputComponent
+                schema={schema}
+                suggestions={suggestions}
+                {...rest}/>
+        case "number":
+            return <DataTypeNumberInputComponent
+                schema={schema}
+                suggestions={suggestions}
+                {...rest}/>
         default:
             return <DataTypeTextInputComponent
-                flowId={flowId}
-                nodeId={nodeId}
-                parameterIndex={parameterIndex}
+                suggestions={suggestions}
+                schema={schema}
                 {...rest}
             />
     }

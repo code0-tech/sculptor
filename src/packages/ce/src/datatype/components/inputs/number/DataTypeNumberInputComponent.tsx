@@ -8,9 +8,9 @@ import {LiteralValue, NodeFunction, NodeParameterValue, ReferenceValue} from "@c
 import {DataTypeInputControlsComponent} from "@edition/datatype/components/inputs/DataTypeInputControlsComponent";
 import {DataTypeInputValueComponent} from "@edition/datatype/components/inputs/DataTypeInputValueComponent";
 
-export type DataTypeTextInputComponentProps = DataTypeInputComponentProps
+export type DataTypeNumberInputComponentProps = DataTypeInputComponentProps
 
-export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProps> = (props) => {
+export const DataTypeNumberInputComponent: React.FC<DataTypeNumberInputComponentProps> = (props) => {
 
     const {formValidation, title, initialValue, description, suggestions, onChange} = props
 
@@ -18,8 +18,9 @@ export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProp
     const onChangeDebounced = useDebouncedCallback((value: string | LiteralValue | NodeFunction | ReferenceValue | undefined) => {
 
         if (typeof value === "string") {
-            formValidation?.setValue?.(value ? {__typename: "LiteralValue", value: value} : undefined)
-            onChange?.(value ? {__typename: "LiteralValue", value: value} : undefined)
+            console.log(value)
+            formValidation?.setValue?.(value ? {__typename: "LiteralValue", value: !Number.isNaN(Number(value)) ? Number(value) : value} : undefined)
+            onChange?.(value ? {__typename: "LiteralValue", value: !Number.isNaN(Number(value)) ? Number(value) : value} : undefined)
         } else {
             formValidation?.setValue?.(value)
             onChange?.(value)

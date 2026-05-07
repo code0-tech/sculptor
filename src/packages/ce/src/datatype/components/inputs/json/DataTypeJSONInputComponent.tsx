@@ -6,7 +6,6 @@ import {DataTypeInputComponentProps} from "../DataTypeInputComponent";
 import {LiteralValue, NodeFunction, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
 import {NodeBadgeComponent} from "../../badges/NodeBadgeComponent";
 import {ReferenceBadgeComponent} from "../../badges/ReferenceBadgeComponent";
-import {useSuggestions} from "@edition/function/hooks/FunctionSuggestion.hook";
 import {
     Button,
     Card,
@@ -37,35 +36,18 @@ export type DataTypeJSONInputComponentProps = DataTypeInputComponentProps
 export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProps> = (props) => {
 
 
-    const {flowId, nodeId, parameterIndex, title, description, formValidation, onChange} = props
+    const {schema, title, description, formValidation, onChange} = props
 
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
 
-    const initialNullValue = useValue(flowId, nodeId, parameterIndex)
-    const suggestions = useSuggestions(flowId, nodeId, parameterIndex)
+    const suggestions = []
     const [editDialogOpen, setEditDialogOpen] = React.useState(false)
     const [editEntry, setEditEntry] = React.useState<EditableJSONEntry | null>(null)
     const [collapsedState, setCollapsedStateRaw] = React.useState<Record<string, boolean>>({})
 
-    const node = React.useMemo(
-        () => flowService.getNodeById(flowId, nodeId),
-        [flowStore, flowId, nodeId]
-    )
 
-    const parameter = React.useMemo(
-        () => node?.parameters?.nodes?.[parameterIndex],
-        [node]
-    )
-
-    const initialValue: NodeParameterValue | null = React.useMemo(() => {
-        if (!parameter?.value || (parameter?.value?.__typename === "LiteralValue" && parameter.value.value == null)) {
-            return initialNullValue
-        }
-        return parameter?.value
-    }, [initialNullValue, parameter])
-
-    const [value, setValue] = React.useState<NodeParameterValue | NodeFunction | null>(initialValue)
+    const [value, setValue] = React.useState<NodeParameterValue | NodeFunction | null>(null)
 
     const setCollapsedState = (path: string[], collapsed: boolean) => {
         setCollapsedStateRaw(prev => ({...prev, [path.join(".")]: collapsed}))
@@ -75,23 +57,6 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
         setEditEntry(entry)
         setEditDialogOpen(true)
     }
-
-    React.useEffect(() => {
-        if (!parameter?.value || (parameter?.value?.__typename === "LiteralValue" && parameter.value.value == null)) {
-            formValidation?.setValue(initialNullValue)
-            setValue(initialNullValue)
-            // @ts-ignore
-            onChange?.()
-        }
-    }, [initialNullValue])
-
-    const handleClear = React.useCallback(() => {
-        formValidation?.setValue(initialNullValue)
-        setValue(initialNullValue)
-        setEditEntry(null)
-        // @ts-ignore
-        onChange?.()
-    }, [initialNullValue])
 
     return (
         <>
@@ -103,7 +68,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                     value={value as any}
                     onOpenChange={open => setEditDialogOpen(open)}
                     onObjectChange={v => {
-                        formValidation?.setValue(v)
+                        formValidation?.setValue?.(v)
                         setValue(v ?? null)
                         // @ts-ignore
                         onChange?.()
@@ -118,9 +83,8 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                         <Text>{"Object"}</Text>
                     </Flex>
                     <ButtonGroup color={"primary"}>
-                        <FunctionSuggestionMenuComponent suggestions={suggestions}
-                                                         onSuggestionSelect={suggestion => {
-                                                             formValidation?.setValue(suggestion.value)
+                        <FunctionSuggestionMenuComponent onSuggestionSelect={suggestion => {
+                                                             formValidation?.setValue?.(suggestion.value)
                                                              setValue(suggestion.value)
                                                              // @ts-ignore
                                                              onChange?.()
@@ -137,8 +101,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                                 onClick={() => setEditDialogOpen(true)}>
                             <IconEdit size={13}/>
                         </Button>
-                        <Button paddingSize="xxs" variant="filled" color="secondary"
-                                onClick={handleClear}>
+                        <Button paddingSize="xxs" variant="filled" color="secondary">
                             <IconX size={13}/>
                         </Button>
                     </ButtonGroup>

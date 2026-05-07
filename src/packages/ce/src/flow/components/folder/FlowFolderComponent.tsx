@@ -361,7 +361,7 @@ export const DFlowFolderItem: React.FC<FlowFolderComponentItemProps> = (props) =
 type TruncateMode = "start" | "middle" | "end";
 
 export function truncateText(
-    value: string,
+    value: string | undefined,
     wrapperWidth: number,
     mode: TruncateMode = "middle",
     ellipsis = "…"
@@ -372,13 +372,13 @@ export function truncateText(
     ctx.font = "400 16px Inter, sans-serif";
     const letterSpacing = -1.9;
 
-    const measure = (text: string) =>
-        ctx.measureText(text).width + (text.length - 1) * letterSpacing;
+    const measure = (text: string | undefined) =>
+        ctx.measureText(text ?? "").width + ((text?.length ?? 0) - 1) * letterSpacing;
 
-    if (measure(value) <= wrapperWidth) return value;
+    if (measure(value) <= wrapperWidth) return value ?? "";
 
     let low = 0;
-    let high = value.length;
+    let high = value?.length ?? 0;
     let best = ellipsis;
 
     while (low <= high) {
@@ -386,12 +386,12 @@ export function truncateText(
         let candidate: string;
 
         if (mode === "end") {
-            candidate = value.slice(0, mid) + ellipsis;
+            candidate = value?.slice(0, mid) + ellipsis;
         } else if (mode === "start") {
-            candidate = ellipsis + value.slice(value.length - mid);
+            candidate = ellipsis + value?.slice(value.length - mid);
         } else {
             const half = Math.floor(mid / 2);
-            candidate = value.slice(0, half) + ellipsis + value.slice(value.length - half);
+            candidate = value?.slice(0, half) + ellipsis + value?.slice(value.length - half);
         }
 
         const width = measure(candidate);
