@@ -31,7 +31,7 @@ export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProp
         <InputDescription>{description}</InputDescription>
         <DataTypeInputValueComponent initialValue={initialValue} onChange={onChangeDebounced} suggestions={suggestions}
                                      formValidation={formValidation}>
-            <EditorInput value={(defaultValue as LiteralValue)?.value}
+            <EditorInput value={(defaultValue as LiteralValue)?.value?.toString()}
                          onChange={onChangeDebounced}
                          formValidation={{...formValidation, setValue: undefined}}
                          maw={"100%"}
