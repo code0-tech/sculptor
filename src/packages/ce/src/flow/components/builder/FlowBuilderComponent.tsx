@@ -680,18 +680,19 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
     }, [revalidateHandles])
 
     React.useEffect(() => {
-        const layouted = getCachedLayoutElements(initialNodes, new Set(initialNodes.map(n => n.id)))
-        setNodes(prevState => {
-            return initialNodes.map((n, i) => {
-                if (prevState[i]) {
-                    return {
-                        ...prevState[i],
-                        data: initialNodes[i].data
-                    }
+        const localNodes = initialNodes.map(value => {
+            const nodeEls = !value.measured ? document.querySelectorAll("[data-id='" + value.id + "']") : [];
+            return {
+                ...value,
+                measured: {
+                    width: value.measured?.width ?? (nodeEls[0] as any)?.clientWidth ?? 0,
+                    height: value.measured?.height ?? (nodeEls[0] as any)?.clientHeight ?? 0,
                 }
-                return n
-            })
+            } as unknown as Node
         })
+
+        const layouted = getCachedLayoutElements(localNodes, new Set(localNodes.map(n => n.id)))
+        setNodes(layouted.nodes as Node[])
         setEdges(initialEdges as Edge[])
 
         revalidateHandles((layouted.nodes as Node[]).map(n => n.id))
