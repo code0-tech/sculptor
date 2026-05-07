@@ -1,13 +1,12 @@
 import React from "react";
 import {DataTypeInputComponentProps} from "../DataTypeInputComponent";
 import {EditorInput, hashToColor, InputDescription, InputLabel} from "@code0-tech/pictor";
-import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeComponent";
-import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
 import {StreamLanguage} from "@codemirror/language";
 import {tags} from "@lezer/highlight";
 import {useDebouncedCallback} from "use-debounce";
 import {LiteralValue, NodeFunction, NodeParameterValue, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
 import {DataTypeInputControlsComponent} from "@edition/datatype/components/inputs/DataTypeInputControlsComponent";
+import {DataTypeInputValueComponent} from "@edition/datatype/components/inputs/DataTypeInputValueComponent";
 
 export type DataTypeTextInputComponentProps = DataTypeInputComponentProps
 
@@ -30,11 +29,8 @@ export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProp
     return React.useMemo(() => <>
         <InputLabel>{title}</InputLabel>
         <InputDescription>{description}</InputDescription>
-        {defaultValue?.__typename === "NodeFunction" || defaultValue?.__typename === "NodeFunctionIdWrapper" ? (
-            <NodeBadgeComponent value={defaultValue}/>
-        ) : defaultValue?.__typename === "ReferenceValue" ? (
-            <ReferenceBadgeComponent value={defaultValue}/>
-        ) : (
+        <DataTypeInputValueComponent initialValue={initialValue} onChange={onChangeDebounced} suggestions={suggestions}
+                                     formValidation={formValidation}>
             <EditorInput value={(defaultValue as LiteralValue)?.value}
                          onChange={onChangeDebounced}
                          formValidation={{...formValidation, setValue: undefined}}
@@ -53,6 +49,6 @@ export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProp
                              <DataTypeInputControlsComponent suggestions={suggestions} onSelect={onChangeDebounced}/>
                          }
                          rightType={"action"}/>
-        )}
+        </DataTypeInputValueComponent>
     </>, [formValidation, defaultValue])
 }
