@@ -68,7 +68,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                     value={value as any}
                     onOpenChange={open => setEditDialogOpen(open)}
                     onObjectChange={v => {
-                        formValidation?.setValue(v)
+                        formValidation?.setValue?.(v)
                         setValue(v ?? null)
                         // @ts-ignore
                         onChange?.()
@@ -84,7 +84,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                     </Flex>
                     <ButtonGroup color={"primary"}>
                         <FunctionSuggestionMenuComponent onSuggestionSelect={suggestion => {
-                                                             formValidation?.setValue(suggestion.value)
+                                                             formValidation?.setValue?.(suggestion.value)
                                                              setValue(suggestion.value)
                                                              // @ts-ignore
                                                              onChange?.()

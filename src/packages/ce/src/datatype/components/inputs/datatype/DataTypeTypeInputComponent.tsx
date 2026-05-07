@@ -53,7 +53,7 @@ export const DataTypeTypeInputComponent: React.FC<DataTypeJSONInputComponentProp
     )
 
     React.useEffect(() => {
-        formValidation?.setValue(type)
+        formValidation?.setValue?.(type)
         const timeout = setTimeout(() => {
             // @ts-ignore
             onChange?.()
