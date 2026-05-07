@@ -5,6 +5,7 @@ import {LiteralValue, NodeFunction, NodeParameterValue, ReferenceValue} from "@c
 import {DataTypeBooleanInputComponent} from "@edition/datatype/components/inputs/boolean/DataTypeBooleanInputComponent";
 import {DataTypeSelectInputComponent} from "@edition/datatype/components/inputs/select/DataTypeSelectInputComponent";
 import {InputWrapperProps} from "@code0-tech/pictor/dist/components/form/InputWrapper";
+import {DataTypeNumberInputComponent} from "@edition/datatype/components/inputs/number/DataTypeNumberInputComponent";
 
 export interface DataTypeInputComponentProps extends Omit<InputWrapperProps<NodeParameterValue | NodeFunction>, "wrapperComponent" | "onChange"> {
     schema: NodeSchema
@@ -29,6 +30,11 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
             />
         case "select":
             return <DataTypeSelectInputComponent
+                schema={schema}
+                suggestions={suggestions}
+                {...rest}/>
+        case "number":
+            return <DataTypeNumberInputComponent
                 schema={schema}
                 suggestions={suggestions}
                 {...rest}/>
