@@ -9,6 +9,7 @@ import {
 } from "@edition/datatype/components/inputs/json/DataTypeJSONInputEditDialogComponent";
 import {DataTypeInputValueComponent} from "@edition/datatype/components/inputs/DataTypeInputValueComponent";
 import {useDebouncedCallback} from "use-debounce";
+import {DataInput} from "@code0-tech/triangulum/dist/util/schema.util";
 
 export interface EditableJSONEntry {
     key: string
@@ -21,7 +22,6 @@ export type DataTypeJSONInputComponentProps = DataTypeInputComponentProps
 //TODO render fallback value if undefined based on schema
 export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProps> = (props) => {
 
-
     const {schema, title, description, suggestions, formValidation, initialValue, onChange} = props
 
     const [editDialogOpen, setEditDialogOpen] = React.useState(false)
@@ -32,6 +32,14 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
         formValidation?.setValue?.(value)
         onChange?.(value)
     }, 200)
+
+    const value = React.useMemo(
+        () => initialValue ?? (schema.functionSchema.input === "list" ? {
+            __typename: "LiteralValue",
+            value: []
+        } as LiteralValue : generateDefaultDataValue(schema.functionSchema as DataInput)),
+            [initialValue, schema]
+    )
 
     const setCollapsedState = (path: string[], collapsed: boolean) => {
         setCollapsedStateRaw(prev => ({...prev, [path.join(".")]: collapsed}))
@@ -44,12 +52,12 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
 
     return (
         <>
-            {initialValue?.__typename === "LiteralValue" && (
+            {value?.__typename === "LiteralValue" && (
                 <DataTypeJSONInputEditDialogComponent
                     key={`edit-dialog-${editEntry?.path.join("-")}-${editDialogOpen}`}
                     open={editDialogOpen}
                     entry={editEntry}
-                    value={initialValue as LiteralValue}
+                    value={value as LiteralValue}
                     onOpenChange={open => setEditDialogOpen(open)}
                     onObjectChange={onChangeDebounced}
                 />
@@ -57,12 +65,12 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
             <InputLabel>{title}</InputLabel>
             <InputDescription>{description}</InputDescription>
             <DataTypeInputValueComponent inside
-                                         initialValue={initialValue}
+                                         initialValue={value}
                                          onChange={onChangeDebounced}
                                          suggestions={suggestions}
                                          formValidation={formValidation}>
                 <DataTypeJSONInputTreeComponent
-                    object={initialValue as LiteralValue}
+                    object={value as LiteralValue}
                     onEntryClick={handleEntryClick}
                     collapsedState={collapsedState}
                     setCollapsedState={setCollapsedState}
@@ -70,4 +78,24 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
             </DataTypeInputValueComponent>
         </>
     )
+}
+
+
+const generateDefaultDataValue = (schema: DataInput): LiteralValue => {
+    return {
+        __typename: "LiteralValue",
+        value: {
+            ...(Object.entries(schema.properties ?? {})?.map(([key, propSchema]) => {
+                if (!Array.isArray(propSchema)) {
+                    if (propSchema.input === "data") {
+                        return {[key]: generateDefaultDataValue(propSchema).value}
+                    }
+                    if (propSchema.input === "list") {
+                        return {[key]: []}
+                    }
+                    return {[key]: null}
+                }
+            }))
+        }
+    }
 }
