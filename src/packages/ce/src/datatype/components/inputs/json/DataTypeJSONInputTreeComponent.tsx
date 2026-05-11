@@ -120,7 +120,7 @@ export const DataTypeJSONInputTreeComponent: React.FC<DataTypeJSONInputTreeCompo
                         <Text size="xs" style={{color: "inherit"}}>{key}</Text>
                     </Badge>
                     <Text hierarchy="tertiary">has value</Text>
-                    <Badge border color={"tertiary"} style={{verticalAlign: "middle"}}>
+                    <Badge border color={"primary"} style={{verticalAlign: "middle"}}>
                         <Text size="xs" style={{color: "inherit"}}>{String((val as any))}</Text>
                     </Badge>
                 </Flex>
