@@ -6,6 +6,8 @@ import {DataTypeBooleanInputComponent} from "@edition/datatype/components/inputs
 import {DataTypeSelectInputComponent} from "@edition/datatype/components/inputs/select/DataTypeSelectInputComponent";
 import {InputWrapperProps} from "@code0-tech/pictor/dist/components/form/InputWrapper";
 import {DataTypeNumberInputComponent} from "@edition/datatype/components/inputs/number/DataTypeNumberInputComponent";
+import {DataTypeJSONInputComponent} from "@edition/datatype/components/inputs/json/DataTypeJSONInputComponent";
+import {DataTypeGenericInputComponent} from "@edition/datatype/components/inputs/generic/DataTypeGenericInputComponent";
 
 export interface DataTypeInputComponentProps extends Omit<InputWrapperProps<NodeParameterValue | NodeFunction>, "wrapperComponent" | "onChange"> {
     schema: NodeSchema
@@ -20,8 +22,9 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
     const {schema, ...rest} = props
 
     const suggestions = schema?.schema?.suggestions as (NodeFunction | ReferenceValue | LiteralValue)[]
+    const inputName = schema?.schema?.input === "generic" ? schema.functionSchema.input : schema?.schema?.input
 
-    switch (schema?.schema?.input) {
+    switch (inputName) {
         case "boolean":
             return <DataTypeBooleanInputComponent
                 schema={schema}
@@ -35,6 +38,17 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
                 {...rest}/>
         case "number":
             return <DataTypeNumberInputComponent
+                schema={schema}
+                suggestions={suggestions}
+                {...rest}/>
+        case "list":
+        case "data":
+            return <DataTypeJSONInputComponent
+                schema={schema}
+                suggestions={suggestions}
+                {...rest}/>
+        case "generic":
+            return <DataTypeGenericInputComponent
                 schema={schema}
                 suggestions={suggestions}
                 {...rest}/>
