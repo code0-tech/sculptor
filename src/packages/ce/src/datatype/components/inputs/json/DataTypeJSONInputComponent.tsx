@@ -3,7 +3,7 @@ import "../type/DataTypeTypeInputComponent.style.scss"
 import {DataTypeJSONInputTreeComponent} from "./DataTypeJSONInputTreeComponent";
 import {DataTypeInputComponentProps} from "../DataTypeInputComponent";
 import {LiteralValue, NodeFunction, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
-import {InputDescription, InputLabel} from "@code0-tech/pictor";
+import {InputDescription, InputLabel, Spacing} from "@code0-tech/pictor";
 import {
     DataTypeJSONInputEditDialogComponent
 } from "@edition/datatype/components/inputs/json/DataTypeJSONInputEditDialogComponent";
@@ -75,12 +75,14 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                     collapsedState={collapsedState}
                     setCollapsedState={setCollapsedState}
                 />
+                <Spacing spacing={"xxs"}/>
             </DataTypeInputValueComponent>
         </>
     )
 }
 
 
+//TODO: only if required
 const generateDefaultDataValue = (schema: DataInput): LiteralValue => {
     return {
         __typename: "LiteralValue",
