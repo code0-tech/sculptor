@@ -8,8 +8,11 @@ import {InputWrapperProps} from "@code0-tech/pictor/dist/components/form/InputWr
 import {DataTypeNumberInputComponent} from "@edition/datatype/components/inputs/number/DataTypeNumberInputComponent";
 import {DataTypeJSONInputComponent} from "@edition/datatype/components/inputs/json/DataTypeJSONInputComponent";
 import {DataTypeGenericInputComponent} from "@edition/datatype/components/inputs/generic/DataTypeGenericInputComponent";
+import {
+    DataTypeSubFlowInputComponent
+} from "@edition/datatype/components/inputs/sub-flow/DataTypeSubFlowInputComponent";
 
-export interface DataTypeInputComponentProps extends Omit<InputWrapperProps<NodeParameterValue | NodeFunction>, "wrapperComponent" | "onChange"> {
+export interface DataTypeInputComponentProps extends Omit<InputWrapperProps<NodeParameterValue | NodeFunction>, "onChange"> {
     schema: NodeSchema
     clearable?: boolean
     onChange?: (value: ReferenceValue | LiteralValue | NodeFunction | undefined) => void
@@ -49,6 +52,11 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
                 {...rest}/>
         case "generic":
             return <DataTypeGenericInputComponent
+                schema={schema}
+                suggestions={suggestions}
+                {...rest}/>
+        case "sub-flow":
+            return <DataTypeSubFlowInputComponent
                 schema={schema}
                 suggestions={suggestions}
                 {...rest}/>

@@ -72,8 +72,10 @@ export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsCompo
                 </MenuContent>
             </MenuPortal>
         </Menu>
-        <Button paddingSize={"xxs"} onClick={() => {
+        <Button paddingSize={"xxs"} onClick={(event) => {
             onSelect?.(undefined)
+            event.stopPropagation()
+            event.preventDefault()
         }}>
             <IconX size={13}/>
         </Button>
