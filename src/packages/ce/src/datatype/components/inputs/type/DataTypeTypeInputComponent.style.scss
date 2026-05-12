@@ -29,8 +29,8 @@ li {
     height: 20px;
     top: 5px;
     transform: translateY(-50%);
-    border-left: 2px solid helpers.backgroundColor(variables.$white);
-    border-bottom: 2px solid helpers.backgroundColor(variables.$white);
+    border-left: 2px solid helpers.backgroundColor(variables.$white, 2);
+    border-bottom: 2px solid helpers.backgroundColor(variables.$white, 2);
     border-bottom-left-radius: 0.5rem;
   }
 
@@ -39,7 +39,7 @@ li {
     position: absolute;
     width: 2px;
     height: 100%;
-    background: helpers.backgroundColor(variables.$white);
+    background: helpers.backgroundColor(variables.$white, 2);
     top: 0;
     left: -0.35rem;
   }
@@ -53,7 +53,7 @@ li {
 
   & {
     @include helpers.borderRadius();
-    @include box.boxHover(variables.$secondary);
+    @include box.boxHover(variables.$tertiary);
     @include box.boxActive(variables.$secondary);
     @include helpers.fontStyle();
     box-shadow: none;
