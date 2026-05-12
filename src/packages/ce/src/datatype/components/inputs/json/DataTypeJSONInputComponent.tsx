@@ -1,29 +1,15 @@
 import React from "react"
-import {IconAlignLeft, IconEdit, IconX} from "@tabler/icons-react"
 import "../type/DataTypeTypeInputComponent.style.scss"
 import {DataTypeJSONInputTreeComponent} from "./DataTypeJSONInputTreeComponent";
 import {DataTypeInputComponentProps} from "../DataTypeInputComponent";
-import {LiteralValue, NodeFunction, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
-import {NodeBadgeComponent} from "../../badges/NodeBadgeComponent";
-import {ReferenceBadgeComponent} from "../../badges/ReferenceBadgeComponent";
-import {
-    Button,
-    Card,
-    Flex,
-    InputDescription,
-    InputLabel,
-    InputMessage,
-    Text,
-    useService,
-    useStore
-} from "@code0-tech/pictor";
-import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
-import {FunctionSuggestionMenuComponent} from "@edition/function/components/suggestion/FunctionSuggestionMenuComponent";
+import {LiteralValue, NodeFunction, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
+import {InputDescription, InputLabel, Spacing} from "@code0-tech/pictor";
 import {
     DataTypeJSONInputEditDialogComponent
 } from "@edition/datatype/components/inputs/json/DataTypeJSONInputEditDialogComponent";
-import {FlowService} from "@edition/flow/services/Flow.service";
-import {useValue} from "@edition/datatype/hooks/DataType.value.hook";
+import {DataTypeInputValueComponent} from "@edition/datatype/components/inputs/DataTypeInputValueComponent";
+import {useDebouncedCallback} from "use-debounce";
+import {DataInput} from "@code0-tech/triangulum/dist/util/schema.util";
 
 export interface EditableJSONEntry {
     key: string
@@ -33,21 +19,27 @@ export interface EditableJSONEntry {
 
 export type DataTypeJSONInputComponentProps = DataTypeInputComponentProps
 
+//TODO render fallback value if undefined based on schema
 export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProps> = (props) => {
 
+    const {schema, title, description, suggestions, formValidation, initialValue, onChange} = props
 
-    const {schema, title, description, formValidation, onChange} = props
-
-    const flowService = useService(FlowService)
-    const flowStore = useStore(FlowService)
-
-    const suggestions = []
     const [editDialogOpen, setEditDialogOpen] = React.useState(false)
-    const [editEntry, setEditEntry] = React.useState<EditableJSONEntry | null>(null)
+    const [editEntry, setEditEntry] = React.useState<EditableJSONEntry | undefined>(undefined)
     const [collapsedState, setCollapsedStateRaw] = React.useState<Record<string, boolean>>({})
 
+    const onChangeDebounced = useDebouncedCallback((value: LiteralValue | NodeFunction | ReferenceValue | undefined) => {
+        formValidation?.setValue?.(value)
+        onChange?.(value)
+    }, 200)
 
-    const [value, setValue] = React.useState<NodeParameterValue | NodeFunction | null>(null)
+    const value = React.useMemo(
+        () => initialValue ?? (schema.functionSchema.input === "list" ? {
+            __typename: "LiteralValue",
+            value: []
+        } as LiteralValue : generateDefaultDataValue(schema.functionSchema as DataInput)),
+            [initialValue, schema]
+    )
 
     const setCollapsedState = (path: string[], collapsed: boolean) => {
         setCollapsedStateRaw(prev => ({...prev, [path.join(".")]: collapsed}))
@@ -65,65 +57,47 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                     key={`edit-dialog-${editEntry?.path.join("-")}-${editDialogOpen}`}
                     open={editDialogOpen}
                     entry={editEntry}
-                    value={value as any}
+                    value={value as LiteralValue}
                     onOpenChange={open => setEditDialogOpen(open)}
-                    onObjectChange={v => {
-                        formValidation?.setValue?.(v)
-                        setValue(v ?? null)
-                        // @ts-ignore
-                        onChange?.()
-                    }}
+                    onObjectChange={onChangeDebounced}
                 />
             )}
             <InputLabel>{title}</InputLabel>
             <InputDescription>{description}</InputDescription>
-            <Card color="secondary" paddingSize="xs">
-                <Flex style={{gap: ".7rem"}} align="center" justify="space-between">
-                    <Flex style={{gap: ".35rem"}} align="center">
-                        <Text>{"Object"}</Text>
-                    </Flex>
-                    <ButtonGroup color={"primary"}>
-                        <FunctionSuggestionMenuComponent onSuggestionSelect={suggestion => {
-                                                             formValidation?.setValue?.(suggestion.value)
-                                                             setValue(suggestion.value)
-                                                             // @ts-ignore
-                                                             onChange?.()
-                                                         }}
-                                                         triggerContent={<Button paddingSize="xxs" variant="filled"
-                                                                                 color="secondary"
-                                                                                 onClick={() => setEditDialogOpen(true)}>
-                                                             <IconAlignLeft size={13}/>
-                                                         </Button>}/>
-                        <Button paddingSize="xxs"
-                                variant="filled"
-                                disabled={value?.__typename != "LiteralValue"}
-                                color="secondary"
-                                onClick={() => setEditDialogOpen(true)}>
-                            <IconEdit size={13}/>
-                        </Button>
-                        <Button paddingSize="xxs" variant="filled" color="secondary">
-                            <IconX size={13}/>
-                        </Button>
-                    </ButtonGroup>
-                </Flex>
-                <Card paddingSize="xs" mt={0.7} mb={-0.55} mx={-0.55}>
-                    {value?.__typename === "NodeFunction" || value?.__typename === "NodeFunctionIdWrapper" ? (
-                        <NodeBadgeComponent value={value}/>
-                    ) : value?.__typename === "ReferenceValue" ? (
-                        <ReferenceBadgeComponent value={value}/>
-                    ) : (
-                        <DataTypeJSONInputTreeComponent
-                            object={value as any}
-                            onEntryClick={handleEntryClick}
-                            collapsedState={collapsedState}
-                            setCollapsedState={setCollapsedState}
-                        />
-                    )}
-                </Card>
-            </Card>
-            {!formValidation?.valid && formValidation?.notValidMessage && (
-                <InputMessage>{formValidation.notValidMessage}</InputMessage>
-            )}
+            <DataTypeInputValueComponent inside
+                                         initialValue={value}
+                                         onChange={onChangeDebounced}
+                                         suggestions={suggestions}
+                                         formValidation={formValidation}>
+                <DataTypeJSONInputTreeComponent
+                    object={value as LiteralValue}
+                    onEntryClick={handleEntryClick}
+                    collapsedState={collapsedState}
+                    setCollapsedState={setCollapsedState}
+                />
+                <Spacing spacing={"xxs"}/>
+            </DataTypeInputValueComponent>
         </>
     )
+}
+
+
+//TODO: only if required
+const generateDefaultDataValue = (schema: DataInput): LiteralValue => {
+    return {
+        __typename: "LiteralValue",
+        value: {
+            ...(Object.entries(schema.properties ?? {})?.map(([key, propSchema]) => {
+                if (!Array.isArray(propSchema)) {
+                    if (propSchema.input === "data") {
+                        return {[key]: generateDefaultDataValue(propSchema).value}
+                    }
+                    if (propSchema.input === "list") {
+                        return {[key]: []}
+                    }
+                    return {[key]: null}
+                }
+            }))
+        }
+    }
 }

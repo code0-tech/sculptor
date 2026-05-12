@@ -22,13 +22,13 @@ import {
 
 export interface DataTypeJSONInputEditDialogComponentProps {
     open: boolean
-    entry: EditableJSONEntry | null
-    value: LiteralValue | null
+    entry: EditableJSONEntry | undefined
+    value: LiteralValue | undefined
     onOpenChange?: (open: boolean) => void
-    onObjectChange?: (object: LiteralValue | null) => void
+    onObjectChange?: (object: LiteralValue | undefined) => void
 }
 
-function getValueAtPath(obj: LiteralValue | null, path: string[]): unknown {
+function getValueAtPath(obj: LiteralValue | undefined, path: string[]): unknown {
     if (!obj || !Array.isArray(path) || path.length === 0) return obj?.value
     // Traverse .value recursively if nested
     let current: any = obj.value
@@ -42,8 +42,8 @@ function getValueAtPath(obj: LiteralValue | null, path: string[]): unknown {
     return current
 }
 
-function setValueAtPath(obj: LiteralValue | null, path: string[], value: unknown): LiteralValue | null {
-    if (!obj) return null
+function setValueAtPath(obj: LiteralValue | undefined, path: string[], value: unknown): LiteralValue | undefined {
+    if (!obj) return undefined
     if (path.length === 0) return { ...obj, value }
     const [key, ...rest] = path
     if (Array.isArray(obj.value)) {
@@ -81,22 +81,24 @@ export const DataTypeJSONInputEditDialogComponent: React.FC<DataTypeJSONInputEdi
     const [editOpen, setEditOpen] = React.useState(open)
     const [collapsedState, setCollapsedStateRaw] = React.useState<Record<string, boolean>>({})
     const [activePath, setActivePath] = React.useState(entry?.path ?? [])
-    const [editedObject, setEditedObject] = React.useState<LiteralValue | null>(value)
+    const [editedObject, setEditedObject] = React.useState<LiteralValue | undefined>(value)
     const [editorValue, setEditorValue] = React.useState(getValueAtPath(value, entry?.path ?? []))
     const clickTimeout = React.useRef<NodeJS.Timeout | null>(null)
 
-    React.useEffect(() => {
-        setEditorValue(getValueAtPath(editedObject, activePath))
-    }, [activePath])
+    React.useEffect(
+        () => setEditorValue(getValueAtPath(editedObject, activePath)),
+        [activePath]
+    )
 
     React.useEffect(() => {
         setActivePath(entry?.path ?? [])
         setEditedObject(value)
     }, [entry])
 
-    React.useEffect(() => {
-        setEditOpen(open)
-    }, [open])
+    React.useEffect(
+        () => setEditOpen(open),
+        [open]
+    )
 
     const setCollapsedState = (path: string[], collapsed: boolean) => {
         setCollapsedStateRaw(prev => ({...prev, [path.join(".")]: collapsed}))
@@ -119,9 +121,6 @@ export const DataTypeJSONInputEditDialogComponent: React.FC<DataTypeJSONInputEdi
         setEditedObject(updated)
         onObjectChange?.(updated)
     }
-
-    const suggestions = () => null
-    const tokenHighlights = {}
 
     return (
         <Dialog open={editOpen} onOpenChange={(open) => onOpenChange?.(open)}>
@@ -170,9 +169,9 @@ export const DataTypeJSONInputEditDialogComponent: React.FC<DataTypeJSONInputEdi
                             <ResizableHandle/>
                             <ResizablePanel color="primary">
                                 <Editor
-                                    suggestions={suggestions}
-                                    tokenHighlights={tokenHighlights}
+                                    key={String(editorValue)} // Force remount when active path changes to reset internal state
                                     language="json"
+                                    customSuggestionComponent={false}
                                     initialValue={editorValue}
                                     onChange={handleEditorChange}
                                 />

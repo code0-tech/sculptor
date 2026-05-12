@@ -89,7 +89,7 @@ export const DataTypeJSONInputTreeComponent: React.FC<DataTypeJSONInputTreeCompo
                     {icon}
                     <Text hierarchy="tertiary">{Array.isArray(value) ? "is a list of" : "is a nested object"}</Text>
                 </Flex>
-                {!isCollapsed && <ul>{renderNodes}</ul>}
+                {!isCollapsed && (renderNodes?.length ?? 0) > 0 && <ul>{renderNodes}</ul>}
             </div>
         )
     }
@@ -120,7 +120,7 @@ export const DataTypeJSONInputTreeComponent: React.FC<DataTypeJSONInputTreeCompo
                         <Text size="xs" style={{color: "inherit"}}>{key}</Text>
                     </Badge>
                     <Text hierarchy="tertiary">has value</Text>
-                    <Badge border color={"tertiary"} style={{verticalAlign: "middle"}}>
+                    <Badge border color={"primary"} style={{verticalAlign: "middle"}}>
                         <Text size="xs" style={{color: "inherit"}}>{String((val as any))}</Text>
                     </Badge>
                 </Flex>
@@ -161,6 +161,6 @@ export const DataTypeJSONInputTreeComponent: React.FC<DataTypeJSONInputTreeCompo
     const rootNode = renderRoot()
     const nodes = rootNode && isRoot ? [rootNode] : renderNodes
     const validNodes = (nodes ?? []).filter(Boolean)
-    if (validNodes.length === 0) return null
+    if (validNodes.length <= 0) return null
     return <ul>{validNodes}</ul>
 }

@@ -170,12 +170,14 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
                 <>
                     <FileTabsContent data-qa-selector={"flow-builder-file-content"}
                                      value={flowId!}
+                                     h={"100%"}
                                      key={flowId!}>
                         <FunctionFileTriggerComponent instance={flow!}/>
                     </FileTabsContent>
                     {
                         nodes?.map(node => {
                             return <FileTabsContent data-qa-selector={"flow-builder-file-content"}
+                                                    h={"100%"}
                                                     value={node?.id!}
                                                     key={node?.id!}>
                                 <FunctionFileDefaultComponent node={node!} flowId={flowId}/>
