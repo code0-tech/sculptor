@@ -2,14 +2,15 @@ import React from "react";
 import {useParams, usePathname, useRouter} from "next/navigation";
 import {Tab, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {Button, Text, Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from "@code0-tech/pictor";
-import {IconHome, IconServer, IconSettings} from "@tabler/icons-react";
+import {IconFile, IconHome, IconServer, IconSettings} from "@tabler/icons-react";
 
 export const ProjectTabView: React.FC = () => {
     const pathname = usePathname()
     const router = useRouter()
     const params = useParams()
     const defaultValue = pathname.includes("flow") ? "flow"
-        : pathname.includes("runtime") ? "runtime":
+        : pathname.includes("runtime") ? "runtime"
+            : pathname.includes("ui") ? "ui" :
             "settings"
 
     const namespaceId = params.namespaceId as any
@@ -35,6 +36,24 @@ export const ProjectTabView: React.FC = () => {
                 <TooltipPortal>
                     <TooltipContent side={"right"} sideOffset={8} color={"primary"}>
                         <Text>Project Flows</Text>
+                    </TooltipContent>
+                </TooltipPortal>
+            </Tooltip>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <TabTrigger value={"ui"} asChild={true}>
+                        <Button variant={"none"} paddingSize={"xs"} onClick={() => {
+                            if (!flowId) {
+                                router.push(`/namespace/${namespaceId}/project/${projectId}/ui`)
+                            }
+                        }}>
+                            <IconFile size={16}/>
+                        </Button>
+                    </TabTrigger>
+                </TooltipTrigger>
+                <TooltipPortal>
+                    <TooltipContent side={"right"} sideOffset={8} color={"primary"}>
+                        <Text>Project Pages</Text>
                     </TooltipContent>
                 </TooltipPortal>
             </Tooltip>
