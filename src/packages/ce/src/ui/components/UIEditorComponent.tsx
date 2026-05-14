@@ -59,34 +59,71 @@ export const UIEditorComponent: React.FC<UIEditorComponentProps> = (props) => {
                 },
             },
         },
-        categories: {
-            typography: {
-                title: "Typography",
-                visible: {
-                    icon: "tabler:typography"
+        "categories": {
+            "all": {
+                "title": "All",
+                "visible": {
+                    "icon": "tabler:all"
                 },
-                components: [
-                    {type: "Heading", title: "Heading", description: "Bla", icon: "tabler:heading"},
-                    {type: "Text", title: "Text", description: "Bla", icon: "tabler:text-size"},
-                ],
+                "components": [
+                    { "type": "Heading", "title": "Heading", "description": "Display eye-catching titles and section headers.", "icon": "tabler:heading" },
+                    { "type": "Text", "title": "Text", "description": "Add and style paragraph text for your content.", "icon": "tabler:text-size" },
+                    { "type": "Container", "title": "Container", "description": "A versatile wrapper to group and align components.", "icon": "tabler:container" },
+                    { "type": "Row", "title": "Row", "description": "Arrange elements horizontally in a flexible row.", "icon": "tabler:layout-list" },
+                    { "type": "Column", "title": "Column", "description": "Create vertical sections within your layout.", "icon": "tabler:columns-3" },
+                    { "type": "Link", "title": "Link", "description": "Add clickable navigation or external references.", "icon": "tabler:link" },
+                    { "type": "Divider", "title": "Divider", "description": "Visually separate sections with a clean line.", "icon": "tabler:divider" },
+                    { "type": "Table", "title": "Table", "description": "Organize and display data in structured rows and columns.", "icon": "tabler:table" },
+                    { "type": "Graph", "title": "Graph", "description": "Visualize complex data sets with dynamic charts.", "icon": "tabler:graph" }
+                ]
             },
-            layout: {
-                title: "Layout",
-                visible: {
-                    icon: "tabler:layout"
+            "typography": {
+                "title": "Typography",
+                "visible": {
+                    "icon": "tabler:typography"
                 },
-                components: [
-                    {type: "Container", title: "Container", description: "Bla", icon: "tabler:container"},
-                    {type: "Row", title: "Row", description: "Bla", icon: "tabler:layout-list"},
-                    {type: "Column", title: "Column", description: "Bla", icon: "tabler:columns-3"},
-                ],
+                "components": [
+                    { "type": "Heading", "title": "Heading", "description": "Display eye-catching titles and section headers.", "icon": "tabler:heading" },
+                    { "type": "Text", "title": "Text", "description": "Add and style paragraph text for your content.", "icon": "tabler:text-size" }
+                ]
             },
+            "layout": {
+                "title": "Layout",
+                "visible": {
+                    "icon": "tabler:layout"
+                },
+                "components": [
+                    { "type": "Container", "title": "Container", "description": "A versatile wrapper to group and align components.", "icon": "tabler:container" },
+                    { "type": "Row", "title": "Row", "description": "Arrange elements horizontally in a flexible row.", "icon": "tabler:layout-list" },
+                    { "type": "Column", "title": "Column", "description": "Create vertical sections within your layout.", "icon": "tabler:columns-3" }
+                ]
+            },
+            "elements": {
+                "title": "Elements",
+                "visible": {
+                    "icon": "tabler:atom"
+                },
+                "components": [
+                    { "type": "Link", "title": "Link", "description": "Add clickable navigation or external references.", "icon": "tabler:link" },
+                    { "type": "Divider", "title": "Divider", "description": "Visually separate sections with a clean line.", "icon": "tabler:divider" }
+                ]
+            },
+            "data": {
+                "title": "Data",
+                "visible": {
+                    "icon": "tabler:database"
+                },
+                "components": [
+                    { "type": "Table", "title": "Table", "description": "Organize and display data in structured rows and columns.", "icon": "tabler:table" },
+                    { "type": "Graph", "title": "Graph", "description": "Visualize complex data sets with dynamic charts.", "icon": "tabler:graph" }
+                ]
+            }
         },
     }
 
     const [data, setData] = React.useState<any>({content: [], root: {props: {}}})
 
-    return <Puck key={JSON.stringify(data)} config={config as any} iframe={{
+    return <Puck config={config as any} iframe={{
         enabled: false,
     }} data={data} height={"100%"} onChange={setData}>
         {children}
