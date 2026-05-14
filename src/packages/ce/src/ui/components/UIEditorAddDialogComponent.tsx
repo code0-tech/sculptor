@@ -7,7 +7,8 @@ import {
     CommandDialog,
     CommandEmpty,
     CommandInput,
-    CommandItem, CommandList,
+    CommandItem,
+    CommandList,
     CommandSeparator,
     Flex,
     hashToColor,
@@ -67,8 +68,6 @@ export const UIEditorAddDialogComponent: React.FC<UIEditorAddDialogComponentProp
             }) ?? []
         }
     })
-
-    console.log(modules, ui.componentList)
 
     //@ts-ignore
     return <CommandDialog p={"0"} open={suggestionDialogOpen} onOpenChange={(open) => onOpenChange?.(open)}
@@ -148,17 +147,14 @@ export const UIEditorAddDialogComponent: React.FC<UIEditorAddDialogComponentProp
                                                                      const id = `${component.type}-${Math.random().toString(36).substr(2, 9)}`;
                                                                      const newComponent = {
                                                                          type: component.type,
-                                                                         props: { id },
+                                                                         props: {id},
                                                                      };
 
                                                                      dispatch({
-                                                                         type: "set",
-                                                                         state: (prev) => ({
+                                                                         type: "setData",
+                                                                         data: (prev) => ({
                                                                              ...prev,
-                                                                             data: {
-                                                                                 ...prev.data,
-                                                                                 content: [newComponent, ...prev.data.content]
-                                                                             }
+                                                                             content: [newComponent, ...prev.content]
                                                                          })
                                                                      });
                                                                      onOpenChange?.(false);
