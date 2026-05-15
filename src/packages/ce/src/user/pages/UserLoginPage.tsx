@@ -22,13 +22,10 @@ export const UserLoginPage: React.FC = () => {
 
     const query = useSearchParams() //can be passwordReset
     const userService = useService(UserService)
-    const userSession = useUserSession()
     const router = useRouter()
     const [loading, startTransition] = React.useTransition()
 
-    const callbackUrl = query.get("callbackUrl")
-
-    const [failedAttempts, setFailedAttempts] = React.useState(0)
+    const [_, setFailedAttempts] = React.useState(0)
     const [isInTimeout, setIsInTimeout] = React.useState(false)
 
     const onSubmit = React.useCallback((values: any) => {
@@ -59,14 +56,7 @@ export const UserLoginPage: React.FC = () => {
                     return
                 }
                 if (payload?.userSession) {
-                    const token = payload.userSession.token
                     setUserSession(payload.userSession)
-                    if (callbackUrl && isValidRedirect(callbackUrl)) {
-                        const targetURL = new URL(callbackUrl)
-                        targetURL.searchParams.set('token', token ?? "")
-                        router.push(targetURL.toString())
-                        return
-                    }
                     router.push("/")
                     router.refresh()
                 }
@@ -95,17 +85,6 @@ export const UserLoginPage: React.FC = () => {
         },
         onSubmit: onSubmit
     })
-
-    React.useEffect(() => {
-        if (userSession?.active && userSession.token) {
-            if (callbackUrl && isValidRedirect(callbackUrl)) {
-                const targetURL = new URL(callbackUrl)
-                targetURL.searchParams.set('token', userSession.token ?? "")
-                router.push(targetURL.toString())
-                return
-            }
-        }
-    }, [userSession])
 
 
     return <>
