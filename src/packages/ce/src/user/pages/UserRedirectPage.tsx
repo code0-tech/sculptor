@@ -78,14 +78,14 @@ export const UserRedirectPage: React.FC = () => {
             )
         }
         <InputLabel>Application</InputLabel>
-        <InputDescription>Build high-class workflows, endpoints and software without coding</InputDescription>
+        <InputDescription>The external application you are granting access to.</InputDescription>
         <TextInput left={<IconApiApp size={16}/>} disabled value={`${callbackUrl}`}/>
         <Spacing spacing={"xl"}/>
         {
             selectNamespace && (
                 <>
                     <InputLabel>Organization</InputLabel>
-                    <InputDescription>Build high-class workflows, endpoints and software without coding</InputDescription>
+                    <InputDescription>Choose the organization this application can access.</InputDescription>
                     <SelectInput>
                         <SelectTrigger asChild>
                             <Flex justify={"space-between"} align={"center"} px={0.7} py={0.7}>
@@ -116,7 +116,7 @@ export const UserRedirectPage: React.FC = () => {
             )
         }
         <InputLabel>Permissions</InputLabel>
-        <InputDescription>Build high-class workflows, endpoints and software without coding</InputDescription>
+        <InputDescription>The application is requesting permission to perform the following actions.</InputDescription>
         <Card color={"secondary"}>
             <CardSection border>
                 <Flex style={{gap: "0.7rem"}} align={"center"}>
@@ -142,6 +142,7 @@ export const UserRedirectPage: React.FC = () => {
         <Flex style={{gap: "0.7rem"}} align={"center"}>
             <Button type={"submit"} onClick={() => {
                 document.cookie = "codezero_callback=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+                document.cookie = "codezero_selectNamespace=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
                 router.push("/")
             }} data-qa-selector={"auth-login-send"} color={isValidCallback ? "secondary" : "success"} w={"100%"}
                     mb={1.3}>
@@ -149,6 +150,8 @@ export const UserRedirectPage: React.FC = () => {
             </Button>
             <Button type={"submit"} onClick={() => {
                 if (callbackUrl && userSession) {
+                    document.cookie = "codezero_callback=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+                    document.cookie = "codezero_selectNamespace=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
                     const targetURL = new URL(callbackUrl)
                     targetURL.searchParams.set('token', userSession?.token ?? "")
                     router.push(targetURL.toString())
