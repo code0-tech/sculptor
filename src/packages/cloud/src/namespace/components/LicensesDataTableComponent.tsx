@@ -14,7 +14,7 @@ import {
     useStore
 } from "@code0-tech/pictor";
 import {DataTableFilterProps, DataTableSortProps} from "@code0-tech/pictor/dist/components/data-table/DataTable";
-import {Namespace, NamespaceLicense} from "@code0-tech/sagittarius-graphql-types";
+import {Namespace, License} from "@code0-tech/sagittarius-graphql-types";
 import {NamespaceService} from "@edition/namespace/services/Namespace.service";
 import {LicensesDataTableRowComponent} from "@edition/namespace/components/LicensesDataTableRowComponent";
 import Link from "next/link";
@@ -23,8 +23,8 @@ export interface LicensesDataTableComponentProps {
     namespaceId: Namespace['id']
     sort?: DataTableSortProps
     filter?: DataTableFilterProps
-    preFilter?: (project: NamespaceLicense, index: number) => boolean
-    onSelect?: (item: NamespaceLicense | undefined) => void
+    preFilter?: (project: License, index: number) => boolean
+    onSelect?: (item: License | undefined) => void
 }
 
 export const LicensesDataTableComponent: React.FC<LicensesDataTableComponentProps> = (props) => {
@@ -35,7 +35,7 @@ export const LicensesDataTableComponent: React.FC<LicensesDataTableComponentProp
     const namespaceStore = useStore(NamespaceService)
 
     const licenses = React.useMemo(
-        () => namespaceService.getById(namespaceId)?.namespaceLicenses?.nodes as NamespaceLicense[] ?? [],
+        () => namespaceService.getById(namespaceId)?.licenses?.nodes as License[] ?? [],
         [namespaceStore]
     )
 
