@@ -1,3 +1,5 @@
+"use client"
+
 import React from "react";
 import {
     Alert,
@@ -46,11 +48,11 @@ export const UserRedirectPage: React.FC = () => {
         () => [{
             title: `Personal organization of user @${userSession?.user?.username}`,
             id: userSession?.user?.namespace?.id!
-        }, ...organizationService.values().map((organization: OrganizationView) => ({
+        }, ...organizationService.values().filter((organization: OrganizationView) => organization.userAbilities).map((organization: OrganizationView) => ({
             id: organization.namespace?.id!,
             title: `Organization with name @${organization.name}`
         }))],
-        [organizationService, organizationStore.length, userSession]
+        [organizationStore.length, userSession]
     )
 
     if (userSession === null) router.push("/login")
@@ -58,7 +60,7 @@ export const UserRedirectPage: React.FC = () => {
     return <>
 
         <Text size={"lg"} hierarchy={"primary"} display={"block"}>
-            Authorize third party application
+            Authorize application
         </Text>
         <Spacing spacing={"xs"}/>
         <Text size={"md"} hierarchy={"tertiary"} display={"block"}>
@@ -85,7 +87,7 @@ export const UserRedirectPage: React.FC = () => {
                 <>
                     <InputLabel>Organization</InputLabel>
                     <InputDescription>Build high-class workflows, endpoints and software without coding</InputDescription>
-                    <SelectInput key={namespaces.length}>
+                    <SelectInput>
                         <SelectTrigger asChild>
                             <Flex justify={"space-between"} align={"center"} px={0.7} py={0.7}>
                                 <Text hierarchy={"secondary"}>
@@ -96,7 +98,7 @@ export const UserRedirectPage: React.FC = () => {
                         </SelectTrigger>
                         <SelectPortal>
                             <SelectContent>
-                                <SelectViewport>
+                                <SelectViewport key={namespaces.length}>
                                     {
                                         namespaces.map(namespace => (
                                             <SelectItem value={namespace.id ?? "unique"}>
