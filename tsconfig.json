@@ -32,6 +32,15 @@
       "@edition/*": [
         "./src/packages/ce/src/*"
       ],
+      "@ce/*": [
+        "./src/packages/ce/src/*"
+      ],
+      "@ee/*": [
+        "./src/packages/ee/src/*"
+      ],
+      "@cloud/*": [
+        "./src/packages/cloud/src/*"
+      ],
       "@core/*": [
         "./src/packages/core/src/*"
       ]
