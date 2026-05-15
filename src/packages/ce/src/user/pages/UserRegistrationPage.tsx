@@ -6,7 +6,8 @@ import {
     EmailInput,
     emailValidation,
     Flex,
-    PasswordInput, passwordValidation,
+    PasswordInput,
+    passwordValidation,
     Text,
     TextInput,
     useForm,
@@ -14,17 +15,14 @@ import {
 } from "@code0-tech/pictor";
 import Link from "next/link";
 import {UserService} from "@edition/user/services/User.service";
-import {useRouter, useSearchParams} from "next/navigation";
+import {useRouter} from "next/navigation";
 import {setUserSession} from "@edition/user/hooks/User.session.hook";
-import {isValidRedirect} from "@core/util/redirect";
 
 export const UserRegistrationPage: React.FC = () => {
 
-    const query = useSearchParams()
     const userService = useService(UserService)
     const router = useRouter()
     const [loading, startTransition] = React.useTransition()
-    const callbackUrl = query.get("callbackUrl")
 
     const [inputs, validate] = useForm({
         useInitialValidation: false,
@@ -61,14 +59,7 @@ export const UserRegistrationPage: React.FC = () => {
                     username: (values.username as unknown as string),
                 }).then(payload => {
                     if (payload?.userSession) {
-                        const token = payload.userSession.token
                         setUserSession(payload.userSession)
-                        if (callbackUrl && isValidRedirect(callbackUrl)) {
-                            const targetURL = new URL(callbackUrl)
-                            targetURL.searchParams.set('token', token ?? "")
-                            router.push(targetURL.toString())
-                            return
-                        }
                         router.push("/")
                         router.refresh()
                     }
@@ -86,9 +77,11 @@ export const UserRegistrationPage: React.FC = () => {
         </Text>
         <Flex style={{gap: "1.3rem"}}>
             {/**@ts-ignore**/}
-            <EmailInput data-qa-selector={"auth-register-email"} wrapperComponent={{style: {flex: 1}}} placeholder={"Email"} {...inputs.getInputProps("email")}/>
+            <EmailInput data-qa-selector={"auth-register-email"} wrapperComponent={{style: {flex: 1}}}
+                        placeholder={"Email"} {...inputs.getInputProps("email")}/>
             {/**@ts-ignore**/}
-            <TextInput data-qa-selector={"auth-register-username"} wrapperComponent={{style: {flex: 1}}} placeholder={"Username"}
+            <TextInput data-qa-selector={"auth-register-username"} wrapperComponent={{style: {flex: 1}}}
+                       placeholder={"Username"}
                        w={"100%"} {...inputs.getInputProps("username")}/>
         </Flex>
         <div style={{marginBottom: "1.3rem"}}/>
@@ -105,7 +98,7 @@ export const UserRegistrationPage: React.FC = () => {
         </Button>
         <Text display={"flex"} hierarchy={"tertiary"} size={"md"}>
             Have an account
-            <Link href={`/login?${query.toString()}`}>
+            <Link href={`/login`}>
                 <Text ml={0.35} hierarchy={"primary"} display={"flex"} size={"md"}>
                     Log in
                 </Text>

@@ -7,8 +7,7 @@ import Link from "next/link";
 import {useRouter, useSearchParams} from "next/navigation";
 
 export const UserForgotPasswordPage: React.FC = () => {
-
-    const query = useSearchParams()
+    
     const userService = useService(UserService)
     const [loading, startTransition] = React.useTransition()
     const router = useRouter()
@@ -53,7 +52,7 @@ export const UserForgotPasswordPage: React.FC = () => {
         </Button>
         <Text display={"flex"} hierarchy={"tertiary"} size={"md"}>
             Didn't forget your password?
-            <Link href={`/login?${query.toString()}`}>
+            <Link href={`/login`}>
                 <Text ml={0.35} hierarchy={"primary"} display={"flex"} size={"md"}>
                     Log in
                 </Text>

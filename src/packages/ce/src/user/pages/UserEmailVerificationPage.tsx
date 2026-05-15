@@ -8,7 +8,6 @@ import {useRouter, useSearchParams} from "next/navigation";
 
 export const UserEmailVerificationPage: React.FC = () => {
 
-    const query = useSearchParams()
     const userService = useService(UserService)
     const [loading, startTransition] = React.useTransition()
     const router = useRouter()
@@ -53,7 +52,7 @@ export const UserEmailVerificationPage: React.FC = () => {
         </Button>
         <Text display={"flex"} hierarchy={"tertiary"} size={"md"}>
             Don't have an account yet
-            <Link href={`/login?${query.toString()}`}>
+            <Link href={`/login`}>
                 <Text ml={0.35} hierarchy={"primary"} display={"flex"} size={"md"}>
                     Log in
                 </Text>
