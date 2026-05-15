@@ -3,6 +3,7 @@ fragment UserBasic on User {
     admin
     avatarPath
     createdAt
+    readme
     firstname
     emailVerifiedAt
     email

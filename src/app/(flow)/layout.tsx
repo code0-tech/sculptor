@@ -12,7 +12,7 @@ import {
     FunctionDefinition,
     Namespace,
     NamespaceProject,
-    Runtime
+    Runtime, User
 } from "@code0-tech/sagittarius-graphql-types";
 import {usePersistentReactiveArrayService} from "@/hooks/usePersistentReactiveArrayService";
 import {UserService} from "@edition/user/services/User.service";
@@ -27,7 +27,6 @@ import {FunctionService} from "@edition/function/services/Function.service";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import Image from "next/image";
-import {UserView} from "@edition/user/services/User.view";
 import {OrganizationView} from "@edition/organization/services/Organization.view";
 import {MemberView} from "@edition/member/services/Member.view";
 import {ProjectView} from "@edition/project/services/Project.view";
@@ -56,7 +55,7 @@ export default function FlowLayout({bar, tab, children}: {
 
     if (currentSession === null) router.push("/login")
 
-    const user = usePersistentReactiveArrayService<UserView, UserService>(`dashboard::users::${currentSession?.id}`, (store) => new UserService(graphqlClient, store))
+    const user = usePersistentReactiveArrayService<User, UserService>(`dashboard::users::${currentSession?.id}`, (store) => new UserService(graphqlClient, store))
     const organization = usePersistentReactiveArrayService<OrganizationView, OrganizationService>(`dashboard::organizations::${currentSession?.id}`, (store) => new OrganizationService(graphqlClient, store))
     const member = usePersistentReactiveArrayService<MemberView, MemberService>(`dashboard::members::${currentSession?.id}`, (store) => new MemberService(graphqlClient, store))
     const namespace = usePersistentReactiveArrayService<Namespace, NamespaceService>(`dashboard::namespaces::${currentSession?.id}`, (store) => new NamespaceService(graphqlClient, store))

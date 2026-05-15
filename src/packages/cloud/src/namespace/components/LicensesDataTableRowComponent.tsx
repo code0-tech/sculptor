@@ -1,14 +1,7 @@
 import React from "react";
-import {Namespace, NamespaceLicense, Organization} from "@code0-tech/sagittarius-graphql-types";
-import {Avatar, Button, DataTableColumn, Flex, hashToColor, Text, useService, useStore} from "@code0-tech/pictor";
-import {IconLogout} from "@tabler/icons-react";
-import {OrganizationService} from "@edition/organization/services/Organization.service";
+import {Namespace, NamespaceLicense} from "@code0-tech/sagittarius-graphql-types";
+import {DataTableColumn, useService, useStore} from "@code0-tech/pictor";
 import {NamespaceService} from "@edition/namespace/services/Namespace.service";
-import {MemberService} from "@edition/member/services/Member.service";
-import {UserService} from "@edition/user/services/User.service";
-import {formatDistanceToNow} from "date-fns";
-import {useUserSession} from "@edition/user/hooks/User.session.hook";
-import {OrganizationView} from "@edition/organization/services/Organization.view";
 
 export interface LicensesDataTableRowComponentProps {
     namespaceId: Namespace['id']
