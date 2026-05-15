@@ -16,16 +16,25 @@ import React from "react";
 import {usePersistentReactiveArrayService} from "@/hooks/usePersistentReactiveArrayService";
 import {UserView} from "@edition/user/services/User.view";
 import {FullScreen} from "@code0-tech/pictor/dist/components/fullscreen/FullScreen";
+import {Namespace} from "@code0-tech/sagittarius-graphql-types";
+import {NamespaceService} from "@edition/namespace/services/Namespace.service";
+import {useUserSession} from "@edition/user/hooks/User.session.hook";
+import {OrganizationView} from "@edition/organization/services/Organization.view";
+import {OrganizationService} from "@edition/organization/services/Organization.service";
 
 export default function AuthLayout({children}: Readonly<{ children: React.ReactNode }>) {
 
     const client = useApolloClient()
-    const [store, service] = usePersistentReactiveArrayService<UserView, UserService>("auth-users", (store) => new UserService(new GraphqlClient(client), store))
+    const currentSession = useUserSession()
+    const graphqlClient = React.useMemo(() => new GraphqlClient(client), [client])
+
+    const [store, service] = usePersistentReactiveArrayService<UserView, UserService>("auth-users", (store) => new UserService(graphqlClient, store))
+    const organization = usePersistentReactiveArrayService<OrganizationView, OrganizationService>(`dashboard::organizations::${currentSession?.id}`, (store) => new OrganizationService(graphqlClient, store))
 
     return (
         <FullScreen>
             <AuroraBackground/>
-            <ContextStoreProvider services={[[store, service]]}>
+            <ContextStoreProvider services={[[store, service], organization]}>
                 <Container h={"100%"} w={"100%"}>
                     <Flex h={"100%"} w={"100%"} align={"center"} justify={"center"}>
                         <Col xs={4}>
