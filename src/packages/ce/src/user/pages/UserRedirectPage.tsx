@@ -58,7 +58,6 @@ export const UserRedirectPage: React.FC = () => {
     if (userSession === null) router.push("/login")
 
     return <>
-
         <Text size={"lg"} hierarchy={"primary"} display={"block"}>
             Authorize application
         </Text>
@@ -91,7 +90,7 @@ export const UserRedirectPage: React.FC = () => {
                         <SelectTrigger asChild>
                             <Flex justify={"space-between"} align={"center"} px={0.7} py={0.7}>
                                 <Text hierarchy={"secondary"}>
-                                    <SelectValue placeholder={"title"}/>
+                                    <SelectValue placeholder={"Select an organization"}/>
                                 </Text>
                                 <IconChevronDown size={13}/>
                             </Flex>
@@ -158,7 +157,6 @@ export const UserRedirectPage: React.FC = () => {
                 {isValidCallback ? "Authorize" : "Authorize and ignore warning"}
             </Button>
         </Flex>
-
     </>
 
 }
