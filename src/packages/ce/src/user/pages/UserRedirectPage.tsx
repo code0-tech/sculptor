@@ -40,6 +40,7 @@ export const UserRedirectPage: React.FC = () => {
     const isValidCallback = isValidRedirect(callbackUrl)
     const organizationService = useService(OrganizationService)
     const organizationStore = useStore(OrganizationService)
+    const [namespaceId, setNamespaceId] = React.useState<string | null>(null);
 
     const namespaces: ({
         title?: string
@@ -86,7 +87,7 @@ export const UserRedirectPage: React.FC = () => {
                 <>
                     <InputLabel>Organization</InputLabel>
                     <InputDescription>Choose the organization this application can access.</InputDescription>
-                    <SelectInput>
+                    <SelectInput onValueChange={setNamespaceId}>
                         <SelectTrigger asChild>
                             <Flex justify={"space-between"} align={"center"} px={0.7} py={0.7}>
                                 <Text hierarchy={"secondary"}>
@@ -100,7 +101,7 @@ export const UserRedirectPage: React.FC = () => {
                                 <SelectViewport key={namespaces.length}>
                                     {
                                         namespaces.map(namespace => (
-                                            <SelectItem value={namespace.id ?? "unique"}>
+                                            <SelectItem value={namespace.id ?? ""}>
                                                 <SelectItemText>
                                                     <Text>{namespace.title}</Text>
                                                 </SelectItemText>
@@ -154,6 +155,7 @@ export const UserRedirectPage: React.FC = () => {
                     document.cookie = "codezero_selectNamespace=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
                     const targetURL = new URL(callbackUrl)
                     targetURL.searchParams.set('token', userSession?.token ?? "")
+                    if (selectNamespace && namespaceId) targetURL.searchParams.set('namespace', namespaceId)
                     router.push(targetURL.toString())
                 }
             }} data-qa-selector={"auth-login-send"} color={isValidCallback ? "success" : "error"} w={"100%"} mb={1.3}>
