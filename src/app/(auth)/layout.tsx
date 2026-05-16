@@ -19,11 +19,11 @@ import {GraphqlClient} from "@core/util/graphql-client";
 import Image from "next/image";
 import React from "react";
 import {usePersistentReactiveArrayService} from "@/hooks/usePersistentReactiveArrayService";
-import {UserView} from "@edition/user/services/User.view";
 import {FullScreen} from "@code0-tech/pictor/dist/components/fullscreen/FullScreen";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {OrganizationView} from "@edition/organization/services/Organization.view";
 import {OrganizationService} from "@edition/organization/services/Organization.service";
+import {User} from "@code0-tech/sagittarius-graphql-types";
 
 export default function AuthLayout({children}: Readonly<{ children: React.ReactNode }>) {
 
@@ -31,7 +31,7 @@ export default function AuthLayout({children}: Readonly<{ children: React.ReactN
     const currentSession = useUserSession()
     const graphqlClient = React.useMemo(() => new GraphqlClient(client), [client])
 
-    const [store, service] = usePersistentReactiveArrayService<UserView, UserService>("auth-users", (store) => new UserService(graphqlClient, store))
+    const [store, service] = usePersistentReactiveArrayService<User, UserService>("auth-users", (store) => new UserService(graphqlClient, store))
     const organization = usePersistentReactiveArrayService<OrganizationView, OrganizationService>(`dashboard::organizations::${currentSession?.id}`, (store) => new OrganizationService(graphqlClient, store))
 
     return (

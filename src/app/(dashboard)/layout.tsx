@@ -20,13 +20,12 @@ import {RoleService} from "@edition/role/services/Role.service";
 import Image from "next/image";
 import {Application, ApplicationService} from "@edition/application/services/Application.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
-import {UserView} from "@edition/user/services/User.view";
 import {OrganizationView} from "@edition/organization/services/Organization.view";
 import {MemberView} from "@edition/member/services/Member.view";
 import {ProjectView} from "@edition/project/services/Project.view";
 import {RoleView} from "@edition/role/services/Role.view";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
-import {Namespace, Runtime} from "@code0-tech/sagittarius-graphql-types";
+import {Namespace, Runtime, User} from "@code0-tech/sagittarius-graphql-types";
 
 interface ApplicationLayoutProps {
     children: React.ReactNode
@@ -42,7 +41,7 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
 
     const graphqlClient = React.useMemo(() => new GraphqlClient(client), [client])
 
-    const user = usePersistentReactiveArrayService<UserView, UserService>(`dashboard::users::${currentSession?.id}`, (store) => new UserService(graphqlClient, store))
+    const user = usePersistentReactiveArrayService<User, UserService>(`dashboard::users::${currentSession?.id}`, (store) => new UserService(graphqlClient, store))
     const organization = usePersistentReactiveArrayService<OrganizationView, OrganizationService>(`dashboard::organizations::${currentSession?.id}`, (store) => new OrganizationService(graphqlClient, store))
     const member = usePersistentReactiveArrayService<MemberView, MemberService>(`dashboard::members::${currentSession?.id}`, (store) => new MemberService(graphqlClient, store))
     const namespace = usePersistentReactiveArrayService<Namespace, NamespaceService>(`dashboard::namespaces::${currentSession?.id}`, (store) => new NamespaceService(graphqlClient, store))

@@ -3,7 +3,7 @@
 import React from "react";
 import {AuroraBackground, Button, ButtonGroup, Flex, Spacing, Text} from "@code0-tech/pictor";
 import Link from "next/link";
-import {LicensesDataTableComponent} from "@edition/namespace/components/LicensesDataTableComponent";
+import {LicensesDataTableComponent} from "@cloud/namespace/components/LicensesDataTableComponent";
 import {useParams} from "next/navigation";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
 

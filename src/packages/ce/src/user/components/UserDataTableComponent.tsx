@@ -32,7 +32,7 @@ export const UserDataTableComponent: React.FC<UserDataTableComponentProps> = (pr
                           </Text>
                       </DataTableColumn>}
                       onSelect={(item) => item && onSelect?.(item)}
-                      data={users.map(u => u.json()).filter(preFilter)}>
+                      data={users.filter(preFilter)}>
         {(runtime, index) => {
             return <UserDataTableRowComponent userId={runtime.id}/>
         }}
