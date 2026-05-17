@@ -24,3 +24,8 @@ a {
   display: block !important;
   height: 100%;
 }
+
+[class*="PuckFields--wrapFields"] [class*="PuckFields-field"] + [class*="PuckFields-field"] {
+  border-top: none !important;
+  margin-top: 0 !important;
+}

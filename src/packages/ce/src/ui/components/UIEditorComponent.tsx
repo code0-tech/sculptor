@@ -1,7 +1,7 @@
 import {createUsePuck, Puck} from "@puckeditor/core";
 import React from "react";
-import {Card, CheckboxInput, Col, Container, DataTableFilterInput, Flex, NumberInput, Row, SelectContent, SelectInput, SelectItem, SelectItemText, SelectPortal, SelectTrigger, SelectValue, SelectViewport, SwitchInput, Text, TextInput} from "@code0-tech/pictor";
-import {IconChevronDown} from "@tabler/icons-react";
+import {Card, Col, Container, DataTableFilterInput, Flex, InputLabel, Menu, MenuCheckboxItem, MenuContent, MenuItemIndicator, MenuPortal, MenuTrigger, NumberInput, SelectContent, SelectInput, SelectItem, SelectItemText, SelectPortal, SelectTrigger, SelectValue, SelectViewport, SwitchInput, Text, TextInput} from "@code0-tech/pictor";
+import {IconCheck, IconChevronDown} from "@tabler/icons-react";
 
 export const usePuck = createUsePuck()
 
@@ -72,6 +72,13 @@ const columnSizeOptions = [
     {label: "100%", value: "100%"},
 ]
 
+const columnSizeToSpan = {
+    "25%": 3,
+    "33%": 4,
+    "50%": 6,
+    "100%": 12,
+} as const
+
 const isValidUrl = (value: string) => {
     try {
         const url = new URL(value)
@@ -87,11 +94,16 @@ const renderSelectInput = (title: string, options: { label: string, value: strin
         return (
             <SelectInput
                 title={title}
+                value={props.value}
                 onValueChange={(value) => props.onChange(value)}
+                p={0.5}
+                label={title}
             >
                 <SelectTrigger asChild>
-                    <Flex justify={"space-between"} align={"center"}>
-                        <SelectValue placeholder={"Select..."}/>
+                    <Flex justify={"space-between"} align={"center"} p={0.75}>
+                        <Text hierarchy={"secondary"}>
+                            <SelectValue placeholder={title}/>
+                        </Text>
                         <IconChevronDown size={13}/>
                     </Flex>
                 </SelectTrigger>
@@ -120,7 +132,7 @@ const renderNumberInput = (title: string) => {
         return (
             <NumberInput
                 title={title}
-                value={props.value?.toString() ?? ""}
+                value={props.value?.toString() ?? "1"}
                 onChange={(e) => props.onChange(Number(e.currentTarget.value))}
             />
         )
@@ -135,27 +147,55 @@ const MultipleSelectInput: React.FC<{
 }> = (props) => {
     const {title, value, options, onChange} = props
     const selectedValues = Array.isArray(value) ? value : []
+    const triggerValue = selectedValues.length > 0
+        ? `${selectedValues.length} selected`
+        : title
 
     return (
-        <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
-            <Text size={"sm"} hierarchy={"primary"}>{title}</Text>
-            {options.map((option) => {
-                const selected = selectedValues.includes(option.value)
+        <>
+            <InputLabel>{title}</InputLabel>
+            <Menu>
+                <MenuTrigger asChild>
+                    <button
+                        type={"button"}
+                        className={"input-wrapper"}
+                        style={{width: "100%", border: 0, padding: 0, cursor: "pointer"}}
+                    >
+                        <Flex justify={"space-between"} align={"center"} p={0.75} style={{width: "100%"}}>
+                            <Text hierarchy={"secondary"}>
+                                {triggerValue}
+                            </Text>
+                            <IconChevronDown size={13}/>
+                        </Flex>
+                    </button>
+                </MenuTrigger>
+                <MenuPortal>
+                    <MenuContent align={"start"}>
+                        {options.map((option) => {
+                            const selected = selectedValues.includes(option.value)
 
-                return (
-                    <CheckboxInput
-                        key={option.value}
-                        label={option.label}
-                        checked={selected}
-                        onCheckedChange={(checked) => {
-                            onChange(checked === true
-                                ? [...selectedValues, option.value]
-                                : selectedValues.filter((selectedValue) => selectedValue !== option.value))
-                        }}
-                    />
-                )
-            })}
-        </Flex>
+                            return (
+                                <MenuCheckboxItem
+                                    key={option.value}
+                                    checked={selected}
+                                    onSelect={(event) => event.preventDefault()}
+                                    onCheckedChange={(checked) => {
+                                        onChange(checked === true
+                                            ? [...selectedValues, option.value]
+                                            : selectedValues.filter((selectedValue) => selectedValue !== option.value))
+                                    }}
+                                >
+                                    <MenuItemIndicator>
+                                        <IconCheck size={13}/>
+                                    </MenuItemIndicator>
+                                    {option.label}
+                                </MenuCheckboxItem>
+                            )
+                        })}
+                    </MenuContent>
+                </MenuPortal>
+            </Menu>
+        </>
     )
 }
 
@@ -176,7 +216,6 @@ export const UIEditorComponent: React.FC<UIEditorComponentProps> = (props) => {
                 fields: {
                     content: {
                         type: "custom",
-                        label: "Name",
                         render: (props: any) => {
                             return (
                                 <TextInput
@@ -190,7 +229,6 @@ export const UIEditorComponent: React.FC<UIEditorComponentProps> = (props) => {
                     },
                     size: {
                         type: "custom",
-                        label: "Size",
                         render: renderSelectInput("Size", headingSizes),
                     },
                 },
@@ -223,7 +261,6 @@ export const UIEditorComponent: React.FC<UIEditorComponentProps> = (props) => {
                 fields: {
                     content: {
                         type: "custom",
-                        label: "The content of the text component. You can provide the content as text.",
                         render: (props: any) => {
                             return (
                                 <TextInput
@@ -237,12 +274,11 @@ export const UIEditorComponent: React.FC<UIEditorComponentProps> = (props) => {
                     },
                     hierarchy: {
                         type: "custom",
-                        label: "Hierarchy",
                         render: renderSelectInput("Hierarchy", textHierarchyOptions),
                     },
                 },
-                render: ({content}: { content: string }) => {
-                    return <Text size={"md"}>{content || "Your Text"}</Text>;
+                render: ({ content, hierarchy }: { content: string, hierarchy: "primary" | "secondary" | "tertiary" }) => {
+                    return <Text size={"md"} hierarchy={hierarchy}>{content || "Your Text"}</Text>
                 },
             },
             Container: {
@@ -252,7 +288,7 @@ export const UIEditorComponent: React.FC<UIEditorComponentProps> = (props) => {
                     },
                 },
                 render: ({children: Children}: { children: React.FC }) => {
-                    return <Container>{<Children/>}</Container>;
+                    return <Container p={0} w={"100%"} miw={"auto"} maw={"100%"}>{<Children/>}</Container>;
                 },
             },
             Row: {
@@ -261,30 +297,38 @@ export const UIEditorComponent: React.FC<UIEditorComponentProps> = (props) => {
                         type: "slot",
                     },
                 },
-                render: ({children: Children}: { children: React.FC }) => {
-                    return <Row>{<Children/>}</Row>;
+                render: ({children: Children}: { children: React.FC<any> }) => {
+                    return (
+                        <Children
+                            as={"div"}
+                            collisionAxis={"x"}
+                            minEmptyHeight={120}
+                        />
+                    )
                 },
             },
             Column: {
+                inline: true,
                 fields: {
                     children: {
                         type: "slot",
                     },
                     column_size: {
                         type: "custom",
-                        label: "Column Size",
                         render: renderSelectInput("Column Size", columnSizeOptions),
                     }
                 },
-                render: ({children: Children, column_size}: { children: React.FC, column_size: string }) => {
-                    return <Col width={column_size}>{<Children/>}</Col>;
+                defaultProps: {
+                    column_size: "50%",
+                },
+                render: ({children: Children, column_size, puck}: { children: React.FC, column_size: keyof typeof columnSizeToSpan, puck?: { dragRef?: React.Ref<HTMLDivElement> } }) => {
+                    return <Col ref={puck?.dragRef} xs={columnSizeToSpan[column_size] ?? 12}>{<Children/>}</Col>;
                 },
             },
             Link: {
                 fields: {
                     content: {
                         type: "custom",
-                        label: "Content",
                         render: (props: any) => {
                             return (
                                 <TextInput
@@ -298,7 +342,6 @@ export const UIEditorComponent: React.FC<UIEditorComponentProps> = (props) => {
                     },
                     link: {
                         type: "custom",
-                        label: "Link",
                         render: (props: any) => {
                             return (
                                 <TextInput
@@ -322,12 +365,10 @@ export const UIEditorComponent: React.FC<UIEditorComponentProps> = (props) => {
                     link: "https://example.com",
                 },
                 render: ({content, link}: { content: string, link: string }) => {
-                    const href = isValidUrl(link) ? link : "https://example.com"
-
                     return (
-                        <a href={href} target={"_blank"} rel={"noreferrer"}>
+                        <Text size={"md"}>
                             {content || "Your Link"}
-                        </a>
+                        </Text>
                     )
                 },
             },
@@ -338,7 +379,6 @@ export const UIEditorComponent: React.FC<UIEditorComponentProps> = (props) => {
                     },
                     color: {
                         type: "custom",
-                        label: "Color",
                         render: renderSelectInput("Color", cardColors),
                     },
                 },
@@ -353,7 +393,6 @@ export const UIEditorComponent: React.FC<UIEditorComponentProps> = (props) => {
                 fields: {
                     orientation: {
                         type: "custom",
-                        label: "Orientation",
                         render: renderSelectInput("Orientation", dividerOrientations),
                     },
                 },
@@ -374,17 +413,14 @@ export const UIEditorComponent: React.FC<UIEditorComponentProps> = (props) => {
                 fields: {
                     runtime: {
                         type: "custom",
-                        label: "Runtime",
                         render: renderSelectInput("Runtime", runtimeOptions),
                     },
                     module: {
                         type: "custom",
-                        label: "Module",
                         render: renderSelectInput("Module", moduleOptions),
                     },
                     columns: {
                         type: "custom",
-                        label: "Columns",
                         render: (props: any) => {
                             return (
                                 <MultipleSelectInput
@@ -398,11 +434,10 @@ export const UIEditorComponent: React.FC<UIEditorComponentProps> = (props) => {
                     },
                     filter: {
                         type: "custom",
-                        label: "Filter",
                         render: (props: any) => {
                             return (
                                 <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
-                                    <Text size={"sm"} hierarchy={"primary"}>Filter</Text>
+                                    <InputLabel>Filter</InputLabel>
                                     <DataTableFilterInput
                                         onChange={(filter) => props.onChange(filter)}
                                         filterTokens={columnOptions.map((column) => {
@@ -419,7 +454,6 @@ export const UIEditorComponent: React.FC<UIEditorComponentProps> = (props) => {
                     },
                     showFilter: {
                         type: "custom",
-                        label: "Show Filter",
                         render: (props: any) => {
                             return (
                                 <SwitchInput
@@ -432,17 +466,14 @@ export const UIEditorComponent: React.FC<UIEditorComponentProps> = (props) => {
                     },
                     minItems: {
                         type: "custom",
-                        label: "Minimum Items",
                         render: renderNumberInput("Minimum Items"),
                     },
                     maxItems: {
                         type: "custom",
-                        label: "Maximum Items",
                         render: renderNumberInput("Maximum Items"),
                     },
                     itemsPerPage: {
                         type: "custom",
-                        label: "Items per Page",
                         render: renderNumberInput("Items per Page"),
                     },
                 },
@@ -472,32 +503,26 @@ export const UIEditorComponent: React.FC<UIEditorComponentProps> = (props) => {
                 fields: {
                     runtime: {
                         type: "custom",
-                        label: "Runtime",
                         render: renderSelectInput("Runtime", runtimeOptions),
                     },
                     module: {
                         type: "custom",
-                        label: "Module",
                         render: renderSelectInput("Module", moduleOptions),
                     },
                     xAxis: {
                         type: "custom",
-                        label: "X Axis",
                         render: renderSelectInput("X Axis", axisOptions),
                     },
                     yAxis: {
                         type: "custom",
-                        label: "Y Axis",
                         render: renderSelectInput("Y Axis", axisOptions),
                     },
                     xAxisType: {
                         type: "custom",
-                        label: "X Axis Type",
                         render: renderSelectInput("X Axis Type", axisTypeOptions),
                     },
                     yAxisType: {
                         type: "custom",
-                        label: "Y Axis Type",
                         render: renderSelectInput("Y Axis Type", axisTypeOptions),
                     },
                 },
@@ -588,9 +613,17 @@ export const UIEditorComponent: React.FC<UIEditorComponentProps> = (props) => {
 
     const [data, setData] = React.useState<any>({content: [], root: {props: {}}})
 
-    return <Puck config={config as any} iframe={{
-        enabled: false,
-    }} data={data} height={"100%"} onChange={setData}>
-        {children}
-    </Puck>
+    return (
+        <Puck
+            config={config as any}
+            iframe={{
+                enabled: false,
+            }}
+            data={data}
+            height={"100%"}
+            onChange={setData}
+        >
+            {children}
+        </Puck>
+    )
 }
