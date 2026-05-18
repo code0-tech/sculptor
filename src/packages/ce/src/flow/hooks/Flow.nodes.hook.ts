@@ -6,6 +6,7 @@ import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FunctionNodeComponentProps} from "@edition/function/components/nodes/FunctionNodeComponent";
 import {useFlowSchema} from "@edition/flow/hooks/Flow.schema.hook";
+import {useFlowCompareStore} from "@ce/flow/hooks/Flow.compare.hook";
 
 export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], projectId?: NamespaceProject["id"]): Node<FunctionNodeComponentProps>[] => {
 
@@ -13,6 +14,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
     const flowStore = useStore(FlowService)
     const functionService = useService(FunctionService)
     const functionStore = useStore(FunctionService)
+    const flowToCompare = useFlowCompareStore(state => state.flow)
 
     const [nodes, setNodes] = useState<Node<FunctionNodeComponentProps>[]>([])
 
@@ -21,7 +23,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
         [flowId, flowStore.length, flowService]
     )
 
-    const flowSchema = useFlowSchema(flowId, namespaceId, projectId)
+    const flowSchema = useFlowSchema(flowToCompare || flowId, namespaceId, projectId)
 
     React.useEffect(() => {
         if (!flow) return

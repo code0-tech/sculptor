@@ -6,9 +6,10 @@ import {useSchemaAction} from "@edition/flow/components/FlowWorkerProvider";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {NodeSchema} from "@code0-tech/triangulum";
+import {FlowView} from "@ce/flow/services/Flow.view";
 
 export const useFlowSchema = (
-    flowId: Flow['id'],
+    flow: Flow['id'] | FlowView,
     namespaceId: Namespace['id'],
     projectId: NamespaceProject['id'],
 ): NodeSchema[][] | undefined => {
@@ -22,9 +23,9 @@ export const useFlowSchema = (
 
     const [schema, setSchema] = React.useState<NodeSchema[][] | undefined>([]);
 
-    const flow = React.useMemo(
-        () => flowService.getById(flowId, {namespaceId, projectId}),
-        [flowId, flowService, flowStore]
+    const flowView = React.useMemo(
+        () => typeof flow === "string" ? flowService.getById(flow, {namespaceId, projectId}) : flow,
+        [flow, flowService, flowStore]
     )
 
     const dataTypes = React.useMemo(
@@ -38,19 +39,19 @@ export const useFlowSchema = (
     )
 
     React.useEffect(() => {
-        if (!flow) return
+        if (!flowView) return
         if (dataTypes.length <= 0) return
         if (functions.length <= 0) return
 
         const triggerSchema = execute({
-            flow,
+            flow: flowView,
             dataTypes,
             functions
         })
 
-        const schemas = flow.nodes?.nodes?.map(node => {
+        const schemas = flowView.nodes?.nodes?.map(node => {
             return execute({
-                flow,
+                flow: flowView,
                 dataTypes,
                 functions,
                 nodeId: node?.id
@@ -61,7 +62,7 @@ export const useFlowSchema = (
             setSchema(value as NodeSchema[][])
         })
 
-    }, [functions.length, dataTypes.length, flowStore, flow?.editedAt, flow?.nodes?.nodes?.length])
+    }, [functions.length, dataTypes.length, flowStore, flowView?.editedAt, flowView?.nodes?.nodes?.length])
 
     return schema
 }

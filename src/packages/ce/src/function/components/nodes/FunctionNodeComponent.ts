@@ -7,6 +7,7 @@ export interface FunctionNodeComponentProps extends Record<string, unknown>, Com
     functionId?: FunctionDefinition['id']
     flowId: Flow['id']
     schema: NodeSchema[]
+    compareType?: 'added' | 'removed' | 'changed'
     color: string
     parentNodeId?: NodeFunction['id']
     isParameter?: boolean

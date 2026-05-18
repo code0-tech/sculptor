@@ -19,6 +19,7 @@
     "@code0-tech/triangulum": "^0.22.0",
     "@codemirror/lang-javascript": "^6.2.5",
     "@codemirror/lint": "^6.9.5",
+    "@icons-pack/react-simple-icons": "^13.13.0",
     "@opentelemetry/api": "^1.9.1",
     "@opentelemetry/context-zone": "^2.6.1",
     "@opentelemetry/exporter-logs-otlp-http": "^0.218.0",
