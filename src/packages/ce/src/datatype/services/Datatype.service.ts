@@ -36,6 +36,9 @@ export class DatatypeService extends ReactiveArrayService<DataType, DataTypeDepe
                     namespaceId: namespaceId,
                     projectId: projectId,
 
+                    firstModule: 50,
+                    afterModule: null,
+
                     firstDataType: 50,
                     afterDataType: null,
 
@@ -46,7 +49,7 @@ export class DatatypeService extends ReactiveArrayService<DataType, DataTypeDepe
                     afterRule: null,
                 }
             }).then(res => {
-                const nodes = res.data?.namespace?.project?.primaryRuntime?.dataTypes?.nodes ?? []
+                const nodes = res.data?.namespace?.project?.primaryRuntime?.modules?.nodes?.flatMap(module => module?.dataTypes?.nodes ?? []) ?? []
                 nodes.forEach(dataType => {
                     if (dataType && !this.hasById(dataType.id)) {
                         this.set(this.i++, new View(dataType))

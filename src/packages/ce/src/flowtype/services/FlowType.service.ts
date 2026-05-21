@@ -39,11 +39,14 @@ export class FlowTypeService extends ReactiveArrayService<FlowType, FlowTypeDepe
                     namespaceId: namespaceId,
                     projectId: projectId,
 
+                    firstModule: 50,
+                    afterModule: null,
+
                     firstFlowType: 50,
                     afterFlowType: null,
                 }
             }).then(res => {
-                const nodes = res.data?.namespace?.project?.primaryRuntime?.flowTypes?.nodes ?? []
+                const nodes = res.data?.namespace?.project?.primaryRuntime?.modules?.nodes?.flatMap(module => module?.flowTypes?.nodes ?? []) ?? []
                 nodes.forEach(flowType => {
                     if (flowType && !this.hasById(flowType.id)) {
                         this.set(this.i++, new View(flowType))

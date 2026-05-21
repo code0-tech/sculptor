@@ -12,10 +12,7 @@ fragment Runtime on Runtime {
     createdAt
     updatedAt
     token
-    dataTypes {
-        count
-    }
-    flowTypes {
+    modules {
         count
     }
     projects {

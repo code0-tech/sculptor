@@ -3,6 +3,8 @@
 query Functions (
     $namespaceId: NamespaceID!
     $projectId: NamespaceProjectID!
+    $firstModule: Int!
+    $afterModule: String
     $firstFunction: Int!
     $afterFunction: String
     $firstParameterDefinition: Int!
@@ -11,10 +13,20 @@ query Functions (
     namespace(id: $namespaceId) {
         project(id: $projectId) {
             primaryRuntime {
-                functionDefinitions (first: $firstFunction, after: $afterFunction) {
+                modules(first: $firstModule, after: $afterModule) {
+                    __typename
                     count
                     nodes {
-                        ...Function
+                        functionDefinitions (first: $firstFunction, after: $afterFunction) {
+                            count
+                            nodes {
+                                ...Function
+                            }
+                            pageInfo {
+                                endCursor
+                                hasNextPage
+                            }
+                        }
                     }
                     pageInfo {
                         endCursor

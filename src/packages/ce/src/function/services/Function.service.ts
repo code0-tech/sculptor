@@ -39,6 +39,9 @@ export class FunctionService extends ReactiveArrayService<FunctionDefinition, Fu
                     namespaceId: namespaceId,
                     projectId: projectId,
 
+                    firstModule: 50,
+                    afterModule: null,
+
                     firstFunction: 50,
                     afterFunction: null,
 
@@ -46,7 +49,7 @@ export class FunctionService extends ReactiveArrayService<FunctionDefinition, Fu
                     afterParameterDefinition: null,
                 }
             }).then(res => {
-                const nodes = res.data?.namespace?.project?.primaryRuntime?.functionDefinitions?.nodes ?? []
+                const nodes = res.data?.namespace?.project?.primaryRuntime?.modules?.nodes?.flatMap(module => module?.functionDefinitions?.nodes ?? []) ?? []
                 nodes.forEach(functionD => {
                     if (functionD && !this.hasById(functionD.id)) {
                         this.set(this.i++, new View(functionD))
