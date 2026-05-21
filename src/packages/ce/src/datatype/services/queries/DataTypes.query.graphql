@@ -3,6 +3,8 @@
 query DataTypes (
     $namespaceId: NamespaceID!
     $projectId: NamespaceProjectID!
+    $firstModule: Int!
+    $afterModule: String
     $firstDataType: Int!
     $afterDataType: String
     $firstRule: Int!
@@ -11,11 +13,21 @@ query DataTypes (
     namespace(id: $namespaceId) {
         project(id: $projectId) {
             primaryRuntime {
-                dataTypes (first: $firstDataType, after: $afterDataType) {
+                modules(first: $firstModule, after: $afterModule) {
                     __typename
                     count
                     nodes {
-                        ...DataType
+                        dataTypes (first: $firstDataType, after: $afterDataType) {
+                            __typename
+                            count
+                            nodes {
+                                ...DataType
+                            }
+                            pageInfo {
+                                endCursor
+                                hasNextPage
+                            }
+                        }
                     }
                     pageInfo {
                         endCursor

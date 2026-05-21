@@ -3,16 +3,28 @@
 query FlowTypes (
     $namespaceId: NamespaceID!
     $projectId: NamespaceProjectID!
+    $firstModule: Int!
+    $afterModule: String
     $firstFlowType: Int!
     $afterFlowType: String
 ) {
     namespace(id: $namespaceId) {
         project(id: $projectId) {
             primaryRuntime {
-                flowTypes (first: $firstFlowType, after: $afterFlowType) {
+                modules(first: $firstModule, after: $afterModule) {
+                    __typename
                     count
                     nodes {
-                        ...FlowType
+                        flowTypes (first: $firstFlowType, after: $afterFlowType) {
+                            count
+                            nodes {
+                                ...FlowType
+                            }
+                            pageInfo {
+                                endCursor
+                                hasNextPage
+                            }
+                        }
                     }
                     pageInfo {
                         endCursor
