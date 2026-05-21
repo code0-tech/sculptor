@@ -96,7 +96,8 @@ export class ProjectService extends ReactiveArrayService<ProjectView, ProjectDep
                 runtimes: {
                     count: payload.runtimeIds.length,
                     nodes: payload.runtimeIds.map(runtimeId => ({ id: runtimeId }))
-                }
+                },
+                primaryRuntime: result.data.namespacesProjectsAssignRuntimes.namespaceProject.primaryRuntime
             })))
 
         }
