@@ -37,6 +37,14 @@ fragment Function on FunctionDefinition {
         __typename
     }
 
+    runtime {
+        id
+    }
+    runtimeModule {
+        __typename
+        id
+    }
+
     parameterDefinitions (first: $firstParameterDefinition, after: $afterParameterDefinition) {
         nodes {
             id

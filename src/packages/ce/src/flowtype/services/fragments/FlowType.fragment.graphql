@@ -27,6 +27,10 @@ fragment FlowType on FlowType {
     runtime {
         id
     }
+    runtimeModule {
+        __typename
+        id
+    }
     signature
     flowTypeSettings {
         __typename
