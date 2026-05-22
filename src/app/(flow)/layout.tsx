@@ -12,7 +12,7 @@ import {
     FunctionDefinition,
     Namespace,
     NamespaceProject,
-    Runtime, User
+    Runtime, RuntimeModule, User
 } from "@code0-tech/sagittarius-graphql-types";
 import {usePersistentReactiveArrayService} from "@/hooks/usePersistentReactiveArrayService";
 import {UserService} from "@edition/user/services/User.service";
@@ -33,6 +33,7 @@ import {ProjectView} from "@edition/project/services/Project.view";
 import {RoleView} from "@edition/role/services/Role.view";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
+import {ModuleService} from "@ce/module/services/Module.service";
 
 export default function FlowLayout({bar, tab, children}: {
     bar: React.ReactNode,
@@ -66,6 +67,7 @@ export default function FlowLayout({bar, tab, children}: {
     const functions = usePersistentReactiveArrayService<FunctionDefinition, FunctionService>(`dashboard::functions::${currentSession?.id}`, (store) => new FunctionService(graphqlClient, store))
     const datatype = usePersistentReactiveArrayService<DataType, DatatypeService>(`dashboard::datatypes::${currentSession?.id}`, (store) => new DatatypeService(graphqlClient, store))
     const flowtype = usePersistentReactiveArrayService<FlowType, FlowTypeService>(`dashboard::flowtypes::${currentSession?.id}`, (store) => new FlowTypeService(graphqlClient, store))
+    const module = usePersistentReactiveArrayService<RuntimeModule, ModuleService>(`dashboard::modules::${currentSession?.id}`, (store) => new ModuleService(graphqlClient, store))
 
 
     const runtimeId = React.useMemo(() => project[1].getById(projectId, {namespaceId})?.primaryRuntime?.id, [projectId, project[0], namespaceId])
@@ -77,10 +79,11 @@ export default function FlowLayout({bar, tab, children}: {
         functions[1].values({namespaceId, projectId, runtimeId})
         datatype[1].values({namespaceId, projectId, runtimeId})
         flowtype[1].values({namespaceId, projectId, runtimeId})
+        module[1].values({namespaceId, projectId})
     }, [runtimeId, namespaceId, projectId, currentSession, flow, functions, datatype, flowtype])
 
     return <ContextStoreProvider
-        services={[user, organization, member, namespace, runtime, project, role, flow, functions, datatype, flowtype]}>
+        services={[user, organization, member, namespace, runtime, project, role, flow, functions, datatype, flowtype, module]}>
         <Layout layoutGap={0} style={{zIndex: 0}} showLayoutSplitter={false} leftContent={
             <Flex p={0.7} pt={1} align={"center"} style={{flexDirection: "column", gap: "0.7rem"}}>
                 <div style={{
