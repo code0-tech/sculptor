@@ -1,5 +1,7 @@
 import {LiteralValue, NodeFunction, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
-import {FunctionSuggestion} from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
+import {useService, useStore} from "@code0-tech/pictor";
+import {ModuleService} from "@ce/module/services/Module.service";
+import {FunctionService} from "@ce/function/services/Function.service";
 import React from "react";
 
 export interface Suggestion {
@@ -17,46 +19,68 @@ export interface SuggestionGroup {
     icon?: string
 }
 
-export const getMappedSuggestions = (suggestions: FunctionSuggestion[]): SuggestionGroup[] => {
+export const useMappedSuggestions = (suggestions: (NodeFunction | ReferenceValue | LiteralValue)[]): SuggestionGroup[] => {
+
+    const moduleService = useService(ModuleService)
+    const moduleStore = useStore(ModuleService)
+    const functionService = useService(FunctionService)
+    const functionStore = useStore(FunctionService)
+
+    const modules = React.useMemo(
+        () => moduleService.values(),
+        [moduleService, moduleStore]
+    )
+
+    const functions = React.useMemo(
+        () => functionService.values(),
+        [functionService, functionStore]
+    )
 
     const mappedSuggestions: Suggestion[] = suggestions.map((suggestion) => {
-        return {
-            value: suggestion.value,
-            icon: suggestion.icon,
-            displayMessage: suggestion.displayText.join(" "),
-            aliases: suggestion.aliases || [],
-            definitionSource: suggestion.definitionSource || "All",
-            description: suggestion.description,
+
+        if (suggestion.__typename === "NodeFunction") {
+            const functionDefinition = functions.find(f => f.id === suggestion.functionDefinition?.id)
+            const module = modules.find(m => m.id === functionDefinition?.runtimeModule?.id)
+
+            return {
+                value: suggestion,
+                icon: functionDefinition?.displayIcon,
+                displayMessage: functionDefinition?.names?.[0].content,
+                aliases: functionDefinition?.aliases?.[0].content?.split(";"),
+                definitionSource: module?.id,
+                description: functionDefinition?.descriptions?.[0].content,
+            }
         }
+
+        return null
+    }).filter((Boolean)) as Suggestion[]
+
+    const groupedByModule = new Map<string, { suggestions: Suggestion[], module: any }>()
+
+    mappedSuggestions.forEach((suggestion) => {
+        const moduleId = suggestion.definitionSource
+        const module = modules.find(m => m.id === moduleId)
+
+        if (!groupedByModule.has(moduleId)) {
+            groupedByModule.set(moduleId, {
+                suggestions: [],
+                module: module
+            })
+        }
+
+        groupedByModule.get(moduleId)!.suggestions.push(suggestion)
     })
 
-    const groupedBySource = mappedSuggestions.reduce((acc, suggestion) => {
-        const source = suggestion.definitionSource
-        const runtimeIdentifier = suggestion.value.__typename === "NodeFunction"
-            ? suggestion.value.functionDefinition?.identifier
-            : undefined
-
-        if (!acc[source]) {
-            acc[source] = []
-        }
-
-        if (runtimeIdentifier) {
-            const [_, pkg] = runtimeIdentifier.split("::")
-            const identifier = `${pkg[0].toUpperCase()}${pkg.slice(1)}`
-            if (!acc[identifier]) {
-                acc[identifier] = []
-            }
-            acc[identifier].push(suggestion)
-        }
-
-        acc[source].push(suggestion)
-        return acc
-    }, {} as Record<string, Suggestion[]>)
-
-
-    return Object.entries(groupedBySource).map(([source, suggestions]) => ({
-        suggestions,
-        displayMessage: source,
-        icon: source === "All" ? "" : suggestions[0]?.icon,
-    }))
+    return [
+        {
+            suggestions: mappedSuggestions,
+            displayMessage: "All",
+            icon: undefined
+        },
+        ...Array.from(groupedByModule.values()).map((group) => ({
+            suggestions: group.suggestions,
+            displayMessage: group.module?.names?.[0].content,
+            icon: group.module?.icon
+        }))
+    ]
 }
