@@ -1,0 +1,25 @@
+fragment Module on RuntimeModule {
+    __typename
+    id
+    createdAt
+    updatedAt
+    identifier
+    version
+    author
+    documentation
+    icon
+
+    names {
+        code
+        content
+        __typename
+    }
+    descriptions {
+        code
+        content
+        __typename
+    }
+    runtime {
+        id
+    }
+}
