@@ -1,6 +1,5 @@
 import React from "react";
-import {FunctionSuggestion} from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
-import {getMappedSuggestions, Suggestion} from "@edition/function/components/suggestion/Suggestion.util";
+import {Suggestion, useMappedSuggestions} from "@edition/function/components/suggestion/Suggestion.util";
 import {
     Badge,
     Button,
@@ -9,7 +8,8 @@ import {
     CommandEmpty,
     CommandInput,
     CommandItem,
-    CommandList, CommandSeparator,
+    CommandList,
+    CommandSeparator,
     Flex,
     hashToColor,
     ScrollArea,
@@ -23,9 +23,10 @@ import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 import {Tab, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {icon, IconString} from "@core/util/icons";
 import {IconArrowsUpDown, IconCornerDownLeft, IconSearch} from "@tabler/icons-react";
+import {LiteralValue, NodeFunction, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
 
 export interface SuggestionDialogComponentProps {
-    suggestions?: FunctionSuggestion[]
+    suggestions?: (NodeFunction | ReferenceValue | LiteralValue)[]
     open?: boolean
     onOpenChange?: (open: boolean) => void
     onSuggestionSelect?: (suggestion: Suggestion) => void
@@ -41,7 +42,7 @@ export const SuggestionDialogComponent: React.FC<SuggestionDialogComponentProps>
         setSuggestionDialogOpen(open)
     }, [open])
 
-    const suggestions = getMappedSuggestions(props.suggestions || [])
+    const suggestions = useMappedSuggestions(props.suggestions || [])
     const [currentTab, setCurrentTab] = React.useState<string>("group-0")
     const [holdCurrentTab, setHoldCurrentTab] = React.useState<string>("group-0")
 
@@ -123,7 +124,8 @@ export const SuggestionDialogComponent: React.FC<SuggestionDialogComponentProps>
 
                                                     }}>
                                                         <Flex style={{gap: "0.35rem"}} align={"center"}>
-                                                            <DisplayIcon color={hashToColor(`group-${index}`)} size={16}/>
+                                                            <DisplayIcon color={hashToColor(`group-${index}`)}
+                                                                         size={16}/>
                                                             <Text size={"sm"}>{suggestion.displayMessage}</Text>
                                                         </Flex>
                                                         <Spacing spacing={"xxs"}/>

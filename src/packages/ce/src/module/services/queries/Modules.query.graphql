@@ -1,0 +1,36 @@
+#import "../fragments/Module.fragment.graphql"
+
+query Modules (
+    $namespaceId: NamespaceID!
+    $projectId: NamespaceProjectID!
+    $firstRuntime: Int!
+    $afterRuntime: String
+    $firstModule: Int!
+    $afterModule: String
+) {
+    namespace(id: $namespaceId) {
+        project(id: $projectId) {
+            runtimes(first: $firstRuntime, after: $afterRuntime) {
+                __typename
+                count
+                nodes {
+                    modules(first: $firstModule, after: $afterModule) {
+                        __typename
+                        count
+                        nodes {
+                            ...Module
+                        }
+                        pageInfo {
+                            endCursor
+                            hasNextPage
+                        }
+                    }
+                }
+                pageInfo {
+                    endCursor
+                    hasNextPage
+                }
+            }
+        }
+    }
+}

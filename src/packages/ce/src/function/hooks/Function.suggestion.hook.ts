@@ -2,8 +2,6 @@ import {useService, useStore} from "@code0-tech/pictor";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
-import {FunctionSuggestionType} from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
-import {FALLBACK_FUNCTION_NAME} from "@core/util/fallback-translations";
 
 export const useFunctionSuggestions = () => {
 
@@ -51,18 +49,6 @@ export const useFunctionSuggestions = () => {
         if (packageCmp !== 0) return packageCmp;
 
         return fA.localeCompare(fB);
-    }).map(suggestion => {
-
-        const functionDefinition = functionService.getById(suggestion.functionDefinition?.id)
-        return {
-            path: [],
-            type: FunctionSuggestionType.FUNCTION,
-            displayText: [functionDefinition?.names?.[0]?.content ?? FALLBACK_FUNCTION_NAME],
-            value: suggestion,
-            icon: functionDefinition?.displayIcon || "",
-            aliases: functionDefinition?.aliases?.map((a) => a.content).flatMap(a => a?.split(";") ?? ""),
-            description: functionDefinition?.descriptions?.[0]?.content || "",
-        }
-    }), [nodes]);
+    }), [nodes])
 
 }

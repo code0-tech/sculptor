@@ -28,4 +28,8 @@ fragment BasicDataType on DataType {
     runtime {
         id
     }
+    runtimeModule {
+        __typename
+        id
+    }
 }

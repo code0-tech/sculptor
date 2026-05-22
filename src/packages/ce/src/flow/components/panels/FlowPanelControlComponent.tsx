@@ -1,5 +1,5 @@
 import React from "react";
-import {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
+import {Flow, LiteralValue, NodeFunction, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
 import {
     Badge,
     Button,
@@ -15,7 +15,6 @@ import {Panel} from "@xyflow/react";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {SuggestionDialogComponent} from "@edition/function/components/suggestion/SuggestionDialogComponent";
-import {FunctionSuggestion} from "@edition/function/components/suggestion/FunctionSuggestionComponent.view";
 import {Suggestion} from "@edition/function/components/suggestion/Suggestion.util";
 import {useHotkeys} from "react-hotkeys-hook";
 import {useSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
@@ -51,14 +50,14 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
         })
     }, [selectedNode, flowService, flowStore])
 
-    const addNodeToFlow = React.useCallback((suggestion: FunctionSuggestion | Suggestion) => {
-        if (flowId && suggestion.value.__typename === "NodeFunction" && selectedNode?.id.includes("NodeFunction")) {
+    const addNodeToFlow = React.useCallback((suggestion: NodeFunction | ReferenceValue | LiteralValue) => {
+        if (flowId && suggestion.__typename === "NodeFunction" && selectedNode?.id.includes("NodeFunction")) {
             startTransition(async () => {
-                await flowService.addNextNodeById(flowId, selectedNode?.id as NodeFunction['id'], suggestion.value as NodeFunction)
+                await flowService.addNextNodeById(flowId, selectedNode?.id as NodeFunction['id'], suggestion as NodeFunction)
             })
-        } else if (suggestion.value.__typename === "NodeFunction") {
+        } else if (suggestion.__typename === "NodeFunction") {
             startTransition(async () => {
-                await flowService.addNextNodeById(flowId, null, suggestion.value as NodeFunction)
+                await flowService.addNextNodeById(flowId, null, suggestion as NodeFunction)
             })
         }
     }, [flowId, flowService, flowStore, selectedNode])

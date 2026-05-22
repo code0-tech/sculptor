@@ -32,6 +32,11 @@ fragment DataType on DataType {
         id
     }
 
+    runtimeModule {
+        __typename
+        id
+    }
+
     rules (first: $firstRule, after: $afterRule) {
         __typename
         count
