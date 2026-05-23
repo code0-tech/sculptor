@@ -110,12 +110,13 @@ export const isValidUrl = (value: string) => {
 
 export const UIEditorTextInputField: React.FC<any> = (props) => {
     const {field, name, value, onChange} = props
+    const inputValue = value ?? field.defaultValue ?? ""
 
     return (
         <TextInput
             title={field.title ?? name}
             description={field.description}
-            value={value ?? ""}
+            value={inputValue}
             clearable
             onChange={(event) => {
                 const nextValue = event.currentTarget.value
@@ -132,11 +133,12 @@ export const UIEditorSelectInputField: React.FC<any> = (props) => {
     const {field, value, onChange} = props
     const title = field.title ?? field.label
     const options = field.options ?? []
+    const inputValue = value ?? field.defaultValue ?? options[0]?.value
 
     return (
         <SelectInput
             title={title}
-            value={value}
+            value={inputValue}
             onValueChange={(nextValue) => onChange(nextValue)}
             p={0.5}
             label={title}
@@ -275,11 +277,12 @@ export const MultipleSelectInput: React.FC<{
 
 export const UIEditorMultiSelectInputField: React.FC<any> = (props) => {
     const {field, value, onChange} = props
+    const inputValue = value ?? field.defaultValue ?? []
 
     return (
         <MultipleSelectInput
             title={field.title}
-            value={value}
+            value={inputValue}
             options={field.options ?? []}
             onChange={onChange}
         />

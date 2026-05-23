@@ -93,7 +93,7 @@ export const UIEditorPage: React.FC = () => {
                     <ResizablePanel id={"3"}
                                     color={"primary"}
                                     style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
-                        <UIEditorHistoryPanelView/>
+                        {/*<UIEditorHistoryPanelView/>*/}
                         <UIEditorControlPanelView/>
                         <Puck.Preview/>
                     </ResizablePanel>

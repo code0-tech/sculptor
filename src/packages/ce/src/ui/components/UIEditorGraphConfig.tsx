@@ -12,31 +12,37 @@ export const UIEditorGraphConfig = {
             type: "SelectInput",
             title: "Runtime",
             options: runtimeOptions,
+            defaultValue: "default-runtime",
         },
         module: {
             type: "SelectInput",
             title: "Module",
             options: moduleOptions,
+            defaultValue: "users",
         },
         xAxis: {
             type: "SelectInput",
             title: "X Axis",
             options: axisOptions,
+            defaultValue: "createdAt",
         },
         yAxis: {
             type: "SelectInput",
             title: "Y Axis",
             options: axisOptions,
+            defaultValue: "count",
         },
         xAxisType: {
             type: "SelectInput",
             title: "X Axis Type",
             options: axisTypeOptions,
+            defaultValue: "date",
         },
         yAxisType: {
             type: "SelectInput",
             title: "Y Axis Type",
             options: axisTypeOptions,
+            defaultValue: "number",
         },
     },
     defaultProps: {

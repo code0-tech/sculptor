@@ -1,5 +1,6 @@
 import {createUsePuck, Puck} from "@puckeditor/core";
 import React from "react";
+import {UIEditorActionBarComponent} from "@edition/ui/components/UIEditorActionBarComponent";
 import {UIEditorCardConfig} from "@edition/ui/components/UIEditorCardConfig";
 import {UIEditorColumnConfig} from "@edition/ui/components/UIEditorColumnConfig";
 import {UIEditorContainerConfig} from "@edition/ui/components/UIEditorContainerConfig";
@@ -30,6 +31,9 @@ export const UIEditorComponent: React.FC<UIEditorComponentProps> = (props) => {
     const {children} = props
 
     const config = {
+        root: {
+            fields: {}
+        },
         components: {
             Heading: UIEditorHeadingConfig,
             Text: UIEditorTextConfig,
@@ -115,6 +119,7 @@ export const UIEditorComponent: React.FC<UIEditorComponentProps> = (props) => {
                 enabled: false,
             }}
             overrides={{
+                actionBar: UIEditorActionBarComponent,
                 fieldTypes: {
                     TextInput: UIEditorTextInputField,
                     SelectInput: UIEditorSelectInputField,

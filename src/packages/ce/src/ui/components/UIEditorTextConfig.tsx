@@ -6,11 +6,13 @@ export const UIEditorTextConfig = {
         content: {
             type: "TextInput",
             title: "Content",
+            defaultValue: "Your Text",
         },
         hierarchy: {
             type: "SelectInput",
             title: "Hierarchy",
             options: textHierarchyOptions,
+            defaultValue: "primary",
         },
     },
     render: ({content, hierarchy}: { content: string, hierarchy: "primary" | "secondary" | "tertiary" }) => {

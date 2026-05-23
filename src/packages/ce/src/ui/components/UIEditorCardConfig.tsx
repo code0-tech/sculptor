@@ -11,6 +11,7 @@ export const UIEditorCardConfig = {
             type: "SelectInput",
             title: "Color",
             options: cardColors,
+            defaultValue: "primary",
         },
     },
     defaultProps: {

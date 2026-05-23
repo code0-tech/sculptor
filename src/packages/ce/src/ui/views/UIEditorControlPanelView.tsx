@@ -1,13 +1,31 @@
 import React from "react";
 import {Panel} from "@xyflow/react";
-import {Badge, Button, Text, Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from "@code0-tech/pictor";
-import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
+import {Badge, Button, ButtonGroup, Text, Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from "@code0-tech/pictor";
 import {UIEditorAddDialogComponent} from "@edition/ui/components/UIEditorAddDialogComponent";
 import {useHotkeys} from "react-hotkeys-hook";
+import {usePuck} from "@edition/ui/components/UIEditorComponent";
 
 export const UIEditorControlPanelView: React.FC = () => {
-
     const [suggestionDialogOpen, setSuggestionDialogOpen] = React.useState(false)
+    const itemSelector = usePuck((state) => state.appState.ui.itemSelector)
+    const dispatch = usePuck((state) => state.dispatch)
+    const selected = Boolean(itemSelector)
+
+    const deleteSelectedComponent = () => {
+        if (!itemSelector) return
+
+        dispatch({
+            type: "remove",
+            index: itemSelector.index,
+            zone: itemSelector.zone ?? "root",
+        })
+        dispatch({
+            type: "setUi",
+            ui: {
+                itemSelector: null,
+            },
+        })
+    }
 
     useHotkeys('shift+a', (keyboardEvent) => {
         setSuggestionDialogOpen(true)
@@ -26,13 +44,15 @@ export const UIEditorControlPanelView: React.FC = () => {
                     <Button data-qa-selector={"flow-builder-control-panel-delete"}
                             paddingSize={"xxs"}
                             variant={"filled"}
-                            color={"error"}>
+                            color={"error"}
+                            disabled={!selected}
+                            onClick={deleteSelectedComponent}>
                         <Text>Delete component</Text>
                     </Button>
                 </TooltipTrigger>
                 <TooltipPortal>
                     <TooltipContent sideOffset={8}>
-                        <Text>Select a component to delete it</Text>
+                        <Text>{selected ? "Delete selected component" : "Select a component to delete it"}</Text>
                     </TooltipContent>
                 </TooltipPortal>
             </Tooltip>

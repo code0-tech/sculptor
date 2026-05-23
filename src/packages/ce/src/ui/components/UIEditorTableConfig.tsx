@@ -11,16 +11,19 @@ export const UIEditorTableConfig = {
             type: "SelectInput",
             title: "Runtime",
             options: runtimeOptions,
+            defaultValue: "default-runtime",
         },
         module: {
             type: "SelectInput",
             title: "Module",
             options: moduleOptions,
+            defaultValue: "users",
         },
         columns: {
             type: "MultiSelectInput",
             title: "Columns",
             options: columnOptions,
+            defaultValue: ["name", "createdAt"],
         },
         filter: {
             type: "DataTableFilterInput",

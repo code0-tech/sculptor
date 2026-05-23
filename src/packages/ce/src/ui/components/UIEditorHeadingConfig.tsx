@@ -6,11 +6,13 @@ export const UIEditorHeadingConfig = {
         content: {
             type: "TextInput",
             title: "Content",
+            defaultValue: "Your Heading",
         },
         size: {
             type: "SelectInput",
             title: "Size",
             options: headingSizes,
+            defaultValue: "h1",
         },
     },
     defaultProps: {

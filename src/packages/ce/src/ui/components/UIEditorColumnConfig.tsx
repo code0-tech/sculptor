@@ -12,12 +12,17 @@ export const UIEditorColumnConfig = {
             type: "SelectInput",
             title: "Column Size",
             options: columnSizeOptions,
+            defaultValue: "50%",
         }
     },
     defaultProps: {
         column_size: "50%",
     },
     render: ({children: Children, column_size, puck}: { children: React.FC, column_size: keyof typeof columnSizeToSpan, puck?: { dragRef?: React.Ref<HTMLDivElement> } }) => {
-        return <Col ref={puck?.dragRef} xs={columnSizeToSpan[column_size] ?? 12}>{<Children/>}</Col>;
-    },
+        return (
+            <Col ref={puck?.dragRef} xs={columnSizeToSpan[column_size] ?? 12}>
+                {<Children />}
+            </Col>
+        )
+    }
 }
