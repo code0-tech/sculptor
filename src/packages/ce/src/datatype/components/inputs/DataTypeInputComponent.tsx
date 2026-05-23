@@ -17,9 +17,10 @@ import {DataTypeGenericInputComponent} from "@edition/datatype/components/inputs
 import {
     DataTypeSubFlowInputComponent
 } from "@edition/datatype/components/inputs/sub-flow/DataTypeSubFlowInputComponent";
+import {Schema} from "@code0-tech/triangulum/dist/util/schema.util";
 
 export interface DataTypeInputComponentProps extends Omit<InputWrapperProps<NodeParameterValue | NodeFunction>, "onChange"> {
-    schema: NodeSchema
+    schema: NodeSchema | Schema
     clearable?: boolean
     onChange?: (value: ReferenceValue | SubFlowValue | LiteralValue | NodeFunction | undefined) => void
     suggestions?: (NodeFunction | SubFlowValue | ReferenceValue | LiteralValue)[]
@@ -30,8 +31,8 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
 
     const {schema, ...rest} = props
 
-    const suggestions = schema?.schema?.suggestions as (NodeFunction | ReferenceValue | LiteralValue)[]
-    const inputName = schema?.schema?.input === "generic" ? schema.functionSchema.input : schema?.schema?.input
+    const suggestions = "schema" in schema ? schema?.schema?.suggestions as (NodeFunction | ReferenceValue | LiteralValue)[] : []
+    const inputName = "schema" in schema ? (schema?.schema?.input === "generic" ? schema.functionSchema.input : schema?.schema?.input) : schema.input
 
     switch (inputName) {
         case "boolean":
