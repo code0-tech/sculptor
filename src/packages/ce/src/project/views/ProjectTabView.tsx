@@ -58,7 +58,7 @@ export const ProjectTabView: React.FC = () => {
                 <TooltipTrigger asChild>
                     <TabTrigger value={"module"} asChild={true}>
                         <Button variant={"none"} paddingSize={"xs"}
-                                onClick={() => router.push(`/namespace/${namespaceId}/project/${projectId}/runtime/1/module`)}>
+                                onClick={() => router.push(`/namespace/${namespaceId}/project/${projectId}/module`)}>
                             <IconBox size={16}/>
                         </Button>
                     </TabTrigger>
