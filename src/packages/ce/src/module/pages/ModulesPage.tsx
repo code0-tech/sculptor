@@ -1,8 +1,8 @@
 "use client"
 
 import React from "react";
-import {useParams} from "next/navigation";
-import {Namespace, NamespaceProject, Runtime} from "@code0-tech/sagittarius-graphql-types";
+import {useParams, useRouter} from "next/navigation";
+import {Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {
     Badge,
     Button,
@@ -25,6 +25,7 @@ import {ProjectService} from "@ce/project/services/Project.service";
 
 export const ModulesPage: React.FC = () => {
 
+    const router = useRouter()
     const params = useParams()
     const moduleService = useService(ModuleService)
     const moduleStore = useStore(ModuleService)
@@ -138,7 +139,11 @@ export const ModulesPage: React.FC = () => {
                                         <Button variant={"none"} w={"100%"}>
                                             Documentation
                                         </Button>
-                                        <Button disabled={(module.configurationDefinitions?.nodes?.length ?? 0) <= 0} color={"tertiary"} w={"100%"}>
+                                        <Button onClick={() => {
+                                            const number = module?.id?.match(/RuntimeModule\/(\d+)$/)?.[1]
+                                            router.push(`/namespace/${namespaceIndex}/project/${projectIndex}/module/${number}`)
+                                        }} disabled={(module.configurationDefinitions?.nodes?.length ?? 0) <= 0}
+                                                color={"tertiary"} w={"100%"}>
                                             Configure
                                         </Button>
                                     </Flex>
