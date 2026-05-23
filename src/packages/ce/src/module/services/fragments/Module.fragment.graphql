@@ -22,4 +22,10 @@ fragment Module on RuntimeModule {
     runtime {
         id
     }
+    flowTypes {
+        count
+    }
+    functionDefinitions {
+        count
+    }
 }
