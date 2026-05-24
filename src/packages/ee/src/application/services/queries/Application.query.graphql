@@ -1,0 +1,10 @@
+#import "../fragments/Application.fragment.graphql"
+
+query Application(
+    $firstLicense: Int,
+    $afterLicense: String
+) {
+    application {
+        ...Application
+    }
+}

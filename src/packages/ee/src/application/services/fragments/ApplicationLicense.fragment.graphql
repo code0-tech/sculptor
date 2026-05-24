@@ -1,17 +1,14 @@
-fragment NamespaceLicense on NamespaceLicense {
+fragment ApplicationLicense on License {
     __typename
     id
-
     createdAt
     updatedAt
-
     startDate
     endDate
-
     licensee
 
     userAbilities {
         __typename
-        deleteNamespaceLicense
+        deleteLicense
     }
 }
