@@ -1,7 +1,7 @@
 import {LiteralValue, NodeFunction, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
 import {useService, useStore} from "@code0-tech/pictor";
-import {ModuleService} from "@ce/module/services/Module.service";
-import {FunctionService} from "@ce/function/services/Function.service";
+import {ModuleService} from "@edition/module/services/Module.service";
+import {FunctionService} from "@edition/function/services/Function.service";
 import React from "react";
 
 export interface Suggestion {
