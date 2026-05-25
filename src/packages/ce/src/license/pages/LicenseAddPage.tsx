@@ -3,6 +3,6 @@
 import React from "react";
 import {notFound} from "next/navigation";
 
-export const ApplicationLicenseAddPage: React.FC = () => {
+export const LicenseAddPage: React.FC = () => {
     return notFound()
 }
