@@ -33,7 +33,7 @@ import {ProjectView} from "@edition/project/services/Project.view";
 import {RoleView} from "@edition/role/services/Role.view";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
-import {ModuleService} from "@ce/module/services/Module.service";
+import {ModuleService} from "@edition/module/services/Module.service";
 
 export default function FlowLayout({bar, tab, children}: {
     bar: React.ReactNode,
