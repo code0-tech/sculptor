@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react";
-import {LicensesView} from "@cloud/namespace/views/LicensesView";
+import {LicensesView} from "@cloud/license/views/LicensesView";
 
 export const LicensesPage: React.FC = () => {
     return <div style={{
