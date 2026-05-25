@@ -17,19 +17,23 @@ export const UIEditorEditPage: React.FC = () => {
             <ResizablePanel id={"2"}>
                 <UIEditorComponent>
                     <ResizablePanelGroup orientation={"horizontal"}>
-                        <ResizablePanel id={"3"}
-                                        color={"primary"}
-                                        style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
+                        <ResizablePanel
+                            id={"3"}
+                            color={"primary"}
+                            style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}
+                        >
                             {/*<UIEditorHistoryPanelView/>*/}
                             <UIEditorControlPanelView/>
                             <Puck.Preview/>
                         </ResizablePanel>
                         <ResizableHandle/>
-                        <ResizablePanel id={"4"}
-                                        defaultSize={"25%"}
-                                        color={"primary"}
-                                        style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
-                            <Puck.Fields/>
+                        <ResizablePanel
+                            id={"4"}
+                            defaultSize={"25%"}
+                            color={"primary"}
+                            style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}
+                        >
+                            <Puck.Fields />
                         </ResizablePanel>
                     </ResizablePanelGroup>
                 </UIEditorComponent>

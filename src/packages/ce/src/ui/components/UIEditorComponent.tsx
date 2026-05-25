@@ -26,95 +26,101 @@ export interface UIEditorComponentProps {
     children: React.ReactNode
 }
 
-export const UIEditorComponent: React.FC<UIEditorComponentProps> = (props) => {
+const DEFAULT_COMPONENT_GAP = "1rem"
 
-    const {children} = props
-
-    const config = {
-        root: {
-            fields: {}
+export const editorConfig = {
+    root: {
+        fields: {},
+        render: ({children}: { children: React.ReactNode }) => {
+            return (
+                <div style={{display: "flex", flexDirection: "column", gap: DEFAULT_COMPONENT_GAP}}>
+                    {children}
+                </div>
+            )
         },
-        components: {
-            Heading: UIEditorHeadingConfig,
-            Text: UIEditorTextConfig,
-            Container: UIEditorContainerConfig,
-            Row: UIEditorRowConfig,
-            Column: UIEditorColumnConfig,
-            Link: UIEditorLinkConfig,
-            Card: UIEditorCardConfig,
-            Divider: UIEditorDividerConfig,
-            Table: UIEditorTableConfig,
-            Graph: UIEditorGraphConfig,
+    },
+    components: {
+        Heading: UIEditorHeadingConfig,
+        Text: UIEditorTextConfig,
+        Container: UIEditorContainerConfig,
+        Row: UIEditorRowConfig,
+        Column: UIEditorColumnConfig,
+        Link: UIEditorLinkConfig,
+        Card: UIEditorCardConfig,
+        Divider: UIEditorDividerConfig,
+        Table: UIEditorTableConfig,
+        Graph: UIEditorGraphConfig,
+    },
+    "categories": {
+        "all": {
+            "title": "All",
+            "visible": {
+                "icon": "tabler:all"
+            },
+            "components": [
+                { "type": "Heading", "title": "Heading", "description": "Display eye-catching titles and section headers.", "icon": "tabler:heading" },
+                { "type": "Text", "title": "Text", "description": "Add and style paragraph text for your content.", "icon": "tabler:text-size" },
+                { "type": "Container", "title": "Container", "description": "A versatile wrapper to group and align components.", "icon": "tabler:container" },
+                { "type": "Row", "title": "Row", "description": "Arrange elements horizontally in a flexible row.", "icon": "tabler:layout-list" },
+                { "type": "Column", "title": "Column", "description": "Create vertical sections within your layout.", "icon": "tabler:columns-3" },
+                { "type": "Link", "title": "Link", "description": "Add clickable navigation or external references.", "icon": "tabler:link" },
+                { "type": "Card", "title": "Card", "description": "Group content inside a styled surface.", "icon": "tabler:cards" },
+                { "type": "Divider", "title": "Divider", "description": "Visually separate sections with a clean line.", "icon": "tabler:divider" },
+                { "type": "Table", "title": "Table", "description": "Organize and display data in structured rows and columns.", "icon": "tabler:table" },
+                { "type": "Graph", "title": "Graph", "description": "Visualize complex data sets with dynamic charts.", "icon": "tabler:graph" }
+            ]
         },
-        "categories": {
-            "all": {
-                "title": "All",
-                "visible": {
-                    "icon": "tabler:all"
-                },
-                "components": [
-                    { "type": "Heading", "title": "Heading", "description": "Display eye-catching titles and section headers.", "icon": "tabler:heading" },
-                    { "type": "Text", "title": "Text", "description": "Add and style paragraph text for your content.", "icon": "tabler:text-size" },
-                    { "type": "Container", "title": "Container", "description": "A versatile wrapper to group and align components.", "icon": "tabler:container" },
-                    { "type": "Row", "title": "Row", "description": "Arrange elements horizontally in a flexible row.", "icon": "tabler:layout-list" },
-                    { "type": "Column", "title": "Column", "description": "Create vertical sections within your layout.", "icon": "tabler:columns-3" },
-                    { "type": "Link", "title": "Link", "description": "Add clickable navigation or external references.", "icon": "tabler:link" },
-                    { "type": "Card", "title": "Card", "description": "Group content inside a styled surface.", "icon": "tabler:cards" },
-                    { "type": "Divider", "title": "Divider", "description": "Visually separate sections with a clean line.", "icon": "tabler:divider" },
-                    { "type": "Table", "title": "Table", "description": "Organize and display data in structured rows and columns.", "icon": "tabler:table" },
-                    { "type": "Graph", "title": "Graph", "description": "Visualize complex data sets with dynamic charts.", "icon": "tabler:graph" }
-                ]
+        "typography": {
+            "title": "Typography",
+            "visible": {
+                "icon": "tabler:typography"
             },
-            "typography": {
-                "title": "Typography",
-                "visible": {
-                    "icon": "tabler:typography"
-                },
-                "components": [
-                    { "type": "Heading", "title": "Heading", "description": "Display eye-catching titles and section headers.", "icon": "tabler:heading" },
-                    { "type": "Text", "title": "Text", "description": "Add and style paragraph text for your content.", "icon": "tabler:text-size" }
-                ]
+            "components": [
+                { "type": "Heading", "title": "Heading", "description": "Display eye-catching titles and section headers.", "icon": "tabler:heading" },
+                { "type": "Text", "title": "Text", "description": "Add and style paragraph text for your content.", "icon": "tabler:text-size" }
+            ]
+        },
+        "layout": {
+            "title": "Layout",
+            "visible": {
+                "icon": "tabler:layout"
             },
-            "layout": {
-                "title": "Layout",
-                "visible": {
-                    "icon": "tabler:layout"
-                },
-                "components": [
-                    { "type": "Container", "title": "Container", "description": "A versatile wrapper to group and align components.", "icon": "tabler:container" },
-                    { "type": "Row", "title": "Row", "description": "Arrange elements horizontally in a flexible row.", "icon": "tabler:layout-list" },
-                    { "type": "Column", "title": "Column", "description": "Create vertical sections within your layout.", "icon": "tabler:columns-3" }
-                ]
+            "components": [
+                { "type": "Container", "title": "Container", "description": "A versatile wrapper to group and align components.", "icon": "tabler:container" },
+                { "type": "Row", "title": "Row", "description": "Arrange elements horizontally in a flexible row.", "icon": "tabler:layout-list" },
+                { "type": "Column", "title": "Column", "description": "Create vertical sections within your layout.", "icon": "tabler:columns-3" },
+            ]
+        },
+        "elements": {
+            "title": "Elements",
+            "visible": {
+                "icon": "tabler:atom"
             },
-            "elements": {
-                "title": "Elements",
-                "visible": {
-                    "icon": "tabler:atom"
-                },
-                "components": [
-                    { "type": "Link", "title": "Link", "description": "Add clickable navigation or external references.", "icon": "tabler:link" },
-                    { "type": "Card", "title": "Card", "description": "Group content inside a styled surface.", "icon": "tabler:cards" },
-                    { "type": "Divider", "title": "Divider", "description": "Visually separate sections with a clean line.", "icon": "tabler:divider" }
-                ]
+            "components": [
+                { "type": "Link", "title": "Link", "description": "Add clickable navigation or external references.", "icon": "tabler:link" },
+                { "type": "Card", "title": "Card", "description": "Group content inside a styled surface.", "icon": "tabler:cards" },
+                { "type": "Divider", "title": "Divider", "description": "Visually separate sections with a clean line.", "icon": "tabler:divider" }
+            ]
+        },
+        "data": {
+            "title": "Data",
+            "visible": {
+                "icon": "tabler:database"
             },
-            "data": {
-                "title": "Data",
-                "visible": {
-                    "icon": "tabler:database"
-                },
-                "components": [
-                    { "type": "Table", "title": "Table", "description": "Organize and display data in structured rows and columns.", "icon": "tabler:table" },
-                    { "type": "Graph", "title": "Graph", "description": "Visualize complex data sets with dynamic charts.", "icon": "tabler:graph" }
-                ]
-            }
+            "components": [
+                { "type": "Table", "title": "Table", "description": "Organize and display data in structured rows and columns.", "icon": "tabler:table" },
+                { "type": "Graph", "title": "Graph", "description": "Visualize complex data sets with dynamic charts.", "icon": "tabler:graph" }
+            ]
         }
     }
+}
 
+export const UIEditorComponent: React.FC<UIEditorComponentProps> = ({ children }) => {
     const [data, setData] = React.useState<any>({content: [], root: {props: {}}})
 
     return (
         <Puck
-            config={config as any}
+            config={editorConfig as any}
             iframe={{
                 enabled: false,
             }}
