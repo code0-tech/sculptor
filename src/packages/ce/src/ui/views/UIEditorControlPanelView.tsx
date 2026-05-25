@@ -66,8 +66,8 @@ export const UIEditorControlPanelView: React.FC = () => {
                     <Badge style={{gap: 0}}>Shift + A</Badge>
                 </Text>
             </Button>
-            <Button variant={"none"} color={"secondary"} paddingSize={"xxs"}>
-                View this page
+            <Button variant={"filled"} color={"success"} paddingSize={"xxs"}>
+                Save changes
             </Button>
         </ButtonGroup>
     </Panel>

@@ -1,9 +1,14 @@
-import {Card, Flex, Text} from "@code0-tech/pictor";
+import {Card, DataTable, DataTableColumn, Flex, Text} from "@code0-tech/pictor";
 import {
     columnOptions,
     moduleOptions,
     runtimeOptions,
 } from "@edition/ui/components/UIEditorConfigInputs";
+
+const columnLabels = columnOptions.reduce<Record<string, string>>((acc, option) => {
+    acc[option.value] = option.label
+    return acc
+}, {})
 
 export const UIEditorTableConfig = {
     fields: {
@@ -58,14 +63,40 @@ export const UIEditorTableConfig = {
         maxItems: 100,
         itemsPerPage: 10,
     },
-    render: ({module, columns, itemsPerPage}: { module: string, columns: string[], itemsPerPage: number }) => {
+    render: ({
+        columns,
+        filter,
+        showFilter,
+        rows,
+    }: {
+        columns: string[],
+        filter: Record<string, { operator: "isOneOf" | "isNotOneOf", value: string | string[] }>,
+        showFilter: boolean,
+        rows: Record<string, unknown>[],
+    }) => {
+        const selectedColumns = columns ?? []
+
         return (
             <Card color={"secondary"}>
-                <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
-                    <Text hierarchy={"primary"}>Table: {module}</Text>
-                    <Text hierarchy={"secondary"}>Columns: {columns?.join(", ")}</Text>
-                    <Text hierarchy={"tertiary"}>Items per page: {itemsPerPage}</Text>
-                </Flex>
+                {selectedColumns.length > 0 ? (
+                    <DataTable
+                        data={rows ?? []}
+                        filter={showFilter ? filter : undefined}
+                        emptyComponent={(
+                            <DataTableColumn>
+                                <Text>No rows found.</Text>
+                            </DataTableColumn>
+                        )}
+                    >
+                        {(row) => {
+                            return selectedColumns.map((column) => (
+                                <DataTableColumn key={column}>
+                                    <Text>{String(row[column] ?? "")}</Text>
+                                </DataTableColumn>
+                            ))
+                        }}
+                    </DataTable>
+                ) : "No columns selected."}
             </Card>
         )
     },

@@ -134,6 +134,8 @@ export const UIEditorActionBarComponent = (props: {
                 right: position?.right ?? 8,
                 zIndex: 10000,
                 pointerEvents: "auto",
+                borderRadius: "1rem",
+                boxShadow: "0 16px 40px rgba(0, 0, 0, 0.32), 0 4px 12px rgba(0, 0, 0, 0.22)",
             }}
         >
             {parentActions.length > 0 && <ButtonGroup children={parentActions}/>}
