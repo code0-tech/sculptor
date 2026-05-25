@@ -1,4 +1,4 @@
-#import from "@edition/application/services/fragments/ApplicationLicense.fragment.graphql"
+#import "@ee/application/services/fragments/ApplicationLicense.fragment.graphql"
 
 fragment Application on Application {
     __typename
@@ -10,6 +10,9 @@ fragment Application on Application {
     legalNoticeUrl
     privacyUrl
     termsAndConditionsUrl
+    currentLicense {
+        ...ApplicationLicense
+    }
     licenses (first: $firstLicense, after: $afterLicense) {
         __typename
         count
