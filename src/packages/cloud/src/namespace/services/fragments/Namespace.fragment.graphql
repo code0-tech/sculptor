@@ -22,7 +22,7 @@ fragment Namespace on Namespace {
         ...on Organization {
             ...OrganizationId
         }
-        ...on User{
+        ...on User {
             ...UserId
         }
     }
