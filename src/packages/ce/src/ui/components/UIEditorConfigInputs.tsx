@@ -21,8 +21,13 @@ import {
     SwitchInput,
     Text,
     TextInput,
+    useService,
+    useStore,
 } from "@code0-tech/pictor";
 import {IconCheck, IconChevronDown} from "@tabler/icons-react";
+import {useParams} from "next/navigation";
+import {RuntimeService} from "@edition/runtime/services/Runtime.service";
+import type {Namespace} from "@code0-tech/sagittarius-graphql-types";
 
 export const headingSizes = Array.from({length: 6}, (_, index) => {
     const level = index + 1
@@ -129,24 +134,45 @@ export const UIEditorTextInputField: React.FC<any> = (props) => {
     )
 }
 
-export const UIEditorSelectInputField: React.FC<any> = (props) => {
-    const {field, value, onChange} = props
-    const title = field.title ?? field.label
-    const options = field.options ?? []
-    const inputValue = value ?? field.defaultValue ?? options[0]?.value
+export const UIEditorSelectInputField: React.FC<any> = ({field, value, onChange}) => {
+    const params = useParams()
+    const runtimeService = useService(RuntimeService)
+    const runtimeStore = useStore(RuntimeService)
+
+    const namespaceIndex = params?.namespaceId as string | undefined
+    const namespaceId = namespaceIndex
+        ? (`gid://sagittarius/Namespace/${namespaceIndex}` as Namespace["id"])
+        : undefined
+
+    const runtimeOptions = React.useMemo(() => {
+        if (field.optionsSource !== "runtime") return []
+        const globalRuntimes = runtimeService.values().filter(runtime => !runtime?.namespace?.id)
+        const namespaceRuntimes = namespaceId ? runtimeService.values({namespaceId}) : []
+        return [...globalRuntimes, ...namespaceRuntimes]
+            .filter(Boolean)
+            .map((runtime) => ({
+                label: runtime?.name ?? "Runtime",
+                value: runtime?.id ?? "",
+            }))
+            .filter((option) => option.value.length > 0)
+    }, [field.optionsSource, runtimeStore, namespaceId])
+
+    const resolvedOptions = field.optionsSource === "runtime" && runtimeOptions.length > 0
+        ? runtimeOptions
+        : field.options ?? []
+    const inputValue = value ?? field.defaultValue ?? resolvedOptions[0]?.value
 
     return (
         <SelectInput
-            title={title}
+            title={field.title}
             value={inputValue}
             onValueChange={(nextValue) => onChange(nextValue)}
             p={0.5}
-            label={title}
         >
             <SelectTrigger asChild>
                 <Flex justify={"space-between"} align={"center"} p={0.75}>
                     <Text hierarchy={"secondary"}>
-                        <SelectValue placeholder={title}/>
+                        <SelectValue placeholder={field.title}/>
                     </Text>
                     <IconChevronDown size={13}/>
                 </Flex>
@@ -154,7 +180,7 @@ export const UIEditorSelectInputField: React.FC<any> = (props) => {
             <SelectPortal>
                 <SelectContent position={"item-aligned"}>
                     <SelectViewport>
-                        {options.map((option: { label: string, value: string }) => {
+                        {resolvedOptions.map((option: { label: string, value: string }) => {
                             return (
                                 <SelectItem key={option.value} value={option.value}>
                                     <SelectItemText>

@@ -1,14 +1,9 @@
-import {Card, DataTable, DataTableColumn, Flex, Text} from "@code0-tech/pictor";
+import { Card, DataTable, DataTableColumn, Text } from "@code0-tech/pictor";
 import {
     columnOptions,
     moduleOptions,
     runtimeOptions,
 } from "@edition/ui/components/UIEditorConfigInputs";
-
-const columnLabels = columnOptions.reduce<Record<string, string>>((acc, option) => {
-    acc[option.value] = option.label
-    return acc
-}, {})
 
 export const UIEditorTableConfig = {
     fields: {
@@ -16,6 +11,7 @@ export const UIEditorTableConfig = {
             type: "SelectInput",
             title: "Runtime",
             options: runtimeOptions,
+            optionsSource: "runtime",
             defaultValue: "default-runtime",
         },
         module: {

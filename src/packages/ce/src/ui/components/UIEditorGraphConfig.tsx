@@ -12,6 +12,7 @@ export const UIEditorGraphConfig = {
             type: "SelectInput",
             title: "Runtime",
             options: runtimeOptions,
+            optionsSource: "runtime",
             defaultValue: "default-runtime",
         },
         module: {

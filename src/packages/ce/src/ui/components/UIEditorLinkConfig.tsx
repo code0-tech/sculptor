@@ -12,19 +12,24 @@ export const UIEditorLinkConfig = {
         link: {
             type: "TextInput",
             title: "Link",
-            defaultValue: "https://example.com",
+            defaultValue: "",
             validateUrl: true,
         },
     },
     defaultProps: {
         content: "Your Link",
-        link: "https://example.com",
+        link: "",
     },
     render: ({content, link}: { content: string, link: string }) => {
         const href = isValidUrl(link) ? link : "https://example.com"
 
         return (
-            <Link href={href} target={"_blank"} rel={"noreferrer"}>
+            <Link
+                href={href}
+                target={"_blank"}
+                rel={"noreferrer"}
+                style={{display: "inline-flex"}}
+            >
                 <Text size={"md"}>
                     {content || "Your Link"}
                 </Text>
