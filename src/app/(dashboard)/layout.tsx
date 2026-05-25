@@ -2,14 +2,10 @@
 
 import React from "react";
 import {useApolloClient} from "@apollo/client/react";
-import {
-    AuroraBackground,
-    ContextStoreProvider,
-    Flex
-} from "@code0-tech/pictor";
+import {AuroraBackground, ContextStoreProvider, Flex} from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import {GraphqlClient} from "@core/util/graphql-client";
-import {useRouter} from "next/navigation";
+import {usePathname} from "next/navigation";
 import {OrganizationService} from "@edition/organization/services/Organization.service";
 import {MemberService} from "@edition/member/services/Member.service";
 import {NamespaceService} from "@edition/namespace/services/Namespace.service";
@@ -26,6 +22,7 @@ import {ProjectView} from "@edition/project/services/Project.view";
 import {RoleView} from "@edition/role/services/Role.view";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 import {Namespace, Runtime, User} from "@code0-tech/sagittarius-graphql-types";
+import {ApplicationMiddlewareComponent} from "@edition/application/components/ApplicationMiddlewareComponent";
 
 interface ApplicationLayoutProps {
     children: React.ReactNode
@@ -36,7 +33,7 @@ interface ApplicationLayoutProps {
 const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab}) => {
 
     const client = useApolloClient()
-    const router = useRouter()
+    const pathname = usePathname()
     const currentSession = useUserSession()
 
     const graphqlClient = React.useMemo(() => new GraphqlClient(client), [client])
@@ -50,43 +47,50 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
     const role = usePersistentReactiveArrayService<RoleView, RoleService>(`dashboard::roles::${currentSession?.id}`, (store) => new RoleService(graphqlClient, store))
     const application = usePersistentReactiveArrayService<Application, ApplicationService>(`dashboard::application::${currentSession?.id}`, (store) => new ApplicationService(graphqlClient, store))
 
-    if (currentSession === null) router.push("/login")
+    const isAddLicensePage = pathname === '/licenses/add';
 
-    return <ContextStoreProvider services={[user, organization, member, namespace, runtime, project, role, application]}>
-        <Layout style={{zIndex: 0}} layoutGap={"0"} showLayoutSplitter={false} leftContent={
-            <Flex p={0.7} pt={1} align={"center"} style={{flexDirection: "column", gap: "0.7rem"}}>
-                <div style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "50%",
-                    transform: "scaleX(-1)",
-                    height: "40%",
-                    zIndex: "-1",
-                }}>
-                    <div style={{
-                        position: "absolute",
-                        top: "0",
-                        left: "0",
-                        width: "100%",
-                        height: "100%",
-                        background: "radial-gradient(circle at top right,rgba(25, 24, 37, 0.25) 0%, rgba(25, 24, 37, 1) 25%)",
-                        zIndex: "1"
-                    }}/>
-                    <AuroraBackground/>
+    return <ContextStoreProvider
+        services={[user, organization, member, namespace, runtime, project, role, application]}>
+        <ApplicationMiddlewareComponent>
+            <Layout style={{zIndex: 0}} layoutGap={"0"} showLayoutSplitter={false} leftContent={
+                <Flex p={0.7} pt={1} align={"center"} style={{flexDirection: "column", gap: "0.7rem"}}>
+                    {isAddLicensePage ? (
+                        <AuroraBackground/>
+                    ) : (
+                        <div style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "50%",
+                            transform: "scaleX(-1)",
+                            height: "40%",
+                            zIndex: "-1",
+                        }}>
+                            <div style={{
+                                position: "absolute",
+                                top: "0",
+                                left: "0",
+                                width: "100%",
+                                height: "100%",
+                                background: "radial-gradient(circle at top right,rgba(25, 24, 37, 0.25) 0%, rgba(25, 24, 37, 1) 25%)",
+                                zIndex: "1"
+                            }}/>
+                            <AuroraBackground/>
 
-                </div>
-                <Image src={"/CodeZero_Logo.png"} alt={"CodeZero Banner"} width={160} height={0}
-                       style={{width: '38px', height: 'auto'}}/>
-                {tab}
-            </Flex>
-        }>
-            <Layout showLayoutSplitter={false} px={0.7} layoutGap={"0"} topContent={<>{bar}</>}>
-                <Layout>
-                    <>{children}</>
+                        </div>
+                    )}
+                    <Image src={"/CodeZero_Logo.png"} alt={"CodeZero Banner"} width={160} height={0}
+                           style={{width: '38px', height: 'auto'}}/>
+                    {tab}
+                </Flex>
+            }>
+                <Layout showLayoutSplitter={false} px={0.7} layoutGap={"0"} topContent={<>{bar}</>}>
+                    <Layout>
+                        <>{children}</>
+                    </Layout>
                 </Layout>
             </Layout>
-        </Layout>
+        </ApplicationMiddlewareComponent>
     </ContextStoreProvider>
 }
 
