@@ -3,6 +3,8 @@ import {
     Application as SApplication,
     ApplicationSettingsUpdateInput,
     ApplicationSettingsUpdatePayload,
+    LicensesCreateInput,
+    LicensesCreatePayload,
     Mutation,
     Query
 } from "@code0-tech/sagittarius-graphql-types";
@@ -10,6 +12,7 @@ import {Payload, View} from "@code0-tech/pictor/dist/utils/view";
 import {GraphqlClient} from "@core/util/graphql-client";
 import applicationQuery from "@edition/application/services/queries/Application.query.graphql"
 import applicationUpdateMutation from "@edition/application/services/mutations/Application.update.mutation.graphql"
+import applicationLicenseAddMutation from "@ee/application/services/mutations/Application.addLicense.mutation.graphql"
 
 export type Application = SApplication & Payload
 
@@ -67,5 +70,20 @@ export class ApplicationService extends ReactiveArrayService<Application> {
         }
 
         return result.data?.applicationSettingsUpdate ?? undefined
+    }
+
+    async applicationLicenseAdd(payload: LicensesCreateInput): Promise<LicensesCreatePayload | undefined> {
+        const result = await this.client.mutate<Mutation, LicensesCreateInput>({
+            mutation: applicationLicenseAddMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        if (result.data && result.data.licensesCreate && result.data.licensesCreate.license) {
+            this.clear()
+        }
+
+        return result.data?.licensesCreate ?? undefined
     }
 }
