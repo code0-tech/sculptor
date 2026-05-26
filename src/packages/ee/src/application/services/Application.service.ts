@@ -4,7 +4,7 @@ import {
     ApplicationSettingsUpdateInput,
     ApplicationSettingsUpdatePayload,
     LicensesCreateInput,
-    LicensesCreatePayload,
+    LicensesCreatePayload, LicensesDeleteInput, LicensesDeletePayload,
     Mutation,
     Query
 } from "@code0-tech/sagittarius-graphql-types";
@@ -13,6 +13,7 @@ import {GraphqlClient} from "@core/util/graphql-client";
 import applicationQuery from "@edition/application/services/queries/Application.query.graphql"
 import applicationUpdateMutation from "@edition/application/services/mutations/Application.update.mutation.graphql"
 import applicationLicenseAddMutation from "@ee/application/services/mutations/Application.addLicense.mutation.graphql"
+import applicationLicenseRemoveMutation from "@ee/application/services/mutations/Application.removeLicense.mutation.graphql"
 
 export type Application = SApplication & Payload
 
@@ -81,9 +82,30 @@ export class ApplicationService extends ReactiveArrayService<Application> {
         })
 
         if (result.data && result.data.licensesCreate && result.data.licensesCreate.license) {
-            this.clear()
+            const application = this.get()
+            application!.licenses!.count = (application.licenses?.count ?? 0) + 1
+            application.licenses?.nodes?.push(result.data.licensesCreate.license)
+            this.set(0, new View(application as Application))
         }
 
         return result.data?.licensesCreate ?? undefined
+    }
+
+    async applicationLicenseRemove(payload: LicensesDeleteInput): Promise<LicensesDeletePayload | undefined> {
+        const result = await this.client.mutate<Mutation, LicensesDeleteInput>({
+            mutation: applicationLicenseRemoveMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        if (result.data && result.data.licensesDelete && result.data.licensesDelete.license) {
+            const application = this.get()
+            application!.licenses!.count = (application.licenses?.count ?? 0) - 1
+            application.licenses!.nodes = application.licenses?.nodes?.filter(license => license?.id !== payload.licenseId) ?? []
+            this.set(0, new View(application as Application))
+        }
+
+        return result.data?.licensesDelete ?? undefined
     }
 }
