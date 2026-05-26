@@ -12,9 +12,10 @@ import {
     ResizablePanelGroup
 } from "@code0-tech/pictor/dist/components/resizable/Resizable";
 import {SidebarComponent} from "@core/components/SidebarComponent";
-import {ApplicationGeneralSettingsView} from "@ce/application/views/ApplicationGeneralSettingsView";
-import {ApplicationRestrictionsView} from "@ce/application/views/ApplicationRestrictionsView";
-import {ApplicationTabListView} from "@ce/application/views/ApplicationTabListView";
+import {ApplicationGeneralSettingsView} from "@edition/application/views/ApplicationGeneralSettingsView";
+import {ApplicationRestrictionsView} from "@edition/application/views/ApplicationRestrictionsView";
+import {ApplicationTabListView} from "@edition/application/views/ApplicationTabListView";
+import {ApplicationLicensesView} from "@edition/application/views/ApplicationLicensesView";
 
 export const ApplicationSettingsPage: React.FC = () => {
 
@@ -40,10 +41,11 @@ export const ApplicationSettingsPage: React.FC = () => {
                 <ApplicationTabListView/>
             </SidebarComponent>
             <ResizableHandle/>
-            <ResizablePanel id={"2"} color={"primary"} p={1} style={{borderTopLeftRadius: "1rem"}}>
+            <ResizablePanel id={"2"} color={"primary"} p={2} style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
                 <>
                     <ApplicationGeneralSettingsView/>
                     <ApplicationRestrictionsView/>
+                    <ApplicationLicensesView/>
                 </>
             </ResizablePanel>
         </ResizablePanelGroup>
