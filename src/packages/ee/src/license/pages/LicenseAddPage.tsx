@@ -138,7 +138,7 @@ export const LicenseAddPage: React.FC = () => {
             <FileInputHiddenInput/>
         </FileInput>
         <Spacing spacing={"xl"}/>
-        <Button color={"success"} w={"100%"}>
+        <Button color={"success"} w={"100%"} onClick={() => validate()}>
             Add license
         </Button>
     </>
