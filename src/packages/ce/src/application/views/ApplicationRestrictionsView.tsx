@@ -2,7 +2,7 @@ import React, {startTransition} from "react";
 import {Button, Card, Flex, Spacing, SwitchInput, Text, toast, useForm, useService, useStore} from "@code0-tech/pictor";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
-import {ApplicationService} from "@ee/application/services/Application.service";
+import {ApplicationService} from "@edition/application/services/Application.service";
 
 export const ApplicationRestrictionsView: React.FC = () => {
 
