@@ -1,0 +1,10 @@
+#import "@cloud-internal/namespace/services/fragments/Namespace.fragment.graphql"
+query Namespace (
+    $id: NamespaceID!
+    $firstLicense: Int!
+    $afterLicense: String
+) {
+    namespace(id: $id) {
+        ...Namespace
+    }
+}

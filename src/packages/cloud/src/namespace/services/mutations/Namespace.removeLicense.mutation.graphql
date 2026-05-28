@@ -1,0 +1,19 @@
+#import "@cloud-internal/namespace/services/fragments/NamespaceLicense.fragment.graphql"
+
+mutation licenseRemove($licenseId: LicenseID!) {
+    namespacesLicensesDelete(input: {
+        licenseId: $licenseId
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        license {
+            ...NamespaceLicense
+        }
+    }
+}
