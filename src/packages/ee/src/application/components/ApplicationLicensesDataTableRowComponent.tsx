@@ -12,7 +12,7 @@ import {
     useService,
     useStore
 } from "@code0-tech/pictor";
-import {ApplicationService} from "@edition/application/services/Application.service";
+import {ApplicationService} from "@ee-internal/application/services/Application.service";
 import {formatDistanceToNow, isFuture, isPast} from "date-fns";
 import {IconX} from "@tabler/icons-react";
 

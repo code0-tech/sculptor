@@ -12,10 +12,9 @@ import {
     useService,
     useStore
 } from "@code0-tech/pictor";
-import {ApplicationService} from "@edition/application/services/Application.service";
 import {formatDistanceToNow, isFuture, isPast} from "date-fns";
 import {IconX} from "@tabler/icons-react";
-import {NamespaceService} from "@edition/namespace/services/Namespace.service";
+import {NamespaceService} from "@cloud-internal/namespace/services/Namespace.service";
 
 export interface LicensesDataTableRowComponentProps {
     namespaceId: Namespace['id']
@@ -94,7 +93,8 @@ export const NamespaceLicensesDataTableRowComponent: React.FC<LicensesDataTableR
                 Workflow usage (2.250)
             </Text>
             <Spacing spacing={"xs"}/>
-            <Progress maw={"75%"} value={9} predictionValue={24} max={100} color={"linear-gradient(to right, #29BF12 0%, #D90429 100%)"}/>
+            <Progress maw={"75%"} value={9} predictionValue={24} max={100}
+                      color={"linear-gradient(to right, #29BF12 0%, #D90429 100%)"}/>
             <Spacing spacing={"xs"}/>
             <Text>
                 You used 9% of your available workflow executions and will used 24% until its reseted.
