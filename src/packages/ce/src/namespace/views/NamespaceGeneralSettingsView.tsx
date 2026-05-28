@@ -8,7 +8,7 @@ import {NamespaceService} from "@edition/namespace/services/Namespace.service";
 import {OrganizationService} from "@edition/organization/services/Organization.service";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
 
-export const OrganizationGeneralSettingsView: React.FC = () => {
+export const NamespaceGeneralSettingsView: React.FC = () => {
 
     const params = useParams()
     const namespaceService = useService(NamespaceService)

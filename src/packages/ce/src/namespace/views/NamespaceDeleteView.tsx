@@ -7,7 +7,7 @@ import {NamespaceService} from "@edition/namespace/services/Namespace.service";
 import {OrganizationService} from "@edition/organization/services/Organization.service";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
 
-export const OrganizationDeleteView: React.FC = () => {
+export const NamespaceDeleteView: React.FC = () => {
 
     const params = useParams()
     const router = useRouter()
