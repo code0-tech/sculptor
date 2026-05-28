@@ -1,7 +1,7 @@
 "use client"
 
-import {OrganizationSettingsPage} from "@edition/organization/pages/OrganizationSettingsPage";
+import {NamespaceSettingsPage} from "@edition/namespace/pages/NamespaceSettingsPage";
 
 export default function Page() {
-    return <OrganizationSettingsPage/>
+    return <NamespaceSettingsPage/>
 }
