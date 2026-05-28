@@ -1,77 +1,20 @@
-import {ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor";
 import {
-    Application as SApplication,
-    ApplicationSettingsUpdateInput,
-    ApplicationSettingsUpdatePayload,
     LicensesCreateInput,
-    LicensesCreatePayload, LicensesDeleteInput, LicensesDeletePayload,
-    Mutation,
-    Query
+    LicensesCreatePayload,
+    LicensesDeleteInput,
+    LicensesDeletePayload,
+    Mutation
 } from "@code0-tech/sagittarius-graphql-types";
-import {Payload, View} from "@code0-tech/pictor/dist/utils/view";
-import {GraphqlClient} from "@core/util/graphql-client";
-import applicationQuery from "@edition/application/services/queries/Application.query.graphql"
-import applicationUpdateMutation from "@edition/application/services/mutations/Application.update.mutation.graphql"
-import applicationLicenseAddMutation from "@ee/application/services/mutations/Application.addLicense.mutation.graphql"
-import applicationLicenseRemoveMutation from "@ee/application/services/mutations/Application.removeLicense.mutation.graphql"
+import {View} from "@code0-tech/pictor/dist/utils/view";
+import applicationLicenseAddMutation from "@ee-internal/application/services/mutations/Application.addLicense.mutation.graphql"
+import applicationLicenseRemoveMutation
+    from "@ee-internal/application/services/mutations/Application.removeLicense.mutation.graphql"
 
-export type Application = SApplication & Payload
+import {Application as CEApplication, ApplicationService as CEApplicationService} from "@ce-internal/application/services/Application.service"
 
-export class ApplicationService extends ReactiveArrayService<Application> {
+export type Application = CEApplication
 
-    private readonly client: GraphqlClient
-
-    constructor(client: GraphqlClient, store: ReactiveArrayStore<View<Application>>) {
-        super(store);
-        this.client = client
-    }
-
-
-    get(): SApplication {
-
-        const application = super.get(0)
-
-        if (!application) {
-            this.client.query<Query>({
-                query: applicationQuery,
-                variables: {
-                    firstLicense: 50,
-                    afterLicense: null
-                }
-            }).then(res => {
-                const app = res.data?.application
-                if (app) this.set(0, new View(app as Application))
-            })
-        }
-
-        return application
-
-    }
-
-    async applicationUpdate(payload: ApplicationSettingsUpdateInput): Promise<ApplicationSettingsUpdatePayload | undefined> {
-        const result = await this.client.mutate<Mutation, ApplicationSettingsUpdateInput>({
-            mutation: applicationUpdateMutation,
-            variables: {
-                ...payload
-            }
-        })
-
-        if (result.data && result.data.applicationSettingsUpdate && result.data.applicationSettingsUpdate.applicationSettings) {
-            const application = this.get()
-            this.set(0, new View({
-                ...application,
-                legalNoticeUrl: result.data.applicationSettingsUpdate.applicationSettings.legalNoticeUrl,
-                privacyUrl: result.data.applicationSettingsUpdate.applicationSettings.privacyUrl,
-                termsAndConditionsUrl: result.data.applicationSettingsUpdate.applicationSettings.termsAndConditionsUrl,
-                settings: {
-                    ...result.data.applicationSettingsUpdate.applicationSettings
-                }
-            } as Application))
-
-        }
-
-        return result.data?.applicationSettingsUpdate ?? undefined
-    }
+export class ApplicationService extends CEApplicationService {
 
     async applicationLicenseAdd(payload: LicensesCreateInput): Promise<LicensesCreatePayload | undefined> {
         const result = await this.client.mutate<Mutation, LicensesCreateInput>({
