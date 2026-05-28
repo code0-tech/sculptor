@@ -1,4 +1,4 @@
-#import "@ee/application/services/fragments/ApplicationLicense.fragment.graphql"
+#import "@ee-internal/application/services/fragments/ApplicationLicense.fragment.graphql"
 
 mutation licenseAdd($data: String!) {
     licensesCreate(input: {

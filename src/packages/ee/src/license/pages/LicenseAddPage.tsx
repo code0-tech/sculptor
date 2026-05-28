@@ -23,7 +23,7 @@ import {
 } from "@code0-tech/pictor";
 import {IconFileInfoFilled, IconX} from "@tabler/icons-react";
 import {FileUploadFileChangeDetails} from "@ark-ui/react";
-import {ApplicationService} from "@ee/application/services/Application.service";
+import {ApplicationService} from "@ee-internal/application/services/Application.service";
 import {useRouter} from "next/navigation";
 
 export const LicenseAddPage: React.FC = () => {

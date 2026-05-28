@@ -13,7 +13,7 @@ import {
     Text
 } from "@code0-tech/pictor";
 import Link from "next/link";
-import {ApplicationLicensesDataTableComponent} from "@ee/application/components/ApplicationLicensesDataTableComponent";
+import {ApplicationLicensesDataTableComponent} from "@ee-internal/application/components/ApplicationLicensesDataTableComponent";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 
 export const ApplicationLicensesView: React.FC = () => {

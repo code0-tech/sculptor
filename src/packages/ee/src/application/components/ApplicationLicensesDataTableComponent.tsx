@@ -17,7 +17,7 @@ import {DataTableFilterProps, DataTableSortProps} from "@code0-tech/pictor/dist/
 import {License} from "@code0-tech/sagittarius-graphql-types";
 import {
     ApplicationLicensesDataTableRowComponent
-} from "@ee/application/components/ApplicationLicensesDataTableRowComponent";
+} from "@ee-internal/application/components/ApplicationLicensesDataTableRowComponent";
 import Link from "next/link";
 import {ApplicationService} from "@edition/application/services/Application.service";
 

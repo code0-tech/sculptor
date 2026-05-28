@@ -16,7 +16,7 @@ import {
 import {DataTableFilterProps, DataTableSortProps} from "@code0-tech/pictor/dist/components/data-table/DataTable";
 import {Namespace, License} from "@code0-tech/sagittarius-graphql-types";
 import {NamespaceService} from "@edition/namespace/services/Namespace.service";
-import {LicensesDataTableRowComponent} from "@cloud/license/components/LicensesDataTableRowComponent";
+import {LicensesDataTableRowComponent} from "@cloud-internal/license/components/LicensesDataTableRowComponent";
 import Link from "next/link";
 
 export interface LicensesDataTableComponentProps {

@@ -32,13 +32,13 @@
       "@edition/*": [
         "./src/packages/ce/src/*"
       ],
-      "@ce/*": [
+      "@ce-internal/*": [
         "./src/packages/ce/src/*"
       ],
-      "@ee/*": [
+      "@ee-internal/*": [
         "./src/packages/ee/src/*"
       ],
-      "@cloud/*": [
+      "@cloud-internal/*": [
         "./src/packages/cloud/src/*"
       ],
       "@core/*": [
