@@ -1,0 +1,19 @@
+#import "@ee-internal/application/services/fragments/ApplicationLicense.fragment.graphql"
+
+mutation licenseAdd($data: String!) {
+    licensesCreate(input: {
+        data: $data
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        license {
+            ...ApplicationLicense
+        }
+    }
+}

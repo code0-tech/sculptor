@@ -15,7 +15,7 @@ export type Application = SApplication & Payload
 
 export class ApplicationService extends ReactiveArrayService<Application> {
 
-    private readonly client: GraphqlClient
+    protected readonly client: GraphqlClient
 
     constructor(client: GraphqlClient, store: ReactiveArrayStore<View<Application>>) {
         super(store);

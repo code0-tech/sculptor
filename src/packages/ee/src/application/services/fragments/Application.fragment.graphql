@@ -1,0 +1,46 @@
+#import "@ee-internal/application/services/fragments/ApplicationLicense.fragment.graphql"
+
+fragment Application on Application {
+    __typename
+    metadata {
+        __typename
+        extensions
+        version
+    }
+    legalNoticeUrl
+    privacyUrl
+    termsAndConditionsUrl
+    currentLicense {
+        ...ApplicationLicense
+    }
+    licenses (first: $firstLicense, after: $afterLicense) {
+        __typename
+        count
+        nodes {
+            ...ApplicationLicense
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+    }
+    settings {
+        __typename
+        termsAndConditionsUrl
+        privacyUrl
+        legalNoticeUrl
+        adminStatusVisible
+        organizationCreationRestricted
+        userRegistrationEnabled
+    }
+    userAbilities {
+        __typename
+        createLicense
+        createOrganization
+        createRuntime
+        deleteRuntime
+        rotateRuntimeToken
+        updateApplicationSetting
+        updateRuntime
+    }
+}

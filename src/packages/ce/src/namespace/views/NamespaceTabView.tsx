@@ -32,11 +32,10 @@ export const NamespaceTabView: React.FC = () => {
                         : "overview"
 
     const settings = React.useMemo(() => {
-        return namespace?.parent?.__typename == "Organization"
-        && parentOrganization
-        && (
-            parentOrganization.userAbilities?.deleteOrganization
-            || parentOrganization?.userAbilities?.updateOrganization
+        return (
+            (parentOrganization && (parentOrganization.userAbilities?.deleteOrganization
+            || parentOrganization?.userAbilities?.updateOrganization))
+            || namespace?.userAbilities?.createLicense
             //TODO add license check for enterprise features
         ) ? (
             <TabTrigger value={"settings"} asChild>

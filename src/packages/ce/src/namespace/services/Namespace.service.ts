@@ -6,7 +6,7 @@ import {View} from "@code0-tech/pictor/dist/utils/view";
 
 export class NamespaceService extends ReactiveArrayService<Namespace> {
 
-    private readonly client: GraphqlClient
+    protected readonly client: GraphqlClient
 
     constructor(client: GraphqlClient, store: ReactiveArrayStore<View<Namespace>>) {
         super(store);

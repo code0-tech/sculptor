@@ -1,0 +1,19 @@
+#import "@ee-internal/application/services/fragments/ApplicationLicense.fragment.graphql"
+
+mutation licenseRemove($licenseId: LicenseID!) {
+    licensesDelete(input: {
+        licenseId: $licenseId
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        license {
+            ...ApplicationLicense
+        }
+    }
+}

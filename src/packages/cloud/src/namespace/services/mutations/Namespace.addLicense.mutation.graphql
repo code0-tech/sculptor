@@ -1,0 +1,20 @@
+#import "@cloud-internal/namespace/services/fragments/NamespaceLicense.fragment.graphql"
+
+mutation licenseAdd($namespaceId: NamespaceID!, $data: String!) {
+    namespacesLicensesCreate(input: {
+        namespaceId: $namespaceId
+        data: $data
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        license {
+            ...NamespaceLicense
+        }
+    }
+}
