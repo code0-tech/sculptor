@@ -78,7 +78,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
 
             node.parameters?.nodes?.forEach((param) => {
                 const value = param?.value;
-                if (!value || value.__typename !== "NodeFunctionIdWrapper") return;
+                if (!value || value.__typename !== "SubFlowValue" || !value.startingNodeId) return;
 
                 const groupId = `${nodeId}-group-${groupCounter++}`;
 
@@ -97,14 +97,17 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                             //parentNodeId: nodeId,
                             nodeId: nodeId,
                             flowId: flowId,
-                            color: hashToColor(value?.id ?? ""),
+                            color: hashToColor(value?.startingNodeId ?? value?.functionDefinition?.identifier ?? ""),
                             schema: []
                         },
                     }])
                 }
 
-                const child = flowService.getNodeById(flowId, value.id);
-                if (child) traverse(child, groupId);
+                if (value.startingNodeId) {
+                    const child = flowService.getNodeById(flowId, value.startingNodeId);
+                    if (child) traverse(child, groupId);
+                }
+
             });
 
             if (node.nextNodeId) {
