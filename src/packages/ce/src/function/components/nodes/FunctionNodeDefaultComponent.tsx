@@ -101,7 +101,7 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
                     return <div style={{...decorationStyle, display: "inline-block"}}>
                         <ReferenceBadgeComponent value={nodeParameter.value}/>
                     </div>
-                case "NodeFunctionIdWrapper":
+                case "SubFlowValue":
                     return <div style={{...decorationStyle, display: "inline-block"}}>
                         <NodeBadgeComponent value={nodeParameter.value}/>
                         <Handle
