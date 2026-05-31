@@ -21,8 +21,8 @@ export const ReferenceBadgeComponent: React.FC<ReferenceBadgeComponentProps> = (
         if (flowId) {
             return <Flex align={"center"} display={"inline-flex"}>
                 <NodeBadgeComponent definition={definition} value={{
-                    id: value.nodeFunctionId,
-                    __typename: "NodeFunctionIdWrapper"
+                    startingNodeId: value.nodeFunctionId,
+                    __typename: "SubFlowValue"
                 }}/>
                 {"inputTypeIdentifier" in value && value.inputTypeIdentifier ? "." + value.inputTypeIdentifier : ""}
                 {value.referencePath ? "." + (value.referencePath?.map(path => path.path).join(".") ?? "") : ""}
