@@ -5,7 +5,7 @@ import {
     LiteralValue,
     NodeFunction,
     NodeParameterValue,
-    ReferenceValue
+    ReferenceValue, SubFlowValue
 } from "@code0-tech/sagittarius-graphql-types";
 import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
 import {FlowService} from "@edition/flow/services/Flow.service";
@@ -68,20 +68,18 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
         return values
     }, [validation, flowId, node, definition])
 
-    const onSubmit = React.useCallback((values: Record<string, NodeParameterValue | NodeFunction | undefined>) => {
+    const onSubmit = React.useCallback((values: Record<string, NodeParameterValue | undefined>) => {
         for (const parameterDefinition of definition?.parameterDefinitions?.nodes ?? []) {
 
             const parameterIndex = definition?.parameterDefinitions?.nodes?.findIndex(p => p?.id === parameterDefinition?.id)
             if (typeof parameterIndex !== "number") return
 
             const value = values[parameterDefinition!.id!]
-            if (value?.__typename === "NodeFunctionIdWrapper") return
-
-            flowService.setParameterValue(flowId, node.id!!, parameterIndex, (value ?? undefined) as NodeFunction | ReferenceValue | LiteralValue | undefined, definition);
+            flowService.setParameterValue(flowId, node.id!!, parameterIndex, (value ?? undefined) as SubFlowValue | ReferenceValue | LiteralValue | undefined, definition);
         }
     }, [flowService, definition])
 
-    const [inputs, validate, values] = useForm<Record<string, NodeParameterValue | NodeFunction | undefined>>({
+    const [inputs, validate, values] = useForm<Record<string, NodeParameterValue | undefined>>({
         useInitialValidation: true,
         truthyValidationBeforeSubmit: false,
         initialValues: initialValues,
