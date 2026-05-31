@@ -1,4 +1,4 @@
-import {LiteralValue, NodeFunction, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
+import {LiteralValue, NodeFunction, ReferenceValue, SubFlowValue} from "@code0-tech/sagittarius-graphql-types";
 import {useService, useStore} from "@code0-tech/pictor";
 import {ModuleService} from "@edition/module/services/Module.service";
 import {FunctionService} from "@edition/function/services/Function.service";
@@ -19,7 +19,7 @@ export interface SuggestionGroup {
     icon?: string
 }
 
-export const useMappedSuggestions = (suggestions: (NodeFunction | ReferenceValue | LiteralValue)[]): SuggestionGroup[] => {
+export const useMappedSuggestions = (suggestions: (NodeFunction | SubFlowValue | ReferenceValue | LiteralValue)[]): SuggestionGroup[] => {
 
     const moduleService = useService(ModuleService)
     const moduleStore = useStore(ModuleService)
@@ -27,7 +27,7 @@ export const useMappedSuggestions = (suggestions: (NodeFunction | ReferenceValue
     const functionStore = useStore(FunctionService)
 
     const modules = React.useMemo(
-        () => moduleService.values(),
+        () => [...moduleService.values()],
         [moduleService, moduleStore]
     )
 
@@ -49,6 +49,32 @@ export const useMappedSuggestions = (suggestions: (NodeFunction | ReferenceValue
                 aliases: functionDefinition?.aliases?.[0].content?.split(";"),
                 definitionSource: module?.id,
                 description: functionDefinition?.descriptions?.[0].content,
+            }
+        }
+
+        if (suggestion.__typename === "LiteralValue") {
+
+            return {
+                value: suggestion,
+                icon: "",
+                displayMessage: "functionDefinition?.names?.[0].content",
+                aliases: [""],
+                definitionSource: "literal-values",
+                description: "functionDefinition?.descriptions?.[0].content",
+            }
+        }
+
+        if (suggestion.__typename === "SubFlowValue" && suggestion.functionDefinition?.id) {
+
+
+
+            return {
+                value: suggestion,
+                icon: suggestion.functionDefinition?.displayIcon,
+                displayMessage: suggestion.functionDefinition?.names?.[0].content,
+                aliases: suggestion.functionDefinition?.aliases?.[0].content?.split(";"),
+                definitionSource: "sub-flow-values",
+                description: suggestion.functionDefinition?.descriptions?.[0].content,
             }
         }
 
