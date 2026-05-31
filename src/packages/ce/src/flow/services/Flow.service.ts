@@ -15,12 +15,12 @@ import {
     NamespacesProjectsFlowsUpdateInput,
     NamespacesProjectsFlowsUpdatePayload,
     NodeFunction,
-    NodeFunctionIdWrapper,
     NodeParameter,
     NodeParameterValueInput,
     Query,
     ReferencePathInput,
-    ReferenceValue
+    ReferenceValue,
+    SubFlowValue
 } from "@code0-tech/sagittarius-graphql-types";
 import {GraphqlClient} from "@core/util/graphql-client";
 import flowsQuery from "@edition/flow/services/queries/Flows.query.graphql";
@@ -98,10 +98,10 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
     }
 
     protected removeParameterNode(flow: FlowView, node: NodeParameter): void {
-        if (node?.value?.__typename === "NodeFunctionIdWrapper") {
-            const parameterNode = flow?.nodes?.nodes?.find(n => n?.id === (node.value as NodeFunction)?.id)
+        if (node?.value?.__typename === "SubFlowValue") {
+            const parameterNode = flow?.nodes?.nodes?.find(n => n?.id === (node.value as SubFlowValue)?.startingNodeId)
             if (parameterNode) {
-                flow!.nodes!.nodes = flow!.nodes!.nodes!.filter(n => n?.id !== (node.value as NodeFunction)?.id)
+                flow!.nodes!.nodes = flow!.nodes!.nodes!.filter(n => n?.id !== (node.value as SubFlowValue)?.startingNodeId)
                 let nextNodeId = parameterNode.nextNodeId
                 while (nextNodeId) {
                     const nextNode = flow!.nodes!.nodes!.find(n => n?.id === nextNodeId)
@@ -144,8 +144,21 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
                     let value: NodeParameterValueInput
 
                     switch (parameter?.value?.__typename) {
-                        case "NodeFunctionIdWrapper":
-                            value = {nodeFunctionId: parameter.value.id!}
+                        case "SubFlowValue":
+                            value = {
+                                subFlowValue: {
+                                    startingNodeId: parameter.value.startingNodeId,
+                                    functionIdentifier: parameter?.value?.functionDefinition?.identifier,
+                                    signature: parameter?.value?.signature ?? "",
+                                    settings: parameter?.value?.settings?.map(setting => ({
+                                        defaultValue: setting?.defaultValue,
+                                        hidden: setting?.hidden,
+                                        identifier: setting.identifier!,
+                                        optional: setting?.optional,
+                                    }))
+
+                                }
+                            }
                             break
 
                         case "LiteralValue":
@@ -191,7 +204,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
     async deleteNodeById(flowId: FlowView['id'], nodeId: NodeFunction['id']): Promise<void> {
         const flow = this.getById(flowId)
         const node = this.getNodeById(flowId, nodeId)
-        const parentNode = flow?.nodes?.nodes?.find(node => node?.parameters?.nodes?.find(p => p?.value?.__typename === "NodeFunctionIdWrapper" && (p.value as NodeFunction)?.id === nodeId))
+        const parentNode = flow?.nodes?.nodes?.find(node => node?.parameters?.nodes?.find(p => p?.value?.__typename === "SubFlowValue" && (p.value as SubFlowValue)?.startingNodeId === nodeId))
         const previousNodes = flow?.nodes?.nodes?.find(n => n?.nextNodeId === nodeId)
         const index = this.values().findIndex(f => f.id === flowId)
         if (!flow || !node) return
@@ -207,9 +220,9 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         }
 
         if (parentNode) {
-            const parameter = parentNode.parameters?.nodes?.find(p => p?.value?.__typename === "NodeFunctionIdWrapper" && (p.value as NodeFunction)?.id === nodeId)
-            if (parameter && parameter.value?.__typename === "NodeFunctionIdWrapper" && node.nextNodeId) {
-                parameter.value.id = node.nextNodeId
+            const parameter = parentNode.parameters?.nodes?.find(p => p?.value?.__typename === "SubFlowValue" && (p.value as SubFlowValue)?.startingNodeId === nodeId)
+            if (parameter && parameter.value?.__typename === "SubFlowValue" && node.nextNodeId) {
+                parameter.value.startingNodeId = node.nextNodeId
             } else if (parameter) {
                 parameter.value = undefined
             }
@@ -221,8 +234,27 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         await this.syncFlow(flowId)
     }
 
-    async addNextNodeById(flowId: FlowView['id'], parentNodeId: NodeFunction['id'] | null, nextNode: NodeFunction): Promise<void> {
+    addNodeById(flowId: FlowView['id'], node: NodeFunction): NodeFunction['id'] {
+        const flow = this.getById(flowId)
+        const index = this.values().findIndex(f => f.id === flowId)
 
+        if (!flow) return
+
+        const nextNodeIndex: number = Math.max(0, ...flow.nodes?.nodes?.map(node => Number(node?.id?.match(/NodeFunction\/(\d+)$/)?.[1] ?? 0)) ?? [0])
+        const nextNodeId: NodeFunction['id'] = `gid://sagittarius/NodeFunction/${nextNodeIndex + 1}`
+        const addingNode: NodeFunction = {
+            ...JSON.parse(JSON.stringify(node)),
+            id: nextNodeId,
+        }
+
+        flow.nodes?.nodes?.push(addingNode)
+        this.set(index, new View(flow))
+
+        return addingNode.id
+
+    }
+
+    async addNextNodeById(flowId: FlowView['id'], parentNodeId: NodeFunction['id'] | null, nextNode: NodeFunction): Promise<void> {
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
         const parentNode = parentNodeId ? this.getNodeById(flowId, parentNodeId) : undefined
@@ -256,22 +288,6 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         await this.syncFlow(flowId)
     }
 
-    async setInputType(flowId: FlowView['id'], type: string): Promise<void> {
-
-        const flow = this.getById(flowId)
-        const index = this.values().findIndex(f => f.id === flowId)
-        if (!flow) return
-
-        const colonIndex = flow.signature?.lastIndexOf(')')
-        const prefix = flow.signature?.substring(0, (colonIndex ?? 0) + 1);
-        flow.signature = prefix + ": " + type;
-        flow.editedAt = new Date().toISOString()
-
-        this.set(index, new View(flow))
-        await this.syncFlow(flowId)
-
-    }
-
     async setSettingValue(flowId: FlowView['id'], parameterIndex: number, value: FlowSetting['value'], flowSettingsIdentifier: FlowSetting['flowSettingIdentifier']): Promise<void> {
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
@@ -301,7 +317,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         await this.syncFlow(flowId)
     }
 
-    async setParameterValue(flowId: FlowView['id'], nodeId: NodeFunction['id'], parameterIndex: number, value?: LiteralValue | ReferenceValue | NodeFunction, functionDefinition?: FunctionDefinition): Promise<void> {
+    async setParameterValue(flowId: FlowView['id'], nodeId: NodeFunction['id'], parameterIndex: number, value?: LiteralValue | ReferenceValue | SubFlowValue, functionDefinition?: FunctionDefinition): Promise<void> {
 
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
@@ -338,41 +354,13 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
                 value: null
             }
 
-            if (value?.__typename === "NodeFunction") {
-                const nextNodeIndex: number = Math.max(0, ...flow.nodes?.nodes?.map(node => Number(node?.id?.match(/NodeFunction\/(\d+)$/)?.[1] ?? 0)) ?? [0])
-                const addingIdValue: NodeFunction = {
-                    ...value,
-                    id: `gid://sagittarius/NodeFunction/${nextNodeIndex + 1}`
-                }
-                flow.nodes?.nodes?.push(addingIdValue)
-                localParameter.value = {
-                    id: `gid://sagittarius/NodeFunction/${nextNodeIndex + 1}`,
-                    __typename: "NodeFunctionIdWrapper"
-                } as NodeFunctionIdWrapper
-            } else {
-                localParameter.value = value as LiteralValue | ReferenceValue
-            }
-
+            localParameter.value = value as LiteralValue | ReferenceValue | SubFlowValue
             flow.editedAt = new Date().toISOString()
-
             node.parameters.nodes[parameterIndex] = (localParameter)
+
         } else if (parameter) {
             this.removeParameterNode(flow, parameter)
-            if (value?.__typename === "NodeFunction") {
-                const nextNodeIndex: number = Math.max(0, ...flow.nodes?.nodes?.map(node => Number(node?.id?.match(/NodeFunction\/(\d+)$/)?.[1] ?? 0)) ?? [0])
-                const addingIdValue: NodeFunction = {
-                    ...value,
-                    id: `gid://sagittarius/NodeFunction/${nextNodeIndex + 1}`
-                }
-                flow.nodes?.nodes?.push(addingIdValue)
-                parameter.value = {
-                    id: `gid://sagittarius/NodeFunction/${nextNodeIndex + 1}`,
-                    __typename: "NodeFunctionIdWrapper"
-                } as NodeFunctionIdWrapper
-            } else {
-                parameter.value = value as LiteralValue | ReferenceValue
-            }
-
+            parameter.value = value as LiteralValue | ReferenceValue | SubFlowValue
             flow.editedAt = new Date().toISOString()
         }
 
