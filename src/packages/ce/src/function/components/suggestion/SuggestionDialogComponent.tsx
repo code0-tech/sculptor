@@ -109,16 +109,16 @@ export const SuggestionDialogComponent: React.FC<SuggestionDialogComponentProps>
                                     <CommandEmpty>No results found.</CommandEmpty>
                                     {suggestions.map((group, index) => {
                                         return currentTab === `group-${index}` && <>
-                                            {group.suggestions.map((suggestion) => {
+                                            {group.suggestions.map((suggestion, suggestionIndex) => {
 
                                                 const DisplayIcon = icon(suggestion.icon as IconString)
 
                                                 return <>
-                                                    <CommandItem keywords={suggestion.aliases}
+                                                    <CommandItem keywords={[...suggestion.aliases, suggestion.displayMessage]}
                                                                  display={"block"}
                                                                  my={0.7}
                                                                  style={{boxSizing: "border-box", overflow: "hidden"}}
-                                                                 value={suggestion.displayMessage} onSelect={() => {
+                                                                 value={suggestionIndex.toString()} onSelect={() => {
                                                         onSuggestionSelect?.(suggestion.value)
                                                         props.onOpenChange?.(false)
 
@@ -127,6 +127,9 @@ export const SuggestionDialogComponent: React.FC<SuggestionDialogComponentProps>
                                                             <DisplayIcon color={hashToColor(`group-${index}`)}
                                                                          size={16}/>
                                                             <Text size={"sm"}>{suggestion.displayMessage}</Text>
+                                                            {suggestion.value.__typename === "SubFlowValue" && (
+                                                                <Badge color={"tertiary"}>Direct mapping</Badge>
+                                                            )}
                                                         </Flex>
                                                         <Spacing spacing={"xxs"}/>
                                                         <Text hierarchy={"tertiary"}

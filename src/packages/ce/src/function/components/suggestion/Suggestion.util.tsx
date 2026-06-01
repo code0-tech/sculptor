@@ -5,7 +5,7 @@ import {FunctionService} from "@edition/function/services/Function.service";
 import React from "react";
 
 export interface Suggestion {
-    value: LiteralValue | ReferenceValue | NodeFunction
+    value: LiteralValue | ReferenceValue | NodeFunction | SubFlowValue
     displayMessage: string
     definitionSource: string
     aliases: string[]
@@ -75,7 +75,7 @@ export const useMappedSuggestions = (suggestions: (NodeFunction | SubFlowValue |
                 icon: suggestion.functionDefinition?.displayIcon,
                 displayMessage: suggestion.functionDefinition?.names?.[0].content,
                 aliases: suggestion.functionDefinition?.aliases?.[0].content?.split(";"),
-                definitionSource: "sub-flow-values",
+                definitionSource: suggestion.functionDefinition.runtimeModule?.identifier,
                 description: suggestion.functionDefinition?.descriptions?.[0].content,
             }
         }
