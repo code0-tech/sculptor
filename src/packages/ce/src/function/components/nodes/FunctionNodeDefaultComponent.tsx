@@ -26,10 +26,6 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
     const functionService = useService(FunctionService)
     const functionStore = usePictorStore(FunctionService)
 
-    if (data.functionId) {
-        console.log(data)
-    }
-
     const node = React.useMemo(
         () => flowService.getNodeById(data.flowId, data.nodeId),
         [flowStore, data]
@@ -108,14 +104,6 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
                 case "SubFlowValue":
                     return <div style={{...decorationStyle, display: "inline-block"}}>
                         <NodeBadgeComponent value={nodeParameter.value}/>
-                        <Handle
-                            key={parameterIndex}
-                            type={"target"}
-                            position={Position.Right}
-                            id={`param-${parameterIndex}`}
-                            isConnectable={false}
-                            className={"d-flow-node__handle d-flow-node__handle--target"}
-                        />
                     </div>
             }
             return <div style={{...decorationStyle, display: "inline-block"}}>
@@ -166,6 +154,14 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
                 className={"d-flow-node__handle d-flow-node__handle--target"}
                 style={{...(data.isParameter ? {right: "2px"} : {top: "2px"})}}
                 position={data.isParameter ? Position.Right : Position.Top}
+            />
+
+            <Handle
+                type={"target"}
+                position={Position.Right}
+                id={`param`}
+                isConnectable={false}
+                className={"d-flow-node__handle d-flow-node__handle--target"}
             />
 
             {/* Ausgang */}
