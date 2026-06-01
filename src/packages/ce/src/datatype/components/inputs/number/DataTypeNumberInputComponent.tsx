@@ -4,7 +4,13 @@ import {EditorInput, hashToColor, InputDescription, InputLabel} from "@code0-tec
 import {StreamLanguage} from "@codemirror/language";
 import {tags} from "@lezer/highlight";
 import {useDebouncedCallback} from "use-debounce";
-import {LiteralValue, NodeFunction, NodeParameterValue, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
+import {
+    LiteralValue,
+    NodeFunction,
+    NodeParameterValue,
+    ReferenceValue,
+    SubFlowValue
+} from "@code0-tech/sagittarius-graphql-types";
 import {DataTypeInputControlsComponent} from "@edition/datatype/components/inputs/DataTypeInputControlsComponent";
 import {DataTypeInputValueComponent} from "@edition/datatype/components/inputs/DataTypeInputValueComponent";
 
@@ -15,7 +21,7 @@ export const DataTypeNumberInputComponent: React.FC<DataTypeNumberInputComponent
     const {formValidation, title, initialValue, description, suggestions, onChange} = props
 
     const defaultValue: NodeParameterValue | NodeFunction | undefined = React.useMemo(() => initialValue ?? undefined, [initialValue])
-    const onChangeDebounced = useDebouncedCallback((value: string | LiteralValue | NodeFunction | ReferenceValue | undefined) => {
+    const onChangeDebounced = useDebouncedCallback((value: string | LiteralValue | SubFlowValue | NodeFunction | ReferenceValue | undefined) => {
 
         if (typeof value === "string") {
             console.log(value)

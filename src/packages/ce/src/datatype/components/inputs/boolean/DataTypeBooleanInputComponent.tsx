@@ -2,7 +2,7 @@ import React from "react";
 import {DataTypeInputComponentProps} from "@edition/datatype/components/inputs/DataTypeInputComponent";
 import {InputDescription, InputLabel, SegmentedControl, SegmentedControlItem} from "@code0-tech/pictor";
 import {useDebouncedCallback} from "use-debounce";
-import {LiteralValue, NodeFunction, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
+import {LiteralValue, NodeFunction, ReferenceValue, SubFlowValue} from "@code0-tech/sagittarius-graphql-types";
 import {DataTypeInputValueComponent} from "@edition/datatype/components/inputs/DataTypeInputValueComponent";
 
 export type DataTypeBooleanInputComponentProps = DataTypeInputComponentProps
@@ -11,7 +11,7 @@ export const DataTypeBooleanInputComponent: React.FC<DataTypeBooleanInputCompone
 
     const {suggestions, initialValue, title, description, formValidation, onChange} = props
 
-    const onChangeDebounced = useDebouncedCallback((value: string | LiteralValue | NodeFunction | ReferenceValue | undefined) => {
+    const onChangeDebounced = useDebouncedCallback((value: string | LiteralValue | NodeFunction | SubFlowValue | ReferenceValue | undefined) => {
 
         if (typeof value === "string") {
             const boolValue: LiteralValue | undefined = value && ["true", "false"].includes(value) ? {
