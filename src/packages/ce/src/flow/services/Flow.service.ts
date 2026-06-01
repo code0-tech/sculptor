@@ -147,8 +147,13 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
                         case "SubFlowValue":
                             value = {
                                 subFlowValue: {
-                                    startingNodeId: parameter.value.startingNodeId,
-                                    functionIdentifier: parameter?.value?.functionDefinition?.identifier,
+                                    ...(
+                                        parameter.value.startingNodeId ? {
+                                            startingNodeId: parameter.value.startingNodeId
+                                        } : parameter?.value?.functionDefinition?.identifier ? {
+                                            functionIdentifier: parameter?.value?.functionDefinition?.identifier,
+                                        } : {}
+                                    ),
                                     signature: parameter?.value?.signature ?? "",
                                     settings: parameter?.value?.settings?.map(setting => ({
                                         defaultValue: setting?.defaultValue,
