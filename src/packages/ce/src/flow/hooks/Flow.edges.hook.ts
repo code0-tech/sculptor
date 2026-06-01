@@ -97,7 +97,7 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                             id: `${node.id}-${param.id}-next`,
                             source: `${node.id}-${param.id}`,
                             target: node.id!,
-                            targetHandle: `param-${index}`,
+                            targetHandle: `param`,
                             deletable: false,
                             selectable: false,
                             animated: true,
