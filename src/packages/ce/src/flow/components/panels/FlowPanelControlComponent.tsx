@@ -1,5 +1,5 @@
 import React from "react";
-import {Flow, LiteralValue, NodeFunction, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
+import {Flow, LiteralValue, NodeFunction, ReferenceValue, SubFlowValue} from "@code0-tech/sagittarius-graphql-types";
 import {
     Badge,
     Button,
@@ -50,7 +50,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
         })
     }, [selectedNode, flowService, flowStore])
 
-    const addNodeToFlow = React.useCallback((suggestion: NodeFunction | ReferenceValue | LiteralValue) => {
+    const addNodeToFlow = React.useCallback((suggestion: NodeFunction | ReferenceValue | LiteralValue | SubFlowValue) => {
         if (flowId && suggestion.__typename === "NodeFunction" && selectedNode?.id.includes("NodeFunction")) {
             startTransition(async () => {
                 await flowService.addNextNodeById(flowId, selectedNode?.id as NodeFunction['id'], suggestion as NodeFunction)
@@ -63,7 +63,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
     }, [flowId, flowService, flowStore, selectedNode])
 
     useHotkeys('shift+a', (keyboardEvent) => {
-        if (selectedNode) setSuggestionDialogOpen(true)
+        if (selectedNode && selectedNode.data.nodeId) setSuggestionDialogOpen(true)
         else setAddNextNodeTooltipOpen(true)
         keyboardEvent.stopPropagation()
         keyboardEvent.preventDefault()
@@ -97,11 +97,11 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
             <Tooltip open={addNextNodeTooltipOpen} onOpenChange={setAddNextNodeTooltipOpen}>
                 <TooltipTrigger asChild>
                     <Button data-qa-selector={"flow-builder-control-panel-add"}
-                            disabled={!selectedNode}
+                            disabled={!selectedNode || !selectedNode.data.nodeId}
                             paddingSize={"xxs"}
                             variant={"filled"}
                             onClick={() => {
-                                if (selectedNode) setSuggestionDialogOpen(true)
+                                if (selectedNode && selectedNode.data.nodeId) setSuggestionDialogOpen(true)
                             }}
                             color={"secondary"}>
                         <Text display={"flex"} align={"center"} style={{gap: "0.35rem"}}>
@@ -111,7 +111,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                     </Button>
                 </TooltipTrigger>
                 <TooltipPortal>
-                    {!selectedNode && <TooltipContent sideOffset={8}>
+                    {!selectedNode || !selectedNode.data.nodeId && <TooltipContent sideOffset={8}>
                         <Text>Select a node to add a next node</Text>
                     </TooltipContent>}
                 </TooltipPortal>

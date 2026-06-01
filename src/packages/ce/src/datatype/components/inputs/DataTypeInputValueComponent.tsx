@@ -8,19 +8,20 @@ import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/Refer
 export interface DataTypeInputValueComponentProps extends Omit<DataTypeInputComponentProps, 'schema'> {
     children?: React.ReactNode
     inside?: boolean
+    showSuggestions?: boolean
 }
 
 export const DataTypeInputValueComponent: React.FC<DataTypeInputValueComponentProps> = (props) => {
 
-    const {children, inside = false, initialValue, suggestions, onChange, formValidation, ...rest} = props
+    const {children, inside = false, initialValue, suggestions, onChange, formValidation, showSuggestions, ...rest} = props
 
-    return inside || initialValue?.__typename === "NodeFunction" || initialValue?.__typename === "NodeFunctionIdWrapper" || initialValue?.__typename === "ReferenceValue" ?
+    return inside || initialValue?.__typename === "SubFlowValue" || initialValue?.__typename === "ReferenceValue" ?
         <InputWrapper formValidation={{...formValidation, setValue: undefined}} right={
-            <DataTypeInputControlsComponent suggestions={suggestions} onSelect={onChange}/>
+            <DataTypeInputControlsComponent showSuggestions={showSuggestions} suggestions={suggestions} onSelect={onChange}/>
         } rightType={"action"} {...rest}>
             <div style={{alignSelf: "center", flex: "1 1 auto"}}>
                 {
-                    initialValue?.__typename === "NodeFunction" || initialValue?.__typename === "NodeFunctionIdWrapper" ? (
+                    initialValue?.__typename === "SubFlowValue" ? (
                         <NodeBadgeComponent value={initialValue}/>
                     ) : initialValue?.__typename === "ReferenceValue" ? (
                         <ReferenceBadgeComponent value={initialValue}/>

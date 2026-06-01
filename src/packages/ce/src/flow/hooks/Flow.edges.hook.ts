@@ -90,7 +90,25 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                 const parameterDefinition = functionService.getById(node.functionDefinition?.id!!)?.parameterDefinitions?.nodes?.[index];
                 if (!parameterValue) return
 
-                if (parameterValue && parameterValue.__typename === "NodeFunctionIdWrapper") {
+                if (parameterValue && parameterValue.__typename === "SubFlowValue") {
+
+                    if (parameterValue.functionDefinition?.id) {
+                        edges.push({
+                            id: `${node.id}-${param.id}-next`,
+                            source: `${node.id}-${param.id}`,
+                            target: node.id!,
+                            targetHandle: `param`,
+                            deletable: false,
+                            selectable: false,
+                            animated: true,
+                            data: {
+                                color: hashToColor(parameterValue?.startingNodeId || parameterValue.functionDefinition?.id || ""),
+                                type: 'parameter',
+                                flowId: flowId
+                            }
+                        })
+                        return
+                    }
 
                     const groupId = `${node.id}-group-${idCounter++}`;
 
@@ -103,7 +121,7 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                         animated: true,
                         label: parameterDefinition?.names!![0]?.content ?? FALLBACK_FUNCTION_PARAMETER_NAME,
                         data: {
-                            color: hashToColor(parameterValue?.id || ""),
+                            color: hashToColor(parameterValue?.startingNodeId || parameterValue.functionDefinition?.id || ""),
                             type: 'group',
                             flowId: flowId,
                             parentNodeId: parentNode?.id
@@ -112,11 +130,15 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
 
                     (groupsWithValue.get(node.id!) ?? (groupsWithValue.set(node.id!, []), groupsWithValue.get(node.id!)!)).push(groupId);
 
-                    traverse(
-                        flowService.getNodeById(flowId, parameterValue.id)!,
-                        node,
-                        true
-                    );
+                    if (parameterValue.startingNodeId) {
+                        traverse(
+                            flowService.getNodeById(flowId, parameterValue.startingNodeId)!,
+                            node,
+                            true
+                        );
+                    }
+
+
                 }
             });
 

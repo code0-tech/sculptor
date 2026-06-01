@@ -23,13 +23,13 @@ import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 import {Tab, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {icon, IconString} from "@core/util/icons";
 import {IconArrowsUpDown, IconCornerDownLeft, IconSearch} from "@tabler/icons-react";
-import {LiteralValue, NodeFunction, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
+import {LiteralValue, NodeFunction, ReferenceValue, SubFlowValue} from "@code0-tech/sagittarius-graphql-types";
 
 export interface SuggestionDialogComponentProps {
-    suggestions?: (NodeFunction | ReferenceValue | LiteralValue)[]
+    suggestions?: (NodeFunction | SubFlowValue | ReferenceValue | LiteralValue)[]
     open?: boolean
     onOpenChange?: (open: boolean) => void
-    onSuggestionSelect?: (suggestion: Suggestion) => void
+    onSuggestionSelect?: (suggestion: (NodeFunction | SubFlowValue | ReferenceValue | LiteralValue)) => void
 }
 
 export const SuggestionDialogComponent: React.FC<SuggestionDialogComponentProps> = (props) => {
@@ -109,17 +109,17 @@ export const SuggestionDialogComponent: React.FC<SuggestionDialogComponentProps>
                                     <CommandEmpty>No results found.</CommandEmpty>
                                     {suggestions.map((group, index) => {
                                         return currentTab === `group-${index}` && <>
-                                            {group.suggestions.map((suggestion) => {
+                                            {group.suggestions.map((suggestion, suggestionIndex) => {
 
                                                 const DisplayIcon = icon(suggestion.icon as IconString)
 
                                                 return <>
-                                                    <CommandItem keywords={suggestion.aliases}
+                                                    <CommandItem keywords={[...suggestion.aliases, suggestion.displayMessage]}
                                                                  display={"block"}
                                                                  my={0.7}
                                                                  style={{boxSizing: "border-box", overflow: "hidden"}}
-                                                                 value={suggestion.displayMessage} onSelect={() => {
-                                                        onSuggestionSelect?.(suggestion)
+                                                                 value={suggestionIndex.toString()} onSelect={() => {
+                                                        onSuggestionSelect?.(suggestion.value)
                                                         props.onOpenChange?.(false)
 
                                                     }}>
@@ -127,6 +127,9 @@ export const SuggestionDialogComponent: React.FC<SuggestionDialogComponentProps>
                                                             <DisplayIcon color={hashToColor(`group-${index}`)}
                                                                          size={16}/>
                                                             <Text size={"sm"}>{suggestion.displayMessage}</Text>
+                                                            {suggestion.value.__typename === "SubFlowValue" && (
+                                                                <Badge color={"tertiary"}>Direct mapping</Badge>
+                                                            )}
                                                         </Flex>
                                                         <Spacing spacing={"xxs"}/>
                                                         <Text hierarchy={"tertiary"}

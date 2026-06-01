@@ -1,7 +1,13 @@
 import React from "react";
 import {DataTypeTextInputComponent} from "./text/DataTypeTextInputComponent";
 import {NodeSchema} from "@code0-tech/triangulum";
-import {LiteralValue, NodeFunction, NodeParameterValue, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
+import {
+    LiteralValue,
+    NodeFunction,
+    NodeParameterValue,
+    ReferenceValue,
+    SubFlowValue
+} from "@code0-tech/sagittarius-graphql-types";
 import {DataTypeBooleanInputComponent} from "@edition/datatype/components/inputs/boolean/DataTypeBooleanInputComponent";
 import {DataTypeSelectInputComponent} from "@edition/datatype/components/inputs/select/DataTypeSelectInputComponent";
 import {InputWrapperProps} from "@code0-tech/pictor/dist/components/form/InputWrapper";
@@ -15,8 +21,8 @@ import {
 export interface DataTypeInputComponentProps extends Omit<InputWrapperProps<NodeParameterValue | NodeFunction>, "onChange"> {
     schema: NodeSchema
     clearable?: boolean
-    onChange?: (value: ReferenceValue | LiteralValue | NodeFunction | undefined) => void
-    suggestions?: (NodeFunction | ReferenceValue | LiteralValue)[]
+    onChange?: (value: ReferenceValue | SubFlowValue | LiteralValue | NodeFunction | undefined) => void
+    suggestions?: (NodeFunction | SubFlowValue | ReferenceValue | LiteralValue)[]
     onClear?: (event: React.MouseEvent<HTMLButtonElement>) => void
 }
 

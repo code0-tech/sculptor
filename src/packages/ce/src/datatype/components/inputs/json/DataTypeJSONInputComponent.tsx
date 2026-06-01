@@ -2,7 +2,7 @@ import React from "react"
 import "../type/DataTypeTypeInputComponent.style.scss"
 import {DataTypeJSONInputTreeComponent} from "./DataTypeJSONInputTreeComponent";
 import {DataTypeInputComponentProps} from "../DataTypeInputComponent";
-import {LiteralValue, NodeFunction, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
+import {LiteralValue, NodeFunction, ReferenceValue, SubFlowValue} from "@code0-tech/sagittarius-graphql-types";
 import {InputDescription, InputLabel, Spacing} from "@code0-tech/pictor";
 import {
     DataTypeJSONInputEditDialogComponent
@@ -28,7 +28,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
     const [editEntry, setEditEntry] = React.useState<EditableJSONEntry | undefined>(undefined)
     const [collapsedState, setCollapsedStateRaw] = React.useState<Record<string, boolean>>({})
 
-    const onChangeDebounced = useDebouncedCallback((value: LiteralValue | NodeFunction | ReferenceValue | undefined) => {
+    const onChangeDebounced = useDebouncedCallback((value: LiteralValue | SubFlowValue | NodeFunction | ReferenceValue | undefined) => {
         formValidation?.setValue?.(value)
         onChange?.(value)
     }, 200)

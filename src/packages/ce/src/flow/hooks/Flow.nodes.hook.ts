@@ -51,6 +51,8 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
             node: NodeFunction,
             parentGroup?: string
         ) => {
+
+            globalIndex++
             if (!node?.id) return
 
             const functionDefinition = functionService.getById(node.functionDefinition?.id)
@@ -69,7 +71,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                     data: {
                         nodeId: nodeId,
                         flowId: flowId,
-                        index: ++globalIndex,
+                        index: globalIndex,
                         color: hashToColor(nodeId),
                         schema: flowSchema?.filter(nodeSchema => nodeSchema?.some(schema => schema.nodeId === node.id))?.flat()!
                     },
@@ -78,7 +80,29 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
 
             node.parameters?.nodes?.forEach((param) => {
                 const value = param?.value;
-                if (!value || value.__typename !== "NodeFunctionIdWrapper") return;
+                if (!value || value.__typename !== "SubFlowValue") return;
+
+                if (value.functionDefinition?.id) {
+                    setNodes(prevState => [...prevState, {
+                        id: `${nodeId}-${param.id}`,
+                        type: functionDefinition && "design" in functionDefinition ? functionDefinition?.design as string : "square",
+                        position: {x: 0, y: 0},
+                        draggable: false,
+                        parentId: parentGroup,
+                        extent: parentGroup ? "parent" : undefined,
+                        data: {
+                            isParameter: true,
+                            parameterId: param?.id,
+                            parentNodeId: nodeId,
+                            index: globalIndex,
+                            functionId: value.functionDefinition?.id,
+                            flowId: flowId,
+                            color: hashToColor(value?.startingNodeId ?? value?.functionDefinition?.id ?? ""),
+                            schema: []
+                        },
+                    }])
+                    return
+                }
 
                 const groupId = `${nodeId}-group-${groupCounter++}`;
 
@@ -94,17 +118,18 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                         extent: parentGroup ? "parent" : undefined,
                         data: {
                             isParameter: true,
-                            //parentNodeId: nodeId,
                             nodeId: nodeId,
                             flowId: flowId,
-                            color: hashToColor(value?.id ?? ""),
+                            color: hashToColor(value?.startingNodeId ?? ""),
                             schema: []
                         },
                     }])
                 }
 
-                const child = flowService.getNodeById(flowId, value.id);
+                const child = flowService.getNodeById(flowId, value.startingNodeId);
                 if (child) traverse(child, groupId);
+
+
             });
 
             if (node.nextNodeId) {

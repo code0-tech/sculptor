@@ -33,9 +33,21 @@ fragment Flow on Flow {
                             __typename
                             value
                         }
-                        ... on NodeFunctionIdWrapper {
+                        ... on SubFlowValue {
                             __typename
-                            id
+                            startingNodeId
+                            signature
+                            functionDefinition {
+                                id
+                                identifier
+                            }
+                            settings {
+                                __typename
+                                identifier
+                                defaultValue
+                                optional
+                                hidden
+                            }
                         }
                         ... on ReferenceValue {
                             __typename
