@@ -1,5 +1,5 @@
 "use client"
 
-import {ProjectTabView} from "@ce/project/views/ProjectTabView";
+import {ProjectTabView} from "@ce-internal/project/views/ProjectTabView";
 
 export default ProjectTabView

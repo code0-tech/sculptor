@@ -1,3 +1,3 @@
-import {ModulesPage} from "@ce/module/pages/ModulesPage";
+import {ModulesPage} from "@ce-internal/module/pages/ModulesPage";
 
 export default ModulesPage

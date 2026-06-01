@@ -17,11 +17,11 @@ import {
     useService,
     useStore
 } from "@code0-tech/pictor";
-import {ModuleService} from "@ce/module/services/Module.service";
+import {ModuleService} from "@ce-internal/module/services/Module.service";
 import {icon, IconString} from "@core/util/icons";
 import {IconCheck} from "@tabler/icons-react";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
-import {ProjectService} from "@ce/project/services/Project.service";
+import {ProjectService} from "@ce-internal/project/services/Project.service";
 
 export const ModulesPage: React.FC = () => {
 

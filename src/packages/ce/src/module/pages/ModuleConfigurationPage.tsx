@@ -21,18 +21,18 @@ import {
     useService,
     useStore
 } from "@code0-tech/pictor";
-import {ModuleService} from "@ce/module/services/Module.service";
+import {ModuleService} from "@ce-internal/module/services/Module.service";
 import {Namespace, NamespaceProject, RuntimeModule} from "@code0-tech/sagittarius-graphql-types";
 import {getTypeSchema} from "@code0-tech/triangulum";
-import {DatatypeService} from "@ce/datatype/services/Datatype.service";
-import {DataTypeInputComponent} from "@ce/datatype/components/inputs/DataTypeInputComponent";
+import {DatatypeService} from "@ce-internal/datatype/services/Datatype.service";
+import {DataTypeInputComponent} from "@ce-internal/datatype/components/inputs/DataTypeInputComponent";
 import {Panel} from "@xyflow/react";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import '@xyflow/react/dist/style.css';
 import {Select} from "@radix-ui/react-select";
 import {IconChevronDown} from "@tabler/icons-react";
-import {RuntimeService} from "@ce/runtime/services/Runtime.service";
-import {ProjectService} from "@ce/project/services/Project.service";
+import {RuntimeService} from "@ce-internal/runtime/services/Runtime.service";
+import {ProjectService} from "@ce-internal/project/services/Project.service";
 
 export const ModuleConfigurationPage: React.FC = () => {
 
