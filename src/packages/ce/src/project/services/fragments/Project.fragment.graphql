@@ -37,6 +37,44 @@ fragment Project on NamespaceProject {
             hasNextPage
         }
     }
+    runtimeAssignments {
+        __typename
+        count
+        nodes {
+            __typename
+            id
+            compatible
+            updatedAt
+            createdAt
+            moduleConfigurations {
+                __typename
+                count
+                nodes {
+                    __typename
+                    id
+                    createdAt
+                    updatedAt
+                    value
+                    definition {
+                        id
+                    }
+                }
+                pageInfo {
+                    __typename
+                    endCursor
+                    hasNextPage
+                }
+            }
+            runtime {
+                id
+            }
+        }
+        pageInfo {
+            __typename
+            endCursor
+            hasNextPage
+        }
+    }
     roles {
         __typename
         count
