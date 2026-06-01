@@ -43,6 +43,7 @@ fragment Function on FunctionDefinition {
     runtimeModule {
         __typename
         id
+        identifier
     }
 
     parameterDefinitions (first: $firstParameterDefinition, after: $afterParameterDefinition) {
