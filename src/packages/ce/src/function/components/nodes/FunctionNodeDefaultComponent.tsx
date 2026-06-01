@@ -13,7 +13,7 @@ import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeC
 import {NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {underlineBySeverity} from "@core/util/inspection";
 import {icon, IconString} from "@core/util/icons";
-import {FALLBACK_FUNCTION_DISPLAY_MESSAGE} from "@core/util/fallback-translations";
+import {FALLBACK_FUNCTION_DISPLAY_MESSAGE, FALLBACK_FUNCTION_NAME} from "@core/util/fallback-translations";
 import {useSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
 
 export type FunctionNodeDefaultComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
@@ -26,6 +26,10 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
     const functionService = useService(FunctionService)
     const functionStore = usePictorStore(FunctionService)
 
+    if (data.functionId) {
+        console.log(data)
+    }
+
     const node = React.useMemo(
         () => flowService.getNodeById(data.flowId, data.nodeId),
         [flowStore, data]
@@ -34,7 +38,7 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
     const selectedNode = useSelectedFunctionNode()
 
     const definition = React.useMemo(
-        () => node ? functionService.getById(node.functionDefinition?.id!!) : undefined,
+        () => functionService.getById(node?.functionDefinition?.id || data.functionId),
         [functionStore, data, node]
     )
 
@@ -43,7 +47,7 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
     const validation = useFlowValidation(data.flowId)
 
     const nodeValidations = React.useMemo(
-        () => validation?.filter(v => v.nodeId === data.nodeId && v.parameterIndex === null),
+        () => validation?.filter(v => v.nodeId === data.nodeId && v.parameterIndex === null && !data.functionId),
         [validation]
     )
 
@@ -190,7 +194,7 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
 
             <Flex align={"center"} style={{gap: "0.7rem", ...nodeValidationStyle}}>
                 <DisplayIcon color={data.color} size={16}/>
-                <Text size={"md"}>{displayMessage}</Text>
+                <Text size={"md"}>{node ? displayMessage : definition?.names?.[0].content ?? FALLBACK_FUNCTION_NAME}</Text>
             </Flex>
         </Card>
     );
