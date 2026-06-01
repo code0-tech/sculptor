@@ -27,7 +27,11 @@ export const useMappedSuggestions = (suggestions: (NodeFunction | SubFlowValue |
     const functionStore = useStore(FunctionService)
 
     const modules = React.useMemo(
-        () => [...moduleService.values()],
+        () => [...moduleService.values(), {
+            identifier: "sub-flow-values",
+            names: [{content: "Static functions"}],
+            icon: "tabler:circle-dot"
+        }],
         [moduleService, moduleStore]
     )
 
@@ -47,7 +51,7 @@ export const useMappedSuggestions = (suggestions: (NodeFunction | SubFlowValue |
                 icon: functionDefinition?.displayIcon,
                 displayMessage: functionDefinition?.names?.[0].content,
                 aliases: functionDefinition?.aliases?.[0].content?.split(";"),
-                definitionSource: module?.id,
+                definitionSource: module?.identifier,
                 description: functionDefinition?.descriptions?.[0].content,
             }
         }
@@ -66,8 +70,6 @@ export const useMappedSuggestions = (suggestions: (NodeFunction | SubFlowValue |
 
         if (suggestion.__typename === "SubFlowValue" && suggestion.functionDefinition?.id) {
 
-
-
             return {
                 value: suggestion,
                 icon: suggestion.functionDefinition?.displayIcon,
@@ -85,7 +87,7 @@ export const useMappedSuggestions = (suggestions: (NodeFunction | SubFlowValue |
 
     mappedSuggestions.forEach((suggestion) => {
         const moduleId = suggestion.definitionSource
-        const module = modules.find(m => m.id === moduleId)
+        const module = modules.find(m => m.identifier === moduleId)
 
         if (!groupedByModule.has(moduleId)) {
             groupedByModule.set(moduleId, {
