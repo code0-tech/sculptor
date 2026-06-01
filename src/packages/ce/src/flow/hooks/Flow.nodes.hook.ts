@@ -85,7 +85,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                 if (value.functionDefinition?.id) {
                     setNodes(prevState => [...prevState, {
                         id: `${nodeId}-${param.id}`,
-                        type: functionDefinition && "design" in functionDefinition ? functionDefinition?.design as string : "default",
+                        type: functionDefinition && "design" in functionDefinition ? functionDefinition?.design as string : "square",
                         position: {x: 0, y: 0},
                         draggable: false,
                         parentId: parentGroup,
