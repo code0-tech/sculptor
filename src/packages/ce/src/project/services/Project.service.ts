@@ -1,5 +1,6 @@
 import {ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor";
 import {
+    ModuleConfiguration,
     Mutation,
     Namespace,
     NamespaceProject,
@@ -186,7 +187,17 @@ export class ProjectService extends ReactiveArrayService<NamespaceProject, Proje
                     ...project?.runtimeAssignments,
                     nodes: [
                         ...(project?.runtimeAssignments?.nodes?.filter(rA => rA?.id !== payload.namespaceProjectRuntimeAssignmentId) ?? []),
-                        (result?.data.namespacesProjectsRuntimeAssignmentsUpdateModuleConfigurations.namespaceProjectRuntimeAssignment ?? {})
+                        {
+                            ...result?.data.namespacesProjectsRuntimeAssignmentsUpdateModuleConfigurations.namespaceProjectRuntimeAssignment,
+                            moduleConfigurations: {
+                                nodes: payload.moduleConfigurations.map((config, index) => {
+                                    return {
+                                        ...project?.runtimeAssignments?.nodes?.find(rA => rA?.id === payload.namespaceProjectRuntimeAssignmentId)?.moduleConfigurations?.nodes?.find(mC => mC?.definition?.id === config.moduleConfigurationDefinitionId),
+                                        value: config.value
+                                    } as ModuleConfiguration
+                                })
+                            }
+                        }
                     ]
                 }
             }))
