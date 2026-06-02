@@ -13,8 +13,14 @@ mutation projectUpdateModuleConfiguration($namespaceProjectRuntimeAssignmentId: 
             }
         }
         namespaceProjectRuntimeAssignment {
+            __typename
             id
-            ##TODO
+            compatible
+            updatedAt
+            createdAt
+            runtime {
+                id
+            }
         }
     }
 }
