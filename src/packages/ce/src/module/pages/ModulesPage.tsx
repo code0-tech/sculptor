@@ -52,28 +52,21 @@ export const ModulesPage: React.FC = () => {
     )
 
     return <>
-        <Flex justify={"space-between"} pt={"0"} py={1} style={{flexWrap: "wrap"}} align={"center"}>
-            <Flex style={{gap: "0.35rem", flexDirection: "column"}}>
-                <Text size={"xl"} hierarchy={"primary"}>
-                    Installed plugins on {project?.name}
-                </Text>
-                <Text size={"sm"} hierarchy={"tertiary"}>
-                    Extend the capabilities of your runtime by installing plugins. Plugins can provide new flow types
-                    and
-                    function.
-                </Text>
-            </Flex>
-            <Button color={"tertiary"}>
-                Learn how to install plugins
-            </Button>
-        </Flex>
         <div style={{
             background: "#070514",
             height: "100%",
-            padding: "1rem",
+            padding: "2rem",
             borderTopLeftRadius: "1rem",
             borderTopRightRadius: "1rem"
         }}>
+            <Flex justify={"space-between"} pt={"0"} py={1} style={{flexWrap: "wrap"}} align={"start"}>
+                <Text size={"xl"} hierarchy={"primary"}>
+                    Installed plugins on {project?.name}
+                </Text>
+                <Button color={"tertiary"}>
+                    Learn how to install plugins
+                </Button>
+            </Flex>
             <Flex justify={"space-between"} style={{gap: "0.7rem"}} w={"100%"} align={"center"}>
                 <div style={{width: "100%"}}>
                     <DataTableFilterInput/>

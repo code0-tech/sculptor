@@ -32,7 +32,7 @@ export const ProjectSettingsPage: React.FC = () => {
                 </TabList>
             </SidebarComponent>
             <ResizableHandle/>
-            <ResizablePanel id={"2"} color={"primary"} p={1}
+            <ResizablePanel id={"2"} color={"primary"} p={2}
                             style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
                 <>
                     <ProjectSettingsGeneralView/>
