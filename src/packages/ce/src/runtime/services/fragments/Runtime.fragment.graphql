@@ -14,6 +14,16 @@ fragment Runtime on Runtime {
     token
     modules {
         count
+        nodes {
+            __typename
+            id
+            identifier
+        }
+        pageInfo {
+            __typename
+            endCursor
+            hasNextPage
+        }
     }
     projects {
         count

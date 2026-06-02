@@ -18,10 +18,9 @@ import {Application, ApplicationService} from "@edition/application/services/App
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {OrganizationView} from "@edition/organization/services/Organization.view";
 import {MemberView} from "@edition/member/services/Member.view";
-import {ProjectView} from "@edition/project/services/Project.view";
 import {RoleView} from "@edition/role/services/Role.view";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
-import {Namespace, Runtime, User} from "@code0-tech/sagittarius-graphql-types";
+import {Namespace, NamespaceProject, Runtime, User} from "@code0-tech/sagittarius-graphql-types";
 import {ApplicationMiddlewareComponent} from "@edition/application/components/ApplicationMiddlewareComponent";
 
 interface ApplicationLayoutProps {
@@ -43,7 +42,7 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
     const member = usePersistentReactiveArrayService<MemberView, MemberService>(`dashboard::members::${currentSession?.id}`, (store) => new MemberService(graphqlClient, store))
     const namespace = usePersistentReactiveArrayService<Namespace, NamespaceService>(`dashboard::namespaces::${currentSession?.id}`, (store) => new NamespaceService(graphqlClient, store))
     const runtime = usePersistentReactiveArrayService<Runtime, RuntimeService>(`dashboard::global_runtimes::${currentSession?.id}`, (store) => new RuntimeService(graphqlClient, store))
-    const project = usePersistentReactiveArrayService<ProjectView, ProjectService>(`dashboard::projects::${currentSession?.id}`, (store) => new ProjectService(graphqlClient, store))
+    const project = usePersistentReactiveArrayService<NamespaceProject, ProjectService>(`dashboard::projects::${currentSession?.id}`, (store) => new ProjectService(graphqlClient, store))
     const role = usePersistentReactiveArrayService<RoleView, RoleService>(`dashboard::roles::${currentSession?.id}`, (store) => new RoleService(graphqlClient, store))
     const application = usePersistentReactiveArrayService<Application, ApplicationService>(`dashboard::application::${currentSession?.id}`, (store) => new ApplicationService(graphqlClient, store))
 

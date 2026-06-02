@@ -31,7 +31,7 @@ export const ProjectDataTableComponent: React.FC<ProjectDataTableComponentProps>
                           </Text>
                       </DataTableColumn>}
                       onSelect={(item) => item && onSelect?.(item)}
-                      data={projects.map(p => p.json()).filter(preFilter)}>
+                      data={projects.filter(preFilter)}>
         {(project, index) => {
             return <ProjectDataTableRowComponent additionalColumns={additionalColumns(project, index)} projectId={project.id}/>
         }}

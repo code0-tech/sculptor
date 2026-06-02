@@ -7,6 +7,8 @@ query Modules (
     $afterRuntime: String
     $firstModule: Int!
     $afterModule: String
+    $firstConfiguration: Int!
+    $afterConfiguration: String
 ) {
     namespace(id: $namespaceId) {
         project(id: $projectId) {

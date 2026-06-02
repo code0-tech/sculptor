@@ -34,10 +34,10 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
     }, 200)
 
     const value = React.useMemo(
-        () => initialValue ?? (schema.functionSchema.input === "list" ? {
+        () => initialValue ?? (("functionSchema" in schema ? schema.functionSchema.input === "list" : schema.input === "list") ? {
             __typename: "LiteralValue",
             value: []
-        } as LiteralValue : generateDefaultDataValue(schema.functionSchema as DataInput)),
+        } as LiteralValue : generateDefaultDataValue("functionSchema" in schema ? schema.functionSchema as DataInput : schema as DataInput)),
             [initialValue, schema]
     )
 

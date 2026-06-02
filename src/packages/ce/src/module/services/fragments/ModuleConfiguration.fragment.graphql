@@ -1,0 +1,26 @@
+fragment ModuleConfiguration on ModuleConfigurationDefinition {
+    __typename
+    id
+    createdAt
+    updatedAt
+    identifier
+    defaultValue
+    type
+    hidden
+    optional
+
+    runtimeModule {
+        id
+    }
+    names {
+        code
+        content
+        __typename
+    }
+    descriptions {
+        code
+        content
+        __typename
+    }
+
+}

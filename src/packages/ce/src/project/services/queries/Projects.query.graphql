@@ -1,4 +1,5 @@
 #import "../fragments/Project.fragment.graphql"
+
 query Projects (
     $namespaceId: NamespaceID!,
 
