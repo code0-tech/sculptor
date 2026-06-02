@@ -1,0 +1,20 @@
+mutation projectUpdateModuleConfiguration($namespaceProjectRuntimeAssignmentId: NamespaceProjectRuntimeAssignmentID!, $moduleConfigurations: [ModuleConfigurationInput!]!) {
+    namespacesProjectsRuntimeAssignmentsUpdateModuleConfigurations(input: {
+        namespaceProjectRuntimeAssignmentId: $namespaceProjectRuntimeAssignmentId,
+        moduleConfigurations: $moduleConfigurations
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    ...on ActiveModelError { attribute type }
+                    __typename
+                }
+            }
+        }
+        namespaceProjectRuntimeAssignment {
+            id
+            ##TODO
+        }
+    }
+}
