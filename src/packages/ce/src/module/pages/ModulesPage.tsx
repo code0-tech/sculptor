@@ -68,14 +68,6 @@ export const ModulesPage: React.FC = () => {
                     Learn how to install plugins
                 </Button>
             </Flex>
-            <Flex justify={"space-between"} style={{gap: "0.7rem"}} w={"100%"} align={"center"}>
-                <div style={{width: "100%"}}>
-                    <DataTableFilterInput/>
-                </div>
-                <Button color={"secondary"}>
-                    Sort
-                </Button>
-            </Flex>
             <Spacing spacing={"xl"}/>
             <Row key={modules.length}>
                 {
