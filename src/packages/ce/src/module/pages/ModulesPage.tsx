@@ -22,6 +22,7 @@ import {icon, IconString} from "@core/util/icons";
 import {IconCheck} from "@tabler/icons-react";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {ProjectService} from "@ce-internal/project/services/Project.service";
+import Link from "next/link";
 
 export const ModulesPage: React.FC = () => {
 
@@ -146,16 +147,18 @@ export const ModulesPage: React.FC = () => {
                         </Col>
                     })
                 }
-                <Col xs={6} md={4} lg={3} xl={2} mb={1}>
+                <Col xs={6} md={4} lg={3} xxl={2} mb={1}>
                     <Card h={"100%"}
                           style={{textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center"}}>
                         <Text size={"md"} hierarchy={"primary"}>Are you missing a plugin?</Text>
                         <Spacing spacing={"xxs"}/>
                         <Text>
-                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
+                            Create a issue on our github repository or join our discord to request a plugin
                         </Text>
                         <Spacing spacing={"sm"}/>
-                        <Button>Request a plugin</Button>
+                        <Link href={"https://github.com/code0-tech/codezero"}>
+                            <Button>Request a plugin</Button>
+                        </Link>
                     </Card>
                 </Col>
             </Row>
