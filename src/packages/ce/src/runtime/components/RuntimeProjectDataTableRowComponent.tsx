@@ -11,7 +11,7 @@ import {
     MenuContent,
     MenuItem,
     MenuPortal,
-    MenuTrigger,
+    MenuTrigger, Spacing,
     Text,
     useService,
     useStore
@@ -20,6 +20,7 @@ import {RuntimeService} from "@edition/runtime/services/Runtime.service";
 import {formatDistanceToNow} from "date-fns";
 import {IconDotsVertical, IconServerSpark, IconX} from "@tabler/icons-react";
 import {ProjectService} from "@edition/project/services/Project.service";
+import {ModuleService} from "@edition/module/services/Module.service";
 
 export interface RuntimeProjectDataTableRowComponentProps {
     projectId: NamespaceProject['id']
@@ -34,6 +35,8 @@ export const RuntimeProjectDataTableRowComponent: React.FC<RuntimeProjectDataTab
     const projectStore = useStore(ProjectService)
     const runtimeService = useService(RuntimeService)
     const runtimeStore = useStore(RuntimeService)
+    const moduleService = useService(ModuleService)
+    const moduleStore = useStore(ModuleService)
 
     const runtime = React.useMemo(
         () => runtimeService.getById(runtimeId),
@@ -43,6 +46,11 @@ export const RuntimeProjectDataTableRowComponent: React.FC<RuntimeProjectDataTab
     const project = React.useMemo(
         () => projectService.getById(projectId),
         [projectStore, projectId]
+    )
+
+    const modules = React.useMemo(
+        () =>moduleService.values({namespaceId: project?.namespace?.id, projectId: projectId, runtimeId: runtimeId}),
+        [moduleStore, runtime]
     )
 
     const makePrimary = React.useCallback(() => {
@@ -91,6 +99,27 @@ export const RuntimeProjectDataTableRowComponent: React.FC<RuntimeProjectDataTab
             </Flex>
         </DataTableColumn>
         <DataTableColumn>
+            <Text>
+                Installed plugins
+            </Text>
+            <Spacing spacing={"xxs"}/>
+            <Flex align={"center"} style={{gap: "0.35rem"}}>
+                {
+                    modules.map(m => m.names?.[0].content).map((name, index) => {
+                        return index <= 5 ? <Badge color={"secondary"}>
+                            {name}
+                        </Badge> : index == 6 ? <Text>...</Text> : null
+                    })
+
+                }
+            </Flex>
+
+        </DataTableColumn>
+        <DataTableColumn>
+            <Text>
+                Status
+            </Text>
+            <Spacing spacing={"xxs"}/>
             <Badge color={runtime?.status === "CONNECTED" ? "success" : "error"} border>
                 <Text style={{color: "inherit"}}>{runtime?.status}</Text>
             </Badge>
