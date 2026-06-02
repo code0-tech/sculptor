@@ -46,8 +46,8 @@ export const ModulesPage: React.FC = () => {
         () => moduleService.values({
             namespaceId,
             projectId
-        }),
-        [params, namespaceId, projectId, moduleStore]
+        }).filter(module => module.runtime?.id === project?.primaryRuntime?.id),
+        [params, namespaceId, projectId, moduleStore, project]
     )
 
     return <>
