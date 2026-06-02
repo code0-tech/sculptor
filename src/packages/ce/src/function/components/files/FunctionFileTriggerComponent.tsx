@@ -26,6 +26,7 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
     const flowTypeStore = useStore(FlowTypeService)
     const flowService = useService(FlowService)
     const validation = useFlowValidation(instance.id)
+    const changedValue = React.useRef(false)
     const [, startTransition] = React.useTransition()
 
     const definition = React.useMemo(
@@ -43,7 +44,7 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
             }
         })
         return values
-    }, [definition, instance])
+    }, [definition])
 
     const flowNode = useNodes().find(value => value.id == instance.id)
 
@@ -64,7 +65,7 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
             }
         })
         return values
-    }, [instance, validation])
+    }, [validation, instance, definition])
 
     const onSubmit = React.useCallback((values: Record<string, LiteralValue | undefined>) => {
         startTransition(async () => {
@@ -74,11 +75,12 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
                 if (typeof index !== "number") return
 
                 const value = values[flowTypeSetting.id!]
-
                 await flowService.setSettingValue(props.instance.id, index, value?.value, flowTypeSetting.identifier)
+
+                changedValue.current = false
             }
         })
-    }, [definition])
+    }, [flowService, definition])
 
     const [inputs, validate, values] = useForm<Record<string, LiteralValue | undefined>>({
         initialValues: initialValues,
@@ -89,8 +91,16 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
     })
 
     React.useEffect(
-        () =>  validate(),
-        [validation?.length, values]
+        () => {
+            if (changedValue.current)
+                validate()
+        },
+        [values]
+    )
+
+    React.useEffect(
+        () => validate(undefined, false),
+        [validation]
     )
 
     return <>
@@ -122,6 +132,7 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
                                         schema={(flowNode?.data?.schema as NodeSchema[])?.[index]}
                                         description={description}
                                         clearable
+                                        onChange={() => changedValue.current = true}
                                         {...inputs.getInputProps(settingDefinition.id!)}
                 />
                 <Spacing spacing={"xl"}/>

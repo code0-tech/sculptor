@@ -66,7 +66,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
             }
         })
         return values
-    }, [validation, flowId, node, definition])
+    }, [validation, node, definition])
 
     const onSubmit = React.useCallback((values: Record<string, NodeParameterValue | undefined>) => {
         for (const parameterDefinition of definition?.parameterDefinitions?.nodes ?? []) {
@@ -76,6 +76,8 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
 
             const value = values[parameterDefinition!.id!]
             flowService.setParameterValue(flowId, node.id!!, parameterIndex, (value ?? undefined) as SubFlowValue | ReferenceValue | LiteralValue | undefined, definition);
+
+            changedValue.current = false
         }
     }, [flowService, definition])
 
