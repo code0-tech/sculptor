@@ -82,7 +82,7 @@ export const ModulesPage: React.FC = () => {
 
                         const DisplayIcon = icon(module.icon as IconString)
 
-                        return <Col xs={6} md={4} lg={3} xl={2} mb={1}>
+                        return <Col xs={6} md={4} lg={3} xxl={2} mb={1}>
                             <Card color={"secondary"} paddingSize={"sm"}>
                                 <CardSection border>
                                     <Flex style={{flexDirection: "column", gap: "1rem", flexWrap: "wrap"}}>
