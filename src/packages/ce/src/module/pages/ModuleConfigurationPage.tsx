@@ -22,7 +22,13 @@ import {
     useStore
 } from "@code0-tech/pictor";
 import {ModuleService} from "@ce-internal/module/services/Module.service";
-import {Namespace, NamespaceProject, RuntimeModule} from "@code0-tech/sagittarius-graphql-types";
+import {
+    ModuleConfigurationInput,
+    Namespace,
+    NamespaceProject, NamespaceProjectRuntimeAssignment,
+    Runtime,
+    RuntimeModule, Scalars
+} from "@code0-tech/sagittarius-graphql-types";
 import {getTypeSchema} from "@code0-tech/triangulum";
 import {DatatypeService} from "@ce-internal/datatype/services/Datatype.service";
 import {DataTypeInputComponent} from "@ce-internal/datatype/components/inputs/DataTypeInputComponent";
@@ -70,6 +76,8 @@ export const ModuleConfigurationPage: React.FC = () => {
         [runtimeStore, project]
     )
 
+    const [selectedRuntime, setSelectedRuntime] = React.useState<Runtime['id'] | undefined>(project?.primaryRuntime?.id)
+
     const moduleConfigurationSchemas = module?.configurationDefinitions?.nodes?.map(moduleConfiguration => {
         return getTypeSchema(moduleConfiguration?.type!, dataTypeService.values({
             namespaceId,
@@ -82,16 +90,39 @@ export const ModuleConfigurationPage: React.FC = () => {
         () => {
             const values: Record<string, any> = {}
             module?.configurationDefinitions?.nodes?.forEach((moduleConfiguration, index) => {
-                values[moduleConfiguration?.id!] = null
+                const value = project?.runtimeAssignments?.nodes?.find(rA => rA?.runtime?.id == selectedRuntime)?.moduleConfigurations?.nodes?.find?.(config => config?.id === moduleConfiguration?.id)?.value
+                values[moduleConfiguration?.id!] = {__typename: "LiteralValue", value: value ?? null}
             })
             return values
         },
-        [module]
+        [module, selectedRuntime]
     )
 
+    const onSubmit = React.useCallback((values: Record<string, any>) => {
+        const namespaceProjectRuntimeAssignmentId: NamespaceProjectRuntimeAssignment['id'] = project?.runtimeAssignments?.nodes?.find(rA => rA?.runtime?.id == selectedRuntime)?.id
+        const moduleConfigurations: Array<ModuleConfigurationInput> = Object.entries(values)?.map(([key, value]) => {
+            return {
+                moduleConfigurationDefinitionId: key,
+                value: value?.value ?? null
+            } as ModuleConfigurationInput
+        })
+
+        if (!namespaceProjectRuntimeAssignmentId) return
+
+        projectService.projectModuleConfigurationUpdate({
+            namespaceProjectRuntimeAssignmentId,
+            moduleConfigurations
+        })
+    }, [selectedRuntime, projectService, project])
+
     const [inputs, validate] = useForm({
-        initialValues: initialValues,
+        initialValues,
+        onSubmit,
     })
+
+    React.useEffect(() => {
+        setSelectedRuntime(project?.primaryRuntime?.id)
+    }, [project?.primaryRuntime?.id])
 
     return <>
         <Text size={"xl"} hierarchy={"primary"}>
@@ -121,9 +152,11 @@ export const ModuleConfigurationPage: React.FC = () => {
         }
         <Panel position={"bottom-center"}>
             <ButtonGroup>
-                <Select>
+                <Select key={selectedRuntime}
+                        value={selectedRuntime as string}
+                        onValueChange={(value) => setSelectedRuntime(value as Runtime['id'])}>
                     <SelectTrigger asChild>
-                        <Button variant={"none"}>
+                        <Button variant={"none"} paddingSize={"xxs"}>
                             <SelectValue placeholder={"Select runtime"}/>
                             <IconChevronDown size={13}/>
                         </Button>
@@ -151,10 +184,10 @@ export const ModuleConfigurationPage: React.FC = () => {
                         </SelectContent>
                     </SelectPortal>
                 </Select>
-                <Button variant={"none"}>
+                <Button variant={"none"} paddingSize={"xxs"}>
                     Copy to runtime
                 </Button>
-                <Button variant={"none"} color={"success"}>
+                <Button variant={"none"} color={"success"} onClick={validate} paddingSize={"xxs"}>
                     Save
                 </Button>
             </ButtonGroup>
