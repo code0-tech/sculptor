@@ -1,5 +1,5 @@
 import {ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor";
-import {Namespace, NamespaceProject, Query, RuntimeModule} from "@code0-tech/sagittarius-graphql-types";
+import {Namespace, NamespaceProject, Query, Runtime, RuntimeModule} from "@code0-tech/sagittarius-graphql-types";
 import {GraphqlClient} from "@core/util/graphql-client";
 import {View} from "@code0-tech/pictor/dist/utils/view";
 import modulesQuery from "@edition/module/services/queries/Modules.query.graphql"
@@ -7,6 +7,7 @@ import modulesQuery from "@edition/module/services/queries/Modules.query.graphql
 export type ModuleDependencies = {
     namespaceId: Namespace['id']
     projectId: NamespaceProject['id']
+    runtimeId: Runtime['id']
 }
 
 export class ModuleService extends ReactiveArrayService<RuntimeModule, ModuleDependencies> {
@@ -23,31 +24,35 @@ export class ModuleService extends ReactiveArrayService<RuntimeModule, ModuleDep
         const modules = super.values()
         if (!dependencies?.namespaceId || !dependencies.projectId) return modules
 
-        this.client.query<Query>({
-            query: modulesQuery,
-            variables: {
-                namespaceId: dependencies?.namespaceId,
-                projectId: dependencies.projectId,
+        const filtered = modules.filter(m => m.runtime?.id === dependencies.runtimeId)
 
-                firstRuntime: 50,
-                afterRuntime: null,
+        if (filtered.length <= 0) {
+            this.client.query<Query>({
+                query: modulesQuery,
+                variables: {
+                    namespaceId: dependencies?.namespaceId,
+                    projectId: dependencies.projectId,
 
-                firstModule: 50,
-                afterModule: null,
+                    firstRuntime: 50,
+                    afterRuntime: null,
 
-                firstConfiguration: 50,
-                afterConfiguration: null
-            }
-        }).then(res => {
-            const nodes = res.data?.namespace?.project?.runtimes?.nodes?.flatMap(runtime => runtime?.modules?.nodes ?? []) ?? []
-            nodes.forEach(module => {
-                if (module && !this.hasById(module.id)) {
-                    this.set(this.i++, new View(module))
+                    firstModule: 50,
+                    afterModule: null,
+
+                    firstConfiguration: 50,
+                    afterConfiguration: null
                 }
+            }).then(res => {
+                const nodes = res.data?.namespace?.project?.runtimes?.nodes?.flatMap(runtime => runtime?.modules?.nodes ?? []) ?? []
+                nodes.forEach(module => {
+                    if (module && !this.hasById(module.id)) {
+                        this.set(this.i++, new View(module))
+                    }
+                })
             })
-        })
+        }
 
-        return modules
+        return filtered
     }
 
     hasById(id: RuntimeModule["id"]): boolean {

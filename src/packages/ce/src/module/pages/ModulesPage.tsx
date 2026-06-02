@@ -45,8 +45,9 @@ export const ModulesPage: React.FC = () => {
     const modules = React.useMemo(
         () => moduleService.values({
             namespaceId,
-            projectId
-        }).filter(module => module.runtime?.id === project?.primaryRuntime?.id),
+            projectId,
+            runtimeId: project?.primaryRuntime?.id
+        }),
         [params, namespaceId, projectId, moduleStore, project]
     )
 

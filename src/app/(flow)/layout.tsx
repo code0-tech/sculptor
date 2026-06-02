@@ -78,7 +78,7 @@ export default function FlowLayout({bar, tab, children}: {
         functions[1].values({namespaceId, projectId, runtimeId})
         datatype[1].values({namespaceId, projectId, runtimeId})
         flowtype[1].values({namespaceId, projectId, runtimeId})
-        module[1].values({namespaceId, projectId})
+        module[1].values({namespaceId, projectId, runtimeId})
     }, [runtimeId, namespaceId, projectId, currentSession, flow, functions, datatype, flowtype])
 
     return <ContextStoreProvider
