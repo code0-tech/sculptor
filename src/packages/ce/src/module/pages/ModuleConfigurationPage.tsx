@@ -65,14 +65,6 @@ export const ModuleConfigurationPage: React.FC = () => {
     const projectId: NamespaceProject['id'] = `gid://sagittarius/NamespaceProject/${projectIndex}`
     const moduleId: RuntimeModule['id'] = `gid://sagittarius/RuntimeModule/${moduleIndex}`
 
-    const module = React.useMemo(
-        () => moduleService.getById(moduleId, {
-            namespaceId,
-            projectId
-        }),
-        [moduleId, moduleStore, namespaceId, projectId]
-    )
-
     const project = React.useMemo(
         () => projectService.getById(projectId),
         [projectStore, projectId]
@@ -85,7 +77,16 @@ export const ModuleConfigurationPage: React.FC = () => {
 
     const runtime = React.useMemo(
         () => runtimes.find((runtime) => runtime.modules?.nodes?.find(module => module?.id === moduleId)),
-        [runtimes, module]
+        [runtimes]
+    )
+
+    const module = React.useMemo(
+        () => moduleService.getById(moduleId, {
+            namespaceId,
+            projectId,
+            runtimeId: runtime?.id
+        }),
+        [moduleId, moduleStore, namespaceId, projectId, runtime]
     )
 
     const moduleConfigurationSchemas = module?.configurationDefinitions?.nodes?.map(moduleConfiguration => {
