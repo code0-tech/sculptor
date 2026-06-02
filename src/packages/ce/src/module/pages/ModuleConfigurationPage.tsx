@@ -171,7 +171,7 @@ export const ModuleConfigurationPage: React.FC = () => {
                 </div>
             })
         }
-        <Panel position={"bottom-center"}>
+        <Panel position={"bottom-center"} style={{bottom: "1.3rem"}}>
             <ButtonGroup>
                 <Select key={runtime?.id}
                         value={runtime?.id as string}
@@ -189,7 +189,7 @@ export const ModuleConfigurationPage: React.FC = () => {
                         </Button>
                     </SelectTrigger>
                     <SelectPortal>
-                        <SelectContent>
+                        <SelectContent side={"top"} sideOffset={8} position={"popper"}>
                             <SelectViewport>
                                 {
                                     runtimes.map(runtime => {
@@ -202,6 +202,9 @@ export const ModuleConfigurationPage: React.FC = () => {
                                                     <Text>
                                                         {runtime.name}
                                                     </Text>
+                                                    {runtime.id === project?.primaryRuntime?.id && <Badge color={"secondary"}>
+                                                        Primary
+                                                    </Badge>}
                                                 </Flex>
                                             </SelectItemText>
                                         </SelectItem>
@@ -219,7 +222,7 @@ export const ModuleConfigurationPage: React.FC = () => {
                         </Button>
                     </MenuTrigger>
                     <MenuPortal>
-                        <MenuContent>
+                        <MenuContent side={"top"} sideOffset={8}>
                             {
                                 runtimes.map(pRuntime => {
                                     return <MenuItem onSelect={() => {
@@ -243,7 +246,7 @@ export const ModuleConfigurationPage: React.FC = () => {
                                         }).then(payload => {
                                             if ((payload?.errors?.length ?? 0) <= 0) {
                                                 toast({
-                                                    title: "Copied configuration",
+                                                    title: "Copied and saved configuration",
                                                     color: "success",
                                                     dismissible: true,
                                                 })
@@ -260,6 +263,9 @@ export const ModuleConfigurationPage: React.FC = () => {
                                             <Text>
                                                 {pRuntime.name}
                                             </Text>
+                                            {pRuntime.id === project?.primaryRuntime?.id && <Badge color={"secondary"}>
+                                                Primary
+                                            </Badge>}
                                         </Flex>
                                     </MenuItem>
                                 })
