@@ -1,13 +1,18 @@
 "use client"
 
 import React from "react";
-import {useParams} from "next/navigation";
+import {useParams, useRouter} from "next/navigation";
 import {
     Avatar,
     Badge,
     Button,
     Flex,
     hashToColor,
+    Menu,
+    MenuContent,
+    MenuItem,
+    MenuPortal,
+    MenuTrigger,
     SelectContent,
     SelectItem,
     SelectItemText,
@@ -17,6 +22,7 @@ import {
     SelectViewport,
     Spacing,
     Text,
+    toast,
     useForm,
     useService,
     useStore
@@ -25,9 +31,9 @@ import {ModuleService} from "@ce-internal/module/services/Module.service";
 import {
     ModuleConfigurationInput,
     Namespace,
-    NamespaceProject, NamespaceProjectRuntimeAssignment,
-    Runtime,
-    RuntimeModule, Scalars
+    NamespaceProject,
+    NamespaceProjectRuntimeAssignment,
+    RuntimeModule
 } from "@code0-tech/sagittarius-graphql-types";
 import {getTypeSchema} from "@code0-tech/triangulum";
 import {DatatypeService} from "@ce-internal/datatype/services/Datatype.service";
@@ -50,6 +56,7 @@ export const ModuleConfigurationPage: React.FC = () => {
     const runtimeStore = useStore(RuntimeService)
     const projectService = useService(ProjectService)
     const projectStore = useStore(ProjectService)
+    const router = useRouter()
 
     const namespaceIndex = params.namespaceId as any as number
     const projectIndex = params.projectId as any as number
@@ -76,7 +83,10 @@ export const ModuleConfigurationPage: React.FC = () => {
         [runtimeStore, project]
     )
 
-    const [selectedRuntime, setSelectedRuntime] = React.useState<Runtime['id'] | undefined>(project?.primaryRuntime?.id)
+    const runtime = React.useMemo(
+        () => runtimes.find((runtime) => runtime.modules?.nodes?.find(module => module?.id === moduleId)),
+        [runtimes, module]
+    )
 
     const moduleConfigurationSchemas = module?.configurationDefinitions?.nodes?.map(moduleConfiguration => {
         return getTypeSchema(moduleConfiguration?.type!, dataTypeService.values({
@@ -90,16 +100,16 @@ export const ModuleConfigurationPage: React.FC = () => {
         () => {
             const values: Record<string, any> = {}
             module?.configurationDefinitions?.nodes?.forEach((moduleConfiguration, index) => {
-                const value = project?.runtimeAssignments?.nodes?.find(rA => rA?.runtime?.id == selectedRuntime)?.moduleConfigurations?.nodes?.find?.(config => config?.id === moduleConfiguration?.id)?.value
-                values[moduleConfiguration?.id!] = {__typename: "LiteralValue", value: value ?? null}
+                const value = project?.runtimeAssignments?.nodes?.find(rA => rA?.runtime?.id == runtime?.id)?.moduleConfigurations?.nodes?.find?.(config => config?.definition?.id === moduleConfiguration?.id)?.value
+                values[moduleConfiguration?.id!] = value ? {__typename: "LiteralValue", value: value} : null
             })
             return values
         },
-        [module, selectedRuntime]
+        [module, project, runtime?.id]
     )
 
     const onSubmit = React.useCallback((values: Record<string, any>) => {
-        const namespaceProjectRuntimeAssignmentId: NamespaceProjectRuntimeAssignment['id'] = project?.runtimeAssignments?.nodes?.find(rA => rA?.runtime?.id == selectedRuntime)?.id
+        const namespaceProjectRuntimeAssignmentId: NamespaceProjectRuntimeAssignment['id'] = project?.runtimeAssignments?.nodes?.find(rA => rA?.runtime?.id == runtime?.id)?.id
         const moduleConfigurations: Array<ModuleConfigurationInput> = Object.entries(values)?.map(([key, value]) => {
             return {
                 moduleConfigurationDefinitionId: key,
@@ -112,17 +122,24 @@ export const ModuleConfigurationPage: React.FC = () => {
         projectService.projectModuleConfigurationUpdate({
             namespaceProjectRuntimeAssignmentId,
             moduleConfigurations
+        }).then(payload => {
+            if ((payload?.errors?.length ?? 0) <= 0) {
+                toast({
+                    title: "Saved configuration",
+                    color: "success",
+                    dismissible: true,
+                })
+            }
         })
-    }, [selectedRuntime, projectService, project])
+
+    }, [projectService, project, runtime?.id])
 
     const [inputs, validate] = useForm({
-        initialValues,
-        onSubmit,
+        useInitialValidation: true,
+        truthyValidationBeforeSubmit: false,
+        initialValues: initialValues,
+        onSubmit: onSubmit,
     })
-
-    React.useEffect(() => {
-        setSelectedRuntime(project?.primaryRuntime?.id)
-    }, [project?.primaryRuntime?.id])
 
     return <>
         <Text size={"xl"} hierarchy={"primary"}>
@@ -140,21 +157,30 @@ export const ModuleConfigurationPage: React.FC = () => {
         {
             module?.configurationDefinitions?.nodes?.map((moduleConfiguration, index) => {
 
-                return <>
-                    <DataTypeInputComponent description={moduleConfiguration?.descriptions?.[0].content}
-                                            title={moduleConfiguration?.names?.[0].content}
+                if (!moduleConfiguration) return null
+                if (!moduleConfigurationSchemas[index]) return null
+
+                return <div key={moduleConfiguration.id}>
+                    <DataTypeInputComponent description={moduleConfiguration.descriptions?.[0].content}
+                                            title={moduleConfiguration.names?.[0].content}
                                             schema={moduleConfigurationSchemas[index]!}
                                             clearable
-                                            {...inputs.getInputProps(moduleConfiguration?.id!)}/>
+                                            {...inputs.getInputProps(moduleConfiguration.id!)}/>
                     <Spacing spacing={"xl"}/>
-                </>
+                </div>
             })
         }
         <Panel position={"bottom-center"}>
             <ButtonGroup>
-                <Select key={selectedRuntime}
-                        value={selectedRuntime as string}
-                        onValueChange={(value) => setSelectedRuntime(value as Runtime['id'])}>
+                <Select key={runtime?.id}
+                        value={runtime?.id as string}
+                        onValueChange={(value) => {
+                            const lRuntime = runtimes.find(r => r.id === value)
+                            const lModule = lRuntime?.modules?.nodes?.find(m => m?.identifier === module?.identifier)
+                            const number = lModule?.id?.match(/RuntimeModule\/(\d+)$/)?.[1]
+                            router.push(`/namespace/${namespaceIndex}/project/${projectIndex}/module/${number}`)
+
+                        }}>
                     <SelectTrigger asChild>
                         <Button variant={"none"} paddingSize={"xxs"}>
                             <SelectValue placeholder={"Select runtime"}/>
@@ -184,9 +210,62 @@ export const ModuleConfigurationPage: React.FC = () => {
                         </SelectContent>
                     </SelectPortal>
                 </Select>
-                <Button variant={"none"} paddingSize={"xxs"}>
-                    Copy to runtime
-                </Button>
+                <Menu key={`${runtime?.id}-menu`}>
+                    <MenuTrigger asChild>
+                        <Button variant={"none"} paddingSize={"xxs"}>
+                            Copy to runtime
+                            <IconChevronDown size={13}/>
+                        </Button>
+                    </MenuTrigger>
+                    <MenuPortal>
+                        <MenuContent>
+                            {
+                                runtimes.map(pRuntime => {
+                                    return <MenuItem onSelect={() => {
+                                        const lRuntime = runtimes.find(r => r.id === pRuntime.id)
+                                        const lModule = lRuntime?.modules?.nodes?.find(m => m?.identifier === module?.identifier)
+
+                                        const lNamespaceProjectRuntimeAssignment1: NamespaceProjectRuntimeAssignment | undefined = project?.runtimeAssignments?.nodes?.find(rA => rA?.runtime?.id == runtime?.id)!
+                                        const lNamespaceProjectRuntimeAssignment2: NamespaceProjectRuntimeAssignment | undefined = project?.runtimeAssignments?.nodes?.find(rA => rA?.runtime?.id == lRuntime?.id)!
+
+                                        const lModuleConfigurations: Array<ModuleConfigurationInput> = lNamespaceProjectRuntimeAssignment2?.moduleConfigurations?.nodes?.map((config, index) => {
+                                            return {
+                                                moduleConfigurationDefinitionId: config?.definition?.id!,
+                                                value: lNamespaceProjectRuntimeAssignment1?.moduleConfigurations?.nodes?.[index]?.value
+                                            }
+                                        }) ?? []
+
+
+                                        projectService.projectModuleConfigurationUpdate({
+                                            namespaceProjectRuntimeAssignmentId: lNamespaceProjectRuntimeAssignment2?.id!,
+                                            moduleConfigurations: lModuleConfigurations
+                                        }).then(payload => {
+                                            if ((payload?.errors?.length ?? 0) <= 0) {
+                                                toast({
+                                                    title: "Copied configuration",
+                                                    color: "success",
+                                                    dismissible: true,
+                                                })
+                                            }
+                                        })
+
+                                        const number = lModule?.id?.match(/RuntimeModule\/(\d+)$/)?.[1]
+                                        router.push(`/namespace/${namespaceIndex}/project/${projectIndex}/module/${number}`)
+                                    }}>
+                                        <Flex align={"center"} style={{gap: "0.7rem"}}>
+                                            <Avatar size={16}
+                                                    color={hashToColor(pRuntime.name!, 0, 180)}
+                                                    identifier={pRuntime.name!}/>
+                                            <Text>
+                                                {pRuntime.name}
+                                            </Text>
+                                        </Flex>
+                                    </MenuItem>
+                                })
+                            }
+                        </MenuContent>
+                    </MenuPortal>
+                </Menu>
                 <Button variant={"none"} color={"success"} onClick={validate} paddingSize={"xxs"}>
                     Save
                 </Button>
