@@ -1,6 +1,12 @@
 import React from "react";
 import {useParams} from "next/navigation";
-import {Flow, Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
+import {
+    Flow,
+    FunctionDefinition,
+    Namespace,
+    NamespaceProject,
+    NodeFunction
+} from "@code0-tech/sagittarius-graphql-types";
 import {
     Button,
     Card,
@@ -42,6 +48,16 @@ import {
 } from "@code0-tech/pictor/dist/components/file-tabs/FileTabs";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 import {formatDistanceToNow} from "date-fns";
+import {GanttItem} from "@code0-tech/pictor/dist/components/gantt/GanttItem";
+
+export interface NodeGanttItem extends GanttItem {
+    data?: {
+        displayMessage: string
+        color: string
+        node: NodeFunction
+        function: FunctionDefinition
+    }
+}
 
 export const FlowExecutionResultView: React.FC = () => {
 
@@ -68,6 +84,24 @@ export const FlowExecutionResultView: React.FC = () => {
     const flowExecutionResults = React.useMemo(
         () => flow?.executionResults?.nodes ?? [],
         [flow]
+    )
+
+    const activeFlowExecutionResult = React.useMemo(
+        () => flowExecutionResults.find?.(result => result?.id === activeTab),
+        [flowExecutionResults, activeTab]
+    )
+
+    const ganttItems = React.useMemo<NodeGanttItem[]>(
+        () => {
+            return [
+                {
+                    id: activeFlowExecutionResult?.id as string,
+                    start: 0,
+                    end: 0
+                }
+            ]
+        },
+        []
     )
 
     return <>
