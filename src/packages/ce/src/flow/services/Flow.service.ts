@@ -74,6 +74,12 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
 
                     firstSetting: 50,
                     afterSetting: null,
+
+                    firstExecution: 50,
+                    afterExecution: null,
+
+                    firstNodeResult: 50,
+                    afterNodeResult: null
                 }
             }).then(res => {
                 const nodes = res.data?.namespace?.project?.flows?.nodes ?? []
