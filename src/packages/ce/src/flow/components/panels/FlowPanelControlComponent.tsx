@@ -63,7 +63,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
     }, [flowId, flowService, flowStore, selectedNode])
 
     useHotkeys('shift+a', (keyboardEvent) => {
-        if (selectedNode && selectedNode.data.nodeId) setSuggestionDialogOpen(true)
+        if (selectedNode && !selectedNode.data.functionId) setSuggestionDialogOpen(true)
         else setAddNextNodeTooltipOpen(true)
         keyboardEvent.stopPropagation()
         keyboardEvent.preventDefault()
@@ -97,11 +97,11 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
             <Tooltip open={addNextNodeTooltipOpen} onOpenChange={setAddNextNodeTooltipOpen}>
                 <TooltipTrigger asChild>
                     <Button data-qa-selector={"flow-builder-control-panel-add"}
-                            disabled={!selectedNode || !selectedNode.data.nodeId}
+                            disabled={!selectedNode || !!selectedNode.data.functionId}
                             paddingSize={"xxs"}
                             variant={"filled"}
                             onClick={() => {
-                                if (selectedNode && selectedNode.data.nodeId) setSuggestionDialogOpen(true)
+                                if (selectedNode && !selectedNode.data.functionId) setSuggestionDialogOpen(true)
                             }}
                             color={"secondary"}>
                         <Text display={"flex"} align={"center"} style={{gap: "0.35rem"}}>
@@ -111,7 +111,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                     </Button>
                 </TooltipTrigger>
                 <TooltipPortal>
-                    {!selectedNode || !selectedNode.data.nodeId && <TooltipContent sideOffset={8}>
+                    {!selectedNode || !!selectedNode.data.functionId && <TooltipContent sideOffset={8}>
                         <Text>Select a node to add a next node</Text>
                     </TooltipContent>}
                 </TooltipPortal>
