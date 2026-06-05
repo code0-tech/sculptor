@@ -17,9 +17,9 @@ import {ErrorLink} from "@apollo/client/link/error";
 import {useRouter} from "next/navigation";
 import {Toaster} from "sonner";
 import {Error} from "@code0-tech/sagittarius-graphql-types";
-import {toast} from "@code0-tech/pictor";
 import {Inter} from 'next/font/google'
 import {GraphQLFormattedError} from "graphql/error";
+import {addIslandErrorNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 
 /**
  * Load the Inter font with Latin subset and swap display strategy
@@ -70,16 +70,12 @@ const ErrorCodeDescription: Record<string, string> = {
 const toastHandler = (error: Error | GraphQLFormattedError) => {
     console.error("[ERROR]", error)
     if (error && "errorCode" in error) {
-        toast({
-            title: ErrorCodeDescription[(error.errorCode as string)],
-            color: "error",
-            dismissible: true,
+        addIslandErrorNotification({
+            message: ErrorCodeDescription[(error.errorCode as string)]
         })
     } else {
-        toast({
-            title: "An internal error occurred",
-            color: "error",
-            dismissible: true,
+        addIslandErrorNotification({
+            message: "Internal error"
         })
     }
 }
