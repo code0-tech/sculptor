@@ -2,11 +2,12 @@
 
 import React from "react";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
-import {Button, Card, Flex, Spacing, Text, TextInput, toast, useForm, useService, useStore} from "@code0-tech/pictor";
+import {Button, Card, Flex, Spacing, Text, TextInput, useForm, useService, useStore} from "@code0-tech/pictor";
 import {useParams} from "next/navigation";
 import {NamespaceService} from "@edition/namespace/services/Namespace.service";
 import {OrganizationService} from "@edition/organization/services/Organization.service";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
+import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 
 export const NamespaceGeneralSettingsView: React.FC = () => {
 
@@ -44,10 +45,8 @@ export const NamespaceGeneralSettingsView: React.FC = () => {
                     organizationId: parentOrganization?.id!!
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
-                        toast({
-                            title: "The organization was successfully updated.",
-                            color: "success",
-                            dismissible: true,
+                        addIslandSuccessNotification({
+                            message: "Updated organization"
                         })
                     }
                 })
