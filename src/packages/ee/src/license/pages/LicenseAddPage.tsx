@@ -18,13 +18,15 @@ import {
     Flex,
     hashToColor,
     Spacing,
-    Text, toast,
-    useForm, useService
+    Text,
+    useForm,
+    useService
 } from "@code0-tech/pictor";
 import {IconFileInfoFilled, IconX} from "@tabler/icons-react";
 import {FileUploadFileChangeDetails} from "@ark-ui/react";
 import {ApplicationService} from "@ee-internal/application/services/Application.service";
 import {useRouter} from "next/navigation";
+import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 
 export const LicenseAddPage: React.FC = () => {
 
@@ -49,10 +51,8 @@ export const LicenseAddPage: React.FC = () => {
                     data: fileContent ?? ""
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
-                        toast({
-                            title: "The license was successfully added.",
-                            color: "success",
-                            dismissible: true,
+                        addIslandSuccessNotification({
+                            message: "Added license"
                         })
                         router.push("/")
                     }
