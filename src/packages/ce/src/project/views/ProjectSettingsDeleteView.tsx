@@ -1,10 +1,11 @@
 "use client"
 
 import React, {startTransition} from "react";
-import {Button, Card, Flex, Spacing, Text, toast, useService, useStore} from "@code0-tech/pictor";
+import {Button, Card, Flex, Spacing, Text, useService} from "@code0-tech/pictor";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {useParams, useRouter} from "next/navigation";
 import {ProjectService} from "@edition/project/services/Project.service";
+import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 
 export const ProjectSettingsDeleteView: React.FC = () => {
 
@@ -21,10 +22,8 @@ export const ProjectSettingsDeleteView: React.FC = () => {
                 namespaceProjectId: `gid://sagittarius/NamespaceProject/${projectId}`
             }).then(payload => {
                 if ((payload?.errors?.length ?? 0) <= 0) {
-                    toast({
-                        title: "The project was successfully deleted.",
-                        color: "success",
-                        dismissible: true,
+                    addIslandSuccessNotification({
+                        message: "Deleted project"
                     })
                 }
                 router.push(`/namespace/${namespaceId}`)
