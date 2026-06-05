@@ -1,20 +1,9 @@
 import React, {startTransition} from "react";
-import {
-    Badge,
-    Button,
-    Card,
-    Flex,
-    Spacing,
-    Text,
-    TextInput,
-    toast,
-    useForm,
-    useService,
-    useStore
-} from "@code0-tech/pictor";
+import {Badge, Button, Card, Flex, Spacing, Text, TextInput, useForm, useService, useStore} from "@code0-tech/pictor";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {ApplicationService} from "@edition/application/services/Application.service";
+import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 
 export const ApplicationGeneralSettingsView: React.FC = () => {
 
@@ -47,10 +36,8 @@ export const ApplicationGeneralSettingsView: React.FC = () => {
                     termsAndConditionsUrl: !!values.termsAndConditionsUrl ? values.termsAndConditionsUrl : null,
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
-                        toast({
-                            title: "The application was successfully updated.",
-                            color: "success",
-                            dismissible: true,
+                        addIslandSuccessNotification({
+                            message: "Updated application"
                         })
                     }
                 })
