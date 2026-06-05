@@ -12,14 +12,15 @@ mutation projectUpdateModuleConfiguration($namespaceProjectRuntimeAssignmentId: 
                 }
             }
         }
-        namespaceProjectRuntimeAssignment {
+        moduleConfigurations {
             __typename
             id
-            compatible
-            updatedAt
             createdAt
-            runtime {
+            updatedAt
+            value
+            definition {
                 id
+                identifier
             }
         }
     }
