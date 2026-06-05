@@ -1,20 +1,10 @@
 import React from "react";
 import {License, Namespace} from "@code0-tech/sagittarius-graphql-types";
-import {
-    Badge,
-    Button,
-    DataTableColumn,
-    Flex,
-    Progress,
-    Spacing,
-    Text,
-    toast,
-    useService,
-    useStore
-} from "@code0-tech/pictor";
+import {Badge, Button, DataTableColumn, Flex, Progress, Spacing, Text, useService, useStore} from "@code0-tech/pictor";
 import {formatDistanceToNow, isFuture, isPast} from "date-fns";
 import {IconX} from "@tabler/icons-react";
 import {NamespaceService} from "@cloud-internal/namespace/services/Namespace.service";
+import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 
 export interface LicensesDataTableRowComponentProps {
     namespaceId: Namespace['id']
@@ -38,10 +28,8 @@ export const NamespaceLicensesDataTableRowComponent: React.FC<LicensesDataTableR
             licenseId: licenseId!
         }).then(payload => {
             if ((payload?.errors?.length ?? 0) <= 0) {
-                toast({
-                    title: "The license was successfully deleted.",
-                    color: "success",
-                    dismissible: true,
+                addIslandSuccessNotification({
+                    message: "Deleted license"
                 })
             }
         })
