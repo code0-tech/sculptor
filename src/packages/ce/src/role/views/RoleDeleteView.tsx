@@ -2,10 +2,11 @@
 
 import React from "react";
 import {useParams, useRouter} from "next/navigation";
-import {Button, Card, Flex, Spacing, Text, toast, useService} from "@code0-tech/pictor";
+import {Button, Card, Flex, Spacing, Text, useService} from "@code0-tech/pictor";
 import {RoleService} from "@edition/role/services/Role.service";
 import type {NamespaceRole} from "@code0-tech/sagittarius-graphql-types";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
+import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 
 export const RoleDeleteView: React.FC = () => {
 
@@ -24,10 +25,8 @@ export const RoleDeleteView: React.FC = () => {
                 namespaceRoleId: roleId
             }).then(payload => {
                 if ((payload?.errors?.length ?? 0) <= 0) {
-                    toast({
-                        title: "The role was successfully deleted.",
-                        color: "success",
-                        dismissible: true,
+                    addIslandSuccessNotification({
+                        message: "Deleted role"
                     })
                 }
                 router.push(`/namespace/${namespaceIndex}/roles`)
