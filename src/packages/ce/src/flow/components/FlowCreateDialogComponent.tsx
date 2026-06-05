@@ -23,7 +23,6 @@ import {
     MenuTrigger,
     Spacing,
     Text,
-    toast,
     useForm,
     useService,
     useStore
@@ -38,6 +37,7 @@ import {FlowService} from "@edition/flow/services/Flow.service";
 import Link from "next/link";
 import {icon, IconString} from "@core/util/icons";
 import {FALLBACK_FLOW_TYPE_NAME} from "@core/util/fallback-translations";
+import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 
 export interface FlowCreateDialogComponentProps {
     open?: boolean
@@ -107,10 +107,8 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                 projectId: projectId
             }).then(payload => {
                 if ((payload?.errors?.length ?? 0) <= 0) {
-                    toast({
-                        title: "The flow was successfully created.",
-                        color: "success",
-                        dismissible: true,
+                    addIslandSuccessNotification({
+                        message: "Created flow"
                     })
 
                 }
@@ -222,7 +220,8 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
 
                                             const DisplayIcon = icon(flowType?.displayIcon as IconString)
 
-                                            return <MenuItem data-qa-selector={"flow-create-trigger-select-item"} key={flowType.id} onSelect={() => {
+                                            return <MenuItem data-qa-selector={"flow-create-trigger-select-item"}
+                                                             key={flowType.id} onSelect={() => {
                                                 inputs.getInputProps("flowTypeId").formValidation?.setValue?.(flowType.id)
                                                 setSelectedFlowTypeId(flowType.id)
                                             }}>
@@ -263,7 +262,8 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                             <DialogClose asChild>
                                 <Button color={"tertiary"} variant={"filled"}>No, go back!</Button>
                             </DialogClose>
-                            <Button data-qa-selector={"flow-create-send"} color={"success"} variant={"filled"} onClick={validate}>Yes, create!</Button>
+                            <Button data-qa-selector={"flow-create-send"} color={"success"} variant={"filled"}
+                                    onClick={validate}>Yes, create!</Button>
                         </Flex>
                     </>
                 )}
