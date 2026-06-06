@@ -75,7 +75,7 @@ export const ModulesPage: React.FC = () => {
 
                         const DisplayIcon = icon(module.icon as IconString)
 
-                        return <Col xs={6} md={4} lg={3} xxl={2} mb={1}>
+                        return <Col xs={6} md={4} lg={3} xxl={3} mb={1}>
                             <Card color={"secondary"} paddingSize={"sm"}>
                                 <CardSection border>
                                     <Flex style={{flexDirection: "column", gap: "1rem", flexWrap: "wrap"}}>
@@ -139,7 +139,7 @@ export const ModulesPage: React.FC = () => {
                         </Col>
                     })
                 }
-                <Col xs={6} md={4} lg={3} xxl={2} mb={1}>
+                <Col xs={6} md={4} lg={3} xxl={3} mb={1}>
                     <Card h={"100%"}
                           style={{textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center"}}>
                         <Text size={"md"} hierarchy={"primary"}>Are you missing a plugin?</Text>
