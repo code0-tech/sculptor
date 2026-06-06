@@ -1,29 +1,36 @@
 import React from "react";
-import {Panel, useReactFlow, useViewport} from "@xyflow/react";
+import {Panel, useOnViewportChange, useReactFlow} from "@xyflow/react";
 import {IconFocusCentered, IconMinus, IconPlus} from "@tabler/icons-react";
 import {Badge, Button, Flex, Text} from "@code0-tech/pictor";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
+import {useThrottledCallback} from "use-debounce";
 
 export const FlowPanelSizeComponent: React.FC = () => {
 
-    const viewport = useViewport();
     const reactFlow = useReactFlow();
+    const [zoomDisplay, setZoomDisplay] = React.useState("100%");
 
-    const zoomIn = () => {
+    const updateZoomThrottled = useThrottledCallback((zoom: number) => {
+        setZoomDisplay(`${Math.round(zoom * 100)}%`);
+    }, 500);
+
+    useOnViewportChange({
+        onChange: (viewport) => {
+            updateZoomThrottled(viewport.zoom);
+        },
+    });
+
+    const zoomIn = React.useCallback(() => {
         reactFlow.zoomIn()
-    }
+    }, [reactFlow])
 
-    const zoomOut = () => {
+    const zoomOut = React.useCallback(() => {
         reactFlow.zoomOut()
-    }
+    }, [reactFlow])
 
-    const center = () => {
+    const center = React.useCallback(() => {
         reactFlow.fitView()
-    }
-
-    const getCurrentZoomInPercent = () => {
-        return Math.round(viewport.zoom * 100);
-    }
+    }, [reactFlow])
 
     return <Panel position="bottom-left">
         <Flex align="center" style={{gap: ".35rem"}}>
@@ -36,7 +43,7 @@ export const FlowPanelSizeComponent: React.FC = () => {
                         onClick={() => center()}><IconFocusCentered size={13}/></Button>
             </ButtonGroup>
             <Badge color={"primary"} style={{boxShadow: "none"}}>
-                <Text>{getCurrentZoomInPercent()}%</Text>
+                <Text>{zoomDisplay}</Text>
             </Badge>
         </Flex>
     </Panel>
