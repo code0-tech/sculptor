@@ -613,7 +613,7 @@ export const FlowBuilderComponent: React.FC<FlowBuilderProps> = (props) => {
 const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
     const {flowId, namespaceId, projectId, ...rest} = props
 
-    const {setCenter, getInternalNode, getZoom} = useReactFlow();
+    const {getZoom} = useReactFlow();
 
     const nodeTypes = React.useMemo(() => ({
         default: FunctionNodeDefaultComponent,
