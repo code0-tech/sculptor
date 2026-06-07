@@ -47,17 +47,15 @@ export const FlowPanelUpdateComponent: React.FC<FlowPanelUpdateComponentProps> =
         if (!flowId) return
 
 
-        startTransition(async () => {
-            flowService.flowUpdate({
-                flowInput: flowInput!,
-                flowId: flowId!
-            }).then(payload => {
-                if ((payload?.errors?.length ?? 0) <= 0) {
-                    addIslandSuccessNotification({
-                        message: "Synced flow"
-                    })
-                }
-            })
+        flowService.flowUpdate({
+            flowInput: flowInput!,
+            flowId: flowId!
+        }).then(payload => {
+            if ((payload?.errors?.length ?? 0) <= 0) {
+                addIslandSuccessNotification({
+                    message: "Synced flow"
+                })
+            }
         })
 
     }, [flowId, flowService])
