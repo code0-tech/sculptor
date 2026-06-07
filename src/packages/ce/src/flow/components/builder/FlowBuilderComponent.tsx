@@ -683,6 +683,7 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
         const localNodes = initialNodes.map(value => {
             const nodeEls = !value.measured ? document.querySelectorAll("[data-id='" + value.id + "']") : [];
             return {
+                ...nodes.find(node => node.id === value.id),
                 ...value,
                 measured: {
                     width: value.measured?.width ?? (nodeEls[0] as any)?.clientWidth ?? 0,
