@@ -16,7 +16,7 @@
   "dependencies": {
     "@apollo/client": "^4.0.9",
     "@code0-tech/pictor": "^0.10.3",
-    "@code0-tech/triangulum": "^0.20.0",
+    "@code0-tech/triangulum": "^0.21.0",
     "@codemirror/lang-javascript": "^6.2.5",
     "@codemirror/lint": "^6.9.5",
     "@opentelemetry/api": "^1.9.1",
