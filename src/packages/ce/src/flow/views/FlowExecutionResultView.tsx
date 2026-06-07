@@ -8,7 +8,8 @@ import {
     Maybe,
     Namespace,
     NamespaceProject,
-    NodeFunction
+    NodeFunction,
+    ParameterDefinition
 } from "@code0-tech/sagittarius-graphql-types";
 import {
     Button,
@@ -34,7 +35,7 @@ import {
     withAlpha
 } from "@code0-tech/pictor";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import {IconPlus} from "@tabler/icons-react";
+import {IconPlayerPlayFilled, IconPlus} from "@tabler/icons-react";
 import {Editor} from "@code0-tech/pictor/dist/components/editor/Editor";
 import {
     FileTabs,
@@ -48,12 +49,15 @@ import {FALLBACK_FLOW_TYPE_NAME, FALLBACK_FUNCTION_NAME} from "@core/util/fallba
 import {FunctionService} from "@edition/function/services/Function.service";
 import {ProjectService} from "@edition/project/services/Project.service";
 import Link from "next/link";
+import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
+import {icon} from "@core/util/icons";
+import {formatDistanceToNow} from "date-fns";
 
 export interface NodeGanttItem extends GanttItem {
     data?: {
         displayMessage: string
         color: string
-        node?: Maybe<NodeFunction>
+        payload?: Maybe<NodeFunction> | Maybe<Flow>
         input?: ExecutionParameterResult[] | object
         success?: object
         error?: Maybe<ExecutionError>
@@ -67,6 +71,8 @@ export const FlowExecutionResultView: React.FC = () => {
     const flowStore = useStore(FlowService)
     const functionService = useService(FunctionService)
     const functionStore = useStore(FunctionService)
+    const flowTypeService = useService(FlowTypeService)
+    const flowTypeStore = useStore(FlowTypeService)
     const projectService = useService(ProjectService)
     const projectStore = useStore(ProjectService)
     const [activeTab, setActiveTab] = React.useState<string>()
@@ -91,6 +97,15 @@ export const FlowExecutionResultView: React.FC = () => {
         [projectId, projectStore]
     )
 
+    const flowTypes = React.useMemo(
+        () => flowTypeService.values({
+            namespaceId,
+            projectId,
+            runtimeId: project?.primaryRuntime?.id
+        }),
+        [project, flowTypeStore]
+    )
+
     const functions = React.useMemo(
         () => functionService.values({
             namespaceId,
@@ -101,7 +116,7 @@ export const FlowExecutionResultView: React.FC = () => {
     )
 
     const flowExecutionResults = React.useMemo(
-        () => flow?.executionResults?.nodes ?? [],
+        () => [...(flow?.executionResults?.nodes ?? [])]?.reverse() ?? [],
         [flow?.executionResults?.nodes]
     )
 
@@ -112,27 +127,35 @@ export const FlowExecutionResultView: React.FC = () => {
                     id: result?.id as string,
                     type: "trigger",
                     start: 0,
-                    end: 0,
+                    end: (result?.finishedAt ?? 0) - (result?.startedAt ?? 0),
                     data: {
-                        displayMessage: result?.flow?.name ?? FALLBACK_FLOW_TYPE_NAME,
+                        displayMessage: flowTypes.find(fT => fT.id === flow?.type?.id)?.names?.[0].content ?? FALLBACK_FLOW_TYPE_NAME,
                         color: hashToColor(result?.flow?.name ?? ""),
+                        payload: {
+                            ...flow,
+                            type: flowTypes.find(fT => fT.id === flow?.type?.id)
+                        },
                         success: result?.success,
                         input: result?.input,
                         error: result?.error,
                     }
                 },
                 ...(result?.nodeResults?.nodes?.map?.(nodeResult => {
+
+                    const node = flow?.nodes?.nodes?.find(n => n?.id === nodeResult?.nodeFunction?.id)
+                    const funktion = functions.find(f => f.id === nodeResult?.nodeFunction?.functionDefinition?.id)
+
                     return {
                         id: nodeResult?.id as string,
                         type: "node",
-                        start: 0,
-                        end: 0,
+                        start: (nodeResult?.startedAt ?? 0) - (result?.startedAt ?? 0),
+                        end: (nodeResult?.finishedAt ?? 0) - (result?.startedAt ?? 0),
                         data: {
-                            displayMessage: nodeResult?.nodeFunction?.functionDefinition?.names?.[0].content ?? FALLBACK_FUNCTION_NAME,
+                            displayMessage: funktion?.names?.[0].content ?? FALLBACK_FUNCTION_NAME,
                             color: hashToColor(nodeResult?.nodeFunction?.id ?? ""),
-                            node: {
-                                ...flow?.nodes?.nodes?.find(n => n?.id === nodeResult?.nodeFunction?.id),
-                                functionDefinition: functions.find(f => f.id === nodeResult?.nodeFunction?.functionDefinition?.id)
+                            payload: {
+                                ...node,
+                                functionDefinition: funktion
                             },
                             success: nodeResult?.success,
                             input: nodeResult?.parameterResults ?? [],
@@ -142,12 +165,13 @@ export const FlowExecutionResultView: React.FC = () => {
                 }) ?? [])
             ]]))
         },
-        []
+        [flowExecutionResults, flowTypes, flow, functions]
     )
 
     return <>
         <FileTabs
             value={activeTab}
+            defaultValue={flowExecutionResults?.[0]?.id ?? undefined}
             onValueChange={(value) => {
                 setActiveTab(value)
             }}
@@ -178,12 +202,21 @@ export const FlowExecutionResultView: React.FC = () => {
                     ) : null
                 }
             >
-                {Array.from(ganttItems)?.map(([id]) => {
+                {Array.from(ganttItems)?.map(([id, items]) => {
+
+                    const execution = flowExecutionResults.find(execution => execution?.id === id)
+
                     return <FileTabsTrigger value={id!}
                                             key={id!}>
-                        <Text size={"sm"}>
-                            {id}
-                        </Text>
+                        <Flex align={"center"} style={{gap: "0.35rem"}}>
+                            <IconPlayerPlayFilled size={13} color={hashToColor(id!)}/>
+                            <Text size={"sm"}>
+                                #{id?.match(/ExecutionResult\/(\d+)$/)?.[1]}
+                            </Text>
+                            <Text size={"sm"} hierarchy={"tertiary"}>
+                                {formatDistanceToNow(execution?.createdAt ?? "")}
+                            </Text>
+                        </Flex>
                     </FileTabsTrigger>
                 })}
             </FileTabsList>}>
@@ -195,166 +228,145 @@ export const FlowExecutionResultView: React.FC = () => {
                                                     value={id!}
                                                     key={id}>
                                 <Gantt step={0.15} stepWidth={"50px"} rowHeight={"50px"} items={items} start={0}>
-                                    {(item) => item.type === "group" ? (
-                                        <Flex align={"center"} justify={"start"} w={"100%"} h={"100%"}
-                                              style={{cursor: "pointer"}}
-                                              onClick={() => {
-                                                  const element = document.getElementById(`group-target-${item.data.displayMessage}`)
-                                                  element?.scrollIntoView({behavior: "smooth"})
-                                              }}>
-                                            <Card color={"secondary"}
-                                                  paddingSize={"xs"}
-                                                  p={"0"}
-                                                  h={"31px"}
-                                                  style={{
-                                                      background: "transparent",
-                                                      backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 2px, ${withAlpha(item.data.color, 0.25)} 4px, ${withAlpha(item.data.color, 0.25)} 4px)`
-                                                  }}
-                                                  w={"100%"}>
-                                                <></>
-                                            </Card>
-                                        </Flex>
-                                    ) : (
-                                        <Tooltip key={item.id}>
-                                            <TooltipTrigger asChild>
-                                                <Flex align={"center"} justify={"start"} w={"100%"} h={"100%"}
-                                                      style={{cursor: "pointer"}}>
-                                                    <Card color={"primary"}
-                                                          className={`d-flow-node`}
-                                                          paddingSize={"xs"}
-                                                          py={"0.35"}
-                                                          w={"100%"}>
-                                                        <Flex align={"center"} w={"100%"} pos={"relative"}
-                                                              justify={"space-between"}
-                                                              style={{
-                                                                  gap: "0.35rem",
-                                                                  textWrap: "nowrap",
-                                                                  overflow: "hidden"
-                                                              }}>
-                                                            <Flex align={"center"} maw={"75%"} pos={"relative"}
-                                                                  justify={"start"}
-                                                                  style={{gap: "0.7rem"}}>
-                                                                {item.data.icon && React.createElement(item.data.icon, {
-                                                                    color: hashToColor(item.id),
-                                                                    size: 16,
-                                                                    style: {minWidth: "13px", minHeight: "13px"}
-                                                                })}
+                                    {(item) => {
+
+                                        if (item.type === "group") {
+                                            return <Flex align={"center"} justify={"start"} w={"100%"} h={"100%"}
+                                                         style={{cursor: "pointer"}}
+                                                         onClick={() => {
+                                                             const element = document.getElementById(`group-target-${item.data.displayMessage}`)
+                                                             element?.scrollIntoView({behavior: "smooth"})
+                                                         }}>
+                                                <Card color={"secondary"}
+                                                      paddingSize={"xs"}
+                                                      p={"0"}
+                                                      h={"31px"}
+                                                      style={{
+                                                          background: "transparent",
+                                                          backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 2px, ${withAlpha(item.data.color, 0.25)} 4px, ${withAlpha(item.data.color, 0.25)} 4px)`
+                                                      }}
+                                                      w={"100%"}>
+                                                    <></>
+                                                </Card>
+                                            </Flex>
+                                        } else {
+
+                                            const DisplayIcon = icon(
+                                                item.type === "node" ? item?.data?.payload?.functionDefinition?.displayIcon : item?.data?.payload?.type?.displayIcon,
+                                            )
+
+                                            return <Tooltip key={item.id}>
+                                                <TooltipTrigger asChild>
+                                                    <Flex align={"center"} justify={"start"} w={"100%"} h={"100%"}
+                                                          style={{cursor: "pointer"}}>
+                                                        <Card color={"primary"}
+                                                              className={`d-flow-node`}
+                                                              paddingSize={"xs"}
+                                                              py={"0.35"}
+                                                              w={"100%"}>
+                                                            <Flex align={"center"} w={"100%"} pos={"relative"}
+                                                                  justify={"space-between"}
+                                                                  style={{
+                                                                      gap: "0.35rem",
+                                                                      textWrap: "nowrap",
+                                                                      overflow: "hidden"
+                                                                  }}>
+                                                                <Flex align={"center"} maw={"75%"} pos={"relative"}
+                                                                      justify={"start"}
+                                                                      style={{gap: "0.7rem"}}>
+                                                                    <DisplayIcon size={16}
+                                                                                 color={hashToColor(item?.data?.payload?.id)}/>
+                                                                    <Text size={"md"}
+                                                                          style={{
+                                                                              overflow: "hidden",
+                                                                              position: "relative"
+                                                                          }}>
+                                                                        {item.data.displayMessage}
+                                                                    </Text>
+                                                                </Flex>
+                                                                <Text size={"xs"} hierarchy={"tertiary"}>
+                                                                    {getRelativeValue(item.end - item.start)}
+                                                                </Text>
+                                                            </Flex>
+                                                        </Card>
+                                                    </Flex>
+                                                </TooltipTrigger>
+                                                <TooltipPortal>
+                                                    <TooltipContent forceMount sideOffset={8} align={"start"}
+                                                                    maw={"300px"}>
+                                                        <Flex align={"center"} justify={"space-between"}
+                                                              style={{gap: "0.7rem"}}>
+                                                            <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                                                <DisplayIcon size={16}
+                                                                             color={hashToColor(item?.data?.payload?.id)}/>
                                                                 <Text size={"md"}
                                                                       style={{
                                                                           overflow: "hidden",
                                                                           position: "relative"
                                                                       }}>
-                                                                    {item.data.displayMessage}
+                                                                    {item?.data?.displayMessage}
                                                                 </Text>
                                                             </Flex>
-                                                            <Text size={"xs"} hierarchy={"tertiary"}>
+                                                            <Text size={"sm"} hierarchy={"tertiary"}>
                                                                 {getRelativeValue(item.end - item.start)}
                                                             </Text>
                                                         </Flex>
-                                                    </Card>
-                                                </Flex>
-                                            </TooltipTrigger>
-                                            <TooltipPortal>
-                                                <TooltipContent forceMount sideOffset={8} align={"start"}
-                                                                maw={"300px"}>
-                                                    <Flex align={"start"} pos={"relative"} justify={"start"}
-                                                          style={{gap: "0.35rem"}}>
-                                                        {item.data.icon && React.createElement(item.data.icon, {
-                                                            color: hashToColor(item.id),
-                                                            size: 16,
-                                                            style: {
-                                                                minWidth: "16px",
-                                                                minHeight: "16px",
-                                                                marginTop: "2px"
-                                                            }
-                                                        })}
-                                                        <Text size={"md"}
-                                                              style={{overflow: "hidden", position: "relative"}}>
-                                                            {item.data.displayMessage}
-                                                        </Text>
-                                                    </Flex>
-                                                    <Spacing spacing={"xs"}/>
-                                                    <table style={{width: '100%'}}>
-                                                        <tbody>
-                                                        <tr>
-                                                            <td>
-                                                                <Text size={"md"} hierarchy={"tertiary"}>
-                                                                    Start time
-                                                                </Text>
-                                                            </td>
-                                                            <td style={{width: "1px"}}>
-                                                                <Text size={"sm"} hierarchy={"tertiary"}>
-                                                                    {getRelativeValue(item.start)}
-                                                                </Text>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <Text size={"md"} hierarchy={"tertiary"}>
-                                                                    End time
-                                                                </Text>
-                                                            </td>
-                                                            <td style={{width: "1px"}}>
-                                                                <Text size={"sm"} hierarchy={"tertiary"}>
-                                                                    {getRelativeValue(item.end)}
-                                                                </Text>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <Text size={"md"} hierarchy={"tertiary"}>
-                                                                    Duration
-                                                                </Text>
-                                                            </td>
-                                                            <td style={{width: "1px"}}>
-                                                                <Text size={"sm"} hierarchy={"tertiary"}>
-                                                                    {getRelativeValue(item.end - item.start)}
-                                                                </Text>
-                                                            </td>
-                                                        </tr>
-                                                        </tbody>
-                                                    </table>
-                                                    <Spacing spacing={"xs"}/>
+                                                        <Spacing spacing={"xs"}/>
 
-                                                    <>
-                                                        <Text size={"md"}>
-                                                            Parameters
-                                                        </Text>
-                                                        {item.data.parameters?.map((item: any, index: number) => (
-                                                            <div key={item.name}>
-                                                                <Text size={"sm"} hierarchy={"tertiary"}>
-                                                                    {item.name}
-                                                                </Text>
+                                                        <>
+                                                            <Text size={"md"}>
+                                                                {item.type === "node" ? "Parameters" : "Input"}
+                                                            </Text>
+                                                            {item.type === "node" ? item.data.input?.map((input: ExecutionParameterResult, index: number) => {
+
+                                                                const parameter: ParameterDefinition = item?.data?.payload?.functionDefinition?.parameterDefinitions?.nodes?.[index]
+
+                                                                return <div key={input.id}>
+                                                                    <Text size={"sm"} hierarchy={"tertiary"}>
+                                                                        {parameter?.names?.[0]?.content}
+                                                                    </Text>
+                                                                    <Editor readonly showTooltips={false}
+                                                                            language={"json"}
+                                                                            initialValue={input.value}
+                                                                            customSuggestionComponent={false}
+                                                                            basicSetup={{
+                                                                                highlightActiveLine: false,
+                                                                                highlightActiveLineGutter: false,
+                                                                            }}/>
+                                                                </div>
+
+                                                            }) : item.type === "trigger" ? (
                                                                 <Editor readonly showTooltips={false} language={"json"}
-                                                                        initialValue={item.value}
+                                                                        initialValue={item.data.input}
+                                                                        customSuggestionComponent={false}
                                                                         basicSetup={{
                                                                             highlightActiveLine: false,
                                                                             highlightActiveLineGutter: false,
                                                                         }}/>
-                                                            </div>
-                                                        ))}
-                                                    </>
+                                                            ) : null}
+                                                        </>
 
-                                                    <Spacing spacing={"xs"}/>
-                                                    {
-                                                        item.data.result && (
-                                                            <div>
-                                                                <Text size={"md"}>
-                                                                    Result
-                                                                </Text>
-                                                                <Editor readonly showTooltips={false} language={"json"}
-                                                                        initialValue={item.data.result}
-                                                                        basicSetup={{
-                                                                            highlightActiveLine: false,
-                                                                            highlightActiveLineGutter: false,
-                                                                        }}/>
-                                                            </div>
-                                                        )
-                                                    }
-                                                </TooltipContent>
-                                            </TooltipPortal>
-                                        </Tooltip>
-                                    )}
+                                                        <Spacing spacing={"xs"}/>
+                                                        {
+                                                            item.data.success && (
+                                                                <div>
+                                                                    <Text size={"md"}>
+                                                                        Result
+                                                                    </Text>
+                                                                    <Editor readonly showTooltips={false} language={"json"}
+                                                                            initialValue={item.data.success}
+                                                                            basicSetup={{
+                                                                                highlightActiveLine: false,
+                                                                                highlightActiveLineGutter: false,
+                                                                            }}/>
+                                                                </div>
+                                                            )
+                                                        }
+                                                    </TooltipContent>
+                                                </TooltipPortal>
+                                            </Tooltip>
+                                        }
+                                    }}
                                 </Gantt>
                             </FileTabsContent>
                         }) : (
