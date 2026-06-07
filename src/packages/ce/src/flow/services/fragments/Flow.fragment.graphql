@@ -103,7 +103,7 @@ fragment Flow on Flow {
     type {
         id
     }
-    executionResults (first: $firstExecution, after: $afterExecution) {
+    executionResults {
         __typename
         count
         nodes {
@@ -153,6 +153,10 @@ fragment Flow on Flow {
                     nodeFunction {
                         __typename
                         id
+                        functionDefinition {
+                            __typename
+                            id
+                        }
                     }
                     error {
                         __typename

@@ -16,9 +16,6 @@ query Flows (
     $firstSetting: Int!,
     $afterSetting: String,
 
-    $firstExecution: Int!,
-    $afterExecution: String
-
     $firstNodeResult: Int!,
     $afterNodeResult: String
 ) {
