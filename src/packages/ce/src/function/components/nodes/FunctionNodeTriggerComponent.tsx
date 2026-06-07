@@ -7,10 +7,13 @@ import {FlowService} from "@edition/flow/services/Flow.service";
 import {IconVariable} from "@tabler/icons-react";
 import {NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {icon, IconString} from "@core/util/icons";
-import {FALLBACK_FLOW_TYPE_DISPLAY_MESSAGE} from "@core/util/fallback-translations";
+import {FALLBACK_FLOW_TYPE_DISPLAY_MESSAGE, FALLBACK_FLOW_TYPE_NAME} from "@core/util/fallback-translations";
 import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
 import {underlineBySeverity} from "@core/util/inspection";
 import {useSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
+import {LiteralBadgeComponent} from "@edition/datatype/components/badges/LiteralBadgeComponent";
+import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
+import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeComponent";
 
 
 export type FunctionNodeTriggerComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
@@ -39,6 +42,59 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
             : {};
 
     const selectedNode = useSelectedFunctionNode()
+
+    const splitTemplate = (str: string) =>
+        str
+            .split(/(\$\{[^}]+\})/)
+            .filter(Boolean)
+            .flatMap(part =>
+                part.startsWith("${")
+                    ? [part.slice(2, -1)]          // variable name ohne ${}
+                    : part.split(/(\s*,\s*)/)      // Kommas einzeln extrahieren
+                        .filter(Boolean)
+                        .flatMap(p => p.trim() === "," ? [","] : p.trim() ? [p.trim()] : [])
+            )
+
+    const displayMessage = React.useMemo(() => splitTemplate(definition?.displayMessages?.[0]?.content ?? FALLBACK_FLOW_TYPE_DISPLAY_MESSAGE).map(item => {
+
+        const nodeParameter = flow?.settings?.nodes?.find((_, index) => {
+            const parameterDefinition = definition?.flowTypeSettings?.[index]
+            return parameterDefinition?.identifier == item
+        })
+
+        const parameterDefinition = definition?.flowTypeSettings?.find(pd => pd?.identifier == item)
+        const parameterIndex = parameterDefinition ? definition?.flowTypeSettings?.findIndex(p => p?.id === parameterDefinition.id) : undefined
+        const parameterValidation = validation?.filter(v => v.parameterIndex === parameterIndex && !v.nodeId)
+        const decorationStyle: CSSProperties =
+            parameterValidation?.length
+                ? underlineBySeverity[parameterValidation[0].type]
+                : {};
+
+        if (parameterDefinition) {
+            switch (nodeParameter?.value?.__typename) {
+                case "LiteralValue":
+                    return <div style={{...decorationStyle, display: "inline-block"}}>
+                        <LiteralBadgeComponent value={nodeParameter.value}/>
+                    </div>
+                case "ReferenceValue":
+                    return <div style={{...decorationStyle, display: "inline-block"}}>
+                        <ReferenceBadgeComponent value={nodeParameter.value}/>
+                    </div>
+                case "SubFlowValue":
+                    return <div style={{...decorationStyle, display: "inline-block"}}>
+                        <NodeBadgeComponent value={nodeParameter.value}/>
+                    </div>
+            }
+            return <div style={{...decorationStyle, display: "inline-block"}}>
+                <Badge style={{verticalAlign: "middle"}} border>
+                    <Text size={"sm"}>
+                        {item}
+                    </Text>
+                </Badge>
+            </div>
+        }
+        return " " + String(item) + " "
+    }), [flowStore, data, definition, validation])
 
     const isReferenced = React.useMemo(() => {
 
@@ -75,9 +131,7 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
 
         <Flex style={{gap: "0.7rem", ...triggerValidationStyle}} align={"center"}>
             <DisplayIcon color={data.color} size={16}/>
-            <Text display={"block"}>
-                {definition?.displayMessages?.[0]?.content ?? FALLBACK_FLOW_TYPE_DISPLAY_MESSAGE}
-            </Text>
+            <Text size={"md"}>{flow ? displayMessage : definition?.names?.[0].content ?? FALLBACK_FLOW_TYPE_NAME}</Text>
         </Flex>
 
         {
