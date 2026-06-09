@@ -1,4 +1,5 @@
 #import "@edition/module/services/fragments/ModuleConfiguration.fragment.graphql"
+#import "@edition/module/services/fragments/ModuleDefinition.fragment.graphql"
 
 fragment Module on RuntimeModule {
     __typename
@@ -29,6 +30,17 @@ fragment Module on RuntimeModule {
     }
     functionDefinitions {
         count
+    }
+    definitions(first: $firstDefinition, after: $afterDefinition) {
+        __typename
+        count
+        nodes {
+            ...ModuleDefinition
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
     }
     configurationDefinitions (first: $firstConfiguration, after: $afterConfiguration) {
         __typename

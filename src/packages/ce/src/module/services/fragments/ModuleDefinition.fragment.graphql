@@ -1,0 +1,9 @@
+fragment ModuleDefinition on RuntimeModuleDefinition {
+    __typename
+    id
+    createdAt
+    updatedAt
+    endpoint
+    host
+    port
+}
