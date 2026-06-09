@@ -16,7 +16,7 @@
   "dependencies": {
     "@apollo/client": "^4.0.9",
     "@code0-tech/pictor": "^0.10.3",
-    "@code0-tech/triangulum": "^0.21.0",
+    "@code0-tech/triangulum": "^0.22.0",
     "@codemirror/lang-javascript": "^6.2.5",
     "@codemirror/lint": "^6.9.5",
     "@opentelemetry/api": "^1.9.1",
@@ -27,6 +27,7 @@
     "@opentelemetry/instrumentation-fetch": "^0.218.0",
     "@opentelemetry/instrumentation-xml-http-request": "^0.218.0",
     "@opentelemetry/sdk-trace-web": "^2.6.1",
+    "@uidotdev/usehooks": "^2.4.1",
     "@vercel/otel": "^2.1.1",
     "@xyflow/react": "^12.11.0",
     "date-fns": "^4.1.0",
