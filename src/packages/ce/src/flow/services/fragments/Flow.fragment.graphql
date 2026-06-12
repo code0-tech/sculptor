@@ -150,6 +150,10 @@ fragment Flow on Flow {
                         value
                         position
                     }
+                    functionDefinition {
+                        __typename
+                        id
+                    }
                     nodeFunction {
                         __typename
                         id

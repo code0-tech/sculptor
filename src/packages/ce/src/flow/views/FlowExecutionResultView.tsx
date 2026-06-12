@@ -4,7 +4,7 @@ import {
     ExecutionError,
     ExecutionParameterResult,
     ExecutionResult,
-    Flow,
+    Flow, FunctionDefinition,
     Maybe,
     Namespace,
     NamespaceProject,
@@ -57,7 +57,7 @@ export interface NodeGanttItem extends GanttItem {
     data?: {
         displayMessage: string
         color: string
-        payload?: Maybe<NodeFunction> | Maybe<Flow>
+        payload?: Maybe<NodeFunction> | Maybe<FunctionDefinition> | Maybe<Flow>
         input?: ExecutionParameterResult[] | object
         success?: object
         error?: Maybe<ExecutionError>
@@ -141,6 +141,25 @@ export const FlowExecutionResultView: React.FC = () => {
                     }
                 },
                 ...(result?.nodeResults?.nodes?.map?.(nodeResult => {
+
+                    if (nodeResult?.functionDefinition) {
+                        const funktion = functions.find(f => f.id === nodeResult?.functionDefinition?.id)
+
+                        return {
+                            id: nodeResult?.id as string,
+                            type: "function",
+                            start: (nodeResult?.startedAt ?? 0) - (result?.startedAt ?? 0),
+                            end: (nodeResult?.finishedAt ?? 0) - (result?.startedAt ?? 0),
+                            data: {
+                                displayMessage: funktion?.names?.[0].content ?? FALLBACK_FUNCTION_NAME,
+                                color: hashToColor(funktion?.identifier ?? ""),
+                                payload: funktion,
+                                success: nodeResult?.success,
+                                input: nodeResult?.parameterResults ?? [],
+                                error: nodeResult?.error,
+                            }
+                        }
+                    }
 
                     const node = flow?.nodes?.nodes?.find(n => n?.id === nodeResult?.nodeFunction?.id)
                     const funktion = functions.find(f => f.id === nodeResult?.nodeFunction?.functionDefinition?.id)
@@ -252,7 +271,7 @@ export const FlowExecutionResultView: React.FC = () => {
                                         } else {
 
                                             const DisplayIcon = icon(
-                                                item.type === "node" ? item?.data?.payload?.functionDefinition?.displayIcon : item?.data?.payload?.type?.displayIcon,
+                                                item.type === "node" ? item?.data?.payload?.functionDefinition?.displayIcon : item.type === "function" ? item?.data?.payload?.displayIcon : item?.data?.payload?.type?.displayIcon,
                                             )
 
                                             return <Tooltip key={item.id}>
