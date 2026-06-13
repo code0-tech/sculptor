@@ -294,6 +294,10 @@ export const FlowExecutionResultView: React.FC = () => {
                                                                       justify={"start"}
                                                                       style={{gap: "0.7rem"}}>
                                                                     <DisplayIcon size={16}
+                                                                                 style={{
+                                                                                     minWidth: "16px",
+                                                                                     minHeight: "16px",
+                                                                                 }}
                                                                                  color={hashToColor(item?.data?.payload?.id)}/>
                                                                     <Text size={"md"}
                                                                           style={{
@@ -317,6 +321,10 @@ export const FlowExecutionResultView: React.FC = () => {
                                                               style={{gap: "0.7rem"}}>
                                                             <Flex align={"center"} style={{gap: "0.35rem"}}>
                                                                 <DisplayIcon size={16}
+                                                                             style={{
+                                                                                 minWidth: "16px",
+                                                                                 minHeight: "16px",
+                                                                             }}
                                                                              color={hashToColor(item?.data?.payload?.id)}/>
                                                                 <Text size={"md"}
                                                                       style={{
