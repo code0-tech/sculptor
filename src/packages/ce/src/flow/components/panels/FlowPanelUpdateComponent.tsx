@@ -15,6 +15,7 @@ import {
     useStore
 } from "@code0-tech/pictor";
 import {FlowService} from "@edition/flow/services/Flow.service";
+import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 
 export interface FlowPanelUpdateComponentProps {
     flowId: Flow['id']
@@ -46,11 +47,15 @@ export const FlowPanelUpdateComponent: React.FC<FlowPanelUpdateComponentProps> =
         if (!flowId) return
 
 
-        startTransition(async () => {
-            await flowService.flowUpdate({
-                flowInput: flowInput!,
-                flowId: flowId!
-            })
+        flowService.flowUpdate({
+            flowInput: flowInput!,
+            flowId: flowId!
+        }).then(payload => {
+            if ((payload?.errors?.length ?? 0) <= 0) {
+                addIslandSuccessNotification({
+                    message: "Synced flow"
+                })
+            }
         })
 
     }, [flowId, flowService])

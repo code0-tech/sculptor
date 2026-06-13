@@ -1,12 +1,13 @@
 "use client"
 
 import React from "react";
-import {Button, Card, Flex, Spacing, Text, TextInput, toast, useForm, useService, useStore} from "@code0-tech/pictor";
+import {Button, Card, Flex, Spacing, Text, TextInput, useForm, useService, useStore} from "@code0-tech/pictor";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {RoleService} from "@edition/role/services/Role.service";
 import type {Namespace, NamespaceRole} from "@code0-tech/sagittarius-graphql-types";
 import {useParams} from "next/navigation";
+import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 
 export const RoleGeneralAdjustmentView: React.FC = () => {
 
@@ -49,10 +50,8 @@ export const RoleGeneralAdjustmentView: React.FC = () => {
                     name: values.name!
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
-                        toast({
-                            title: "The name were successfully updated.",
-                            color: "success",
-                            dismissible: true,
+                        addIslandSuccessNotification({
+                            message: "Updated role name"
                         })
                     }
                 })

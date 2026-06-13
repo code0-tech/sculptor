@@ -1,6 +1,6 @@
 "use client"
 
-import {Alert, Button, DataTableColumn, Flex, Spacing, Text, toast, useService, useStore} from "@code0-tech/pictor";
+import {Alert, Button, DataTableColumn, Flex, Spacing, Text, useService, useStore} from "@code0-tech/pictor";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import React from "react";
 import {useParams} from "next/navigation";
@@ -9,6 +9,7 @@ import type {Namespace, NamespaceProject, NamespaceRole, Scalars} from "@code0-t
 import {ProjectDataTableComponent} from "@edition/project/components/ProjectDataTableComponent";
 import {ProjectMenuComponent} from "@edition/project/components/ProjectMenuComponent";
 import {IconTrash} from "@tabler/icons-react";
+import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 
 export const RoleProjectView: React.FC = () => {
 
@@ -37,10 +38,8 @@ export const RoleProjectView: React.FC = () => {
                 projectIds: assignedProjectIds as Scalars['NamespaceProjectID']['output'][]
             }).then(payload => {
                 if ((payload?.errors?.length ?? 0) <= 0) {
-                    toast({
-                        title: "All projects were successfully assigned to the role.",
-                        color: "success",
-                        dismissible: true,
+                    addIslandSuccessNotification({
+                        message: "Assigned project"
                     })
                 }
             })

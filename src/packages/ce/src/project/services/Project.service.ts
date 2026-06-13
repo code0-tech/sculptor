@@ -177,7 +177,7 @@ export class ProjectService extends ReactiveArrayService<NamespaceProject, Proje
             }
         })
 
-        if (result.data && result.data.namespacesProjectsRuntimeAssignmentsUpdateModuleConfigurations && result.data.namespacesProjectsRuntimeAssignmentsUpdateModuleConfigurations.namespaceProjectRuntimeAssignment) {
+        if (result.data && result.data.namespacesProjectsRuntimeAssignmentsUpdateModuleConfigurations && result.data.namespacesProjectsRuntimeAssignmentsUpdateModuleConfigurations.moduleConfigurations) {
             const project = super.values().find(p => p.runtimeAssignments?.nodes?.map(rA => rA?.id).includes(payload.namespaceProjectRuntimeAssignmentId))
             const index = super.values().findIndex(p => p.runtimeAssignments?.nodes?.map(rA => rA?.id).includes(payload.namespaceProjectRuntimeAssignmentId))
 
@@ -188,14 +188,9 @@ export class ProjectService extends ReactiveArrayService<NamespaceProject, Proje
                     nodes: [
                         ...(project?.runtimeAssignments?.nodes?.filter(rA => rA?.id !== payload.namespaceProjectRuntimeAssignmentId) ?? []),
                         {
-                            ...result?.data.namespacesProjectsRuntimeAssignmentsUpdateModuleConfigurations.namespaceProjectRuntimeAssignment,
+                            ...(project?.runtimeAssignments?.nodes?.find(rA => rA?.id === payload.namespaceProjectRuntimeAssignmentId) ?? {}),
                             moduleConfigurations: {
-                                nodes: payload.moduleConfigurations.map((config, index) => {
-                                    return {
-                                        ...project?.runtimeAssignments?.nodes?.find(rA => rA?.id === payload.namespaceProjectRuntimeAssignmentId)?.moduleConfigurations?.nodes?.find(mC => mC?.definition?.id === config.moduleConfigurationDefinitionId),
-                                        value: config.value
-                                    } as ModuleConfiguration
-                                })
+                                nodes: result.data.namespacesProjectsRuntimeAssignmentsUpdateModuleConfigurations.moduleConfigurations
                             }
                         }
                     ]

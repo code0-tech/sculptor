@@ -1,8 +1,9 @@
 import React, {startTransition} from "react";
-import {Button, Card, Flex, Spacing, SwitchInput, Text, toast, useForm, useService, useStore} from "@code0-tech/pictor";
+import {Button, Card, Flex, Spacing, SwitchInput, Text, useForm, useService, useStore} from "@code0-tech/pictor";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {ApplicationService} from "@edition/application/services/Application.service";
+import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 
 export const ApplicationRestrictionsView: React.FC = () => {
 
@@ -35,10 +36,8 @@ export const ApplicationRestrictionsView: React.FC = () => {
                     userRegistrationEnabled: values.userRegistrationEnabled,
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
-                        toast({
-                            title: "The application was successfully updated.",
-                            color: "success",
-                            dismissible: true,
+                        addIslandSuccessNotification({
+                            message: "Updated application"
                         })
                     }
                 })

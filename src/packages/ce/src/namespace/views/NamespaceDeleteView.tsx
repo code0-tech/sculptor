@@ -1,11 +1,12 @@
 "use client"
 
 import React from "react";
-import {Button, Card, Flex, Spacing, Text, useService, useStore, toast} from "@code0-tech/pictor";
+import {Button, Card, Flex, Spacing, Text, useService, useStore} from "@code0-tech/pictor";
 import {useParams, useRouter} from "next/navigation";
 import {NamespaceService} from "@edition/namespace/services/Namespace.service";
 import {OrganizationService} from "@edition/organization/services/Organization.service";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
+import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 
 export const NamespaceDeleteView: React.FC = () => {
 
@@ -31,10 +32,8 @@ export const NamespaceDeleteView: React.FC = () => {
                 organizationId: parentOrganization?.id!!
             }).then(payload => {
                 if ((payload?.errors?.length ?? 0) <= 0) {
-                    toast({
-                        title: "The organization was successfully deleted.",
-                        color: "success",
-                        dismissible: true,
+                    addIslandSuccessNotification({
+                        message: "Deleted organization"
                     })
                 }
                 router.push("/")

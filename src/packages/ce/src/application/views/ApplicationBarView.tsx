@@ -1,14 +1,16 @@
 "use client"
 
-import {Button, Flex, MenuItem, MenuSeparator, useService, useStore} from "@code0-tech/pictor";
+import {Button, Flex, MenuItem, MenuSeparator, Text, useService, useStore} from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
-import {useRouter} from "next/navigation";
+import {useParams, useRouter} from "next/navigation";
 import React from "react";
 import Link from "next/link";
 import {IconBuilding, IconFolders, IconInbox, IconLogout, IconSearch, IconUser} from "@tabler/icons-react";
 import {ApplicationBreadcrumbView} from "@edition/application/views/ApplicationBreadcrumbView";
 import UserMenuComponent from "@edition/user/components/UserMenuComponent";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
+import {Island} from "@code0-tech/pictor/dist/components/island/Island";
+import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 
 export const ApplicationBarView: React.FC = () => {
 
@@ -17,10 +19,14 @@ export const ApplicationBarView: React.FC = () => {
     const userStore = useStore(UserService)
     const router = useRouter()
     const [loading, startTransition] = React.useTransition()
+    const params = useParams()
 
+    const namespaceIndex = params.namespaceId as string | undefined
+    const projectIndex = params.projectId as string | undefined
     const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [userStore, currentSession])
-    const namespaceIndex = React.useMemo(() => currentUser?.namespace?.id?.match(/Namespace\/(\d+)$/)?.[1], [currentUser])
+    const userNamespaceIndex = React.useMemo(() => currentUser?.namespace?.id?.match(/Namespace\/(\d+)$/)?.[1], [currentUser])
     const userIndex = currentUser?.id?.match(/User\/(\d+)$/)?.[1]
+    const currentStep = projectIndex ? "project" : namespaceIndex ? "namespace" : "home";
 
     const userMenu = React.useMemo(() => {
 
@@ -51,7 +57,7 @@ export const ApplicationBarView: React.FC = () => {
                     <IconBuilding size={16}/>Organizations
                 </MenuItem>
             </Link>
-            <Link href={`/namespace/${namespaceIndex}`}>
+            <Link href={`/namespace/${userNamespaceIndex}`}>
                 <MenuItem>
                     <IconFolders size={16}/>Personal Workspace
                 </MenuItem>
@@ -61,10 +67,36 @@ export const ApplicationBarView: React.FC = () => {
                 <IconLogout size={16}/>Logout
             </MenuItem>
         </UserMenuComponent>
-    }, [currentUser, currentSession, namespaceIndex])
+    }, [currentUser, currentSession, userNamespaceIndex])
 
-    return <Flex py={0.7} align={"center"} justify={"space-between"}>
+    return <Flex py={0.7} key={`island-${currentStep}`} align={"center"} justify={"space-between"}>
         <ApplicationBreadcrumbView/>
+        <Flex pos={"fixed"} top={"1rem"} left={"50%"} justify={"center"}
+              style={{zIndex: 9999, transform: "translateX(-50%)"}}>
+            <Island>
+                <ButtonGroup color={"primary"} bg={"transparent"} style={{boxShadow: "none"}}>
+                    <Button paddingSize={"xxs"} key={"home-button"} variant={"none"}
+                            aria-selected={!namespaceIndex && !projectIndex} onClick={() => router.push(`/`)}>
+                        <Text>Home</Text>
+                    </Button>
+                    {namespaceIndex ? (
+                        <Button paddingSize={"xxs"} key={"orga-button"} variant={"none"}
+                                onClick={() => router.push(`/namespace/${namespaceIndex}`)}
+                                aria-selected={!!namespaceIndex && !projectIndex}>
+                            <Text>Organization</Text>
+                        </Button>
+                    ) : (null as any)}
+                    {namespaceIndex && projectIndex ? (
+                        <Button paddingSize={"xxs"} key={"home-button"} variant={"none"}
+                                onClick={() => router.push(`/namespace/${namespaceIndex}/project/${projectIndex}/flow`)}
+                                aria-selected={!!namespaceIndex && !!projectIndex}>
+                            <Text>Project</Text>
+                        </Button>
+                    ) : (null as any)}
+                </ButtonGroup>
+
+            </Island>
+        </Flex>
         <Flex align={"center"} style={{gap: ".7rem"}}>
             <Button disabled variant={"none"} paddingSize={"xs"}>
                 <IconSearch size={16}/>

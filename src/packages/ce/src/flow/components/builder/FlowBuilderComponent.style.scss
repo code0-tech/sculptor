@@ -1,15 +1,29 @@
 .flow {
   overflow: hidden;
+  position: relative;
+
+  .react-flow__viewport {
+    will-change: transform;
+    -webkit-will-change: transform;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+  }
 
   &[data-tree-visibility=false] {
     .react-flow__node, .react-flow__edgelabel-renderer, .react-flow__edge {
       opacity: 0;
+      pointer-events: none;
+      will-change: opacity, stroke-dashoffset;
+      -webkit-will-change: opacity, stroke-dashoffset;
     }
   }
 
   &[data-tree-visibility=true] {
     .react-flow__node, .react-flow__edgelabel-renderer, .react-flow__edge {
-      opacity: 100%;
+      opacity: 1;
+      pointer-events: auto;
+      will-change: opacity, stroke-dashoffset;
+      -webkit-will-change: opacity, stroke-dashoffset;
     }
   }
 

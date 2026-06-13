@@ -40,7 +40,10 @@ export class ModuleService extends ReactiveArrayService<RuntimeModule, ModuleDep
                     afterModule: null,
 
                     firstConfiguration: 50,
-                    afterConfiguration: null
+                    afterConfiguration: null,
+
+                    firstDefinition: 50,
+                    afterDefinition: null
                 }
             }).then(res => {
                 const nodes = res.data?.namespace?.project?.runtimes?.nodes?.flatMap(runtime => runtime?.modules?.nodes ?? []) ?? []

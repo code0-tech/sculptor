@@ -2,6 +2,7 @@ import React from "react";
 import {Flow, Namespace, NamespaceProject, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {
     Button,
+    Flex,
     hashToColor,
     Menu,
     MenuContent,
@@ -10,6 +11,7 @@ import {
     MenuPortal,
     MenuSeparator,
     MenuTrigger,
+    Spacing,
     Text,
     useService,
     useStore
@@ -51,7 +53,7 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
     const functionStore = useStore(FunctionService)
 
     const id = React.useId()
-    const [activeTab, setActiveTab] = React.useState<string>()
+    const [activeTab, setActiveTab] = React.useState<string | undefined>(undefined)
     const reactFlow = useReactFlow()
     const selectedNode = useSelectedFunctionNode()
 
@@ -99,7 +101,7 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
     }, [activeTab])
 
     React.useEffect(() => {
-        if (selectedNode) setActiveTab(selectedNode.id)
+        setActiveTab(selectedNode?.id ?? undefined)
     }, [selectedNode?.id])
 
     return (
@@ -168,6 +170,24 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
                 }
             </FileTabsList>}>
                 <>
+                    {
+                        !activeTab ? (
+                            <Flex align={"center"} justify={"center"} p={1} h={"100%"}
+                                  style={{textAlign: "center", flexDirection: "column"}}>
+                                <Flex align={"center"} justify={"center"}
+                                      style={{textAlign: "center", flexDirection: "column"}}>
+                                    <Text size={"lg"} hierarchy={"primary"}>
+                                        Select a node for editing
+                                    </Text>
+                                    <Spacing spacing={"xl"}/>
+                                    <Text>
+                                        To edit the properties of a node, select the node in the flow editor or select
+                                        it from the list of nodes in the dropdown above.
+                                    </Text>
+                                </Flex>
+                            </Flex>
+                        ) : null
+                    }
                     <FileTabsContent data-qa-selector={"flow-builder-file-content"}
                                      value={flowId!}
                                      h={"100%"}

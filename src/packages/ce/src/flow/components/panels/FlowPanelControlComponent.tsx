@@ -1,8 +1,22 @@
 import React from "react";
-import {Flow, LiteralValue, NodeFunction, ReferenceValue, SubFlowValue} from "@code0-tech/sagittarius-graphql-types";
+import {
+    Flow,
+    LiteralValue,
+    Namespace,
+    NamespaceProject,
+    NodeFunction,
+    ReferenceValue,
+    SubFlowValue
+} from "@code0-tech/sagittarius-graphql-types";
 import {
     Badge,
     Button,
+    Dialog,
+    DialogContent,
+    DialogOverlay,
+    DialogPortal,
+    DialogTrigger,
+    Spacing,
     Text,
     Tooltip,
     TooltipContent,
@@ -15,10 +29,16 @@ import {Panel} from "@xyflow/react";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {SuggestionDialogComponent} from "@edition/function/components/suggestion/SuggestionDialogComponent";
-import {Suggestion} from "@edition/function/components/suggestion/Suggestion.util";
 import {useHotkeys} from "react-hotkeys-hook";
 import {useSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
 import {useFunctionSuggestions} from "@edition/function/hooks/Function.suggestion.hook";
+import {useParams} from "next/navigation";
+import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
+import {ProjectService} from "@edition/project/services/Project.service";
+import {ModuleService} from "@edition/module/services/Module.service";
+import {IconCheck, IconCopy} from "@tabler/icons-react";
+import {InputWrapper} from "@code0-tech/pictor/dist/components/form/InputWrapper";
+import {useCopyToClipboard} from "@uidotdev/usehooks";
 
 export interface FlowPanelControlComponentProps {
     flowId: Flow['id']
@@ -30,16 +50,70 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
     const {flowId} = props
 
     //services and stores
+    const params = useParams()
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
+    const flowTypeService = useService(FlowTypeService)
+    const flowTypeStore = useStore(FlowTypeService)
+    const projectService = useService(ProjectService)
+    const projectStore = useStore(ProjectService)
+    const moduleService = useService(ModuleService)
+    const moduleStore = useStore(ModuleService)
+
+    const [copiedText, copyToClipboard] = useCopyToClipboard();
+    const hasCopiedText = Boolean(copiedText);
     const [, startTransition] = React.useTransition()
     const [suggestionDialogOpen, setSuggestionDialogOpen] = React.useState(false)
     const [addNextNodeTooltipOpen, setAddNextNodeTooltipOpen] = React.useState(false)
 
+    const namespaceIndex = params.namespaceId as any as number
+    const projectIndex = params.projectId as any as number
+    const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
+    const projectId: NamespaceProject['id'] = `gid://sagittarius/NamespaceProject/${projectIndex}`
+
     //memoized values
     const selectedNode = useSelectedFunctionNode()
-
     const result = useFunctionSuggestions()
+
+    const flow = React.useMemo(
+        () => flowService.getById(flowId, {
+            namespaceId,
+            projectId
+        }),
+        [flowId, flowStore, namespaceId, projectId]
+    )
+
+    const project = React.useMemo(
+        () => projectService.getById(projectId, {
+            namespaceId
+        }),
+        [projectId, namespaceId, projectStore]
+    )
+
+    const flowType = React.useMemo(
+        () => flowTypeService.getById(flow?.type?.id, {
+            namespaceId,
+            projectId,
+            runtimeId: project?.primaryRuntime?.id
+        }),
+        [flow?.type?.id, namespaceId, projectId, project?.primaryRuntime?.id, flowTypeStore]
+    )
+
+    const module = React.useMemo(
+        () => moduleService.getById(flowType?.runtimeModule?.id, {
+            namespaceId: namespaceId,
+            projectId: projectId,
+            runtimeId: project?.primaryRuntime?.id
+        }),
+        [flowType?.runtimeModule?.id, namespaceId, projectId, project?.primaryRuntime?.id, moduleStore]
+    )
+
+    let endpoint = `http://${module?.definitions?.nodes?.[0]?.host}:${module?.definitions?.nodes?.[0]?.port}${module?.definitions?.nodes?.[0]?.endpoint}`
+        .replace("${{project_slug}}", project?.slug ?? "${{project_slug}}")
+
+    flow?.settings?.nodes?.forEach(setting => {
+        endpoint = endpoint.replace(`\${{${setting?.flowSettingIdentifier}}}`, setting?.value)
+    })
 
     //callbacks
     const deleteActiveNode = React.useCallback(() => {
@@ -83,7 +157,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                             disabled={!selectedNode}
                             onClick={deleteActiveNode}
                             paddingSize={"xxs"}
-                            variant={"filled"}
+                            variant={"none"}
                             color={"error"}>
                         <Text>Delete node</Text>
                     </Button>
@@ -99,11 +173,11 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                     <Button data-qa-selector={"flow-builder-control-panel-add"}
                             disabled={!selectedNode || !!selectedNode.data.functionId}
                             paddingSize={"xxs"}
-                            variant={"filled"}
+                            variant={"none"}
                             onClick={() => {
                                 if (selectedNode && !selectedNode.data.functionId) setSuggestionDialogOpen(true)
                             }}
-                            color={"secondary"}>
+                            color={"tertiary"}>
                         <Text display={"flex"} align={"center"} style={{gap: "0.35rem"}}>
                             Add next node
                             <Badge style={{gap: 0}}>Shift + A</Badge>
@@ -116,7 +190,54 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                     </TooltipContent>}
                 </TooltipPortal>
             </Tooltip>
+            {module?.definitions?.nodes?.[0] ? (
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button data-qa-selector={"flow-builder-control-panel-execute"}
+                                paddingSize={"xxs"}
+                                variant={"none"}
+                                color={"tertiary"}>
+                            <Text>
+                                Execute flow
+                            </Text>
+                        </Button>
+                    </DialogTrigger>
+                    <DialogPortal>
+                        <DialogOverlay/>
+                        <DialogContent showCloseButton title={"Execute the flow to see the results"}>
+                            <Spacing spacing={"xl"}/>
+                            <InputWrapper title={"Endpoint"} description={"The url endpoint to execute this flow."}
+                                          left={flow?.settings?.nodes?.find(setting => setting?.flowSettingIdentifier === "httpMethod")?.value ? (
+                                              <Text size={"xs"}>
+                                                  {flow?.settings?.nodes?.find(setting => setting?.flowSettingIdentifier === "httpMethod")?.value}
+                                              </Text>
+                                          ) : undefined}
+                                          right={
+                                              <ButtonGroup color={"primary"}>
+                                                  <Button onClick={() => {
+                                                      copyToClipboard(endpoint)
+                                                  }} paddingSize={"xxs"} variant={"none"} color={"secondary"}>
+                                                      {hasCopiedText ? <IconCheck size={13}/> : <IconCopy size={13}/>}
+                                                  </Button>
+                                              </ButtonGroup>
+                                          }>
+                                <div style={{
+                                    alignSelf: "center",
+                                    flex: "1 1 auto"
+                                }}>
+                                    <Text>
+                                        {endpoint}
+                                    </Text>
+                                </div>
+
+                            </InputWrapper>
+                        </DialogContent>
+                    </DialogPortal>
+                </Dialog>
+            ) : (null as any)}
         </ButtonGroup>
+
+
     </Panel>
 
 }

@@ -5,7 +5,6 @@ import {
     Button,
     Flex,
     Text,
-    toast,
     Tooltip,
     TooltipArrow,
     TooltipContent,
@@ -26,6 +25,7 @@ import {
     FlowFolderContextMenuComponentItemData
 } from "@edition/flow/components/folder/FlowFolderContextMenuComponent";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
+import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 
 export const FlowFolderView: React.FC = () => {
 
@@ -55,10 +55,8 @@ export const FlowFolderView: React.FC = () => {
             flowId: flow.id!
         }).then(payload => {
             if ((payload?.errors?.length ?? 0) <= 0) {
-                toast({
-                    title: "The flow was successfully deleted.",
-                    color: "success",
-                    dismissible: true,
+                addIslandSuccessNotification({
+                    message: "Deleted flow"
                 })
                 router.push(`/namespace/${namespaceIndex}/project/${projectIndex}/flow`)
             }
@@ -79,7 +77,8 @@ export const FlowFolderView: React.FC = () => {
         <Layout layoutGap={"0.7rem"} showLayoutSplitter={false} topContent={
             <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
                 <Flex style={{gap: "0.35rem"}} align={"center"} justify={"space-between"}>
-                    <Button data-qa-selector={"flow-send"} color={"tertiary"} paddingSize={"xxs"} style={{textWrap: "nowrap"}} onClick={() => {
+                    <Button data-qa-selector={"flow-send"} color={"tertiary"} paddingSize={"xxs"}
+                            style={{textWrap: "nowrap"}} onClick={() => {
                         setCreateDialogOpen(true)
                         setFlowTypeId(undefined)
                     }}>

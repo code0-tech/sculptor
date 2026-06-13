@@ -1,18 +1,18 @@
 "use client"
 
 import React from "react";
-import {Button, Card, Flex, Spacing, Text, TextInput, toast, useForm, useService, useStore} from "@code0-tech/pictor";
+import {Button, Card, Flex, Spacing, Text, TextInput, useForm, useService, useStore} from "@code0-tech/pictor";
 import {RuntimeService} from "@edition/runtime/services/Runtime.service";
 import {notFound, useParams, useRouter} from "next/navigation";
 import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
-import {IconLayoutSidebar} from "@tabler/icons-react";
 import {
     ResizableHandle,
     ResizablePanel,
     ResizablePanelGroup
 } from "@code0-tech/pictor/dist/components/resizable/Resizable";
 import {SidebarComponent} from "@core/components/SidebarComponent";
+import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 
 export const RuntimeSettingsPage: React.FC = () => {
 
@@ -60,10 +60,8 @@ export const RuntimeSettingsPage: React.FC = () => {
                     runtimeId: runtime?.id!!
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
-                        toast({
-                            title: "The runtime was successfully updated.",
-                            color: "success",
-                            dismissible: true,
+                        addIslandSuccessNotification({
+                            message: "Updated runtime"
                         })
                     }
                 })
@@ -77,10 +75,8 @@ export const RuntimeSettingsPage: React.FC = () => {
                 runtimeId: runtime?.id!!
             }).then(payload => {
                 if ((payload?.errors?.length ?? 0) <= 0) {
-                    toast({
-                        title: "The runtime was successfully deleted.",
-                        color: "success",
-                        dismissible: true,
+                    addIslandSuccessNotification({
+                        message: "Deleted runtime"
                     })
                 }
                 router.push(namespaceId ? `/namespace/${namespaceId}/runtimes` : "/runtimes")
@@ -96,10 +92,8 @@ export const RuntimeSettingsPage: React.FC = () => {
                 if ((payload?.errors?.length ?? 0) <= 0) {
                     if (payload?.runtime?.token) {
                         setToken(payload.runtime.token)
-                        toast({
-                            title: "The runtime token was successfully rotated.",
-                            color: "success",
-                            dismissible: true,
+                        addIslandSuccessNotification({
+                            message: "Rotated runtime token"
                         })
                     }
                 }
@@ -132,7 +126,7 @@ export const RuntimeSettingsPage: React.FC = () => {
                 </TabList>
             </SidebarComponent>
             <ResizableHandle/>
-            <ResizablePanel id={"2"} color={"primary"} p={1}
+            <ResizablePanel id={"2"} color={"primary"} p={2}
                             style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
                 <>
                     <TabContent value={"general"}>
