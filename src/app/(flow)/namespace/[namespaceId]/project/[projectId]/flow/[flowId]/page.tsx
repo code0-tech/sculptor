@@ -1,25 +1,8 @@
 "use client"
 
-import {
-    Button,
-    Card,
-    Flex,
-    Gantt,
-    getRelativeValue,
-    hashToColor, Spacing, Text,
-    Tooltip, TooltipContent, TooltipPortal,
-    TooltipTrigger,
-    withAlpha,
-} from "@code0-tech/pictor";
+import {Button, Flex,} from "@code0-tech/pictor";
 import React from "react";
-import {
-    IconArrowRampRight2,
-    IconBrandDiscord, IconBrandTeams,
-    IconDatabase,
-    IconFile,
-    IconPlayerPlay,
-    IconTextGrammar
-} from "@tabler/icons-react";
+import {IconFile, IconPlayerPlay} from "@tabler/icons-react";
 import {useParams} from "next/navigation";
 import {Flow} from "@code0-tech/sagittarius-graphql-types";
 import {FlowBuilderComponent} from "@edition/flow/components/builder/FlowBuilderComponent";
@@ -30,7 +13,6 @@ import {
     ResizablePanelGroup
 } from "@code0-tech/pictor/dist/components/resizable/Resizable";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
-import {Editor} from "@code0-tech/pictor/dist/components/editor/Editor";
 import {FlowExecutionResultView} from "@edition/flow/views/FlowExecutionResultView";
 
 export default function Page() {
@@ -45,11 +27,14 @@ export default function Page() {
     return <ResizablePanel id={"2"}>
         <Layout layoutGap={0} showLayoutSplitter={false} rightContent={
             <Flex pl={0.7} style={{flexDirection: "column", gap: "0.7rem"}}>
-                <Button aria-selected={tab === "file"} onClick={() => setTab(prevState => prevState === "file" ? undefined : "file")} variant={"none"}
+                <Button aria-selected={tab === "file"}
+                        onClick={() => setTab(prevState => prevState === "file" ? undefined : "file")} variant={"none"}
                         paddingSize={"xs"}>
                     <IconFile size={16}/>
                 </Button>
-                <Button aria-selected={tab === "execution"} onClick={() => setTab(prevState => prevState === "execution" ? undefined : "execution")} variant={"none"}
+                <Button aria-selected={tab === "execution"}
+                        onClick={() => setTab(prevState => prevState === "execution" ? undefined : "execution")}
+                        variant={"none"}
                         paddingSize={"xs"}>
                     <IconPlayerPlay size={16}/>
                 </Button>
