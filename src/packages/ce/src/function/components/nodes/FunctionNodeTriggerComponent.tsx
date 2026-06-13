@@ -123,26 +123,11 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
                 : {};
 
         if (parameterDefinition) {
-            switch (nodeParameter?.value?.__typename) {
-                case "LiteralValue":
-                    return <div style={{...decorationStyle, display: "inline-block"}}>
-                        <LiteralBadgeComponent value={nodeParameter.value}/>
-                    </div>
-                case "ReferenceValue":
-                    return <div style={{...decorationStyle, display: "inline-block"}}>
-                        <ReferenceBadgeComponent value={nodeParameter.value}/>
-                    </div>
-                case "SubFlowValue":
-                    return <div style={{...decorationStyle, display: "inline-block"}}>
-                        <NodeBadgeComponent value={nodeParameter.value}/>
-                    </div>
-            }
             return <div style={{...decorationStyle, display: "inline-block"}}>
-                <Badge style={{verticalAlign: "middle"}} border>
-                    <Text size={"sm"}>
-                        {item}
-                    </Text>
-                </Badge>
+                <LiteralBadgeComponent value={{
+                    __typename: "LiteralValue",
+                    value: nodeParameter?.value
+                }}/>
             </div>
         }
         return " " + String(item) + " "
