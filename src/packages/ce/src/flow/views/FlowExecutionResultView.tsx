@@ -228,7 +228,7 @@ export const FlowExecutionResultView: React.FC = () => {
                     return <FileTabsTrigger value={id!}
                                             key={id!}>
                         <Flex align={"center"} style={{gap: "0.35rem"}}>
-                            <IconPlayerPlayFilled size={13} color={hashToColor(id!)}/>
+                            <IconPlayerPlayFilled size={13} color={hashToColor(id ?? "")}/>
                             <Text size={"sm"}>
                                 #{id?.match(/ExecutionResult\/(\d+)$/)?.[1]}
                             </Text>
@@ -298,7 +298,7 @@ export const FlowExecutionResultView: React.FC = () => {
                                                                                      minWidth: "16px",
                                                                                      minHeight: "16px",
                                                                                  }}
-                                                                                 color={hashToColor(item?.data?.payload?.id)}/>
+                                                                                 color={hashToColor(item?.data?.payload?.id ?? "")}/>
                                                                     <Text size={"md"}
                                                                           style={{
                                                                               overflow: "hidden",
@@ -325,7 +325,7 @@ export const FlowExecutionResultView: React.FC = () => {
                                                                                  minWidth: "16px",
                                                                                  minHeight: "16px",
                                                                              }}
-                                                                             color={hashToColor(item?.data?.payload?.id)}/>
+                                                                             color={hashToColor(item?.data?.payload?.id ?? "")}/>
                                                                 <Text size={"md"}
                                                                       style={{
                                                                           overflow: "hidden",
