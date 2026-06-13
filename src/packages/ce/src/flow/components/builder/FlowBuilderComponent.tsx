@@ -28,6 +28,7 @@ import {FlowPanelLayoutComponent} from "@edition/flow/components/panels/FlowPane
 import {FlowPanelControlComponent} from "@edition/flow/components/panels/FlowPanelControlComponent";
 import {FlowPanelUpdateComponent} from "@edition/flow/components/panels/FlowPanelUpdateComponent";
 import {FunctionNodeSquareComponent} from "@edition/function/components/nodes/FunctionNodeSquareComponent";
+import {FlowPanelDefinitionComponent} from "@edition/flow/components/panels/FlowPanelDefinitionComponent";
 
 /**
  * Dynamically layouts a tree of nodes and their parameter nodes for a flow-based editor.
@@ -785,6 +786,7 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
                     <FlowPanelLayoutComponent/>
                     <FlowPanelControlComponent flowId={flowId}/>
                     <FlowPanelUpdateComponent flowId={flowId}/>
+                    <FlowPanelDefinitionComponent/>
                 </>
             ) : null}
         </ReactFlow>
