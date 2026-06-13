@@ -45,11 +45,11 @@ export default function Page() {
     return <ResizablePanel id={"2"}>
         <Layout layoutGap={0} showLayoutSplitter={false} rightContent={
             <Flex pl={0.7} style={{flexDirection: "column", gap: "0.7rem"}}>
-                <Button aria-selected={tab === "file"} onClick={() => setTab("file")} variant={"none"}
+                <Button aria-selected={tab === "file"} onClick={() => setTab(prevState => prevState === "file" ? undefined : "file")} variant={"none"}
                         paddingSize={"xs"}>
                     <IconFile size={16}/>
                 </Button>
-                <Button aria-selected={tab === "execution"} onClick={() => setTab("execution")} variant={"none"}
+                <Button aria-selected={tab === "execution"} onClick={() => setTab(prevState => prevState === "execution" ? undefined : "execution")} variant={"none"}
                         paddingSize={"xs"}>
                     <IconPlayerPlay size={16}/>
                 </Button>
