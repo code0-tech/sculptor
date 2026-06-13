@@ -1,21 +1,19 @@
 import React from "react";
+import {Flow, LiteralValue, NodeFunction, ReferenceValue, SubFlowValue} from "@code0-tech/sagittarius-graphql-types";
 import {
-    Flow,
-    LiteralValue,
-    Namespace,
-    NamespaceProject,
-    NodeFunction,
-    ReferenceValue,
-    SubFlowValue
-} from "@code0-tech/sagittarius-graphql-types";
-import {
+    AuroraBackground,
     Badge,
     Button,
-    Dialog,
-    DialogContent,
-    DialogOverlay,
-    DialogPortal,
-    DialogTrigger,
+    Card,
+    EditorInput,
+    Flex,
+    SelectContent,
+    SelectItem,
+    SelectItemText,
+    SelectPortal,
+    SelectTrigger,
+    SelectValue,
+    SelectViewport,
     Spacing,
     Text,
     Tooltip,
@@ -32,13 +30,22 @@ import {SuggestionDialogComponent} from "@edition/function/components/suggestion
 import {useHotkeys} from "react-hotkeys-hook";
 import {useSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
 import {useFunctionSuggestions} from "@edition/function/hooks/Function.suggestion.hook";
-import {useParams} from "next/navigation";
-import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
-import {ProjectService} from "@edition/project/services/Project.service";
-import {ModuleService} from "@edition/module/services/Module.service";
-import {IconCheck, IconCopy} from "@tabler/icons-react";
-import {InputWrapper} from "@code0-tech/pictor/dist/components/form/InputWrapper";
-import {useCopyToClipboard} from "@uidotdev/usehooks";
+import {
+    IconArrowBigUp,
+    IconBackspace,
+    IconChevronDown,
+    IconLetterA,
+    IconLetterQ,
+    IconSend,
+    IconX
+} from "@tabler/icons-react";
+import {HoverCard, HoverCardContent, HoverCardPortal, HoverCardTrigger} from "@radix-ui/react-hover-card";
+import {ChaoticOrbit} from "ldrs/react";
+import {StreamLanguage} from "@codemirror/language";
+import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
+import {Select} from "@radix-ui/react-select";
+import {SiClaude} from "@icons-pack/react-simple-icons";
+import 'ldrs/react/ChaoticOrbit.css'
 
 export interface FlowPanelControlComponentProps {
     flowId: Flow['id']
@@ -50,70 +57,16 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
     const {flowId} = props
 
     //services and stores
-    const params = useParams()
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
-    const flowTypeService = useService(FlowTypeService)
-    const flowTypeStore = useStore(FlowTypeService)
-    const projectService = useService(ProjectService)
-    const projectStore = useStore(ProjectService)
-    const moduleService = useService(ModuleService)
-    const moduleStore = useStore(ModuleService)
 
-    const [copiedText, copyToClipboard] = useCopyToClipboard();
-    const hasCopiedText = Boolean(copiedText);
     const [, startTransition] = React.useTransition()
     const [suggestionDialogOpen, setSuggestionDialogOpen] = React.useState(false)
     const [addNextNodeTooltipOpen, setAddNextNodeTooltipOpen] = React.useState(false)
 
-    const namespaceIndex = params.namespaceId as any as number
-    const projectIndex = params.projectId as any as number
-    const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
-    const projectId: NamespaceProject['id'] = `gid://sagittarius/NamespaceProject/${projectIndex}`
-
     //memoized values
     const selectedNode = useSelectedFunctionNode()
     const result = useFunctionSuggestions()
-
-    const flow = React.useMemo(
-        () => flowService.getById(flowId, {
-            namespaceId,
-            projectId
-        }),
-        [flowId, flowStore, namespaceId, projectId]
-    )
-
-    const project = React.useMemo(
-        () => projectService.getById(projectId, {
-            namespaceId
-        }),
-        [projectId, namespaceId, projectStore]
-    )
-
-    const flowType = React.useMemo(
-        () => flowTypeService.getById(flow?.type?.id, {
-            namespaceId,
-            projectId,
-            runtimeId: project?.primaryRuntime?.id
-        }),
-        [flow?.type?.id, namespaceId, projectId, project?.primaryRuntime?.id, flowTypeStore]
-    )
-
-    const module = React.useMemo(
-        () => moduleService.getById(flowType?.runtimeModule?.id, {
-            namespaceId: namespaceId,
-            projectId: projectId,
-            runtimeId: project?.primaryRuntime?.id
-        }),
-        [flowType?.runtimeModule?.id, namespaceId, projectId, project?.primaryRuntime?.id, moduleStore]
-    )
-
-    let endpoint = `http://${module?.definitions?.nodes?.[0]?.host}:${module?.definitions?.nodes?.[0]?.port}${module?.definitions?.nodes?.[0]?.endpoint}`
-        .replace("${{project_slug}}", project?.slug ?? "${{project_slug}}")
-
-    flow?.settings?.nodes?.forEach(setting => {
-        endpoint = endpoint.replace(`\${{${setting?.flowSettingIdentifier}}}`, setting?.value)
-    })
 
     //callbacks
     const deleteActiveNode = React.useCallback(() => {
@@ -136,6 +89,8 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
         }
     }, [flowId, flowService, flowStore, selectedNode])
 
+    const [aiOpen, setAiOpen] = React.useState(false)
+
     useHotkeys('shift+a', (keyboardEvent) => {
         if (selectedNode && !selectedNode.data.functionId) setSuggestionDialogOpen(true)
         else setAddNextNodeTooltipOpen(true)
@@ -143,101 +98,204 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
         keyboardEvent.preventDefault()
     }, [selectedNode])
 
-    return <Panel position={"bottom-center"} data-qa-selector={"flow-builder-control-panel"}>
+    useHotkeys('backspace', (keyboardEvent) => {
+        if (selectedNode) deleteActiveNode()
+        else setAddNextNodeTooltipOpen(true)
+        keyboardEvent.stopPropagation()
+        keyboardEvent.preventDefault()
+    }, [selectedNode])
 
-        <SuggestionDialogComponent suggestions={result}
-                                   open={suggestionDialogOpen}
-                                   onSuggestionSelect={addNodeToFlow}
-                                   onOpenChange={setSuggestionDialogOpen}/>
+    useHotkeys('shift+q', (keyboardEvent) => {
+        setAiOpen(prevState => !prevState)
+        keyboardEvent.stopPropagation()
+        keyboardEvent.preventDefault()
+    }, [selectedNode])
 
-        <ButtonGroup style={{textWrap: "nowrap"}}>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <Button data-qa-selector={"flow-builder-control-panel-delete"}
-                            disabled={!selectedNode}
-                            onClick={deleteActiveNode}
-                            paddingSize={"xxs"}
+    return <HoverCard open={aiOpen}>
+        <HoverCardTrigger asChild>
+            <Panel position={"bottom-center"} data-qa-selector={"flow-builder-control-panel"}>
+
+                <SuggestionDialogComponent suggestions={result}
+                                           open={suggestionDialogOpen}
+                                           onSuggestionSelect={addNodeToFlow}
+                                           onOpenChange={setSuggestionDialogOpen}/>
+
+                <ButtonGroup style={{textWrap: "nowrap"}}>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button data-qa-selector={"flow-builder-control-panel-delete"}
+                                    disabled={!selectedNode}
+                                    onClick={deleteActiveNode}
+                                    paddingSize={"xxs"}
+                                    variant={"none"}
+                                    color={"error"}>
+                                <Text>Delete node</Text>
+                                <Badge color={"tertiary"}>
+                                    <IconBackspace size={11}/>
+                                </Badge>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipPortal>
+                            <TooltipContent sideOffset={8}>
+                                <Text>Select a node to delete it</Text>
+                            </TooltipContent>
+                        </TooltipPortal>
+                    </Tooltip>
+                    <Tooltip open={addNextNodeTooltipOpen} onOpenChange={setAddNextNodeTooltipOpen}>
+                        <TooltipTrigger asChild>
+                            <Button data-qa-selector={"flow-builder-control-panel-add"}
+                                    disabled={!selectedNode || !!selectedNode.data.functionId}
+                                    paddingSize={"xxs"}
+                                    variant={"none"}
+                                    onClick={() => {
+                                        if (selectedNode && !selectedNode.data.functionId) setSuggestionDialogOpen(true)
+                                    }}
+                                    color={"tertiary"}>
+                                <Text display={"flex"} align={"center"} style={{gap: "0.35rem"}}>
+                                    Add next node
+                                    <Badge color={"tertiary"}>
+                                        <IconArrowBigUp size={10}/>
+                                        +
+                                        <IconLetterA size={10}/>
+                                    </Badge>
+                                </Text>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipPortal>
+                            <TooltipContent sideOffset={8}>
+                                <Text>Select a node to add a next node</Text>
+                            </TooltipContent>
+                        </TooltipPortal>
+                    </Tooltip>
+                    <Button paddingSize={"xxs"}
                             variant={"none"}
-                            color={"error"}>
-                        <Text>Delete node</Text>
+                            onClick={() => setAiOpen(true)}>
+                        <AuroraBackground showRadialGradient={false}/>
+                        Ask AI
+                        <Badge color={"tertiary"}>
+                            <IconArrowBigUp size={10}/>
+                            +
+                            <IconLetterQ size={10}/>
+                        </Badge>
                     </Button>
-                </TooltipTrigger>
-                <TooltipPortal>
-                    <TooltipContent sideOffset={8}>
-                        <Text>Select a node to delete it</Text>
-                    </TooltipContent>
-                </TooltipPortal>
-            </Tooltip>
-            <Tooltip open={addNextNodeTooltipOpen} onOpenChange={setAddNextNodeTooltipOpen}>
-                <TooltipTrigger asChild>
-                    <Button data-qa-selector={"flow-builder-control-panel-add"}
-                            disabled={!selectedNode || !!selectedNode.data.functionId}
-                            paddingSize={"xxs"}
-                            variant={"none"}
-                            onClick={() => {
-                                if (selectedNode && !selectedNode.data.functionId) setSuggestionDialogOpen(true)
-                            }}
-                            color={"tertiary"}>
-                        <Text display={"flex"} align={"center"} style={{gap: "0.35rem"}}>
-                            Add next node
-                            <Badge style={{gap: 0}}>Shift + A</Badge>
+                </ButtonGroup>
+
+
+            </Panel>
+        </HoverCardTrigger>
+        <HoverCardPortal>
+            <HoverCardContent align={"start"} side={"bottom"}
+                              style={{position: "absolute", transform: "translate(0%, -100%)", zIndex: 1}}>
+                <Flex style={{flexDirection: "column", gap: "0.7rem"}} align={"start"}>
+                    <Flex w={"100%"} justify={"center"}>
+                        <ButtonGroup color={"secondary"}>
+                            <Button color={"error"} paddingSize={"xxs"}>
+                                Discard
+                            </Button>
+                            <Button color={"success"} paddingSize={"xxs"}>
+                                Accept
+                            </Button>
+                        </ButtonGroup>
+                    </Flex>
+                    <Flex align={"center"} style={{gap: "0.35rem"}}>
+                        <ChaoticOrbit
+                            size="16"
+                            speed="1.5"
+                            color="white"
+                        />
+                        <Text>
+                            Generating...
                         </Text>
-                    </Button>
-                </TooltipTrigger>
-                <TooltipPortal>
-                    {!selectedNode || !!selectedNode.data.functionId && <TooltipContent sideOffset={8}>
-                        <Text>Select a node to add a next node</Text>
-                    </TooltipContent>}
-                </TooltipPortal>
-            </Tooltip>
-            {module?.definitions?.nodes?.[0] ? (
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button data-qa-selector={"flow-builder-control-panel-execute"}
-                                paddingSize={"xxs"}
-                                variant={"none"}
-                                color={"tertiary"}>
-                            <Text>
-                                Execute flow
-                            </Text>
-                        </Button>
-                    </DialogTrigger>
-                    <DialogPortal>
-                        <DialogOverlay/>
-                        <DialogContent showCloseButton title={"Execute the flow to see the results"}>
-                            <Spacing spacing={"xl"}/>
-                            <InputWrapper title={"Endpoint"} description={"The url endpoint to execute this flow."}
-                                          left={flow?.settings?.nodes?.find(setting => setting?.flowSettingIdentifier === "httpMethod")?.value ? (
-                                              <Text size={"xs"}>
-                                                  {flow?.settings?.nodes?.find(setting => setting?.flowSettingIdentifier === "httpMethod")?.value}
-                                              </Text>
-                                          ) : undefined}
-                                          right={
-                                              <ButtonGroup color={"primary"}>
-                                                  <Button onClick={() => {
-                                                      copyToClipboard(endpoint)
-                                                  }} paddingSize={"xxs"} variant={"none"} color={"secondary"}>
-                                                      {hasCopiedText ? <IconCheck size={13}/> : <IconCopy size={13}/>}
-                                                  </Button>
-                                              </ButtonGroup>
-                                          }>
-                                <div style={{
-                                    alignSelf: "center",
-                                    flex: "1 1 auto"
-                                }}>
-                                    <Text>
-                                        {endpoint}
-                                    </Text>
-                                </div>
+                    </Flex>
+                    <Card paddingSize={"xxs"} color={"secondary"} w={"var(--radix-popper-anchor-width)"}>
+                        <EditorInput
+                            wrapperComponent={{
+                                style: {
+                                    background: "transparent",
+                                    boxShadow: "none"
+                                }
+                            }}
+                            placeholder={"Ask AI anything..."}
+                            language={StreamLanguage.define({
+                                token(stream) {
+                                    stream.next()
+                                    return null;
+                                }
+                            })}/>
+                        <Spacing spacing={"xxs"}/>
+                        <CardSection>
+                            <Flex justify={"space-between"} align={"center"}>
+                                <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                    <Select defaultValue={"ask"}>
+                                        <SelectTrigger w={"fit-content"} asChild>
+                                            <Button paddingSize={"xxs"} variant={"none"}>
+                                                <SelectValue placeholder={"Select mode"}/>
+                                                <IconChevronDown size={13}/>
+                                            </Button>
+                                        </SelectTrigger>
+                                        <SelectPortal>
+                                            <SelectContent>
+                                                <SelectViewport>
+                                                    <SelectItem value={"ask"}>
+                                                        <SelectItemText>
+                                                            <Text>Ask</Text>
+                                                        </SelectItemText>
+                                                    </SelectItem>
+                                                    <SelectItem value={"agent"}>
+                                                        <SelectItemText>
+                                                            <Text>Agent</Text>
+                                                        </SelectItemText>
+                                                    </SelectItem>
+                                                </SelectViewport>
+                                            </SelectContent>
+                                        </SelectPortal>
+                                    </Select>
+                                    <Select defaultValue={"claude-opus-4.7"}>
+                                        <SelectTrigger w={"fit-content"} asChild>
+                                            <Button paddingSize={"xxs"} variant={"none"}>
+                                                <SelectValue placeholder={"Select modal"}/>
+                                                <IconChevronDown size={13}/>
+                                            </Button>
+                                        </SelectTrigger>
+                                        <SelectPortal>
+                                            <SelectContent>
+                                                <SelectViewport>
+                                                    <SelectItem value={"claude-opus-4.7"}>
+                                                        <SelectItemText>
+                                                            <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                                                <Text display={"flex"} align={"center"}
+                                                                      style={{gap: "0.35rem"}}>
+                                                                    <SiClaude size={13} color={"default"}/>
+                                                                    Claude Opus 4.7
+                                                                </Text>
+                                                                <Text>
+                                                                    (4.0x)
+                                                                </Text>
+                                                            </Flex>
+                                                        </SelectItemText>
+                                                    </SelectItem>
+                                                </SelectViewport>
+                                            </SelectContent>
+                                        </SelectPortal>
+                                    </Select>
+                                </Flex>
+                                <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                    <Button variant={"none"} color={"tertiary"}
+                                            onClick={() => setAiOpen(false)}>
+                                        <IconX size={13}/>
+                                    </Button>
+                                    <Button variant={"none"} color={"tertiary"}>
+                                        <IconSend size={13}/>
+                                    </Button>
+                                </Flex>
+                            </Flex>
+                        </CardSection>
+                    </Card>
+                </Flex>
 
-                            </InputWrapper>
-                        </DialogContent>
-                    </DialogPortal>
-                </Dialog>
-            ) : (null as any)}
-        </ButtonGroup>
+            </HoverCardContent>
+        </HoverCardPortal>
 
-
-    </Panel>
+    </HoverCard>;
 
 }
