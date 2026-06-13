@@ -79,7 +79,7 @@ export const FunctionNodeSquareComponent: React.FC<FunctionNodeSquareComponentPr
     }, [flowStore, selectedNode, data.flowId, node])
 
     return (
-        <Flex align={"center"} style={{position: "relative"}}>
+        <Flex align={"center"} style={{flexDirection: "column", gap: "0.35rem"}}>
             <Card
                 data-qa-selector={"flow-builder-node"}
                 key={id}
@@ -88,13 +88,13 @@ export const FunctionNodeSquareComponent: React.FC<FunctionNodeSquareComponentPr
                 display={"flex"}
                 align={"center"}
                 justify={"center"}
-                w={"100%"}
-                miw={"60px"}
-                mah={"60px"}
+                miw={"50px"}
+                mah={"50px"}
                 outline={firstItem.id === id}
                 borderColor={selectedNode?.id == id ? "info" : undefined}
                 className={`d-flow-node ${selectedNode?.id == id ? "d-flow-node--active" : ""} ${isReferenced === false ? "d-flow-node--notReferenced" : ""}`}
                 color={"primary"} style={{
+                    aspectRatio: "50/50",
                 ...(isReferenced === true ? {boxShadow: `0 0 5rem 0 ${withAlpha(data.color, 0.25)}`} : {}),
             }}>
 
@@ -133,9 +133,9 @@ export const FunctionNodeSquareComponent: React.FC<FunctionNodeSquareComponentPr
 
                 <Flex align={"center"} style={{flexDirection: "column", gap: "0.35rem", ...nodeValidationStyle}}>
                     <DisplayIcon color={data.color} size={16} style={{width: "16px", height: "16px"}}/>
-                    <Text size={"xs"}>{definition?.names?.[0]?.content ?? FALLBACK_FUNCTION_NAME}</Text>
                 </Flex>
             </Card>
+            <Text size={"xs"}>{definition?.names?.[0]?.content ?? FALLBACK_FUNCTION_NAME}</Text>
         </Flex>
     );
 })
