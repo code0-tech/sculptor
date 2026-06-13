@@ -6,7 +6,7 @@ import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FunctionNodeComponentProps} from "@edition/function/components/nodes/FunctionNodeComponent";
 import {useFlowSchema} from "@edition/flow/hooks/Flow.schema.hook";
-import {useFlowCompareStore} from "@ce/flow/hooks/Flow.compare.hook";
+import {useFlowCompareStore} from "@edition/flow/hooks/Flow.compare.hook";
 
 export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], projectId?: NamespaceProject["id"]): Node<FunctionNodeComponentProps>[] => {
 

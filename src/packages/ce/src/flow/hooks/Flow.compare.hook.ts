@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import {FlowView} from "@ce/flow/services/Flow.view";
+import {FlowView} from "@edition/flow/services/Flow.view";
 
 export const useFlowCompareStore = create<{
     flow: FlowView | null
