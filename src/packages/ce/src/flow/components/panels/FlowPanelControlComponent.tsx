@@ -11,6 +11,11 @@ import {
 import {
     Badge,
     Button,
+    Dialog,
+    DialogContent,
+    DialogOverlay,
+    DialogPortal,
+    DialogTrigger,
     Spacing,
     Text,
     Tooltip,
@@ -186,8 +191,8 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                 </TooltipPortal>
             </Tooltip>
             {module?.definitions?.nodes?.[0] ? (
-                <Tooltip>
-                    <TooltipTrigger asChild>
+                <Dialog>
+                    <DialogTrigger asChild>
                         <Button data-qa-selector={"flow-builder-control-panel-execute"}
                                 paddingSize={"xxs"}
                                 variant={"none"}
@@ -196,22 +201,26 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                                 Execute flow
                             </Text>
                         </Button>
-                    </TooltipTrigger>
-                    <TooltipPortal>
-                        <TooltipContent p={0.7} sideOffset={8} color={"secondary"}>
-                            <Text>
-                                Execute the flow to see the results <br/> in the runtime.
-                            </Text>
-                            <Spacing spacing={"xs"}/>
-                            <InputWrapper title={"Endpoint"} right={
-                                <ButtonGroup color={"primary"}>
-                                    <Button onClick={() => {
-                                        copyToClipboard(endpoint)
-                                    }} paddingSize={"xxs"} variant={"none"} color={"secondary"}>
-                                        {hasCopiedText ? <IconCheck size={13}/> : <IconCopy size={13}/>}
-                                    </Button>
-                                </ButtonGroup>
-                            }>
+                    </DialogTrigger>
+                    <DialogPortal>
+                        <DialogOverlay/>
+                        <DialogContent showCloseButton title={"Execute the flow to see the results"}>
+                            <Spacing spacing={"xl"}/>
+                            <InputWrapper title={"Endpoint"} description={"The url endpoint to execute this flow."}
+                                          left={flow?.settings?.nodes?.find(setting => setting?.flowSettingIdentifier === "httpMethod")?.value ? (
+                                              <Text size={"xs"}>
+                                                  {flow?.settings?.nodes?.find(setting => setting?.flowSettingIdentifier === "httpMethod")?.value}
+                                              </Text>
+                                          ) : undefined}
+                                          right={
+                                              <ButtonGroup color={"primary"}>
+                                                  <Button onClick={() => {
+                                                      copyToClipboard(endpoint)
+                                                  }} paddingSize={"xxs"} variant={"none"} color={"secondary"}>
+                                                      {hasCopiedText ? <IconCheck size={13}/> : <IconCopy size={13}/>}
+                                                  </Button>
+                                              </ButtonGroup>
+                                          }>
                                 <div style={{
                                     alignSelf: "center",
                                     flex: "1 1 auto"
@@ -222,11 +231,10 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                                 </div>
 
                             </InputWrapper>
-                        </TooltipContent>
-                    </TooltipPortal>
-                </Tooltip>
+                        </DialogContent>
+                    </DialogPortal>
+                </Dialog>
             ) : (null as any)}
-
         </ButtonGroup>
 
 
