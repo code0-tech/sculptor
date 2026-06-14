@@ -44,7 +44,7 @@ export default function Page() {
                 <ResizablePanel id={"2"}>
                     <ResizablePanelGroup orientation={"vertical"}>
                         <ResizablePanel id={"1"} color={"primary"}
-                                        style={{borderRadius: "1rem"}}>
+                                        style={{...(tab === "execution" ? {borderRadius: "1rem"} : {borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"})}}>
                             <FlowBuilderComponent flowId={flowId} namespaceId={undefined} projectId={undefined}/>
                         </ResizablePanel>
                         {
