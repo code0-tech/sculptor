@@ -12,7 +12,7 @@ import {
     Text, useService, useStore
 } from "@code0-tech/pictor";
 import {InputWrapper} from "@code0-tech/pictor/dist/components/form/InputWrapper";
-import {IconCheck, IconCopy} from "@tabler/icons-react";
+import {IconCheck, IconCopy, IconPlayerPlay} from "@tabler/icons-react";
 import {useParams} from "next/navigation";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
@@ -93,7 +93,7 @@ export const FlowPanelDefinitionComponent: React.FC = () => {
                                 variant={"none"}
                                 color={"tertiary"}>
                             <Text>
-                                Execute flow
+                                <IconPlayerPlay size={13}/>
                             </Text>
                         </Button>
                     </DialogTrigger>
