@@ -152,7 +152,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                                     }}
                                     color={"tertiary"}>
                                 <Text display={"flex"} align={"center"} style={{gap: "0.35rem"}}>
-                                    Add next node
+                                    Add node
                                     <Badge color={"tertiary"}>
                                         <IconArrowBigUp size={10}/>
                                         +
@@ -170,7 +170,6 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                     <Button paddingSize={"xxs"}
                             variant={"none"}
                             onClick={() => setAiOpen(true)}>
-                        <AuroraBackground showRadialGradient={false}/>
                         Ask AI
                         <Badge color={"tertiary"}>
                             <IconArrowBigUp size={10}/>
