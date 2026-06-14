@@ -11,7 +11,6 @@ import {
     ViewportPortal
 } from "@xyflow/react";
 import React from "react";
-import '@xyflow/react/dist/style.css';
 import "./FlowBuilderComponent.style.scss"
 import {FlowBuilderEdgeComponent} from "./FlowBuilderEdgeComponent";
 import {Flow, type Namespace, type NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
