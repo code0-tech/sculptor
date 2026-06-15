@@ -34,6 +34,6 @@
   }
 
   &--active {
-    box-shadow: 0 0 0 1px rgba(variables.$info, .5);
+    border: 1px solid rgba(variables.$info, .5);
   }
 }
