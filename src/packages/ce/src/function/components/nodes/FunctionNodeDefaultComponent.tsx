@@ -1,10 +1,10 @@
-import {Handle, Node, NodeProps, Position, useStore} from "@xyflow/react";
+import {Handle, Node, NodeProps, NodeToolbar, Position, useStore} from "@xyflow/react";
 import React, {CSSProperties, memo} from "react";
 import "./FunctionNodeComponent.style.scss";
 import {FunctionNodeComponentProps} from "./FunctionNodeComponent";
-import {Badge, Card, Flex, Text, useService, useStore as usePictorStore} from "@code0-tech/pictor";
+import {Badge, Button, ButtonGroup, Card, Flex, Text, useService, useStore as usePictorStore} from "@code0-tech/pictor";
 import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
-import {IconVariable} from "@tabler/icons-react";
+import {IconBackspace, IconEdit, IconSparkles, IconVariable} from "@tabler/icons-react";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {LiteralBadgeComponent} from "@edition/datatype/components/badges/LiteralBadgeComponent";
@@ -146,6 +146,56 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
             color={"primary"} style={{
             ...(isReferenced === true ? {boxShadow: `0 0 5rem 0 ${withAlpha(data.color, 0.25)}`} : {}),
         }}>
+
+            <NodeToolbar align={"center"} offset={8} position={Position.Top}>
+                <ButtonGroup color={"secondary"}>
+                    <Button variant={"none"} color={"tertiary"} paddingSize={"xxs"} onClick={(e) => {
+                        const event = new KeyboardEvent('keydown', {
+                            key: '1',
+                            code: 'Key1',
+                            shiftKey: true,
+                            bubbles: true,
+                            cancelable: true,
+                        });
+
+                        document.dispatchEvent(event);
+                        e.stopPropagation();
+                        e.preventDefault();
+                    }}>
+                        <IconEdit size={13}/>
+                    </Button>
+                    <Button variant={"none"} color={"tertiary"} paddingSize={"xxs"} onClick={(e) => {
+                        const event = new KeyboardEvent('keydown', {
+                            key: 'Backspace',
+                            code: 'Backspace',
+                            bubbles: true,
+                            cancelable: true,
+                        });
+
+                        document.dispatchEvent(event);
+                        e.stopPropagation();
+                        e.preventDefault();
+                    }}>
+                        <IconBackspace size={13}/>
+                    </Button>
+                    <Button variant={"none"} color={"tertiary"} paddingSize={"xxs"} onClick={(e) => {
+                        const event = new KeyboardEvent('keydown', {
+                            key: 'Q',
+                            code: 'KeyQ',
+                            shiftKey: true,
+                            bubbles: true,
+                            cancelable: true,
+                        });
+
+                        document.dispatchEvent(event);
+                        e.stopPropagation();
+                        e.preventDefault();
+                    }}>
+                        <IconSparkles size={13}/>
+                        <Text size={"xs"}>Ask AI</Text>
+                    </Button>
+                </ButtonGroup>
+            </NodeToolbar>
 
             <Handle
                 isConnectable={false}
