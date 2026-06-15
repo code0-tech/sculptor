@@ -1,12 +1,11 @@
 import React from "react";
 import {Flow, LiteralValue, NodeFunction, ReferenceValue, SubFlowValue} from "@code0-tech/sagittarius-graphql-types";
 import {
-    AuroraBackground,
     Badge,
     Button,
     Card,
     EditorInput,
-    Flex,
+    Flex, Progress,
     SelectContent,
     SelectItem,
     SelectItemText,
@@ -109,7 +108,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
         setAiOpen(prevState => !prevState)
         keyboardEvent.stopPropagation()
         keyboardEvent.preventDefault()
-    }, [selectedNode])
+    }, [])
 
     return <HoverCard open={aiOpen}>
         <HoverCardTrigger asChild>
@@ -129,7 +128,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                                     paddingSize={"xxs"}
                                     variant={"none"}
                                     color={"error"}>
-                                <Text>Delete node</Text>
+                                <Text>Delete current node</Text>
                                 <Badge color={"tertiary"}>
                                     <IconBackspace size={11}/>
                                 </Badge>
@@ -152,7 +151,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                                     }}
                                     color={"tertiary"}>
                                 <Text display={"flex"} align={"center"} style={{gap: "0.35rem"}}>
-                                    Add node
+                                    Add next node
                                     <Badge color={"tertiary"}>
                                         <IconArrowBigUp size={10}/>
                                         +
@@ -206,89 +205,99 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                             Generating...
                         </Text>
                     </Flex>
-                    <Card paddingSize={"xxs"} color={"secondary"} w={"var(--radix-popper-anchor-width)"}>
-                        <EditorInput
-                            wrapperComponent={{
-                                style: {
-                                    background: "transparent",
-                                    boxShadow: "none"
-                                }
-                            }}
-                            placeholder={"Ask AI anything..."}
-                            language={StreamLanguage.define({
-                                token(stream) {
-                                    stream.next()
-                                    return null;
-                                }
-                            })}/>
-                        <Spacing spacing={"xxs"}/>
-                        <CardSection>
-                            <Flex justify={"space-between"} align={"center"}>
-                                <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                    <Select defaultValue={"ask"}>
-                                        <SelectTrigger w={"fit-content"} asChild>
-                                            <Button paddingSize={"xxs"} variant={"none"}>
-                                                <SelectValue placeholder={"Select mode"}/>
-                                                <IconChevronDown size={13}/>
-                                            </Button>
-                                        </SelectTrigger>
-                                        <SelectPortal>
-                                            <SelectContent>
-                                                <SelectViewport>
-                                                    <SelectItem value={"ask"}>
-                                                        <SelectItemText>
-                                                            <Text>Ask</Text>
-                                                        </SelectItemText>
-                                                    </SelectItem>
-                                                    <SelectItem value={"agent"}>
-                                                        <SelectItemText>
-                                                            <Text>Agent</Text>
-                                                        </SelectItemText>
-                                                    </SelectItem>
-                                                </SelectViewport>
-                                            </SelectContent>
-                                        </SelectPortal>
-                                    </Select>
-                                    <Select defaultValue={"claude-opus-4.7"}>
-                                        <SelectTrigger w={"fit-content"} asChild>
-                                            <Button paddingSize={"xxs"} variant={"none"}>
-                                                <SelectValue placeholder={"Select modal"}/>
-                                                <IconChevronDown size={13}/>
-                                            </Button>
-                                        </SelectTrigger>
-                                        <SelectPortal>
-                                            <SelectContent>
-                                                <SelectViewport>
-                                                    <SelectItem value={"claude-opus-4.7"}>
-                                                        <SelectItemText>
-                                                            <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                                                <Text display={"flex"} align={"center"}
-                                                                      style={{gap: "0.35rem"}}>
-                                                                    <SiClaude size={13} color={"default"}/>
-                                                                    Claude Opus 4.7
-                                                                </Text>
-                                                                <Text>
-                                                                    (4.0x)
-                                                                </Text>
-                                                            </Flex>
-                                                        </SelectItemText>
-                                                    </SelectItem>
-                                                </SelectViewport>
-                                            </SelectContent>
-                                        </SelectPortal>
-                                    </Select>
+                    <Card paddingSize={"xs"} color={"secondary"} w={"var(--radix-popper-anchor-width)"}>
+                        <Card color={"primary"} paddingSize={"xxs"} mx={-0.6} mt={-0.6}>
+                            <EditorInput
+                                wrapperComponent={{
+                                    style: {
+                                        background: "transparent",
+                                        boxShadow: "none"
+                                    }
+                                }}
+                                placeholder={"Ask AI anything..."}
+                                language={StreamLanguage.define({
+                                    token(stream) {
+                                        stream.next()
+                                        return null;
+                                    }
+                                })}/>
+                            <Spacing spacing={"xxs"}/>
+                            <CardSection>
+                                <Flex justify={"space-between"} align={"center"}>
+                                    <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                        <Select defaultValue={"ask"}>
+                                            <SelectTrigger w={"fit-content"} asChild>
+                                                <Button paddingSize={"xxs"} variant={"none"}>
+                                                    <SelectValue placeholder={"Select mode"}/>
+                                                    <IconChevronDown size={13}/>
+                                                </Button>
+                                            </SelectTrigger>
+                                            <SelectPortal>
+                                                <SelectContent>
+                                                    <SelectViewport>
+                                                        <SelectItem value={"ask"}>
+                                                            <SelectItemText>
+                                                                <Text>Ask</Text>
+                                                            </SelectItemText>
+                                                        </SelectItem>
+                                                        <SelectItem value={"agent"}>
+                                                            <SelectItemText>
+                                                                <Text>Agent</Text>
+                                                            </SelectItemText>
+                                                        </SelectItem>
+                                                    </SelectViewport>
+                                                </SelectContent>
+                                            </SelectPortal>
+                                        </Select>
+                                        <Select defaultValue={"claude-opus-4.7"}>
+                                            <SelectTrigger w={"fit-content"} asChild>
+                                                <Button paddingSize={"xxs"} variant={"none"}>
+                                                    <SelectValue placeholder={"Select modal"}/>
+                                                    <IconChevronDown size={13}/>
+                                                </Button>
+                                            </SelectTrigger>
+                                            <SelectPortal>
+                                                <SelectContent>
+                                                    <SelectViewport>
+                                                        <SelectItem value={"claude-opus-4.7"}>
+                                                            <SelectItemText>
+                                                                <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                                                    <Text display={"flex"} align={"center"}
+                                                                          style={{gap: "0.35rem"}}>
+                                                                        <SiClaude size={13} color={"default"}/>
+                                                                        Claude Opus 4.7
+                                                                    </Text>
+                                                                    <Text>
+                                                                        (4.0x)
+                                                                    </Text>
+                                                                </Flex>
+                                                            </SelectItemText>
+                                                        </SelectItem>
+                                                    </SelectViewport>
+                                                </SelectContent>
+                                            </SelectPortal>
+                                        </Select>
+                                    </Flex>
+                                    <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                        <Button variant={"none"} color={"tertiary"}
+                                                onClick={() => setAiOpen(false)}>
+                                            <IconX size={13}/>
+                                        </Button>
+                                        <Button variant={"none"} color={"tertiary"}>
+                                            <IconSend size={13}/>
+                                        </Button>
+                                    </Flex>
                                 </Flex>
-                                <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                    <Button variant={"none"} color={"tertiary"}
-                                            onClick={() => setAiOpen(false)}>
-                                        <IconX size={13}/>
-                                    </Button>
-                                    <Button variant={"none"} color={"tertiary"}>
-                                        <IconSend size={13}/>
-                                    </Button>
-                                </Flex>
-                            </Flex>
-                        </CardSection>
+                            </CardSection>
+                        </Card>
+                        <Spacing spacing={"xs"}/>
+                        <Flex align={"center"} justify={"space-between"} p={0.35} style={{gap: "0.35rem"}}>
+                            <Text>
+                                Upgrade your license to increase your AI usage limit
+                            </Text>
+                            <Progress w={"100px"} h={"7.5px"} value={86} max={100}
+                                      color={"#70ffb2"}/>
+                        </Flex>
                     </Card>
                 </Flex>
 
