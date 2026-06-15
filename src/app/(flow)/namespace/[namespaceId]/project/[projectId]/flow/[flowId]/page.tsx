@@ -14,6 +14,8 @@ import {
 } from "@code0-tech/pictor/dist/components/resizable/Resizable";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 import {FlowExecutionResultView} from "@edition/flow/views/FlowExecutionResultView";
+import {useHotkeys} from "react-hotkeys-hook";
+import {Node, useReactFlow} from "@xyflow/react";
 
 export default function Page() {
 
@@ -23,6 +25,26 @@ export default function Page() {
     const flowId: Flow['id'] = `gid://sagittarius/Flow/${flowIndex}`
 
     const [tab, setTab] = React.useState<string | undefined>(undefined);
+    const reactFlow = useReactFlow()
+
+    useHotkeys('shift+1', (keyboardEvent) => {
+        setTab(prevState => prevState === "file" ? undefined : "file")
+        keyboardEvent.stopPropagation()
+        keyboardEvent.preventDefault()
+    }, [])
+
+    React.useEffect(() => {
+
+        const localSelectedNode = reactFlow.getNodes().filter((node) => node.selected)[0] as Node | undefined
+        if (!localSelectedNode) return
+        setTimeout(() => {
+            reactFlow.fitView({
+                nodes: [{id: localSelectedNode.id}],
+                maxZoom: reactFlow.getZoom(),
+                minZoom: 1,
+            });
+        }, 100)
+    }, [tab, reactFlow])
 
     return <ResizablePanel id={"2"}>
         <Layout layoutGap={0} showLayoutSplitter={false} rightContent={
@@ -44,7 +66,12 @@ export default function Page() {
                 <ResizablePanel id={"2"}>
                     <ResizablePanelGroup orientation={"vertical"}>
                         <ResizablePanel id={"1"} color={"primary"}
-                                        style={{...(tab === "execution" ? {borderRadius: "1rem"} : {borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"})}}>
+                                        style={{
+                                            ...(tab === "execution" ? {borderRadius: "1rem"} : {
+                                                borderTopLeftRadius: "1rem",
+                                                borderTopRightRadius: "1rem"
+                                            })
+                                        }}>
                             <FlowBuilderComponent flowId={flowId} namespaceId={undefined} projectId={undefined}/>
                         </ResizablePanel>
                         {
@@ -63,7 +90,7 @@ export default function Page() {
                 {tab === "file" && (
                     <>
                         <ResizableHandle/>
-                        <ResizablePanel id={"3"} defaultSize={"25%"} color={"primary"}
+                        <ResizablePanel id={"3"} defaultSize={"40%"} color={"primary"}
                                         style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
                             <FunctionFilesComponent flowId={flowId} namespaceId={undefined}
                                                     projectId={undefined}/>
