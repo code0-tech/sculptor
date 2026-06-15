@@ -6,7 +6,7 @@ import {useSchemaAction} from "@edition/flow/components/FlowWorkerProvider";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {NodeSchema} from "@code0-tech/triangulum";
-import {FlowView} from "@ce/flow/services/Flow.view";
+import {FlowView} from "@edition/flow/services/Flow.view";
 
 export const useFlowSchema = (
     flow: Flow['id'] | FlowView,
