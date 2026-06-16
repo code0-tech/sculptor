@@ -146,7 +146,7 @@ export const ModuleConfigurationPage: React.FC = () => {
         </Text>
         <Spacing spacing={"xs"}/>
         <Text size={"md"} hierarchy={"tertiary"}>
-            {module?.descriptions?.[0].content}<br/>
+            {module?.descriptions?.[0]?.content}<br/>
             This plugin was developed by {" "}
             <Badge color={"lightblue"}>
                 @{module?.author}
@@ -160,8 +160,8 @@ export const ModuleConfigurationPage: React.FC = () => {
                 if (!moduleConfigurationSchemas[index]) return null
 
                 return <div key={moduleConfiguration.id}>
-                    <DataTypeInputComponent description={moduleConfiguration.descriptions?.[0].content}
-                                            title={moduleConfiguration.names?.[0].content}
+                    <DataTypeInputComponent description={moduleConfiguration.descriptions?.[0]?.content}
+                                            title={moduleConfiguration.names?.[0]?.content}
                                             schema={moduleConfigurationSchemas[index]!}
                                             clearable
                                             {...inputs.getInputProps(moduleConfiguration.id!)}/>
