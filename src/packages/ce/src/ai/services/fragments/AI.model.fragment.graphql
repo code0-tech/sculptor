@@ -1,0 +1,7 @@
+fragment Model on VelorumModel {
+    __typename
+    identifier
+    name
+    tokenCost
+    types
+}
