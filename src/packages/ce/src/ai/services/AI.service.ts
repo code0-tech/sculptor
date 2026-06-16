@@ -7,9 +7,9 @@ import {
     VelorumModel,
 } from "@code0-tech/sagittarius-graphql-types";
 import {GraphqlClient} from "@core/util/graphql-client";
-import velorumModelsQuery from "./queries/AI.models.query.graphql";
 import velorumGenerateFlowMutation from "./mutations/VelorumGenerateFlow.mutation.graphql";
 import {Payload, View} from "@code0-tech/pictor/dist/utils/view";
+import velorumModelsQuery from "./queries/AI.models.query.graphql";
 
 export type Model = VelorumModel & Payload
 
