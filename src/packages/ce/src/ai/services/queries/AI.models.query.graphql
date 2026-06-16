@@ -1,0 +1,8 @@
+#import '../fragments/AI.model.fragment.graphql'
+query models {
+    velorum {
+        models {
+            ...Model
+        }
+    }
+}
