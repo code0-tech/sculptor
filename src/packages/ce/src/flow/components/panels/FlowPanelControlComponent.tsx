@@ -3,17 +3,7 @@ import {Flow, LiteralValue, NodeFunction, ReferenceValue, SubFlowValue} from "@c
 import {
     Badge,
     Button,
-    Card,
-    EditorInput,
-    Flex, Progress,
-    SelectContent,
-    SelectItem,
-    SelectItemText,
-    SelectPortal,
-    SelectTrigger,
-    SelectValue,
-    SelectViewport,
-    Spacing,
+    Flex,
     Text,
     Tooltip,
     TooltipContent,
@@ -29,22 +19,11 @@ import {SuggestionDialogComponent} from "@edition/function/components/suggestion
 import {useHotkeys} from "react-hotkeys-hook";
 import {useSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
 import {useFunctionSuggestions} from "@edition/function/hooks/Function.suggestion.hook";
-import {
-    IconArrowBigUp,
-    IconBackspace,
-    IconChevronDown,
-    IconLetterA,
-    IconLetterQ,
-    IconSend,
-    IconX
-} from "@tabler/icons-react";
+import {IconArrowBigUp, IconBackspace, IconLetterA, IconLetterQ} from "@tabler/icons-react";
 import {HoverCard, HoverCardContent, HoverCardPortal, HoverCardTrigger} from "@radix-ui/react-hover-card";
 import {ChaoticOrbit} from "ldrs/react";
-import {StreamLanguage} from "@codemirror/language";
-import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
-import {Select} from "@radix-ui/react-select";
-import {SiClaude} from "@icons-pack/react-simple-icons";
 import 'ldrs/react/ChaoticOrbit.css'
+import {AIChatComponent} from "@edition/ai/components/AIChatComponent";
 
 export interface FlowPanelControlComponentProps {
     flowId: Flow['id']
@@ -60,6 +39,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
     const flowStore = useStore(FlowService)
 
     const [, startTransition] = React.useTransition()
+    const [prompt, setPrompt] = React.useState<string>("")
     const [suggestionDialogOpen, setSuggestionDialogOpen] = React.useState(false)
     const [addNextNodeTooltipOpen, setAddNextNodeTooltipOpen] = React.useState(false)
 
@@ -205,100 +185,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                             Generating...
                         </Text>
                     </Flex>
-                    <Card paddingSize={"xs"} color={"secondary"} w={"var(--radix-popper-anchor-width)"}>
-                        <Card color={"primary"} paddingSize={"xxs"} mx={-0.6} mt={-0.6}>
-                            <EditorInput
-                                wrapperComponent={{
-                                    style: {
-                                        background: "transparent",
-                                        boxShadow: "none"
-                                    }
-                                }}
-                                placeholder={"Ask AI anything..."}
-                                language={StreamLanguage.define({
-                                    token(stream) {
-                                        stream.next()
-                                        return null;
-                                    }
-                                })}/>
-                            <Spacing spacing={"xxs"}/>
-                            <CardSection>
-                                <Flex justify={"space-between"} align={"center"}>
-                                    <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                        <Select defaultValue={"ask"}>
-                                            <SelectTrigger w={"fit-content"} asChild>
-                                                <Button paddingSize={"xxs"} variant={"none"}>
-                                                    <SelectValue placeholder={"Select mode"}/>
-                                                    <IconChevronDown size={13}/>
-                                                </Button>
-                                            </SelectTrigger>
-                                            <SelectPortal>
-                                                <SelectContent>
-                                                    <SelectViewport>
-                                                        <SelectItem value={"ask"}>
-                                                            <SelectItemText>
-                                                                <Text>Ask</Text>
-                                                            </SelectItemText>
-                                                        </SelectItem>
-                                                        <SelectItem value={"agent"}>
-                                                            <SelectItemText>
-                                                                <Text>Agent</Text>
-                                                            </SelectItemText>
-                                                        </SelectItem>
-                                                    </SelectViewport>
-                                                </SelectContent>
-                                            </SelectPortal>
-                                        </Select>
-                                        <Select defaultValue={"claude-opus-4.7"}>
-                                            <SelectTrigger w={"fit-content"} asChild>
-                                                <Button paddingSize={"xxs"} variant={"none"}>
-                                                    <SelectValue placeholder={"Select modal"}/>
-                                                    <IconChevronDown size={13}/>
-                                                </Button>
-                                            </SelectTrigger>
-                                            <SelectPortal>
-                                                <SelectContent>
-                                                    <SelectViewport>
-                                                        <SelectItem value={"claude-opus-4.7"}>
-                                                            <SelectItemText>
-                                                                <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                                                    <Text display={"flex"} align={"center"}
-                                                                          style={{gap: "0.35rem"}}>
-                                                                        <SiClaude size={13} color={"default"}/>
-                                                                        Claude Opus 4.7
-                                                                    </Text>
-                                                                    <Text>
-                                                                        (4.0x)
-                                                                    </Text>
-                                                                </Flex>
-                                                            </SelectItemText>
-                                                        </SelectItem>
-                                                    </SelectViewport>
-                                                </SelectContent>
-                                            </SelectPortal>
-                                        </Select>
-                                    </Flex>
-                                    <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                        <Button variant={"none"} color={"tertiary"}
-                                                onClick={() => setAiOpen(false)}>
-                                            <IconX size={13}/>
-                                        </Button>
-                                        <Button variant={"none"} color={"tertiary"}>
-                                            <IconSend size={13}/>
-                                        </Button>
-                                    </Flex>
-                                </Flex>
-                            </CardSection>
-                        </Card>
-                        <Spacing spacing={"xs"}/>
-                        <Flex align={"center"} justify={"space-between"} p={0.35} style={{gap: "0.35rem"}}>
-                            <Text>
-                                Upgrade your license to increase your AI usage limit
-                            </Text>
-                            <Progress w={"100px"} h={"7.5px"} value={86} max={100}
-                                      color={"#70ffb2"}/>
-                        </Flex>
-                    </Card>
+                    <AIChatComponent prompt={prompt} onPrompt={setPrompt}/>
                 </Flex>
 
             </HoverCardContent>
