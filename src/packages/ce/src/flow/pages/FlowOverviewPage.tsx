@@ -2,33 +2,22 @@ import React from "react";
 import {ResizablePanel} from "@code0-tech/pictor/dist/components/resizable/Resizable";
 import {
     AuroraBackground,
-    Button,
     Card,
     Col,
-    EditorInput,
     Flex,
-    Progress,
     ScrollArea,
     ScrollAreaScrollbar,
     ScrollAreaThumb,
     ScrollAreaViewport,
-    SelectContent,
-    SelectItem,
-    SelectItemText,
-    SelectPortal,
-    SelectTrigger,
-    SelectValue,
-    SelectViewport,
     Spacing,
-    Text
+    Text,
+    useService,
+    useStore
 } from "@code0-tech/pictor";
 import {Panel} from "@xyflow/react";
-import {StreamLanguage} from "@codemirror/language";
-import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
-import {Select} from "@radix-ui/react-select";
-import {IconChevronDown, IconSend} from "@tabler/icons-react";
-import {SiClaude} from "@icons-pack/react-simple-icons";
 import {icon, IconString} from "@core/util/icons";
+import {AIService} from "@edition/ai/services/AI.service";
+import {AIChatComponent} from "@edition/ai/components/AIChatComponent";
 
 const flowTemplates = [
     {
@@ -52,6 +41,14 @@ const flowTemplates = [
 export const FlowOverviewPage: React.FC = () => {
 
     const [prompt, setPrompt] = React.useState<string>("")
+
+    const aiService = useService(AIService)
+    const aiStore = useStore(AIService)
+
+    const models = React.useMemo(
+        () => aiService.values(),
+        [aiStore]
+    )
 
     return <ResizablePanel id={"2"} color={"primary"}
                            style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
@@ -111,98 +108,7 @@ export const FlowOverviewPage: React.FC = () => {
 
         </Flex>
         <Panel position={"bottom-center"} style={{width: "60%"}}>
-            <Card paddingSize={"xs"} color={"secondary"}>
-                <Card color={"primary"} paddingSize={"xxs"} mx={-0.6} mt={-0.6}>
-                    <EditorInput
-                        value={prompt}
-                        onChange={(value) => setPrompt(value)}
-                        wrapperComponent={{
-                            style: {
-                                background: "transparent",
-                                boxShadow: "none"
-                            }
-                        }}
-                        placeholder={"Ask AI anything..."}
-                        language={StreamLanguage.define({
-                            token(stream) {
-                                stream.next()
-                                return null;
-                            }
-                        })}/>
-                    <Spacing spacing={"xxs"}/>
-                    <CardSection>
-                        <Flex justify={"space-between"} align={"center"}>
-                            <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                <Select defaultValue={"claude-opus-4.7"}>
-                                    <SelectTrigger w={"fit-content"} asChild>
-                                        <Button paddingSize={"xxs"} variant={"none"}>
-                                            <SelectValue placeholder={"Select modal"}/>
-                                            <IconChevronDown size={13}/>
-                                        </Button>
-                                    </SelectTrigger>
-                                    <SelectPortal>
-                                        <SelectContent>
-                                            <SelectViewport>
-                                                <SelectItem value={"claude-opus-4.7"}>
-                                                    <SelectItemText>
-                                                        <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                                            <Text display={"flex"} align={"center"}
-                                                                  style={{gap: "0.35rem"}}>
-                                                                <SiClaude size={13} color={"default"}/>
-                                                                Claude Opus 4.7
-                                                            </Text>
-                                                            <Text>
-                                                                (4.0x)
-                                                            </Text>
-                                                        </Flex>
-                                                    </SelectItemText>
-                                                </SelectItem>
-                                            </SelectViewport>
-                                        </SelectContent>
-                                    </SelectPortal>
-                                </Select>
-                                <Select>
-                                    <SelectTrigger w={"fit-content"} asChild>
-                                        <Button paddingSize={"xxs"} variant={"none"}>
-                                            <SelectValue placeholder={"Let AI decide the flow type"}/>
-                                            <IconChevronDown size={13}/>
-                                        </Button>
-                                    </SelectTrigger>
-                                    <SelectPortal>
-                                        <SelectContent>
-                                            <SelectViewport>
-                                                <SelectItem value={"webhook"}>
-                                                    <SelectItemText>
-                                                        <Text>Webhook</Text>
-                                                    </SelectItemText>
-                                                </SelectItem>
-                                                <SelectItem value={"cron"}>
-                                                    <SelectItemText>
-                                                        <Text>Cron Job</Text>
-                                                    </SelectItemText>
-                                                </SelectItem>
-                                            </SelectViewport>
-                                        </SelectContent>
-                                    </SelectPortal>
-                                </Select>
-                            </Flex>
-                            <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                <Button variant={"none"} color={"tertiary"}>
-                                    <IconSend size={13}/>
-                                </Button>
-                            </Flex>
-                        </Flex>
-                    </CardSection>
-                </Card>
-                <Spacing spacing={"xs"}/>
-                <Flex align={"center"} justify={"space-between"} p={0.35} style={{gap: "0.35rem"}}>
-                    <Text>
-                        Upgrade your license to increase your AI usage limit
-                    </Text>
-                    <Progress w={"100px"} h={"7.5px"} value={86} max={100}
-                              color={"#70ffb2"}/>
-                </Flex>
-            </Card>
+            <AIChatComponent prompt={prompt} onPrompt={setPrompt}/>
         </Panel>
     </ResizablePanel>
 }
