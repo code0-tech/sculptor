@@ -74,9 +74,9 @@ export const useMappedSuggestions = (suggestions: (NodeFunction | SubFlowValue |
                 value: suggestion,
                 icon: suggestion.functionDefinition?.displayIcon,
                 displayMessage: suggestion.functionDefinition?.names?.[0]?.content,
-                aliases: suggestion.functionDefinition?.aliases?.[0].content?.split(";"),
+                aliases: (suggestion.functionDefinition?.aliases?.[0]?.content ?? "")?.split(";"),
                 definitionSource: suggestion.functionDefinition.runtimeModule?.identifier,
-                description: suggestion.functionDefinition?.descriptions?.[0].content,
+                description: suggestion.functionDefinition?.descriptions?.[0]?.content ?? "",
             }
         }
 
