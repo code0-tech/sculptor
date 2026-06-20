@@ -342,10 +342,11 @@ export const FlowExecutionResultView: React.FC = () => {
 
                                                         <>
                                                             <Text size={"md"}>
-                                                                {item.type === "node" ? "Parameters" : "Input"}
+                                                                {item.type === "node" || item.type === "function" ? "Parameters" : "Input"}
                                                             </Text>
-                                                            {item.type === "node" ? item.data.input?.map((input: ExecutionParameterResult, index: number) => {
+                                                            {item.type === "node" || item.type === "function" ? item.data.input?.map((input: ExecutionParameterResult, index: number) => {
 
+                                                                //TODO: for item.type === function this is wrong
                                                                 const parameter: ParameterDefinition = item?.data?.payload?.functionDefinition?.parameterDefinitions?.nodes?.[index]
 
                                                                 return <div key={input.id}>
