@@ -1,5 +1,5 @@
 mutation generateFlow($projectId: NamespaceProjectID!, $modelIdentifier: String!, $prompt: String!, $flowId: FlowID) {
-    velorumGenerateFlow(input: {
+    aiGenerateFlow(input: {
         projectId: $projectId
         modelIdentifier: $modelIdentifier
         prompt: $prompt

@@ -1,5 +1,78 @@
 subscription generateFlow($executionIdentifier: String!) {
-    velorumGenerateFlow(executionIdentifier: $executionIdentifier) {
-        flow
+    aiGenerateFlow(executionIdentifier: $executionIdentifier) {
+        flow {
+            __typename
+            name
+            startingNodeId
+            settings {
+                __typename
+                id
+                value
+                cast
+                flowSettingIdentifier
+            }
+            type {
+                __typename
+                id
+                identifier
+            }
+            nodes {
+                __typename
+                id
+                nextNodeId
+                parameters {
+                    __typename
+                    id
+                    cast
+                    value {
+                        __typename
+                        ... on AiGenerationLiteralValue {
+                            __typename
+                            value
+                        }
+                        ... on AiGenerationReferenceValue {
+                            __typename
+                            id
+                            nodeFunctionId
+                            inputIndex
+                            inputTypeIdentifier
+                            parameterIndex
+                            referencePath {
+                                __typename
+                                path
+                                arrayIndex
+                            }
+                        }
+                        ... on AiGenerationSubFlowValue {
+                            __typename
+                            startingNodeId
+                            signature
+                            settings {
+                                __typename
+                                identifier
+                                defaultValue
+                                hidden
+                                optional
+                            }
+                            functionDefinition {
+                                __typename
+                                id
+                                identifier
+                            }
+                        }
+                    }
+                    parameterDefinition {
+                        __typename
+                        id
+                        identifier
+                    }
+                }
+                functionDefinition {
+                    __typename
+                    id
+                    identifier
+                }
+            }
+        }
     }
 }

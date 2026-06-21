@@ -1,4 +1,4 @@
-fragment Model on VelorumModel {
+fragment Model on AiModel {
     __typename
     identifier
     name

@@ -1,17 +1,16 @@
 import {ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor";
 import {
+    AiGenerateFlowInput, AiGenerateFlowPayload,
+    AiModel,
     Mutation,
-    Query,
-    VelorumGenerateFlowInput,
-    VelorumGenerateFlowPayload,
-    VelorumModel,
+    Query
 } from "@code0-tech/sagittarius-graphql-types";
 import {GraphqlClient} from "@core/util/graphql-client";
 import velorumGenerateFlowMutation from "./mutations/AI.generateFlow.mutation.graphql";
 import {Payload, View} from "@code0-tech/pictor/dist/utils/view";
 import velorumModelsQuery from "./queries/AI.models.query.graphql";
 
-export type Model = VelorumModel & Payload
+export type Model = AiModel & Payload
 
 export class AIService extends ReactiveArrayService<Model> {
 
@@ -23,14 +22,14 @@ export class AIService extends ReactiveArrayService<Model> {
         this.client = client
     }
 
-    values(): VelorumModel[] {
+    values(): Model[] {
         const models = super.values()
         if (models.length > 0) return models
 
         this.client.query<Query>({
             query: velorumModelsQuery,
         }).then(result => {
-            const models = result.data?.velorum?.models ?? []
+            const models = result.data?.ai?.models ?? []
             models.forEach(model => {
                 if (model && !this.hasById(model.identifier)) {
                     this.set(this.i++, new View(model as Model))
@@ -41,17 +40,17 @@ export class AIService extends ReactiveArrayService<Model> {
         return super.values()
     }
 
-    hasById(identifier: VelorumModel["identifier"]): boolean {
+    hasById(identifier: Model["identifier"]): boolean {
         return super.values().some(m => m.identifier === identifier)
     }
 
-    async generateFlow(payload: VelorumGenerateFlowInput): Promise<VelorumGenerateFlowPayload | undefined> {
-        const result = await this.client.mutate<Mutation, VelorumGenerateFlowInput>({
+    async generateFlow(payload: AiGenerateFlowInput): Promise<AiGenerateFlowPayload | undefined> {
+        const result = await this.client.mutate<Mutation, AiGenerateFlowInput>({
             mutation: velorumGenerateFlowMutation,
             variables: {...payload}
         })
 
-        return result.data?.velorumGenerateFlow ?? undefined
+        return result.data?.aiGenerateFlow ?? undefined
     }
 
 }
