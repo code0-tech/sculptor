@@ -73,7 +73,6 @@ export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsCompo
                             }
 
                             if (suggest.__typename === "SubFlowValue") {
-                                console.log(suggest)
                                 return <MenuItem onSelect={() => onSelect?.(suggest)}>
                                     <NodeBadgeComponent value={suggest}/>
                                 </MenuItem>

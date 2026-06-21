@@ -3,6 +3,7 @@ import path from "node:path";
 
 const EDITION = process.env.EDITION ?? "ce";
 const SAGITTARIUS_GRAPHQL_URL = process.env.SAGITTARIUS_GRAPHQL_URL ?? 'http://localhost:3010/graphql';
+const SAGITTARIUS_CABLE_URL = process.env.SAGITTARIUS_CABLE_URL ?? 'http://localhost:3010/cable';
 
 const cspHeader = `
     default-src 'self';
@@ -15,7 +16,7 @@ const cspHeader = `
     form-action 'self';
     frame-ancestors 'none';
     worker-src 'self' blob: data: *;
-    connect-src 'self' ${SAGITTARIUS_GRAPHQL_URL} ${process.env.NEXT_PUBLIC_OTEL_LOGS_ENDPOINT} ${process.env.NEXT_PUBLIC_OTEL_TRACES_ENDPOINT};
+    connect-src 'self' ${SAGITTARIUS_GRAPHQL_URL} ${SAGITTARIUS_CABLE_URL.replace("http", "ws")} ${process.env.NEXT_PUBLIC_OTEL_LOGS_ENDPOINT} ${process.env.NEXT_PUBLIC_OTEL_TRACES_ENDPOINT};
 `
 
 const nextConfig: NextConfig = {
@@ -55,6 +56,10 @@ const nextConfig: NextConfig = {
             {
                 source: '/graphql',
                 destination: SAGITTARIUS_GRAPHQL_URL // Proxy to Backend
+            },
+            {
+                source: '/cable',
+                destination: SAGITTARIUS_CABLE_URL // Proxy to Backend
             }
         ];
     }

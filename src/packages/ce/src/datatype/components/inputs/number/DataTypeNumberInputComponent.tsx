@@ -24,7 +24,6 @@ export const DataTypeNumberInputComponent: React.FC<DataTypeNumberInputComponent
     const onChangeDebounced = useDebouncedCallback((value: string | LiteralValue | SubFlowValue | NodeFunction | ReferenceValue | undefined) => {
 
         if (typeof value === "string") {
-            console.log(value)
             formValidation?.setValue?.(value ? {__typename: "LiteralValue", value: !Number.isNaN(Number(value)) ? Number(value) : value} : undefined)
             onChange?.(value ? {__typename: "LiteralValue", value: !Number.isNaN(Number(value)) ? Number(value) : value} : undefined)
         } else {

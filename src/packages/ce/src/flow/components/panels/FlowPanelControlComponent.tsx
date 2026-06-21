@@ -1,5 +1,13 @@
 import React from "react";
-import {Flow, LiteralValue, NodeFunction, ReferenceValue, SubFlowValue} from "@code0-tech/sagittarius-graphql-types";
+import {
+    AiGenerateFlowSubscriptionPayload,
+    Flow,
+    LiteralValue, Namespace,
+    NamespaceProject,
+    NodeFunction,
+    ReferenceValue,
+    SubFlowValue
+} from "@code0-tech/sagittarius-graphql-types";
 import {
     Badge,
     Button,
@@ -24,15 +32,19 @@ import {HoverCard, HoverCardContent, HoverCardPortal, HoverCardTrigger} from "@r
 import {ChaoticOrbit} from "ldrs/react";
 import 'ldrs/react/ChaoticOrbit.css'
 import {AIChatComponent} from "@edition/ai/components/AIChatComponent";
+import {mapAiGenerationFlowToFlowInput} from "@edition/ai/util/AI.flow.mapper";
+import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 
 export interface FlowPanelControlComponentProps {
+    namespaceId: Namespace['id']
+    projectId: NamespaceProject['id']
     flowId: Flow['id']
 }
 
 export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps> = (props) => {
 
     //props
-    const {flowId} = props
+    const {namespaceId, projectId, flowId} = props
 
     //services and stores
     const flowService = useService(FlowService)
@@ -55,6 +67,27 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
             await flowService.deleteNodeById(flowId, selectedNode?.id as NodeFunction['id'])
         })
     }, [selectedNode, flowService, flowStore])
+
+    const onAIData = React.useCallback((payload: AiGenerateFlowSubscriptionPayload) => {
+        const aiFlow = payload?.flow
+        if (!aiFlow) return
+
+        const existingNames = (flowService.values({namespaceId, projectId}) ?? [])
+            .map(f => f.name)
+            .filter((n): n is string => !!n)
+
+        const flowInput = mapAiGenerationFlowToFlowInput(aiFlow, {existingNames})
+        if (!flowInput) return
+
+        flowService.flowUpdate({
+            flowId: flowId!,
+            flowInput: flowInput,
+        }).then(result => {
+            if ((result?.errors?.length ?? 0) <= 0) {
+                addIslandSuccessNotification({message: "Created flow"})
+            }
+        })
+    }, [flowStore, namespaceId, projectId])
 
     const addNodeToFlow = React.useCallback((suggestion: NodeFunction | ReferenceValue | LiteralValue | SubFlowValue) => {
         if (flowId && suggestion.__typename === "NodeFunction" && selectedNode?.id.includes("NodeFunction")) {
@@ -175,17 +208,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                             </Button>
                         </ButtonGroup>
                     </Flex>
-                    <Flex align={"center"} style={{gap: "0.35rem"}}>
-                        <ChaoticOrbit
-                            size="16"
-                            speed="1.5"
-                            color="white"
-                        />
-                        <Text>
-                            Generating...
-                        </Text>
-                    </Flex>
-                    <AIChatComponent prompt={prompt} onPrompt={setPrompt}/>
+                    <AIChatComponent projectId={projectId} flowId={flowId} prompt={prompt} onPrompt={setPrompt}/>
                 </Flex>
 
             </HoverCardContent>

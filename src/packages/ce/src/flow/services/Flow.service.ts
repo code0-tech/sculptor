@@ -24,6 +24,7 @@ import {
 } from "@code0-tech/sagittarius-graphql-types";
 import {GraphqlClient} from "@core/util/graphql-client";
 import flowsQuery from "@edition/flow/services/queries/Flows.query.graphql";
+import flowQuery from "@edition/flow/services/queries/Flow.query.graphql";
 import flowCreateMutation from "@edition/flow/services/mutations/Flow.create.mutation.graphql";
 import flowDeleteMutation from "@edition/flow/services/mutations/Flow.delete.mutation.graphql";
 import flowUpdateMutation from "@edition/flow/services/mutations/Flow.update.mutation.graphql";
@@ -408,10 +409,35 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         })
 
         if (result.data && result.data.namespacesProjectsFlowsCreate && result.data.namespacesProjectsFlowsCreate.flow) {
-            const flow = result.data.namespacesProjectsFlowsCreate.flow
-            if (!this.hasById(flow.id)) {
-                flow.nodes = {nodes: []} //TODO: to avoid issues, when fixed in pictor
-                this.add(new View(flow))
+            const mutationFlow = result.data.namespacesProjectsFlowsCreate.flow
+            if (!this.hasById(mutationFlow.id) && mutationFlow?.project?.id && mutationFlow?.project?.namespace?.id) {
+
+                this.client.query<Query>({
+                    query: flowQuery,
+                    variables: {
+                        namespaceId: mutationFlow.project.namespace.id,
+                        projectId: mutationFlow?.project.id,
+                        flowId: mutationFlow.id,
+
+                        firstNode: 50,
+                        afterNode: null,
+
+                        firstNodeParameter: 50,
+                        afterNodeParameter: null,
+
+                        firstSetting: 50,
+                        afterSetting: null,
+
+                        firstNodeResult: 50,
+                        afterNodeResult: null
+                    }
+                }).then(res => {
+                    const flow = res.data?.namespace?.project?.flow
+                    this.add(new View(flow!))
+                })
+            } else {
+                mutationFlow.nodes = {nodes: []}
+                this.add(new View(mutationFlow))
             }
         }
 

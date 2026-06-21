@@ -16,8 +16,16 @@ import {
 } from "@code0-tech/pictor";
 import {Panel} from "@xyflow/react";
 import {icon, IconString} from "@core/util/icons";
-import {AIService} from "@edition/ai/services/AI.service";
 import {AIChatComponent} from "@edition/ai/components/AIChatComponent";
+import {useParams} from "next/navigation";
+import {
+    AiGenerateFlowSubscriptionPayload,
+    Namespace,
+    NamespaceProject
+} from "@code0-tech/sagittarius-graphql-types";
+import {FlowService} from "@edition/flow/services/Flow.service";
+import {mapAiGenerationFlowToFlowInput} from "@edition/ai/util/AI.flow.mapper";
+import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 
 const flowTemplates = [
     {
@@ -40,15 +48,37 @@ const flowTemplates = [
 
 export const FlowOverviewPage: React.FC = () => {
 
+    const params = useParams()
     const [prompt, setPrompt] = React.useState<string>("")
 
-    const aiService = useService(AIService)
-    const aiStore = useStore(AIService)
+    const namespaceIndex = params.namespaceId as any as number
+    const projectIndex = params.projectId as any as number
+    const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
+    const projectId: NamespaceProject['id'] = `gid://sagittarius/NamespaceProject/${projectIndex}`
 
-    const models = React.useMemo(
-        () => aiService.values(),
-        [aiStore]
-    )
+    const flowService = useService(FlowService)
+    const flowStore = useStore(FlowService)
+
+    const onAIData = React.useCallback((payload: AiGenerateFlowSubscriptionPayload) => {
+        const aiFlow = payload?.flow
+        if (!aiFlow) return
+
+        const existingNames = (flowService.values({namespaceId, projectId}) ?? [])
+            .map(f => f.name)
+            .filter((n): n is string => !!n)
+
+        const flowInput = mapAiGenerationFlowToFlowInput(aiFlow, {existingNames})
+        if (!flowInput) return
+
+        flowService.flowCreate({
+            flow: flowInput,
+            projectId: projectId,
+        }).then(result => {
+            if ((result?.errors?.length ?? 0) <= 0) {
+                addIslandSuccessNotification({message: "Created flow"})
+            }
+        })
+    }, [flowService, flowStore, namespaceId, projectId])
 
     return <ResizablePanel id={"2"} color={"primary"}
                            style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
@@ -108,7 +138,7 @@ export const FlowOverviewPage: React.FC = () => {
 
         </Flex>
         <Panel position={"bottom-center"} style={{width: "60%"}}>
-            <AIChatComponent prompt={prompt} onPrompt={setPrompt}/>
+            <AIChatComponent projectId={projectId} prompt={prompt} onPrompt={setPrompt} onData={onAIData}/>
         </Panel>
     </ResizablePanel>
 }

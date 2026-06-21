@@ -22,31 +22,103 @@ import Link from "next/link";
 import {StreamLanguage} from "@codemirror/language";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {Select} from "@radix-ui/react-select";
-import {IconChevronDown, IconSend, IconSparkles2Filled} from "@tabler/icons-react";
+import {IconChevronDown, IconPlayerStop, IconSend, IconSparkles2Filled} from "@tabler/icons-react";
 import {AIService} from "@edition/ai/services/AI.service";
 import {motion} from "framer-motion";
+import {Flow, NamespaceProject, Subscription} from "@code0-tech/sagittarius-graphql-types";
+import {useSubscription} from "@apollo/client/react";
+import generateFlowSubscription from "@edition/ai/services/subscriptions/AI.generateFlow.subscription.graphql"
+
+const GENERATING_VARIANTS = [
+    "Generating...",
+    "Thinking...",
+    "Analyzing your prompt...",
+    "Composing flow...",
+    "Crafting nodes...",
+    "Wiring it up...",
+    "Almost there..."
+]
 
 export interface AIChatComponentProps {
+    projectId: NamespaceProject['id']
+    flowId?: Flow['id']
     onPrompt?: (value: string) => void
     prompt?: string
+    onData?: (data: any) => void
+
 }
 
 export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
 
-    const {onPrompt, prompt = ""} = props
+    const {projectId, flowId, onPrompt, prompt = "", onData} = props
 
-    const [promptState, setPromptState] = React.useState<string>(prompt)
     const aiService = useService(AIService)
     const aiStore = useStore(AIService)
+
+    const [promptState, setPromptState] = React.useState<string>(prompt)
+    const [model, setModel] = React.useState<string | undefined>(undefined)
+    const [executionIdentifier, setExecutionIdentifier] = React.useState<string | null>(null)
+    const [isAIActive, setIsAIActive] = React.useState(false)
+    const [aiVariantIndex, setAiVariantIndex] = React.useState(0)
+    const [aiErrorMessage, setAiErrorMessage] = React.useState<string | null>(null)
 
     const models = React.useMemo(
         () => aiService.values(),
         [aiStore]
     )
 
-    const onSend = React.useCallback(() => {
 
+    const {data} = useSubscription<Subscription>(generateFlowSubscription, {
+        variables: {executionIdentifier: executionIdentifier},
+        skip: !executionIdentifier,
+        onData: (data) => {
+            setIsAIActive(true)
+            if (data.data.data?.aiGenerateFlow?.flow) {
+                onData?.(data.data.data?.aiGenerateFlow)
+                setPromptState("")
+            } else if (data.data.data?.aiGenerateFlow?.flow === null) {
+                setExecutionIdentifier(null)
+                setAiErrorMessage("Generation failed. Try another model.")
+            }
+        },
+        onComplete: () => setIsAIActive(false),
+        onError: () => {
+            setIsAIActive(false)
+            setAiErrorMessage("Generation failed. Try another model.")
+        },
+    })
+
+    const aiLoading = React.useMemo(
+        () => ((!data || Object.keys(data).length === 0) && executionIdentifier && isAIActive),
+        [executionIdentifier, data, isAIActive]
+    )
+
+    const onSend = React.useCallback(() => {
+        aiService.generateFlow({
+            prompt: promptState,
+            projectId: projectId!,
+            modelIdentifier: model!,
+            flowId: flowId,
+        }).then(payload => {
+            if ((payload?.errors?.length ?? 0) <= 0) {
+                setExecutionIdentifier(payload?.executionIdentifier ?? null)
+            }
+        })
+    }, [aiService, model, promptState])
+
+    React.useEffect(() => {
+        const id = setInterval(
+            () => setAiVariantIndex(i => (i + 1) % GENERATING_VARIANTS.length),
+            4000
+        )
+        return () => clearInterval(id)
     }, [])
+
+    React.useEffect(() => {
+        setModel(models.length > 0
+            ? models.reduce((max, obj) => (obj?.tokenCost ?? 1) > (max?.tokenCost ?? 1) ? obj : max)?.identifier ?? undefined
+            : undefined)
+    }, [models])
 
     React.useEffect(
         () => setPromptState(prompt),
@@ -100,22 +172,60 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
                         </Card>
                     )
                 }
-                <EditorInput
-                    value={promptState}
-                    onChange={(value) => onPrompt?.(value)}
-                    wrapperComponent={{
-                        style: {
-                            background: "transparent",
-                            boxShadow: "none"
-                        }
-                    }}
-                    placeholder={"Ask AI anything..."}
-                    language={StreamLanguage.define({
-                        token(stream) {
-                            stream.next()
-                            return null;
-                        }
-                    })}/>
+                {
+                    aiLoading ? (
+                        <div
+                            style={{
+                                padding: "0.7rem",
+                                position: "relative",
+                                overflow: "hidden",
+                                height: "2.3rem",
+                            }}
+                        >
+                            <motion.div
+                                key={GENERATING_VARIANTS[aiVariantIndex]}
+                                initial={{y: 18, opacity: 0}}
+                                animate={{y: 0, opacity: 1}}
+                                exit={{y: -18, opacity: 0}}
+                                transition={{duration: 0.45, ease: [0.4, 0, 0.4, 1]}}
+                            >
+                                <motion.div
+                                    style={{
+                                        display: "block",
+                                        backgroundImage:
+                                            "linear-gradient(90deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.25) 40%, rgba(255,255,255,1) 50%, rgba(255,255,255,0.25) 60%, rgba(255,255,255,0.25) 100%)",
+                                        backgroundSize: "200% 100%",
+                                        WebkitBackgroundClip: "text",
+                                        backgroundClip: "text",
+                                        WebkitTextFillColor: "transparent",
+                                        color: "transparent",
+                                    }}
+                                    animate={{backgroundPosition: ["200% 0%", "-200% 0%"]}}
+                                    transition={{duration: 3, ease: "linear", repeat: Infinity}}
+                                >
+                                    <Text>{GENERATING_VARIANTS[aiVariantIndex]}</Text>
+                                </motion.div>
+                            </motion.div>
+                        </div>
+                    ) : (
+                        <EditorInput
+                            value={promptState}
+                            onChange={(value) => onPrompt?.(value)}
+                            wrapperComponent={{
+                                style: {
+                                    background: "transparent",
+                                    boxShadow: "none"
+                                }
+                            }}
+                            placeholder={"Ask AI anything..."}
+                            language={StreamLanguage.define({
+                                token(stream) {
+                                    stream.next()
+                                    return null;
+                                }
+                            })}/>
+                    )
+                }
                 <Spacing spacing={"xxs"}/>
                 <CardSection>
                     <Flex justify={"space-between"} align={"center"}>
@@ -141,11 +251,7 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
                                     </SelectContent>
                                 </SelectPortal>
                             </Select>
-                            <Select key={models.length} defaultValue={
-                                models.length > 0
-                                    ? models.reduce((max, obj) => (obj?.tokenCost ?? 1) > (max?.tokenCost ?? 1) ? obj : max)?.identifier ?? undefined
-                                    : undefined
-                            }>
+                            <Select value={model} onValueChange={setModel} key={models.length}>
                                 <SelectTrigger w={"fit-content"} asChild>
                                     <Button paddingSize={"xxs"} variant={"none"}>
                                         <SelectValue placeholder={"Select modal"}/>
@@ -177,9 +283,20 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
                             </Select>
                         </Flex>
                         <Flex align={"center"} style={{gap: "0.35rem"}}>
-                            <Button variant={"none"} color={"secondary"}>
-                                <IconSend size={13}/>
-                            </Button>
+                            {!aiLoading && aiErrorMessage ? (
+                                <Text c={"#D90429"}>
+                                    {aiErrorMessage}
+                                </Text>
+                            ) : null}
+                            {aiLoading ? (
+                                <Button onClick={() => setExecutionIdentifier(null)} color={"secondary"}>
+                                    <IconPlayerStop size={13}/>
+                                </Button>
+                            ) : (
+                                <Button onClick={onSend} variant={"none"} color={"secondary"}>
+                                    <IconSend size={13}/>
+                                </Button>
+                            )}
                         </Flex>
                     </Flex>
                 </CardSection>
@@ -196,24 +313,24 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
                     mass: 0.8
                 }}
             >
-            <Spacing spacing={"xs"}/>
-            {
-                models.length > 0 ? (
-                    <Flex align={"center"} justify={"space-between"} p={0.35} style={{gap: "0.35rem"}}>
-                        <Text>
-                            Upgrade your license to increase your AI usage limit
-                        </Text>
-                        <Progress w={"100px"} h={"7.5px"} value={0} max={100}
-                                  color={"#70ffb2"}/>
-                    </Flex>
-                ) : (
-                    <Flex align={"center"} justify={"center"} p={0.35}>
-                        <Text>
-                            You currently don't have AI features enabled or don't have any models available
-                        </Text>
-                    </Flex>
-                )
-            }
+                <Spacing spacing={"xs"}/>
+                {
+                    models.length > 0 ? (
+                        <Flex align={"center"} justify={"space-between"} p={0.35} style={{gap: "0.35rem"}}>
+                            <Text>
+                                Upgrade your license to increase your AI usage limit
+                            </Text>
+                            <Progress w={"100px"} h={"7.5px"} value={0} max={100}
+                                      color={"#70ffb2"}/>
+                        </Flex>
+                    ) : (
+                        <Flex align={"center"} justify={"center"} p={0.35}>
+                            <Text>
+                                You currently don't have AI features enabled or don't have any models available
+                            </Text>
+                        </Flex>
+                    )
+                }
             </motion.div>
         </Card>
     </motion.div>
