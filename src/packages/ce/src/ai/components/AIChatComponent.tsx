@@ -207,6 +207,7 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
                         </div>
                     ) : (
                         <EditorInput
+                            key={prompt}
                             value={prompt}
                             onChange={(value) => {
                                 setPromptState(value)
