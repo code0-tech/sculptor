@@ -43,6 +43,8 @@ export const useFlowSchema = (
         if (dataTypes.length <= 0) return
         if (functions.length <= 0) return
 
+        let cancelled = false
+
         const triggerSchema = execute({
             flow: flowView,
             dataTypes,
@@ -59,9 +61,13 @@ export const useFlowSchema = (
         })
 
         Promise.all([triggerSchema!, ...schemas!]).then((value) => {
+            if (cancelled) return
             setSchema(value as NodeSchema[][])
         })
 
+        return () => {
+            cancelled = true
+        }
     }, [functions.length, dataTypes.length, flowStore, flowView?.editedAt, flowView?.nodes?.nodes?.length])
 
     return schema
