@@ -61,14 +61,14 @@ export const FlowOverviewPage: React.FC = () => {
 
     const onAIData = React.useCallback((payload: AiGenerateFlowSubscriptionPayload) => {
         const aiFlow = payload?.flow
-        if (!aiFlow) return
+        if (!aiFlow) return "No flow returned. Try again."
 
         const existingNames = (flowService.values({namespaceId, projectId}) ?? [])
             .map(f => f.name)
             .filter((n): n is string => !!n)
 
         const flowInput = mapAiGenerationFlowToFlowInput(aiFlow, {existingNames})
-        if (!flowInput) return
+        if (!flowInput) return "Invalid flow type. Try another model."
 
         flowService.flowCreate({
             flow: flowInput,

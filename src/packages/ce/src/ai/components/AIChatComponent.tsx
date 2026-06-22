@@ -43,7 +43,7 @@ export interface AIChatComponentProps {
     projectId: NamespaceProject['id']
     flowId?: Flow['id']
     prompt?: string
-    onData?: (data: any) => void
+    onData?: (data: any) => string | void
 
 }
 
@@ -72,8 +72,13 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
         onData: (data) => {
             setIsAIActive(true)
             if (data.data.data?.aiGenerateFlow?.flow) {
-                onData?.(data.data.data?.aiGenerateFlow)
-                setPromptState("")
+                const result = onData?.(data.data.data?.aiGenerateFlow)
+                if (typeof result === "string") {
+                    setAiErrorMessage(result)
+                } else {
+                    setPromptState("")
+                }
+                setExecutionIdentifier(null)
             } else if (data.data.data?.aiGenerateFlow?.flow === null) {
                 setExecutionIdentifier(null)
                 setAiErrorMessage("Generation failed. Try another model.")
@@ -83,6 +88,7 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
         onError: () => {
             setIsAIActive(false)
             setAiErrorMessage("Generation failed. Try another model.")
+            setExecutionIdentifier(null)
         },
     })
 

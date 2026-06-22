@@ -74,10 +74,10 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
 
     const onAIData = React.useCallback((payload: AiGenerateFlowSubscriptionPayload) => {
         const aiFlow = payload?.flow
-        if (!aiFlow) return
+        if (!aiFlow) return "No flow returned. Try again."
 
         const currentFlow = flowService.getById(flowId, {namespaceId, projectId})
-        if (!currentFlow) return
+        if (!currentFlow) return "Flow not found. Try again."
 
         const currentFlowName = currentFlow.name ?? undefined
         const existingNames = (flowService.values({namespaceId, projectId}) ?? [])
@@ -85,7 +85,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
             .filter((n): n is string => !!n && n !== currentFlowName)
 
         const flowInput = mapAiGenerationFlowToFlowInput(aiFlow, {existingNames})
-        if (!flowInput) return
+        if (!flowInput) return "Invalid flow type. Try another model."
 
         const oldFlowSnapshot: FlowView = JSON.parse(JSON.stringify(currentFlow))
 
