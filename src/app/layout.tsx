@@ -7,7 +7,8 @@ import {
     HttpLink,
     InMemoryCache,
     Observable,
-    ServerError
+    ServerError,
+    split,
 } from "@apollo/client";
 import {ApolloProvider} from "@apollo/client/react";
 import React, {Suspense} from "react";
@@ -20,6 +21,8 @@ import {Error} from "@code0-tech/sagittarius-graphql-types";
 import {Inter} from 'next/font/google'
 import {GraphQLFormattedError} from "graphql/error";
 import {addIslandErrorNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {createConsumer} from "@rails/actioncable";
+import ActionCableLink from "graphql-ruby-client/subscriptions/ActionCableLink";
 
 /**
  * Load the Inter font with Latin subset and swap display strategy
@@ -170,21 +173,48 @@ export default function RootLayout({children}: Readonly<{ children: React.ReactN
     /**
      * Apollo Client instance with configured links and cache
      */
-    const client = React.useMemo(() => new ApolloClient({
-        cache: new InMemoryCache(),
-        link: ApolloLink.from([errorLink, authMiddleware, responseHandlerLink, new HttpLink({uri: "/graphql"})]),
-        defaultOptions: {
-            watchQuery: {
-                errorPolicy: "all",
+    const client = React.useMemo(() => {
+        const cable = createConsumer("/cable")
+
+        const getToken = () => {
+            try {
+                const raw = localStorage.getItem("ide_code-zero_session")
+                return raw ? JSON.parse(raw)?.token : undefined
+            } catch {
+                return undefined
+            }
+        }
+
+        const hasSubscriptionOperation = ({query: {definitions}}: any) => {
+            return definitions.some(
+                ({kind, operation}: any) => kind === "OperationDefinition" && operation === "subscription"
+            )
+        }
+
+        const actionCableLink = new ActionCableLink({
+            cable,
+            connectionParams: () => {
+                const token = getToken()
+                return token ? {token: `Session ${token}`} : {}
             },
-            query: {
-                errorPolicy: "all",
+        })
+
+        const link = ApolloLink.split(
+            hasSubscriptionOperation,
+            actionCableLink,
+            ApolloLink.from([errorLink, authMiddleware, responseHandlerLink, new HttpLink({uri: "/graphql"})]),
+        )
+
+        return new ApolloClient({
+            cache: new InMemoryCache(),
+            link,
+            defaultOptions: {
+                watchQuery: {errorPolicy: "all"},
+                query: {errorPolicy: "all"},
+                mutate: {errorPolicy: "all"},
             },
-            mutate: {
-                errorPolicy: "all",
-            },
-        },
-    }), [authMiddleware])
+        })
+    }, [authMiddleware])
 
     return React.useMemo(() => {
         return <html suppressHydrationWarning>

@@ -113,7 +113,7 @@ export const ModulesPage: React.FC = () => {
                                             </Badge>
                                         </Flex>
                                         <Text hierarchy={"tertiary"}>
-                                            {module.descriptions?.[0].content} <br/>
+                                            {module.descriptions?.[0]?.content} <br/>
                                             This plugin was developed by
                                             <Badge color={"lightblue"}>
                                                 @{module.author}

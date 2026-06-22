@@ -1,0 +1,18 @@
+mutation generateFlow($projectId: NamespaceProjectID!, $modelIdentifier: String!, $prompt: String!, $flowId: FlowID) {
+    aiGenerateFlow(input: {
+        projectId: $projectId
+        modelIdentifier: $modelIdentifier
+        prompt: $prompt
+        flowId: $flowId
+    }) {
+        errors {
+            ...on Error {
+                errorCode
+                details {
+                    __typename
+                }
+            }
+        }
+        executionIdentifier
+    }
+}

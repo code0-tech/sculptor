@@ -1,10 +1,19 @@
 import React, {CSSProperties, memo} from "react";
-import {Handle, Node, NodeProps, Position} from "@xyflow/react";
-import {Badge, Card, Flex, Text, useService, useStore, useStore as usePictorStore} from "@code0-tech/pictor";
+import {Handle, Node, NodeProps, NodeToolbar, Position} from "@xyflow/react";
+import {
+    Button,
+    ButtonGroup,
+    Card,
+    Flex,
+    Text,
+    useService,
+    useStore,
+    useStore as usePictorStore
+} from "@code0-tech/pictor";
 import {FunctionNodeComponentProps} from "@edition/function/components/nodes/FunctionNodeComponent";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import {IconVariable} from "@tabler/icons-react";
+import {IconEdit, IconSparkles, IconVariable} from "@tabler/icons-react";
 import {Namespace, NamespaceProject, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {icon, IconString} from "@core/util/icons";
 import {FALLBACK_FLOW_TYPE_DISPLAY_MESSAGE, FALLBACK_FLOW_TYPE_NAME} from "@core/util/fallback-translations";
@@ -12,8 +21,6 @@ import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
 import {underlineBySeverity} from "@core/util/inspection";
 import {useSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
 import {LiteralBadgeComponent} from "@edition/datatype/components/badges/LiteralBadgeComponent";
-import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
-import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeComponent";
 import {useParams} from "next/navigation";
 import {ProjectService} from "@edition/project/services/Project.service";
 import {ModuleService} from "@edition/module/services/Module.service";
@@ -124,7 +131,7 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
 
         if (parameterDefinition) {
             return <div style={{...decorationStyle, display: "inline-block"}}>
-                <LiteralBadgeComponent value={{
+                <LiteralBadgeComponent size={"xs"} value={{
                     __typename: "LiteralValue",
                     value: nodeParameter?.value
                 }}/>
@@ -149,57 +156,101 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
 
     }, [flowStore, selectedNode, data.flowId])
 
-    return <Card data-qa-selector={"flow-builder-trigger"}
-                 variant={"normal"}
-                 color={"info"}
-                 paddingSize={"xs"}
-                 key={id}
-                 data-flow-refernce={id}
-                 className={`d-flow-node ${selected ? "d-flow-node--active" : undefined}`}
-                 style={{...(isReferenced === true ? {boxShadow: `0 0 5rem 0 rgba(112, 255, 178, 0.25)`} : {}),}}>
-
-        <Flex pos={"absolute"}
-              top={"-0.35rem"}
-              left={"50%"}
-              align={"center"}
-              style={{transform: "translate(-50%, -100%)", flexDirection: "column", gap: "0.35rem"}}>
-            <Badge color={"info"}>
-                Flow trigger
-            </Badge>
-            {module?.definitions?.nodes?.[0] && (
-                <Badge color={"secondary"}>
-                    <Text size={"xs"}>{endpoint}</Text>
-                </Badge>
-            )}
-        </Flex>
-
-        <Flex style={{gap: "0.7rem", ...triggerValidationStyle}} align={"center"}>
-            <DisplayIcon color={data.color} size={16}/>
-            <Text size={"md"}>{flow ? displayMessage : flowType?.names?.[0].content ?? FALLBACK_FLOW_TYPE_NAME}</Text>
-        </Flex>
-
-        {
-            isReferenced === true ? (
-                <div className={"d-flow-node__isReferenced"} style={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "-0.5rem",
-                    transform: "translate(-100%, -50%)",
-                    display: "flex"
+    return (
+        <Flex align={"center"} style={{flexDirection: "column", gap: "0.7rem"}}>
+            <Card
+                data-qa-selector={"flow-builder-trigger"}
+                variant={"normal"}
+                color={"secondary"}
+                paddingSize={"xs"}
+                display={"flex"}
+                align={"center"}
+                justify={"center"}
+                key={id}
+                data-flow-refernce={id}
+                miw={"60px"}
+                mah={"60px"}
+                className={`d-flow-node ${selected ? "d-flow-node--active" : undefined}`}
+                style={{
+                    transform: "rotate(45deg)",
+                    aspectRatio: "50/50",
+                    ...(isReferenced === true ? {
+                        boxShadow: `0 0 5rem 0 rgba(112, 255, 178, 0.25)`,
+                    } : {}),
                 }}>
-                    <IconVariable className={"d-flow-node__isReferenced-icon"} color={"#70ffb2"} size={13}/>
-                </div>
-            ) : null
-        }
 
-        <Handle
-            isConnectable={false}
-            type="source"
-            style={{bottom: "2px"}}
-            className={"d-flow-node__handle d-flow-node__handle--source"}
-            position={Position.Bottom}
-        />
-    </Card>
+                <NodeToolbar align={"center"} offset={16} position={Position.Top}>
+                    <ButtonGroup color={"secondary"}>
+                        <Button variant={"none"} color={"tertiary"} paddingSize={"xxs"} onClick={(e) => {
+                            const event = new KeyboardEvent('keydown', {
+                                key: '1',
+                                code: 'Key1',
+                                shiftKey: true,
+                                bubbles: true,
+                                cancelable: true,
+                            });
+
+                            document.dispatchEvent(event);
+                            e.stopPropagation();
+                            e.preventDefault();
+                        }}>
+                            <IconEdit size={13}/>
+                        </Button>
+                        <Button variant={"none"} color={"tertiary"} paddingSize={"xxs"} onClick={(e) => {
+                            const event = new KeyboardEvent('keydown', {
+                                key: 'Q',
+                                code: 'KeyQ',
+                                shiftKey: true,
+                                bubbles: true,
+                                cancelable: true,
+                            });
+
+                            document.dispatchEvent(event);
+                            e.stopPropagation();
+                            e.preventDefault();
+                        }}>
+                            <IconSparkles size={13}/>
+                            <Text size={"xs"}>Ask AI</Text>
+                        </Button>
+                    </ButtonGroup>
+                </NodeToolbar>
+
+                <div style={{
+                    transform: "rotate(-45deg)",
+                }}>
+
+                    <Flex align={"center"} style={{flexDirection: "column", gap: "0.35rem", ...triggerValidationStyle}}>
+                        <DisplayIcon color={data.color} size={16} style={{width: "16px", height: "16px"}}/>
+                    </Flex>
+
+                    {
+                        isReferenced === true ? (
+                            <div className={"d-flow-node__isReferenced"} style={{
+                                position: "absolute",
+                                top: "50%",
+                                left: "-0.5rem",
+                                transform: "translate(-100%, -50%)",
+                                display: "flex"
+                            }}>
+                                <IconVariable className={"d-flow-node__isReferenced-icon"} color={"#70ffb2"} size={13}/>
+                            </div>
+                        ) : null
+                    }
+
+                    <Handle
+                        isConnectable={false}
+                        type="source"
+                        style={{bottom: "2px"}}
+                        className={"d-flow-node__handle d-flow-node__handle--source"}
+                        position={Position.Bottom}
+                    />
+                </div>
+            </Card>
+            <Text size={"xs"} w={"200px"} style={{textAlign: "center"}}>
+                {flow ? displayMessage : flowType?.names?.[0].content ?? FALLBACK_FLOW_TYPE_NAME}
+            </Text>
+        </Flex>
+    )
 
 
 })

@@ -6,6 +6,7 @@ import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FALLBACK_FUNCTION_PARAMETER_NAME} from "@core/util/fallback-translations";
 import {FlowBuilderEdgeDataProps} from "@edition/flow/components/builder/FlowBuilderEdgeComponent";
+import {useFlowCompareStore} from "@edition/flow/hooks/Flow.compare.hook";
 
 // @ts-ignore
 export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], projectId?: NamespaceProject['id']): Edge<FlowBuilderEdgeDataProps>[] => {
@@ -14,8 +15,12 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
     const flowStore = useStore(FlowService)
     const functionService = useService(FunctionService);
     const functionStore = useStore(FunctionService)
+    const flowToCompare = useFlowCompareStore(state => state.flow)
 
-    const flow = React.useMemo(() => flowService.getById(flowId, {namespaceId, projectId}), [flowId, flowStore])
+    const flow = React.useMemo(
+        () => flowService.getById(flowId, {namespaceId, projectId}),
+        [flowId, namespaceId, projectId, flowStore, flowService]
+    )
 
     return React.useMemo(() => {
         if (!flow) return []
@@ -154,5 +159,5 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
         }
 
         return edges
-    }, [flow?.editedAt, functionStore.length]);
+    }, [flowStore, flow?.editedAt, flow, flowToCompare, functionStore.length]);
 };

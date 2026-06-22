@@ -1,0 +1,9 @@
+#import '@edition/ai/services/fragments/AI.flow.fragment.graphql'
+
+subscription generateFlow($executionIdentifier: String!) {
+    aiGenerateFlow(executionIdentifier: $executionIdentifier) {
+        flow {
+            ...AIFlow
+        }
+    }
+}

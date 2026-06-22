@@ -9,6 +9,10 @@ fragment BasicFlow on Flow {
     project {
         __typename
         id
+        namespace {
+            __typename
+            id
+        }
     }
     settings {
         __typename

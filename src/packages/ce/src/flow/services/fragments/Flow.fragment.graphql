@@ -82,6 +82,10 @@ fragment Flow on Flow {
     project {
         __typename
         id
+        namespace {
+            __typename
+            id
+        }
     }
     settings (first: $firstSetting, after: $afterSetting) {
         __typename

@@ -4,14 +4,16 @@ import {Badge, BadgeType, Text, Tooltip, TooltipContent, TooltipPortal, TooltipT
 import {truncateText} from "@edition/flow/components/folder/FlowFolderComponent";
 import {DataTypeJSONInputTreeComponent} from "@edition/datatype/components/inputs/json/DataTypeJSONInputTreeComponent";
 import { EditableJSONEntry } from "../inputs/json/DataTypeJSONInputComponent";
+import {Sizes} from "@code0-tech/pictor/dist/utils";
 
-export interface LiteralBadgeComponentProps extends Omit<BadgeType, 'value' | 'children'> {
+export interface LiteralBadgeComponentProps extends Omit<BadgeType, 'value' | 'children' | 'size'> {
     value: LiteralValue
+    size?: Sizes
 }
 
 export const LiteralBadgeComponent: React.FC<LiteralBadgeComponentProps> = (props) => {
 
-    const {value, ...rest} = props
+    const {value, size = "sm", ...rest} = props
 
     const truncatedValue = React.useMemo(() => {
         return truncateText(JSON.stringify(value.value), 75)
@@ -24,7 +26,7 @@ export const LiteralBadgeComponent: React.FC<LiteralBadgeComponentProps> = (prop
             !JSON.stringify(value).includes(truncatedValue) ? (
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <Text size={"sm"}>
+                        <Text size={size}>
                             {truncatedValue}
                         </Text>
                     </TooltipTrigger>
@@ -39,7 +41,7 @@ export const LiteralBadgeComponent: React.FC<LiteralBadgeComponentProps> = (prop
                                                                     setCollapsedState={function (path: string[], collapsed: boolean): void {
                                                                     }}/>
                                 ) : (
-                                    <Text size={"sm"}>
+                                    <Text size={size}>
                                         {JSON.stringify(value.value)}
                                     </Text>
                                 )
@@ -48,7 +50,7 @@ export const LiteralBadgeComponent: React.FC<LiteralBadgeComponentProps> = (prop
                     </TooltipPortal>
                 </Tooltip>
             ) : (
-                <Text size={"sm"}>
+                <Text size={size}>
                     {truncatedValue}
                 </Text>
             )

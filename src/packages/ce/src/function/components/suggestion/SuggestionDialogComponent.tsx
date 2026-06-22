@@ -114,7 +114,7 @@ export const SuggestionDialogComponent: React.FC<SuggestionDialogComponentProps>
                                                 const DisplayIcon = icon(suggestion.icon as IconString)
 
                                                 return <>
-                                                    <CommandItem keywords={[...suggestion.aliases, suggestion.displayMessage]}
+                                                    <CommandItem keywords={[...suggestion?.aliases ?? [], suggestion.displayMessage]}
                                                                  display={"block"}
                                                                  my={0.7}
                                                                  style={{boxSizing: "border-box", overflow: "hidden"}}

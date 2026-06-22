@@ -23,11 +23,7 @@ export const ProjectTabView: React.FC = () => {
                 <TooltipTrigger asChild>
                     <TabTrigger value={"flow"} asChild={true}>
                         <Button variant={"none"} paddingSize={"xs"} onClick={() => {
-                            if (!flowId) {
-                                router.push(`/namespace/${namespaceId}/project/${projectId}/flow`)
-                            } else {
-                                router.push(`/namespace/${namespaceId}/project/${projectId}/flow/${flowId}`)
-                            }
+                            router.push(`/namespace/${namespaceId}/project/${projectId}/flow`)
                         }}>
                             <IconHome size={16}/>
                         </Button>

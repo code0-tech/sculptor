@@ -12,9 +12,6 @@ export const ApplicationBreadcrumbView: React.FC = () => {
     const namespaceIndex = params.namespaceId as string | undefined
     const projectIndex = params.projectId as string | undefined
 
-
-    console.log(path, path.split("/"), path.split("/").filter(value => value != "").slice(0, path.split("/").length))
-
     return <Breadcrumb>
         {
             (namespaceIndex || projectIndex) ? (

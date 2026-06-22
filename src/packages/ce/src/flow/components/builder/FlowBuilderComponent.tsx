@@ -11,7 +11,6 @@ import {
     ViewportPortal
 } from "@xyflow/react";
 import React from "react";
-import '@xyflow/react/dist/style.css';
 import "./FlowBuilderComponent.style.scss"
 import {FlowBuilderEdgeComponent} from "./FlowBuilderEdgeComponent";
 import {Flow, type Namespace, type NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
@@ -28,6 +27,7 @@ import {FlowPanelLayoutComponent} from "@edition/flow/components/panels/FlowPane
 import {FlowPanelControlComponent} from "@edition/flow/components/panels/FlowPanelControlComponent";
 import {FlowPanelUpdateComponent} from "@edition/flow/components/panels/FlowPanelUpdateComponent";
 import {FunctionNodeSquareComponent} from "@edition/function/components/nodes/FunctionNodeSquareComponent";
+import {FlowPanelDefinitionComponent} from "@edition/flow/components/panels/FlowPanelDefinitionComponent";
 
 /**
  * Dynamically layouts a tree of nodes and their parameter nodes for a flow-based editor.
@@ -783,8 +783,9 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
                     <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .05)" gap={8} size={2}/>
                     <FlowPanelSizeComponent/>
                     <FlowPanelLayoutComponent/>
-                    <FlowPanelControlComponent flowId={flowId}/>
+                    <FlowPanelControlComponent namespaceId={namespaceId} projectId={projectId} flowId={flowId}/>
                     <FlowPanelUpdateComponent flowId={flowId}/>
+                    <FlowPanelDefinitionComponent/>
                 </>
             ) : null}
         </ReactFlow>

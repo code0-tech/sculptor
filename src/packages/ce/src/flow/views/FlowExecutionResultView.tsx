@@ -228,7 +228,7 @@ export const FlowExecutionResultView: React.FC = () => {
                     return <FileTabsTrigger value={id!}
                                             key={id!}>
                         <Flex align={"center"} style={{gap: "0.35rem"}}>
-                            <IconPlayerPlayFilled size={13} color={hashToColor(id!)}/>
+                            <IconPlayerPlayFilled size={13} color={hashToColor(id ?? "")}/>
                             <Text size={"sm"}>
                                 #{id?.match(/ExecutionResult\/(\d+)$/)?.[1]}
                             </Text>
@@ -298,7 +298,7 @@ export const FlowExecutionResultView: React.FC = () => {
                                                                                      minWidth: "16px",
                                                                                      minHeight: "16px",
                                                                                  }}
-                                                                                 color={hashToColor(item?.data?.payload?.id)}/>
+                                                                                 color={hashToColor(item?.data?.payload?.id ?? "")}/>
                                                                     <Text size={"md"}
                                                                           style={{
                                                                               overflow: "hidden",
@@ -325,7 +325,7 @@ export const FlowExecutionResultView: React.FC = () => {
                                                                                  minWidth: "16px",
                                                                                  minHeight: "16px",
                                                                              }}
-                                                                             color={hashToColor(item?.data?.payload?.id)}/>
+                                                                             color={hashToColor(item?.data?.payload?.id ?? "")}/>
                                                                 <Text size={"md"}
                                                                       style={{
                                                                           overflow: "hidden",
@@ -342,10 +342,11 @@ export const FlowExecutionResultView: React.FC = () => {
 
                                                         <>
                                                             <Text size={"md"}>
-                                                                {item.type === "node" ? "Parameters" : "Input"}
+                                                                {item.type === "node" || item.type === "function" ? "Parameters" : "Input"}
                                                             </Text>
-                                                            {item.type === "node" ? item.data.input?.map((input: ExecutionParameterResult, index: number) => {
+                                                            {item.type === "node" || item.type === "function" ? item.data.input?.map((input: ExecutionParameterResult, index: number) => {
 
+                                                                //TODO: for item.type === function this is wrong
                                                                 const parameter: ParameterDefinition = item?.data?.payload?.functionDefinition?.parameterDefinitions?.nodes?.[index]
 
                                                                 return <div key={input.id}>

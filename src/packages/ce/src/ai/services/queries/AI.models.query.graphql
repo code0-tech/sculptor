@@ -1,0 +1,8 @@
+#import '@edition/ai/services/fragments/AI.model.fragment.graphql'
+query models {
+    ai {
+        models {
+            ...AIModel
+        }
+    }
+}

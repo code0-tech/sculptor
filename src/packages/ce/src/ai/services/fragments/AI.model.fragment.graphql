@@ -1,0 +1,7 @@
+fragment AIModel on AiModel {
+    __typename
+    identifier
+    name
+    tokenCost
+    types
+}
