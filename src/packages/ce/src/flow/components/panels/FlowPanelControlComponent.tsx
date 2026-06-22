@@ -2,7 +2,8 @@ import React from "react";
 import {
     AiGenerateFlowSubscriptionPayload,
     Flow,
-    LiteralValue, Namespace,
+    LiteralValue,
+    Namespace,
     NamespaceProject,
     NodeFunction,
     ReferenceValue,
@@ -29,7 +30,6 @@ import {useSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.sele
 import {useFunctionSuggestions} from "@edition/function/hooks/Function.suggestion.hook";
 import {IconArrowBigUp, IconBackspace, IconLetterA, IconLetterQ} from "@tabler/icons-react";
 import {HoverCard, HoverCardContent, HoverCardPortal, HoverCardTrigger} from "@radix-ui/react-hover-card";
-import {ChaoticOrbit} from "ldrs/react";
 import 'ldrs/react/ChaoticOrbit.css'
 import {AIChatComponent} from "@edition/ai/components/AIChatComponent";
 import {mapAiGenerationFlowToFlowInput} from "@edition/ai/util/AI.flow.mapper";
@@ -56,7 +56,6 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
     const clearCompareFlow = useFlowCompareStore(state => state.clearFlow)
 
     const [, startTransition] = React.useTransition()
-    const [prompt, setPrompt] = React.useState<string>("")
     const [suggestionDialogOpen, setSuggestionDialogOpen] = React.useState(false)
     const [addNextNodeTooltipOpen, setAddNextNodeTooltipOpen] = React.useState(false)
 
@@ -239,7 +238,8 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                             </ButtonGroup>
                         </Flex>
                     )}
-                    <AIChatComponent projectId={projectId} flowId={flowId} prompt={prompt} onPrompt={setPrompt}
+                    <AIChatComponent projectId={projectId}
+                                     flowId={flowId}
                                      onData={onAIData}/>
                 </Flex>
 

@@ -138,7 +138,7 @@ export const FlowOverviewPage: React.FC = () => {
 
         </Flex>
         <Panel position={"bottom-center"} style={{width: "60%"}}>
-            <AIChatComponent projectId={projectId} prompt={prompt} onPrompt={setPrompt} onData={onAIData}/>
+            <AIChatComponent projectId={projectId} prompt={prompt} onData={onAIData}/>
         </Panel>
     </ResizablePanel>
 }

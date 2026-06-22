@@ -42,7 +42,6 @@ const GENERATING_VARIANTS = [
 export interface AIChatComponentProps {
     projectId: NamespaceProject['id']
     flowId?: Flow['id']
-    onPrompt?: (value: string) => void
     prompt?: string
     onData?: (data: any) => void
 
@@ -50,7 +49,7 @@ export interface AIChatComponentProps {
 
 export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
 
-    const {projectId, flowId, onPrompt, prompt = "", onData} = props
+    const {projectId, flowId, prompt = "", onData} = props
 
     const aiService = useService(AIService)
     const aiStore = useStore(AIService)
@@ -208,10 +207,9 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
                         </div>
                     ) : (
                         <EditorInput
-                            value={promptState}
+                            value={prompt}
                             onChange={(value) => {
                                 setPromptState(value)
-                                onPrompt?.(value)
                             }}
                             wrapperComponent={{
                                 style: {
