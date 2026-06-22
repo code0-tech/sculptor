@@ -37,6 +37,12 @@ export default function Page() {
         keyboardEvent.preventDefault()
     }, [])
 
+    useHotkeys('shift+2', (keyboardEvent) => {
+        setTab(prevState => prevState === "execution" ? undefined : "execution")
+        keyboardEvent.stopPropagation()
+        keyboardEvent.preventDefault()
+    }, [])
+
     React.useEffect(() => {
 
         const localSelectedNode = reactFlow.getNodes().filter((node) => node.selected)[0] as Node | undefined
