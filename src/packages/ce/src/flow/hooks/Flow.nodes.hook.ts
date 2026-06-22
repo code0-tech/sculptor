@@ -1,6 +1,6 @@
 import {Node} from "@xyflow/react";
 import type {Flow, Namespace, NamespaceProject, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
-import React, {useState} from "react";
+import React from "react";
 import {hashToColor, useService, useStore} from "@code0-tech/pictor";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
@@ -16,8 +16,6 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
     const functionStore = useStore(FunctionService)
     const flowToCompare = useFlowCompareStore(state => state.flow)
 
-    const [nodes, setNodes] = useState<Node<FunctionNodeComponentProps>[]>([])
-
     const flow = React.useMemo(
         () => flowService.getById(flowId, {namespaceId, projectId}),
         [flowId, namespaceId, projectId, flowStore, flowService]
@@ -25,18 +23,18 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
 
     const flowSchema = useFlowSchema(flowId, namespaceId, projectId)
 
-    React.useEffect(() => {
-        if (!flow) return
-        if (functionStore.length <= 0) return
-        if ((flowSchema?.length ?? 0) < (flow.nodes?.nodes?.length ?? 1)) return;
+    return React.useMemo<Node<FunctionNodeComponentProps>[]>(() => {
+        if (!flow) return []
+        if (functionStore.length <= 0) return []
 
-        const visited = new Set<string>();
+        const nodes: Node<FunctionNodeComponentProps>[] = []
+        const visited = new Set<string>()
 
         let groupCounter = 0;
         let globalIndex = 0;
 
         // Trigger node (ID == flow.id -> edge compatible)
-        setNodes(() => [{
+        nodes.push({
             id: `${flow.id}`,
             type: "trigger",
             position: {x: 0, y: 0},
@@ -47,7 +45,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                 color: hashToColor(flowId!),
                 schema: flowSchema?.filter(nodeSchema => nodeSchema?.some(schema => !schema.nodeId))?.flat()!
             },
-        }])
+        })
 
         const traverse = (
             node: NodeFunction,
@@ -58,12 +56,12 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
             if (!node?.id) return
 
             const functionDefinition = functionService.getById(node.functionDefinition?.id)
-            const nodeId = node.id;
+            const nodeId = node.id
 
             if (!visited.has(nodeId)) {
-                visited.add(nodeId);
+                visited.add(nodeId)
 
-                setNodes(prevState => [...prevState, {
+                nodes.push({
                     id: nodeId,
                     type: functionDefinition && "design" in functionDefinition ? functionDefinition?.design as string : "default",
                     position: {x: 0, y: 0},
@@ -77,15 +75,15 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                         color: hashToColor(nodeId),
                         schema: flowSchema?.filter(nodeSchema => nodeSchema?.some(schema => schema.nodeId === node.id))?.flat()!
                     },
-                }])
+                })
             }
 
             node.parameters?.nodes?.forEach((param) => {
-                const value = param?.value;
-                if (!value || value.__typename !== "SubFlowValue") return;
+                const value = param?.value
+                if (!value || value.__typename !== "SubFlowValue") return
 
                 if (value.functionDefinition?.id) {
-                    setNodes(prevState => [...prevState, {
+                    nodes.push({
                         id: `${nodeId}-${param.id}`,
                         type: functionDefinition && "design" in functionDefinition ? functionDefinition?.design as string : "square",
                         position: {x: 0, y: 0},
@@ -102,16 +100,16 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                             color: hashToColor(value?.startingNodeId ?? value?.functionDefinition?.id ?? ""),
                             schema: []
                         },
-                    }])
+                    })
                     return
                 }
 
-                const groupId = `${nodeId}-group-${groupCounter++}`;
+                const groupId = `${nodeId}-group-${groupCounter++}`
 
                 if (!visited.has(groupId)) {
-                    visited.add(groupId);
+                    visited.add(groupId)
 
-                    setNodes(prevState => [...prevState, {
+                    nodes.push({
                         id: groupId,
                         type: "group",
                         position: {x: 0, y: 0},
@@ -125,14 +123,12 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                             color: hashToColor(value?.startingNodeId ?? ""),
                             schema: []
                         },
-                    }])
+                    })
                 }
 
-                const child = flowService.getNodeById(flowId, value.startingNodeId);
-                if (child) traverse(child, groupId);
-
-
-            });
+                const child = flowService.getNodeById(flowId, value.startingNodeId)
+                if (child) traverse(child, groupId)
+            })
 
             if (node.nextNodeId) {
                 const next = flowService.getNodeById(flow.id, node.nextNodeId);
@@ -144,7 +140,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
             const start = flowService.getNodeById(flow.id, flow.startingNodeId);
             if (start) traverse(start);
         }
-    }, [flowStore, flow?.editedAt, flow, flowToCompare, functionStore.length, flowSchema]);
 
-    return nodes
-};
+        return nodes
+    }, [flowStore, flow?.editedAt, flow, flowToCompare, functionStore.length, flowSchema, flowId])
+}
