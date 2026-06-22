@@ -128,8 +128,10 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
     }
 
     getPayloadById(flowId: FlowView['id']): FlowInput {
-        const flow = this.getById(flowId)
+        return this.getPayload(this.getById(flowId))
+    }
 
+    getPayload(flow: FlowView | undefined): FlowInput {
         const payload: FlowInput = {
             name: flow?.name!,
             type: flow?.type?.id!,
@@ -462,7 +464,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         return result.data?.namespacesProjectsFlowsDelete ?? undefined
     }
 
-    async flowUpdate(payload: NamespacesProjectsFlowsUpdateInput): Promise<NamespacesProjectsFlowsUpdatePayload | undefined> {
+    async flowUpdate(payload: NamespacesProjectsFlowsUpdateInput, force?: boolean): Promise<NamespacesProjectsFlowsUpdatePayload | undefined> {
 
         const flow = this.getById(payload.flowId)
 
@@ -477,9 +479,38 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
 
         if (result.data && result.data.namespacesProjectsFlowsUpdate && result.data.namespacesProjectsFlowsUpdate.flow) {
             const flowIndex = this.values().findIndex(f => f.id === payload.flowId)
-            flow.updatedAt = result.data.namespacesProjectsFlowsUpdate.flow.updatedAt
-            flow.editedAt = undefined
-            this.set(flowIndex, new View(flow))
+
+            if (force) {
+                this.client.query<Query>({
+                    query: flowQuery,
+                    variables: {
+                        namespaceId: flow?.project?.namespace?.id,
+                        projectId: flow?.project?.id,
+                        flowId: flow?.id,
+
+                        firstNode: 50,
+                        afterNode: null,
+
+                        firstNodeParameter: 50,
+                        afterNodeParameter: null,
+
+                        firstSetting: 50,
+                        afterSetting: null,
+
+                        firstNodeResult: 50,
+                        afterNodeResult: null
+                    }
+                }).then(res => {
+                    const lflow = res.data?.namespace?.project?.flow! as FlowView
+                    lflow.updatedAt = Date.now().toString()
+                    lflow.editedAt = undefined
+                    this.set(flowIndex, new View(lflow!))
+                })
+            } else {
+                flow.updatedAt = Date.now().toString()
+                flow.editedAt = undefined
+                this.set(flowIndex, new View(flow))
+            }
         }
 
         return result.data?.namespacesProjectsFlowsUpdate ?? undefined
