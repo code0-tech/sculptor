@@ -20,10 +20,10 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
 
     const flow = React.useMemo(
         () => flowService.getById(flowId, {namespaceId, projectId}),
-        [flowId, flowStore.length, flowService]
+        [flowId, namespaceId, projectId, flowStore, flowService]
     )
 
-    const flowSchema = useFlowSchema(flowToCompare || flowId, namespaceId, projectId)
+    const flowSchema = useFlowSchema(flowId, namespaceId, projectId)
 
     React.useEffect(() => {
         if (!flow) return
@@ -144,7 +144,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
             const start = flowService.getNodeById(flow.id, flow.startingNodeId);
             if (start) traverse(start);
         }
-    }, [flowStore, flow?.editedAt, functionStore.length, flowSchema]);
+    }, [flowStore, flow?.editedAt, flow, flowToCompare, functionStore.length, flowSchema]);
 
     return nodes
 };
