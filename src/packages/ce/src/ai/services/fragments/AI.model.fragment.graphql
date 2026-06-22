@@ -1,4 +1,4 @@
-fragment Model on AiModel {
+fragment AIModel on AiModel {
     __typename
     identifier
     name
