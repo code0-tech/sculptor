@@ -10,6 +10,7 @@ fragment BasicFlow on Flow {
         __typename
         id
         namespace {
+            __typename
             id
         }
     }
