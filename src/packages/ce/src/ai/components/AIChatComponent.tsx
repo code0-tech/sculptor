@@ -67,7 +67,6 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
         [aiStore]
     )
 
-
     const {data} = useSubscription<Subscription>(generateFlowSubscription, {
         variables: {executionIdentifier: executionIdentifier},
         skip: !executionIdentifier,
