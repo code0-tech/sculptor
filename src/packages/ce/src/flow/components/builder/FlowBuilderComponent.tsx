@@ -783,7 +783,7 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
                     <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .05)" gap={8} size={2}/>
                     <FlowPanelSizeComponent/>
                     <FlowPanelLayoutComponent/>
-                    <FlowPanelControlComponent projectId={projectId} flowId={flowId}/>
+                    <FlowPanelControlComponent namespaceId={namespaceId} projectId={projectId} flowId={flowId}/>
                     <FlowPanelUpdateComponent flowId={flowId}/>
                     <FlowPanelDefinitionComponent/>
                 </>
