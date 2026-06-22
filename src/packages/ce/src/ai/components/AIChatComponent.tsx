@@ -209,7 +209,10 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
                     ) : (
                         <EditorInput
                             value={promptState}
-                            onChange={(value) => onPrompt?.(value)}
+                            onChange={(value) => {
+                                setPromptState(value)
+                                onPrompt?.(value)
+                            }}
                             wrapperComponent={{
                                 style: {
                                     background: "transparent",
