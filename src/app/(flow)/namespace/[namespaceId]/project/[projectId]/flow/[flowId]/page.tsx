@@ -4,7 +4,7 @@ import {Button, Flex,} from "@code0-tech/pictor";
 import React from "react";
 import {IconFile, IconPlayerPlay} from "@tabler/icons-react";
 import {useParams} from "next/navigation";
-import {Flow} from "@code0-tech/sagittarius-graphql-types";
+import {Flow, Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {FlowBuilderComponent} from "@edition/flow/components/builder/FlowBuilderComponent";
 import {FunctionFilesComponent} from "@edition/function/components/files/FunctionFilesComponent";
 import {
@@ -21,6 +21,10 @@ export default function Page() {
 
     const params = useParams()
 
+    const namespaceIndex = params.namespaceId as any as number
+    const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
+    const projectIndex = params.projectId as any as number
+    const projectId: NamespaceProject['id'] = `gid://sagittarius/NamespaceProject/${projectIndex}`
     const flowIndex = params.flowId as any as number
     const flowId: Flow['id'] = `gid://sagittarius/Flow/${flowIndex}`
 
@@ -72,7 +76,7 @@ export default function Page() {
                                                 borderTopRightRadius: "1rem"
                                             })
                                         }}>
-                            <FlowBuilderComponent flowId={flowId} namespaceId={undefined} projectId={undefined}/>
+                            <FlowBuilderComponent flowId={flowId} namespaceId={namespaceId} projectId={projectId}/>
                         </ResizablePanel>
                         {
                             tab === "execution" && (
