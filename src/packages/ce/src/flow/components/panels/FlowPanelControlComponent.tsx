@@ -34,6 +34,8 @@ import 'ldrs/react/ChaoticOrbit.css'
 import {AIChatComponent} from "@edition/ai/components/AIChatComponent";
 import {mapAiGenerationFlowToFlowInput} from "@edition/ai/util/AI.flow.mapper";
 import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {useFlowCompareStore} from "@edition/flow/hooks/Flow.compare.hook";
+import {FlowView} from "@edition/flow/services/Flow.view";
 
 export interface FlowPanelControlComponentProps {
     namespaceId: Namespace['id']
@@ -49,6 +51,9 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
     //services and stores
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
+    const compareFlow = useFlowCompareStore(state => state.flow)
+    const setCompareFlow = useFlowCompareStore(state => state.setFlow)
+    const clearCompareFlow = useFlowCompareStore(state => state.clearFlow)
 
     const [, startTransition] = React.useTransition()
     const [prompt, setPrompt] = React.useState<string>("")
@@ -72,22 +77,46 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
         const aiFlow = payload?.flow
         if (!aiFlow) return
 
+        const currentFlow = flowService.getById(flowId, {namespaceId, projectId})
+        if (!currentFlow) return
+
+        const currentFlowName = currentFlow.name ?? undefined
         const existingNames = (flowService.values({namespaceId, projectId}) ?? [])
             .map(f => f.name)
-            .filter((n): n is string => !!n)
+            .filter((n): n is string => !!n && n !== currentFlowName)
 
         const flowInput = mapAiGenerationFlowToFlowInput(aiFlow, {existingNames})
         if (!flowInput) return
 
+        const oldFlowSnapshot: FlowView = JSON.parse(JSON.stringify(currentFlow))
+
         flowService.flowUpdate({
             flowId: flowId!,
             flowInput: flowInput,
-        }).then(result => {
+        }, true).then(result => {
             if ((result?.errors?.length ?? 0) <= 0) {
-                addIslandSuccessNotification({message: "Created flow"})
+                setCompareFlow(oldFlowSnapshot)
+                addIslandSuccessNotification({message: "Updated flow"})
             }
         })
-    }, [flowStore, namespaceId, projectId])
+    }, [flowService, flowStore, namespaceId, projectId, flowId, setCompareFlow])
+
+    const onAcceptAIChanges = React.useCallback(() => {
+        clearCompareFlow()
+    }, [clearCompareFlow])
+
+    const onDiscardAIChanges = React.useCallback(() => {
+        if (!compareFlow) return
+        const flowInput = flowService.getPayload(compareFlow)
+        flowService.flowUpdate({
+            flowId: flowId!,
+            flowInput: flowInput,
+        }, true).then(result => {
+            if ((result?.errors?.length ?? 0) <= 0) {
+                clearCompareFlow()
+            }
+        })
+    }, [compareFlow, flowService, flowId, clearCompareFlow])
 
     const addNodeToFlow = React.useCallback((suggestion: NodeFunction | ReferenceValue | LiteralValue | SubFlowValue) => {
         if (flowId && suggestion.__typename === "NodeFunction" && selectedNode?.id.includes("NodeFunction")) {
@@ -198,17 +227,20 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
             <HoverCardContent align={"start"} side={"bottom"}
                               style={{position: "absolute", transform: "translate(0%, -100%)", zIndex: 1}}>
                 <Flex style={{flexDirection: "column", gap: "0.7rem"}} align={"start"}>
-                    <Flex w={"100%"} justify={"center"}>
-                        <ButtonGroup color={"secondary"}>
-                            <Button color={"error"} paddingSize={"xxs"}>
-                                Discard
-                            </Button>
-                            <Button color={"success"} paddingSize={"xxs"}>
-                                Accept
-                            </Button>
-                        </ButtonGroup>
-                    </Flex>
-                    <AIChatComponent projectId={projectId} flowId={flowId} prompt={prompt} onPrompt={setPrompt}/>
+                    {compareFlow && (
+                        <Flex w={"100%"} justify={"center"}>
+                            <ButtonGroup color={"secondary"}>
+                                <Button color={"error"} paddingSize={"xxs"} onClick={onDiscardAIChanges}>
+                                    Discard
+                                </Button>
+                                <Button color={"success"} paddingSize={"xxs"} onClick={onAcceptAIChanges}>
+                                    Accept
+                                </Button>
+                            </ButtonGroup>
+                        </Flex>
+                    )}
+                    <AIChatComponent projectId={projectId} flowId={flowId} prompt={prompt} onPrompt={setPrompt}
+                                     onData={onAIData}/>
                 </Flex>
 
             </HoverCardContent>
