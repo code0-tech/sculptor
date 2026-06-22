@@ -483,6 +483,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
             if (force) {
                 this.client.query<Query>({
                     query: flowQuery,
+                    fetchPolicy: "network-only",
                     variables: {
                         namespaceId: flow?.project?.namespace?.id,
                         projectId: flow?.project?.id,
