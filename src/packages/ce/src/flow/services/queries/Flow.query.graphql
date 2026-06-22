@@ -1,4 +1,4 @@
-#import "../fragments/Flow.fragment.graphql"
+#import "@edition/flow/services/fragments/Flow.fragment.graphql"
 
 query Flows (
     $namespaceId: NamespaceID!
