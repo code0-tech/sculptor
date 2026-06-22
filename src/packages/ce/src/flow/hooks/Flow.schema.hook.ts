@@ -6,10 +6,9 @@ import {useSchemaAction} from "@edition/flow/components/FlowWorkerProvider";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {NodeSchema} from "@code0-tech/triangulum";
-import {FlowView} from "@edition/flow/services/Flow.view";
 
 export const useFlowSchema = (
-    flow: Flow['id'] | FlowView,
+    flowId: Flow['id'],
     namespaceId: Namespace['id'],
     projectId: NamespaceProject['id'],
 ): NodeSchema[][] | undefined => {
@@ -23,9 +22,9 @@ export const useFlowSchema = (
 
     const [schema, setSchema] = React.useState<NodeSchema[][] | undefined>([]);
 
-    const flowView = React.useMemo(
-        () => typeof flow === "string" ? flowService.getById(flow, {namespaceId, projectId}) : flow,
-        [flow, flowService, flowStore]
+    const flow = React.useMemo(
+        () => flowService.getById(flowId, {namespaceId, projectId}),
+        [flowId, flowService, flowStore]
     )
 
     const dataTypes = React.useMemo(
@@ -39,21 +38,21 @@ export const useFlowSchema = (
     )
 
     React.useEffect(() => {
-        if (!flowView) return
+        if (!flow) return
         if (dataTypes.length <= 0) return
         if (functions.length <= 0) return
 
         let cancelled = false
 
         const triggerSchema = execute({
-            flow: flowView,
+            flow,
             dataTypes,
             functions
         })
 
-        const schemas = flowView.nodes?.nodes?.map(node => {
+        const schemas = flow.nodes?.nodes?.map(node => {
             return execute({
-                flow: flowView,
+                flow,
                 dataTypes,
                 functions,
                 nodeId: node?.id
@@ -68,7 +67,7 @@ export const useFlowSchema = (
         return () => {
             cancelled = true
         }
-    }, [functions.length, dataTypes.length, flowStore, flowView?.editedAt, flowView?.nodes?.nodes?.length])
+    }, [functions.length, dataTypes.length, flowStore, flow?.editedAt, flow?.nodes?.nodes?.length])
 
     return schema
 }
