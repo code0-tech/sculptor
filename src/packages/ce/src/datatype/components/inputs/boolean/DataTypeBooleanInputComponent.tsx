@@ -11,13 +11,13 @@ export const DataTypeBooleanInputComponent: React.FC<DataTypeBooleanInputCompone
 
     const {suggestions, initialValue, title, description, formValidation, onChange} = props
 
-    const onChangeDebounced = useDebouncedCallback((value: string | LiteralValue | NodeFunction | SubFlowValue | ReferenceValue | undefined) => {
+    const onChangeDebounced = useDebouncedCallback((value: string | LiteralValue | NodeFunction | SubFlowValue | ReferenceValue | null) => {
 
         if (typeof value === "string") {
-            const boolValue: LiteralValue | undefined = value && ["true", "false"].includes(value) ? {
+            const boolValue: LiteralValue | null = value && ["true", "false"].includes(value) ? {
                 __typename: "LiteralValue",
                 value: value === "true"
-            } : undefined
+            } : null
 
             formValidation?.setValue?.(boolValue)
             onChange?.(boolValue)

@@ -21,7 +21,7 @@ import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeC
 
 export interface DataTypeInputControlsComponentProps {
     suggestions?: (NodeFunction | SubFlowValue | ReferenceValue | LiteralValue)[]
-    onSelect?: (value: NodeFunction | SubFlowValue | ReferenceValue | LiteralValue | undefined) => void
+    onSelect?: (value: NodeFunction | SubFlowValue | ReferenceValue | LiteralValue | null) => void
     showSuggestions?: boolean
 }
 
@@ -83,7 +83,7 @@ export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsCompo
             </Menu>
         ) : <></>}
         <Button paddingSize={"xxs"} onClick={(event) => {
-            onSelect?.(undefined)
+            onSelect?.(null)
             event.stopPropagation()
             event.preventDefault()
         }}>
