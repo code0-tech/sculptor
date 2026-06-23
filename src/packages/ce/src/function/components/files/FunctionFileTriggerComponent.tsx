@@ -1,6 +1,6 @@
 import React from "react";
-import {Alert, InputSyntaxSegment, Spacing, Text, useForm, useService, useStore} from "@code0-tech/pictor";
-import {Flow, LiteralValue, NodeFunction, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
+import {Alert, Spacing, Text, useForm, useService, useStore} from "@code0-tech/pictor";
+import {Flow, LiteralValue, Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
@@ -11,33 +11,40 @@ import {
     FALLBACK_FLOW_TYPE_SETTING_DESCRIPTION,
     FALLBACK_FLOW_TYPE_SETTING_NAME
 } from "@core/util/fallback-translations";
-import {useNodes} from "@xyflow/react";
+import {useNodesData} from "@xyflow/react";
 import {NodeSchema} from "@code0-tech/triangulum";
 
 export interface FunctionFileTriggerComponentProps {
-    instance: Flow
+    flowId: Flow['id']
+    namespaceId: Namespace['id']
+    projectId: NamespaceProject['id']
 }
 
-export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponentProps> = (props) => {
+export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponentProps> = React.memo((props) => {
 
-    const {instance} = props
+    const {flowId, namespaceId, projectId} = props
 
     const flowTypeService = useService(FlowTypeService)
     const flowTypeStore = useStore(FlowTypeService)
     const flowService = useService(FlowService)
-    const validation = useFlowValidation(instance.id)
+    const validation = useFlowValidation(flowId)
     const changedValue = React.useRef(false)
-    const [, startTransition] = React.useTransition()
+    const changedSettings = React.useRef<Set<string>>(new Set())
+
+    const instance = React.useMemo(
+        () => flowService.getById(flowId, {namespaceId, projectId}),
+        [flowService, flowId, namespaceId, projectId]
+    )
 
     const definition = React.useMemo(
-        () => flowTypeService.getById(instance.type?.id!!),
-        [flowTypeStore, instance]
+        () => flowTypeService.getById(instance?.type?.id!!),
+        [flowTypeStore, instance?.type?.id]
     )
 
     const initialValues: Record<string | "inputType", any> = React.useMemo(() => {
         const values: Record<string, any> = {}
         definition?.flowTypeSettings?.forEach((setting, index) => {
-            const flowSetting = instance.settings?.nodes?.[index]
+            const flowSetting = instance?.settings?.nodes?.[index]
             values[setting.id!] = {
                 __typename: "LiteralValue",
                 value: flowSetting?.value,
@@ -46,11 +53,11 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
         return values
     }, [definition])
 
-    const flowNode = useNodes().find(value => value.id == instance.id)
+    const flowNode = useNodesData(flowId!)
 
     const triggerValidation = React.useMemo(
         () => validation?.find(v => v.nodeId === null && v.parameterIndex === null),
-        [validation]
+        [validation?.length]
     )
 
     const settingsValidations = React.useMemo(() => {
@@ -65,24 +72,27 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
             }
         })
         return values
-    }, [validation, instance, definition])
+    }, [validation?.length, definition])
 
     const onSubmit = React.useCallback((values: Record<string, LiteralValue | undefined>) => {
-        startTransition(async () => {
+        React.startTransition(async () => {
             for (const flowTypeSetting of definition?.flowTypeSettings ?? []) {
+
+                if (!changedSettings.current.has(flowTypeSetting.id!)) continue
 
                 const index = definition?.flowTypeSettings?.findIndex(p => p?.id === flowTypeSetting?.id)
                 if (typeof index !== "number") return
 
                 const value = values[flowTypeSetting.id!]
-                await flowService.setSettingValue(props.instance.id, index, value?.value, flowTypeSetting.identifier)
+                await flowService.setSettingValue(flowId, index, value?.value, flowTypeSetting.identifier)
 
-                changedValue.current = false
+                changedSettings.current.delete(flowTypeSetting.id!)
             }
+            changedValue.current = false
         })
     }, [flowService, definition])
 
-    const [inputs, validate, values] = useForm<Record<string, LiteralValue | undefined>>({
+    const [inputs, validate] = useForm<Record<string, LiteralValue | undefined>>({
         initialValues: initialValues,
         validate: settingsValidations,
         truthyValidationBeforeSubmit: false,
@@ -91,16 +101,12 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
     })
 
     React.useEffect(
-        () => {
-            if (changedValue.current)
-                validate()
-        },
-        [values]
+        () => validate(undefined, false),
+        [validation]
     )
 
     React.useEffect(
-        () => validate(undefined, false),
-        [validation]
+        () => console.log("test")
     )
 
     return <>
@@ -132,7 +138,12 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
                                         schema={(flowNode?.data?.schema as NodeSchema[])?.[index]}
                                         description={description}
                                         clearable
-                                        onChange={() => changedValue.current = true}
+                                        key={settingDefinition.id}
+                                        onChange={() => {
+                                            changedValue.current = true
+                                            changedSettings.current.add(settingDefinition.id!)
+                                            validate()
+                                        }}
                                         {...inputs.getInputProps(settingDefinition.id!)}
                 />
                 <Spacing spacing={"xl"}/>
@@ -140,4 +151,4 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
 
         })}
     </>
-}
+})
