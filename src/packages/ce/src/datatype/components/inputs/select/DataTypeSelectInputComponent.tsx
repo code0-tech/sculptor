@@ -37,8 +37,6 @@ export const DataTypeSelectInputComponent: React.FC<DataTypeSelectInputComponent
         onChange?.((!!value ? suggestions?.[Number(value)] : null) ?? null)
     }, 200)
 
-    console.log(title, defaultValue, defaultValue >= 0 ? defaultValue?.toString() : undefined)
-
     return React.useMemo(() => <>
         <InputLabel>{title}</InputLabel>
         <InputDescription>{description}</InputDescription>
