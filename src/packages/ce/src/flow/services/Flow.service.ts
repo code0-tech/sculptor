@@ -137,8 +137,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
             type: flow?.type?.id!,
             settings: flow?.settings?.nodes?.map(setting => {
                 return {
-                    //flowSettingIdentifier: setting?.flowSettingIdentifier!,
-                    value: setting?.value!,
+                    value: setting?.value ?? null,
                 }
             }) ?? [],
             signature: flow?.signature,
