@@ -17,7 +17,7 @@ import {
     FALLBACK_FUNCTION_PARAMETER_DESCRIPTION,
     FALLBACK_FUNCTION_PARAMETER_NAME
 } from "@core/util/fallback-translations";
-import {useNodes, useNodesData} from "@xyflow/react";
+import {useNodes} from "@xyflow/react";
 import {NodeSchema} from "@code0-tech/triangulum";
 
 export interface FunctionFileDefaultComponentProps {
@@ -119,10 +119,6 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
             const description = parameterDefinition?.descriptions?.[0]?.content ?? FALLBACK_FUNCTION_PARAMETER_DESCRIPTION
 
             const schema = (flowNode?.data?.schema as NodeSchema[])?.[index]
-     /*       schema.blocked = schema?.blockedBy?.some(blockedBy => {
-                const val = node.parameters?.nodes?.[blockedBy]?.value;
-                return val === undefined || val === null;
-            }) ?? false;*/
 
             return <div>
                 <DataTypeInputComponent data-qa-selector={"flow-builder-parameter"}
