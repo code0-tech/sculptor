@@ -28,7 +28,6 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
     const flowTypeStore = useStore(FlowTypeService)
     const flowService = useService(FlowService)
     const validation = useFlowValidation(flowId)
-    const changedValue = React.useRef(false)
     const changedSettings = React.useRef<Set<string>>(new Set())
 
     const instance = React.useMemo(
@@ -88,7 +87,6 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
 
                 changedSettings.current.delete(flowTypeSetting.id!)
             }
-            changedValue.current = false
         })
     }, [flowService, definition])
 
@@ -103,10 +101,6 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
     React.useEffect(
         () => validate(undefined, false),
         [validation]
-    )
-
-    React.useEffect(
-        () => console.log("test")
     )
 
     return <>
@@ -140,7 +134,6 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
                                         clearable
                                         key={settingDefinition.id}
                                         onChange={() => {
-                                            changedValue.current = true
                                             changedSettings.current.add(settingDefinition.id!)
                                             validate()
                                         }}

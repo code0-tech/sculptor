@@ -31,7 +31,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
     const onChangeDebounced = useDebouncedCallback((value: LiteralValue | SubFlowValue | NodeFunction | ReferenceValue | undefined) => {
         formValidation?.setValue?.(value)
         onChange?.(value)
-    }, 200)
+    }, 400)
 
     const value = React.useMemo(
         () => initialValue ?? (("functionSchema" in schema ? schema.functionSchema.input === "list" : schema.input === "list") ? {

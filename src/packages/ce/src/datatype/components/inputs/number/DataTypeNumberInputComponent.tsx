@@ -30,7 +30,7 @@ export const DataTypeNumberInputComponent: React.FC<DataTypeNumberInputComponent
             formValidation?.setValue?.(value)
             onChange?.(value)
         }
-    }, 200)
+    }, 400)
 
     return React.useMemo(() => <>
         <InputLabel>{title}</InputLabel>

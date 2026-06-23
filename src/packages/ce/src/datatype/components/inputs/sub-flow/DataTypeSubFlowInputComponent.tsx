@@ -28,7 +28,6 @@ export const DataTypeSubFlowInputComponent: React.FC<DataTypeSubFlowInputCompone
         return initialValue && lodash.isMatch(initialValue, suggest)
     }), [suggestions])!
 
-
     const [suggestionDialogOpen, setSuggestionDialogOpen] = React.useState(false)
     const result = useFunctionSuggestions()
 

@@ -20,7 +20,7 @@ import {
 import {Schema} from "@code0-tech/triangulum/dist/util/schema.util";
 
 export interface DataTypeInputComponentProps extends Omit<InputWrapperProps<NodeParameterValue | NodeFunction>, "onChange"> {
-    schema: NodeSchema | Schema
+    schema: (NodeSchema | Schema) & {blocked?: boolean}
     clearable?: boolean
     onChange?: (value: ReferenceValue | SubFlowValue | LiteralValue | NodeFunction | undefined) => void
     suggestions?: (NodeFunction | SubFlowValue | ReferenceValue | LiteralValue)[]
@@ -33,6 +33,11 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
 
     const suggestions = "schema" in schema ? schema?.schema?.suggestions as (NodeFunction | ReferenceValue | LiteralValue)[] : []
     const inputName = "schema" in schema ? (schema?.schema?.input === "generic" ? schema.functionSchema.input : schema?.schema?.input) : schema.input
+    const blocked = schema?.blocked
+
+    if (blocked) {
+        return null
+    }
 
     switch (inputName) {
         case "boolean":

@@ -83,24 +83,6 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
     )
 
     React.useEffect(() => {
-        //if (activeTab) setSelectedFunctionNode(activeTab, reactFlow);
-        /*setTimeout(() => {
-            const parent = document.querySelector("[data-id=" + '"' + id + '"' + "]") as HTMLDivElement
-            const tabList = parent?.querySelector(".file-tabs__list-content") as HTMLDivElement
-            const trigger = tabList?.querySelector("[data-value=" + '"' + activeTab + '"' + "]") as HTMLDivElement
-
-            if (tabList && trigger) {
-                const offset = (trigger.offsetLeft + (trigger.offsetWidth / 2)) - (tabList.offsetWidth / 2)
-                tabList.scrollLeft = 0 //reset to 0
-                tabList.scrollBy({
-                    left: offset,
-                    behavior: 'smooth'
-                });
-            }
-        }, 0)*/
-    }, [activeTab])
-
-    React.useEffect(() => {
         setActiveTab(selectedNode?.id ?? undefined)
     }, [selectedNode?.id])
 
@@ -192,7 +174,9 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
                                      value={flowId!}
                                      h={"100%"}
                                      key={flowId!}>
-                        <FunctionFileTriggerComponent instance={flow!}/>
+                        <FunctionFileTriggerComponent flowId={flowId}
+                                                      namespaceId={namespaceId}
+                                                      projectId={projectId}/>
                     </FileTabsContent>
                     {
                         nodes?.map(node => {
