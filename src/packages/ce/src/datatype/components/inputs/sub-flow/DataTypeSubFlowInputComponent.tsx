@@ -31,7 +31,7 @@ export const DataTypeSubFlowInputComponent: React.FC<DataTypeSubFlowInputCompone
     const [suggestionDialogOpen, setSuggestionDialogOpen] = React.useState(false)
     const result = useFunctionSuggestions()
 
-    const onChangeDebounced = useDebouncedCallback((value: LiteralValue | SubFlowValue | ReferenceValue | NodeFunction | undefined) => {
+    const onChangeDebounced = useDebouncedCallback((value: LiteralValue | SubFlowValue | ReferenceValue | NodeFunction | null) => {
 
         if (value?.__typename === "NodeFunction") {
             const nodeId = flowService.addNodeById(flowId, value)
@@ -41,8 +41,8 @@ export const DataTypeSubFlowInputComponent: React.FC<DataTypeSubFlowInputCompone
             }
         }
 
-        formValidation?.setValue?.(value ?? undefined)
-        onChange?.(value ?? undefined)
+        formValidation?.setValue?.(value ?? null)
+        onChange?.(value ?? null)
     }, 200)
 
     return React.useMemo(() => <>

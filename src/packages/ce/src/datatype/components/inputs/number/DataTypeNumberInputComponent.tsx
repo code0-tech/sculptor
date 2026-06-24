@@ -21,11 +21,11 @@ export const DataTypeNumberInputComponent: React.FC<DataTypeNumberInputComponent
     const {formValidation, title, initialValue, description, suggestions, onChange} = props
 
     const defaultValue: NodeParameterValue | NodeFunction | undefined = React.useMemo(() => initialValue ?? undefined, [initialValue])
-    const onChangeDebounced = useDebouncedCallback((value: string | LiteralValue | SubFlowValue | NodeFunction | ReferenceValue | undefined) => {
+    const onChangeDebounced = useDebouncedCallback((value: string | LiteralValue | SubFlowValue | NodeFunction | ReferenceValue | null) => {
 
         if (typeof value === "string") {
-            formValidation?.setValue?.(value ? {__typename: "LiteralValue", value: !Number.isNaN(Number(value)) ? Number(value) : value} : undefined)
-            onChange?.(value ? {__typename: "LiteralValue", value: !Number.isNaN(Number(value)) ? Number(value) : value} : undefined)
+            formValidation?.setValue?.(value ? {__typename: "LiteralValue", value: !Number.isNaN(Number(value)) ? Number(value) : value} : null)
+            onChange?.(value ? {__typename: "LiteralValue", value: !Number.isNaN(Number(value)) ? Number(value) : value} : null)
         } else {
             formValidation?.setValue?.(value)
             onChange?.(value)

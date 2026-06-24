@@ -32,23 +32,22 @@ export const DataTypeSelectInputComponent: React.FC<DataTypeSelectInputComponent
         return initialValue && lodash.isMatch(initialValue, suggest)
     }), [suggestions])!
 
-    const onChangeDebounced = useDebouncedCallback((value: string | undefined) => {
-        formValidation?.setValue?.(suggestions?.[Number(value)] ?? undefined)
-        onChange?.(suggestions?.[Number(value)] ?? undefined)
+    const onChangeDebounced = useDebouncedCallback((value: string | null) => {
+        formValidation?.setValue?.((!!value ? suggestions?.[Number(value)] : null) ?? null)
+        onChange?.((!!value ? suggestions?.[Number(value)] : null) ?? null)
     }, 200)
 
     return React.useMemo(() => <>
         <InputLabel>{title}</InputLabel>
         <InputDescription>{description}</InputDescription>
-        <SelectInput defaultValue={defaultValue >= 0 ?defaultValue?.toString() : undefined}
+        <SelectInput value={defaultValue >= 0 ? defaultValue?.toString() : undefined}
                      formValidation={{...formValidation, setValue: undefined}}
                      maw={"100%"}
-                     key={formValidation?.notValidMessage}
+                     key={defaultValue}
                      onValueChange={onChangeDebounced}
-                     placeholder={"sd"}
                      right={
                          <Button color={"primary"} onClick={() => {
-                             onChangeDebounced(undefined)
+                             onChangeDebounced(null)
                          }} paddingSize={"xxs"}>
                              <IconX size={13}/>
                          </Button>

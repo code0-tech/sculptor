@@ -23,12 +23,12 @@ import {
 export interface DataTypeJSONInputEditDialogComponentProps {
     open: boolean
     entry: EditableJSONEntry | undefined
-    value: LiteralValue | undefined
+    value: LiteralValue | null
     onOpenChange?: (open: boolean) => void
-    onObjectChange?: (object: LiteralValue | undefined) => void
+    onObjectChange?: (object: LiteralValue | null) => void
 }
 
-function getValueAtPath(obj: LiteralValue | undefined, path: string[]): unknown {
+function getValueAtPath(obj: LiteralValue | null, path: string[]): unknown {
     if (!obj || !Array.isArray(path) || path.length === 0) return obj?.value
     // Traverse .value recursively if nested
     let current: any = obj.value
@@ -42,8 +42,8 @@ function getValueAtPath(obj: LiteralValue | undefined, path: string[]): unknown 
     return current
 }
 
-function setValueAtPath(obj: LiteralValue | undefined, path: string[], value: unknown): LiteralValue | undefined {
-    if (!obj) return undefined
+function setValueAtPath(obj: LiteralValue | null, path: string[], value: unknown): LiteralValue | null {
+    if (!obj) return null
     if (path.length === 0) return { ...obj, value }
     const [key, ...rest] = path
     if (Array.isArray(obj.value)) {
@@ -81,7 +81,7 @@ export const DataTypeJSONInputEditDialogComponent: React.FC<DataTypeJSONInputEdi
     const [editOpen, setEditOpen] = React.useState(open)
     const [collapsedState, setCollapsedStateRaw] = React.useState<Record<string, boolean>>({})
     const [activePath, setActivePath] = React.useState(entry?.path ?? [])
-    const [editedObject, setEditedObject] = React.useState<LiteralValue | undefined>(value)
+    const [editedObject, setEditedObject] = React.useState<LiteralValue | null>(value)
     const [editorValue, setEditorValue] = React.useState(getValueAtPath(value, entry?.path ?? []))
     const clickTimeout = React.useRef<NodeJS.Timeout | null>(null)
 

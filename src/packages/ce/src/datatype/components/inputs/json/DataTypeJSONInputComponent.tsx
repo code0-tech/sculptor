@@ -28,7 +28,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
     const [editEntry, setEditEntry] = React.useState<EditableJSONEntry | undefined>(undefined)
     const [collapsedState, setCollapsedStateRaw] = React.useState<Record<string, boolean>>({})
 
-    const onChangeDebounced = useDebouncedCallback((value: LiteralValue | SubFlowValue | NodeFunction | ReferenceValue | undefined) => {
+    const onChangeDebounced = useDebouncedCallback((value: LiteralValue | SubFlowValue | NodeFunction | ReferenceValue | null) => {
         formValidation?.setValue?.(value)
         onChange?.(value)
     }, 400)

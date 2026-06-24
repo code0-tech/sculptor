@@ -11,7 +11,7 @@ export const DataTypeGenericInputComponent: React.FC<DataTypeGenericInputCompone
 
     const {title, description, onChange, formValidation} = props
 
-    const onChangeDebounced = useDebouncedCallback((value: LiteralValue | NodeFunction | ReferenceValue | undefined) => {
+    const onChangeDebounced = useDebouncedCallback((value: LiteralValue | NodeFunction | ReferenceValue | null) => {
         formValidation?.setValue?.(value)
         onChange?.(value)
     }, 200)

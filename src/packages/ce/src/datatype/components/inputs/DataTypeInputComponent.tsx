@@ -20,9 +20,9 @@ import {
 import {Schema} from "@code0-tech/triangulum/dist/util/schema.util";
 
 export interface DataTypeInputComponentProps extends Omit<InputWrapperProps<NodeParameterValue | NodeFunction>, "onChange"> {
-    schema: (NodeSchema | Schema) & {blocked?: boolean}
+    schema: (NodeSchema | Schema)
     clearable?: boolean
-    onChange?: (value: ReferenceValue | SubFlowValue | LiteralValue | NodeFunction | undefined) => void
+    onChange?: (value: ReferenceValue | SubFlowValue | LiteralValue | NodeFunction | null) => void
     suggestions?: (NodeFunction | SubFlowValue | ReferenceValue | LiteralValue)[]
     onClear?: (event: React.MouseEvent<HTMLButtonElement>) => void
 }
@@ -31,11 +31,10 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
 
     const {schema, ...rest} = props
 
-    const suggestions = "schema" in schema ? schema?.schema?.suggestions as (NodeFunction | ReferenceValue | LiteralValue)[] : []
-    const inputName = "schema" in schema ? (schema?.schema?.input === "generic" ? schema.functionSchema.input : schema?.schema?.input) : schema.input
-    const blocked = schema?.blocked
+    const suggestions = "schema" in (schema ?? {}) ? (schema as NodeSchema)?.schema?.suggestions as (NodeFunction | ReferenceValue | LiteralValue)[] : []
+    const inputName = "schema" in (schema ?? {}) ? ((schema as NodeSchema)?.schema?.input === "generic" ? (schema as NodeSchema).functionSchema.input : (schema as NodeSchema)?.schema?.input) : (schema as Schema).input
 
-    if (blocked) {
+    if ("schema" in (schema ?? {}) && ((schema as NodeSchema).blockedBy?.length ?? 0) > 0) {
         return null
     }
 
