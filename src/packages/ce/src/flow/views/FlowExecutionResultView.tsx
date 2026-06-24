@@ -4,7 +4,8 @@ import {
     ExecutionError,
     ExecutionParameterResult,
     ExecutionResult,
-    Flow, FunctionDefinition,
+    Flow,
+    FunctionDefinition,
     Maybe,
     Namespace,
     NamespaceProject,
@@ -24,6 +25,10 @@ import {
     MenuItem,
     MenuPortal,
     MenuTrigger,
+    ScrollArea,
+    ScrollAreaScrollbar,
+    ScrollAreaThumb,
+    ScrollAreaViewport,
     Spacing,
     Text,
     Tooltip,
@@ -274,11 +279,11 @@ export const FlowExecutionResultView: React.FC = () => {
                                                 item.type === "node" ? item?.data?.payload?.functionDefinition?.displayIcon : item.type === "function" ? item?.data?.payload?.displayIcon : item?.data?.payload?.type?.displayIcon,
                                             )
 
-                                            return <Tooltip key={item.id}>
+                                            return <Tooltip key={item.id} delayDuration={700}>
                                                 <TooltipTrigger asChild>
                                                     <Flex align={"center"} justify={"start"} w={"100%"} h={"100%"}
                                                           style={{cursor: "pointer"}}>
-                                                        <Card color={"primary"}
+                                                        <Card color={item.data.error ? "error" : "primary"}
                                                               className={`d-flow-node`}
                                                               paddingSize={"xs"}
                                                               py={"0.35"}
@@ -316,80 +321,112 @@ export const FlowExecutionResultView: React.FC = () => {
                                                 </TooltipTrigger>
                                                 <TooltipPortal>
                                                     <TooltipContent forceMount sideOffset={8} align={"start"}
-                                                                    maw={"300px"}>
-                                                        <Flex align={"center"} justify={"space-between"}
-                                                              style={{gap: "0.7rem"}}>
-                                                            <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                                                <DisplayIcon size={16}
-                                                                             style={{
-                                                                                 minWidth: "16px",
-                                                                                 minHeight: "16px",
-                                                                             }}
-                                                                             color={hashToColor(item?.data?.payload?.id ?? "")}/>
-                                                                <Text size={"md"}
-                                                                      style={{
-                                                                          overflow: "hidden",
-                                                                          position: "relative"
-                                                                      }}>
-                                                                    {item?.data?.displayMessage}
-                                                                </Text>
-                                                            </Flex>
-                                                            <Text size={"sm"} hierarchy={"tertiary"}>
-                                                                {getRelativeValue(item.end - item.start)}
-                                                            </Text>
-                                                        </Flex>
-                                                        <Spacing spacing={"xs"}/>
-
-                                                        <>
-                                                            <Text size={"md"}>
-                                                                {item.type === "node" || item.type === "function" ? "Parameters" : "Input"}
-                                                            </Text>
-                                                            {item.type === "node" || item.type === "function" ? item.data.input?.map((input: ExecutionParameterResult, index: number) => {
-
-                                                                //TODO: for item.type === function this is wrong
-                                                                const parameter: ParameterDefinition = item?.data?.payload?.functionDefinition?.parameterDefinitions?.nodes?.[index]
-
-                                                                return <div key={input.id}>
-                                                                    <Text size={"sm"} hierarchy={"tertiary"}>
-                                                                        {parameter?.names?.[0]?.content}
-                                                                    </Text>
-                                                                    <Editor readonly showTooltips={false}
-                                                                            language={"json"}
-                                                                            initialValue={input.value}
-                                                                            customSuggestionComponent={false}
-                                                                            basicSetup={{
-                                                                                highlightActiveLine: false,
-                                                                                highlightActiveLineGutter: false,
-                                                                            }}/>
-                                                                </div>
-
-                                                            }) : item.type === "trigger" ? (
-                                                                <Editor readonly showTooltips={false} language={"json"}
-                                                                        initialValue={item.data.input}
-                                                                        customSuggestionComponent={false}
-                                                                        basicSetup={{
-                                                                            highlightActiveLine: false,
-                                                                            highlightActiveLineGutter: false,
-                                                                        }}/>
-                                                            ) : null}
-                                                        </>
-
-                                                        <Spacing spacing={"xs"}/>
-                                                        {
-                                                            item.data.success && (
+                                                                    maw={"300px"}
+                                                                    mah={"var(--radix-popper-available-height)"}>
+                                                        <ScrollArea h={"var(--radix-popper-available-height)"}>
+                                                            <ScrollAreaViewport>
                                                                 <div>
-                                                                    <Text size={"md"}>
-                                                                        Result
-                                                                    </Text>
-                                                                    <Editor readonly showTooltips={false} language={"json"}
-                                                                            initialValue={item.data.success}
-                                                                            basicSetup={{
-                                                                                highlightActiveLine: false,
-                                                                                highlightActiveLineGutter: false,
-                                                                            }}/>
+
+                                                                    <Flex align={"center"} justify={"space-between"}
+                                                                          style={{gap: "0.7rem"}}>
+                                                                        <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                                                            <DisplayIcon size={16}
+                                                                                         style={{
+                                                                                             minWidth: "16px",
+                                                                                             minHeight: "16px",
+                                                                                         }}
+                                                                                         color={hashToColor(item?.data?.payload?.id ?? "")}/>
+                                                                            <Text size={"md"}
+                                                                                  style={{
+                                                                                      overflow: "hidden",
+                                                                                      position: "relative"
+                                                                                  }}>
+                                                                                {item?.data?.displayMessage}
+                                                                            </Text>
+                                                                        </Flex>
+                                                                        <Text size={"sm"} hierarchy={"tertiary"}>
+                                                                            {getRelativeValue(item.end - item.start)}
+                                                                        </Text>
+                                                                    </Flex>
+                                                                    <Spacing spacing={"xs"}/>
+
+                                                                    <>
+                                                                        <Text size={"md"}>
+                                                                            {item.type === "node" || item.type === "function" ? "Parameters" : "Input"}
+                                                                        </Text>
+                                                                        {item.type === "node" || item.type === "function" ? item.data.input?.map((input: ExecutionParameterResult, index: number) => {
+
+                                                                            //TODO: for item.type === function this is wrong
+                                                                            const parameter: ParameterDefinition = item?.data?.payload?.functionDefinition?.parameterDefinitions?.nodes?.[index]
+
+                                                                            return <div key={input.id}>
+                                                                                <Text size={"sm"}
+                                                                                      hierarchy={"tertiary"}>
+                                                                                    {parameter?.names?.[0]?.content}
+                                                                                </Text>
+                                                                                <Editor readonly showTooltips={false}
+                                                                                        language={"json"}
+                                                                                        initialValue={input.value}
+                                                                                        customSuggestionComponent={false}
+                                                                                        basicSetup={{
+                                                                                            highlightActiveLine: false,
+                                                                                            highlightActiveLineGutter: false,
+                                                                                        }}/>
+                                                                            </div>
+
+                                                                        }) : item.type === "trigger" ? (
+                                                                            <Editor readonly showTooltips={false}
+                                                                                    language={"json"}
+                                                                                    initialValue={item.data.input}
+                                                                                    customSuggestionComponent={false}
+                                                                                    basicSetup={{
+                                                                                        highlightActiveLine: false,
+                                                                                        highlightActiveLineGutter: false,
+                                                                                    }}/>
+                                                                        ) : null}
+                                                                        {
+                                                                            item.data.error ? (
+                                                                                <>
+                                                                                    <Text size={"md"}>
+                                                                                        Error
+                                                                                    </Text>
+                                                                                    <Editor readonly
+                                                                                            showTooltips={false}
+                                                                                            language={"json"}
+                                                                                            initialValue={item.data.error}
+                                                                                            customSuggestionComponent={false}
+                                                                                            basicSetup={{
+                                                                                                highlightActiveLine: false,
+                                                                                                highlightActiveLineGutter: false,
+                                                                                            }}/>
+                                                                                </>
+                                                                            ) : null
+                                                                        }
+                                                                    </>
+
+                                                                    <Spacing spacing={"xs"}/>
+                                                                    {
+                                                                        item.data.success && (
+                                                                            <div>
+                                                                                <Text size={"md"}>
+                                                                                    Result
+                                                                                </Text>
+                                                                                <Editor readonly showTooltips={false}
+                                                                                        language={"json"}
+                                                                                        initialValue={item.data.success}
+                                                                                        basicSetup={{
+                                                                                            highlightActiveLine: false,
+                                                                                            highlightActiveLineGutter: false,
+                                                                                        }}/>
+                                                                            </div>
+                                                                        )
+                                                                    }
                                                                 </div>
-                                                            )
-                                                        }
+                                                            </ScrollAreaViewport>
+                                                            <ScrollAreaScrollbar orientation={"vertical"}>
+                                                                <ScrollAreaThumb/>
+                                                            </ScrollAreaScrollbar>
+                                                        </ScrollArea>
                                                     </TooltipContent>
                                                 </TooltipPortal>
                                             </Tooltip>
