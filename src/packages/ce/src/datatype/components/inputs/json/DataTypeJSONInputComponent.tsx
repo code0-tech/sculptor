@@ -29,9 +29,8 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
     const [collapsedState, setCollapsedStateRaw] = React.useState<Record<string, boolean>>({})
 
     const onChangeDebounced = useDebouncedCallback((value: LiteralValue | SubFlowValue | NodeFunction | ReferenceValue | null) => {
-        formValidation?.setValue?.(value)
         onChange?.(value)
-    }, 400)
+    }, 200)
 
     const value = React.useMemo(
         () => initialValue ?? (("functionSchema" in schema ? schema.functionSchema.input === "list" : schema.input === "list") ? {
@@ -59,14 +58,20 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                     entry={editEntry}
                     value={value as LiteralValue}
                     onOpenChange={open => setEditDialogOpen(open)}
-                    onObjectChange={onChangeDebounced}
+                    onObjectChange={(value) => {
+                        formValidation?.setValue?.(value)
+                        onChangeDebounced(value)
+                    }}
                 />
             )}
             <InputLabel>{title}</InputLabel>
             <InputDescription>{description}</InputDescription>
             <DataTypeInputValueComponent inside
                                          initialValue={value}
-                                         onChange={onChangeDebounced}
+                                         onChange={(value) => {
+                                             formValidation?.setValue?.(value)
+                                             onChangeDebounced(value)
+                                         }}
                                          suggestions={suggestions}
                                          formValidation={formValidation}>
                 <DataTypeJSONInputTreeComponent
