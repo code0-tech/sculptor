@@ -20,6 +20,7 @@ import {
     Gantt,
     getRelativeValue,
     hashToColor,
+    JsonView,
     Menu,
     MenuContent,
     MenuItem,
@@ -41,7 +42,6 @@ import {
 } from "@code0-tech/pictor";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {IconPlayerPlayFilled, IconPlus} from "@tabler/icons-react";
-import {Editor} from "@code0-tech/pictor/dist/components/editor/Editor";
 import {
     FileTabs,
     FileTabsContent,
@@ -67,6 +67,36 @@ export interface NodeGanttItem extends GanttItem {
         success?: object
         error?: Maybe<ExecutionError>
     }
+}
+
+const ExecutionTooltipScrollArea: React.FC<React.PropsWithChildren> = ({children}) => {
+    const contentRef = React.useRef<HTMLDivElement>(null)
+    const [height, setHeight] = React.useState<number>()
+
+    React.useLayoutEffect(() => {
+        const el = contentRef.current
+        if (!el) return
+        const observer = new ResizeObserver((entries) => {
+            const entry = entries[0]
+            if (entry) setHeight(entry.contentRect.height)
+        })
+        observer.observe(el)
+        return () => observer.disconnect()
+    }, [])
+
+    return (
+        <ScrollArea h={height !== undefined ? `${height}px` : undefined}
+                    mah={"var(--radix-popper-available-height)"}>
+            <ScrollAreaViewport>
+                <div ref={contentRef}>
+                    {children}
+                </div>
+            </ScrollAreaViewport>
+            <ScrollAreaScrollbar orientation={"vertical"}>
+                <ScrollAreaThumb/>
+            </ScrollAreaScrollbar>
+        </ScrollArea>
+    )
 }
 
 export const FlowExecutionResultView: React.FC = () => {
@@ -279,7 +309,7 @@ export const FlowExecutionResultView: React.FC = () => {
                                                 item.type === "node" ? item?.data?.payload?.functionDefinition?.displayIcon : item.type === "function" ? item?.data?.payload?.displayIcon : item?.data?.payload?.type?.displayIcon,
                                             )
 
-                                            return <Tooltip key={item.id} delayDuration={700}>
+                                            return <Tooltip key={item.id} delayDuration={0}>
                                                 <TooltipTrigger asChild>
                                                     <Flex align={"center"} justify={"start"} w={"100%"} h={"100%"}
                                                           style={{cursor: "pointer"}}>
@@ -320,11 +350,10 @@ export const FlowExecutionResultView: React.FC = () => {
                                                     </Flex>
                                                 </TooltipTrigger>
                                                 <TooltipPortal>
-                                                    <TooltipContent forceMount sideOffset={8} align={"start"}
+                                                    <TooltipContent sideOffset={8} align={"start"}
                                                                     maw={"300px"}
                                                                     mah={"var(--radix-popper-available-height)"}>
-                                                        <ScrollArea h={"var(--radix-popper-available-height)"}>
-                                                            <ScrollAreaViewport>
+                                                        <ExecutionTooltipScrollArea>
                                                                 <div>
 
                                                                     <Flex align={"center"} justify={"space-between"}
@@ -364,25 +393,11 @@ export const FlowExecutionResultView: React.FC = () => {
                                                                                       hierarchy={"tertiary"}>
                                                                                     {parameter?.names?.[0]?.content}
                                                                                 </Text>
-                                                                                <Editor readonly showTooltips={false}
-                                                                                        language={"json"}
-                                                                                        initialValue={input.value}
-                                                                                        customSuggestionComponent={false}
-                                                                                        basicSetup={{
-                                                                                            highlightActiveLine: false,
-                                                                                            highlightActiveLineGutter: false,
-                                                                                        }}/>
+                                                                                <JsonView collapsed  value={input.value ?? {}}/>
                                                                             </div>
 
                                                                         }) : item.type === "trigger" ? (
-                                                                            <Editor readonly showTooltips={false}
-                                                                                    language={"json"}
-                                                                                    initialValue={item.data.input}
-                                                                                    customSuggestionComponent={false}
-                                                                                    basicSetup={{
-                                                                                        highlightActiveLine: false,
-                                                                                        highlightActiveLineGutter: false,
-                                                                                    }}/>
+                                                                            <JsonView collapsed  value={item.data.input ?? {}}/>
                                                                         ) : null}
                                                                         {
                                                                             item.data.error ? (
@@ -390,15 +405,7 @@ export const FlowExecutionResultView: React.FC = () => {
                                                                                     <Text size={"md"}>
                                                                                         Error
                                                                                     </Text>
-                                                                                    <Editor readonly
-                                                                                            showTooltips={false}
-                                                                                            language={"json"}
-                                                                                            initialValue={item.data.error}
-                                                                                            customSuggestionComponent={false}
-                                                                                            basicSetup={{
-                                                                                                highlightActiveLine: false,
-                                                                                                highlightActiveLineGutter: false,
-                                                                                            }}/>
+                                                                                    <JsonView collapsed  value={item.data.error ?? {}}/>
                                                                                 </>
                                                                             ) : null
                                                                         }
@@ -411,22 +418,12 @@ export const FlowExecutionResultView: React.FC = () => {
                                                                                 <Text size={"md"}>
                                                                                     Result
                                                                                 </Text>
-                                                                                <Editor readonly showTooltips={false}
-                                                                                        language={"json"}
-                                                                                        initialValue={item.data.success}
-                                                                                        basicSetup={{
-                                                                                            highlightActiveLine: false,
-                                                                                            highlightActiveLineGutter: false,
-                                                                                        }}/>
+                                                                                <JsonView collapsed  value={item.data.success ?? {}}/>
                                                                             </div>
                                                                         )
                                                                     }
                                                                 </div>
-                                                            </ScrollAreaViewport>
-                                                            <ScrollAreaScrollbar orientation={"vertical"}>
-                                                                <ScrollAreaThumb/>
-                                                            </ScrollAreaScrollbar>
-                                                        </ScrollArea>
+                                                        </ExecutionTooltipScrollArea>
                                                     </TooltipContent>
                                                 </TooltipPortal>
                                             </Tooltip>

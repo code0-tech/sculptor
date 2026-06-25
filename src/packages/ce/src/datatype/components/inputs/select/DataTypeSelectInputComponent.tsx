@@ -33,7 +33,6 @@ export const DataTypeSelectInputComponent: React.FC<DataTypeSelectInputComponent
     }), [suggestions])!
 
     const onChangeDebounced = useDebouncedCallback((value: string | null) => {
-        formValidation?.setValue?.((!!value ? suggestions?.[Number(value)] : null) ?? null)
         onChange?.((!!value ? suggestions?.[Number(value)] : null) ?? null)
     }, 200)
 
@@ -44,9 +43,13 @@ export const DataTypeSelectInputComponent: React.FC<DataTypeSelectInputComponent
                      formValidation={{...formValidation, setValue: undefined}}
                      maw={"100%"}
                      key={defaultValue}
-                     onValueChange={onChangeDebounced}
+                     onValueChange={(value) => {
+                         formValidation?.setValue?.((!!value ? suggestions?.[Number(value)] : null) ?? null)
+                         onChangeDebounced?.(value)
+                     }}
                      right={
                          <Button color={"primary"} onClick={() => {
+                             formValidation?.setValue?.(null)
                              onChangeDebounced(null)
                          }} paddingSize={"xxs"}>
                              <IconX size={13}/>

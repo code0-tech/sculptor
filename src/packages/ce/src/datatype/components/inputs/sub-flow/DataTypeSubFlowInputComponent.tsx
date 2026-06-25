@@ -32,24 +32,22 @@ export const DataTypeSubFlowInputComponent: React.FC<DataTypeSubFlowInputCompone
     const result = useFunctionSuggestions()
 
     const onChangeDebounced = useDebouncedCallback((value: LiteralValue | SubFlowValue | ReferenceValue | NodeFunction | null) => {
-
-        if (value?.__typename === "NodeFunction") {
-            const nodeId = flowService.addNodeById(flowId, value)
-            value = {
-                __typename: "SubFlowValue",
-                startingNodeId: nodeId
-            }
-        }
-
-        formValidation?.setValue?.(value ?? null)
         onChange?.(value ?? null)
     }, 200)
 
     return React.useMemo(() => <>
         <SuggestionDialogComponent suggestions={[...suggestions!, ...result]}
                                    open={suggestionDialogOpen}
-                                   onSuggestionSelect={suggestion => {
-                                       onChangeDebounced(suggestion as NodeFunction)
+                                   onSuggestionSelect={value => {
+                                       if (value?.__typename === "NodeFunction") {
+                                           const nodeId = flowService.addNodeById(flowId, value)
+                                           value = {
+                                               __typename: "SubFlowValue",
+                                               startingNodeId: nodeId
+                                           }
+                                       }
+                                       formValidation?.setValue?.(value ?? null)
+                                       onChangeDebounced(value as NodeFunction)
                                    }}
                                    onOpenChange={setSuggestionDialogOpen}/>
         <InputLabel>{title}</InputLabel>
@@ -62,7 +60,17 @@ export const DataTypeSubFlowInputComponent: React.FC<DataTypeSubFlowInputCompone
                                          }
                                      }}
                                      initialValue={initialValue}
-                                     onChange={onChangeDebounced}
+                                     onChange={(value) => {
+                                         if (value?.__typename === "NodeFunction") {
+                                             const nodeId = flowService.addNodeById(flowId, value)
+                                             value = {
+                                                 __typename: "SubFlowValue",
+                                                 startingNodeId: nodeId
+                                             }
+                                         }
+                                         formValidation?.setValue?.(value ?? null)
+                                         onChangeDebounced(value ?? null)
+                                     }}
                                      suggestions={suggestions}
                                      formValidation={formValidation}>
             <Text>Select next node</Text>

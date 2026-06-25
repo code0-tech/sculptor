@@ -31,7 +31,10 @@ export const DataTypeBooleanInputComponent: React.FC<DataTypeBooleanInputCompone
     return React.useMemo(() => <>
         <InputLabel>{title}</InputLabel>
         <InputDescription>{description}</InputDescription>
-        <DataTypeInputValueComponent inside initialValue={initialValue} onChange={onChangeDebounced}
+        <DataTypeInputValueComponent inside initialValue={initialValue} onChange={value => {
+            formValidation?.setValue?.(value)
+            onChangeDebounced(value)
+        }}
                                      suggestions={suggestions} formValidation={formValidation}>
             <SegmentedControl type={"single"}
                               h={"100%"}
@@ -39,7 +42,20 @@ export const DataTypeBooleanInputComponent: React.FC<DataTypeBooleanInputCompone
                               bg={"transparent"}
                               style={{boxShadow: "none"}}
                               value={(initialValue as LiteralValue)?.value?.toString() ?? ""}
-                              onValueChange={onChangeDebounced}>
+                              onValueChange={value => {
+                                  if (typeof value === "string") {
+                                      const boolValue: LiteralValue | null = value && ["true", "false"].includes(value) ? {
+                                          __typename: "LiteralValue",
+                                          value: value === "true"
+                                      } : null
+
+                                      formValidation?.setValue?.(boolValue)
+                                      onChangeDebounced(boolValue)
+                                  } else {
+                                      formValidation?.setValue?.(value)
+                                      onChangeDebounced?.(value)
+                                  }
+                              }}>
                 <SegmentedControlItem w={"100%"} value={"true"}>
                     True
                 </SegmentedControlItem>
