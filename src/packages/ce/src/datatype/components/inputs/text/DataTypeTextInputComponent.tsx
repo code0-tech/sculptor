@@ -35,8 +35,7 @@ export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProp
         <DataTypeInputValueComponent initialValue={initialValue} onChange={value => {
             formValidation?.setValue?.(value)
             onChangeDebounced(value)
-        }} suggestions={suggestions}
-                                     formValidation={formValidation}>
+        }} suggestions={suggestions} formValidation={formValidation}>
             <EditorInput value={(defaultValue as LiteralValue)?.value?.toString()}
                          onChange={value => {
                              if (typeof value === "string") {
