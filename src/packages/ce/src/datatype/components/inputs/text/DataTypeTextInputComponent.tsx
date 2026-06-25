@@ -22,12 +22,9 @@ export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProp
 
     const defaultValue: NodeParameterValue | NodeFunction | undefined = React.useMemo(() => initialValue ?? undefined, [initialValue])
     const onChangeDebounced = useDebouncedCallback((value: string | LiteralValue | SubFlowValue | NodeFunction | ReferenceValue | null) => {
-
         if (typeof value === "string") {
-            formValidation?.setValue?.(value ? {__typename: "LiteralValue", value: value} : null)
             onChange?.(value ? {__typename: "LiteralValue", value: value} : null)
         } else {
-            formValidation?.setValue?.(value)
             onChange?.(value)
         }
     }, 400)
@@ -35,10 +32,20 @@ export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProp
     return React.useMemo(() => <>
         <InputLabel>{title}</InputLabel>
         <InputDescription>{description}</InputDescription>
-        <DataTypeInputValueComponent initialValue={initialValue} onChange={onChangeDebounced} suggestions={suggestions}
+        <DataTypeInputValueComponent initialValue={initialValue} onChange={value => {
+            formValidation?.setValue?.(value)
+            onChangeDebounced(value)
+        }} suggestions={suggestions}
                                      formValidation={formValidation}>
             <EditorInput value={(defaultValue as LiteralValue)?.value?.toString()}
-                         onChange={onChangeDebounced}
+                         onChange={value => {
+                             if (typeof value === "string") {
+                                 formValidation?.setValue?.(value ? {__typename: "LiteralValue", value: value} : null)
+                             } else {
+                                 formValidation?.setValue?.(value)
+                             }
+                             onChangeDebounced(value)
+                         }}
                          formValidation={{...formValidation, setValue: undefined}}
                          maw={"100%"}
                          placeholder={String(title) ?? ""}
@@ -52,7 +59,10 @@ export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProp
                              {tag: tags.keyword, color: hashToColor("bracket")},
                          ]}
                          right={
-                             <DataTypeInputControlsComponent suggestions={suggestions} onSelect={onChangeDebounced}/>
+                             <DataTypeInputControlsComponent suggestions={suggestions} onSelect={value => {
+                                 formValidation?.setValue?.(value)
+                                 onChangeDebounced(value)
+                             }}/>
                          }
                          rightType={"action"}/>
         </DataTypeInputValueComponent>
