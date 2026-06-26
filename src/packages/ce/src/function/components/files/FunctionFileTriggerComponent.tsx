@@ -83,7 +83,7 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
                 if (typeof index !== "number") return
 
                 const value = values[flowTypeSetting.id!]
-                await flowService.setSettingValue(flowId, index, value?.value, flowTypeSetting.identifier)
+                await flowService.setSettingValue(flowId, index, value?.value, definition!)
 
                 changedSettings.current.delete(flowTypeSetting.id!)
             }
