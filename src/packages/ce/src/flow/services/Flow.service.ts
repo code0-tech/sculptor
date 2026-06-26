@@ -2,6 +2,7 @@ import {ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor";
 import {
     FlowInput,
     FlowSetting,
+    FlowType,
     FunctionDefinition,
     LiteralValue,
     Maybe,
@@ -298,29 +299,48 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         await this.syncFlow(flowId)
     }
 
-    async setSettingValue(flowId: FlowView['id'], parameterIndex: number, value: FlowSetting['value'], flowSettingsIdentifier: FlowSetting['flowSettingIdentifier']): Promise<void> {
+    async setSettingValue(flowId: FlowView['id'], parameterIndex: number, value: FlowSetting['value'], flowType: FlowType): Promise<void> {
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
         if (!flow) return
 
-        flow.editedAt = new Date().toISOString()
+        if (!flow.settings) {
+            flow.settings = {
+                nodes: []
+            }
+        }
+
+        if (!flow.settings.nodes) {
+            flow.settings.nodes = []
+        }
+
+        flow.settings.nodes = flowType?.flowTypeSettings?.map((_, index) => {
+            const flowSetting = flow.settings?.nodes?.[index]
+            if (!flowSetting) {
+                return {
+                    __typename: 'FlowSetting',
+                    value: null,
+                }
+            }
+
+            return flowSetting
+        }) ?? []
 
         const setting: Maybe<FlowSetting> | undefined = flow.settings?.nodes?.[parameterIndex]
 
-        if (!setting) {
-            const localSetting = {
-                value: null,
-                flowSettingsIdentifier: flowSettingsIdentifier
+        if (!setting && flow.settings && flow.settings.nodes) {
+
+            const localParameter: FlowSetting = {
+                value: null
             }
-            localSetting.value = value
-            if (flow.settings && flow.settings.nodes)
-                flow.settings.nodes[parameterIndex] = localSetting
-            else {
-                flow.settings = {nodes: [localSetting]}
-            }
-        } else {
-            setting.flowSettingIdentifier = flowSettingsIdentifier
-            setting.value = value
+
+            localParameter.value = value as FlowSetting['value']
+            flow.editedAt = new Date().toISOString()
+            flow.settings.nodes[parameterIndex] = (localParameter)
+
+        } else if (setting) {
+            setting.value = value as FlowSetting['value']
+            flow.editedAt = new Date().toISOString()
         }
 
         this.set(index, new View(flow))
@@ -345,16 +365,17 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
             node.parameters.nodes = []
         }
 
-        functionDefinition?.parameterDefinitions?.nodes?.forEach((pD, index) => {
+        node.parameters.nodes = functionDefinition?.parameterDefinitions?.nodes?.map((_, index) => {
             const nodeParameter = node.parameters?.nodes?.[index]
             if (!nodeParameter) {
-
-                node!.parameters!.nodes![parameterIndex] = {
+                return {
                     __typename: "NodeParameter",
                     value: null,
                 }
             }
-        })
+
+            return nodeParameter
+        }) ?? []
 
         const parameter = node.parameters?.nodes?.[parameterIndex]
         if (!parameter && node.parameters && node.parameters.nodes) {
