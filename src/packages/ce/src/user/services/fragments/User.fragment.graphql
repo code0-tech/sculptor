@@ -39,5 +39,6 @@ fragment User on User {
     userAbilities {
         updateUser
         manageMfa
+        deleteUser
     }
 }
