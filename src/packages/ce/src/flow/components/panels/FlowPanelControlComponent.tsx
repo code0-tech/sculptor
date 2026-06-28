@@ -210,7 +210,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                     <Button paddingSize={"xxs"}
                             variant={"none"}
                             onClick={() => setAiOpen(true)}>
-                        Ask AI
+                        Edit with AI
                         <Badge color={"tertiary"}>
                             <IconArrowBigUp size={10}/>
                             +
