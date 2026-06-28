@@ -22,7 +22,7 @@ import Link from "next/link";
 import {StreamLanguage} from "@codemirror/language";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {Select} from "@radix-ui/react-select";
-import {IconChevronDown, IconPlayerStop, IconSend, IconSparkles2Filled} from "@tabler/icons-react";
+import {IconChevronDown, IconPlayerStop, IconSend, IconSparkles2Filled, IconX} from "@tabler/icons-react";
 import {AIService} from "@edition/ai/services/AI.service";
 import {motion} from "framer-motion";
 import {AiGenerateFlowSubscriptionPayload, Flow, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
@@ -34,12 +34,13 @@ export interface AIChatComponentProps {
     flowId?: Flow['id']
     prompt?: string
     onData?: (data: AiGenerateFlowSubscriptionPayload) => string | void
+    onClose?: () => void
 
 }
 
 export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
 
-    const {projectId, flowId, prompt = "", onData} = props
+    const {projectId, flowId, prompt = "", onData, onClose} = props
 
     const aiService = useService(AIService)
     const aiStore = useStore(AIService)
@@ -257,6 +258,11 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
                                     <IconSend size={13}/>
                                 </Button>
                             )}
+                            {onClose ? (
+                                <Button onClick={onClose} variant={"none"} color={"secondary"}>
+                                    <IconX size={13}/>
+                                </Button>
+                            ) : null}
                         </Flex>
                     </Flex>
                 </CardSection>

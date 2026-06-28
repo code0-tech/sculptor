@@ -240,7 +240,8 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                     )}
                     <AIChatComponent projectId={projectId}
                                      flowId={flowId}
-                                     onData={onAIData}/>
+                                     onData={onAIData}
+                                     onClose={() => setAiOpen(false)}/>
                 </Flex>
 
             </HoverCardContent>
