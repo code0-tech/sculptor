@@ -23,6 +23,7 @@ import {GraphQLFormattedError} from "graphql/error";
 import {addIslandErrorNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 import {createConsumer} from "@rails/actioncable";
 import ActionCableLink from "graphql-ruby-client/subscriptions/ActionCableLink";
+import {AIGenerationWatcherComponent} from "@edition/ai/components/AIGenerationWatcherComponent";
 
 /**
  * Load the Inter font with Latin subset and swap display strategy
@@ -222,6 +223,7 @@ export default function RootLayout({children}: Readonly<{ children: React.ReactN
         <Suspense fallback={"loading..."}>
             <ApolloProvider client={client}>
                 <Toaster position={"top-right"}/>
+                <AIGenerationWatcherComponent/>
                 {children}
             </ApolloProvider>
         </Suspense>
