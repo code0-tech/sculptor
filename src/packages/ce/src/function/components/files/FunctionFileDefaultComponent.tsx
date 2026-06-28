@@ -1,5 +1,5 @@
 import React from "react";
-import {Alert, Spacing, Text, useForm, useService} from "@code0-tech/pictor";
+import {Alert, Spacing, Text, useForm, useService, useStore} from "@code0-tech/pictor";
 import {
     Flow,
     LiteralValue,
@@ -10,6 +10,7 @@ import {
 } from "@code0-tech/sagittarius-graphql-types";
 import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
 import {FlowService} from "@edition/flow/services/Flow.service";
+import {FunctionService} from "@edition/function/services/Function.service";
 import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent";
 import {
     FALLBACK_FUNCTION_DESCRIPTION,
@@ -21,21 +22,29 @@ import {useNodes} from "@xyflow/react";
 import {NodeSchema} from "@code0-tech/triangulum";
 
 export interface FunctionFileDefaultComponentProps {
-    node: NodeFunction
+    nodeId: NodeFunction['id']
     flowId: Flow['id']
 }
 
 export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponentProps> = (props) => {
 
-    const {node, flowId} = props
+    const {nodeId, flowId} = props
 
     const flowService = useService(FlowService)
+    const flowStore = useStore(FlowService)
+    const functionService = useService(FunctionService)
+    const functionStore = useStore(FunctionService)
     const validation = useFlowValidation(flowId)
     const changedParameter = React.useRef<Set<string>>(new Set())
 
+    const node = React.useMemo(
+        () => flowService.getNodeById(flowId, nodeId)!,
+        [flowService, flowStore, flowId, nodeId]
+    )
+
     const definition = React.useMemo(
-        () => node.functionDefinition!,
-        [node.functionDefinition]
+        () => functionService.getById(node?.functionDefinition?.id!)!,
+        [functionService, functionStore, node?.functionDefinition?.id]
     )
 
     const initialValues = React.useMemo(() => {
