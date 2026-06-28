@@ -224,7 +224,7 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
                                     boxShadow: "none"
                                 }
                             }}
-                            placeholder={"Ask AI anything..."}
+                            placeholder={"Describe what you want to edit..."}
                             language={StreamLanguage.define({
                                 token(stream) {
                                     stream.next()

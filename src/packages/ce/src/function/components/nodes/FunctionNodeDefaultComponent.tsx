@@ -192,7 +192,7 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
                         e.preventDefault();
                     }}>
                         <IconSparkles size={13}/>
-                        <Text size={"xs"}>Ask AI</Text>
+                        <Text size={"xs"}>Edit with AI</Text>
                     </Button>
                 </ButtonGroup>
             </NodeToolbar>
