@@ -184,7 +184,7 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
                                                     h={"100%"}
                                                     value={node?.id!}
                                                     key={node?.id!}>
-                                <FunctionFileDefaultComponent node={node!} flowId={flowId}/>
+                                <FunctionFileDefaultComponent nodeId={node?.id!} flowId={flowId}/>
                             </FileTabsContent>
                         })
                     }

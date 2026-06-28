@@ -6,7 +6,7 @@ import lodash from "lodash"
 import {useFunctionSuggestions} from "@edition/function/hooks/Function.suggestion.hook";
 import {DataTypeInputValueComponent} from "@edition/datatype/components/inputs/DataTypeInputValueComponent";
 import {SuggestionDialogComponent} from "@edition/function/components/suggestion/SuggestionDialogComponent";
-import {Flow, LiteralValue, NodeFunction, ReferenceValue, SubFlowValue} from "@code0-tech/sagittarius-graphql-types";
+import {Flow, LiteralValue, ReferenceValue, SubFlowValue} from "@code0-tech/sagittarius-graphql-types";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {useParams} from "next/navigation";
 
@@ -31,11 +31,11 @@ export const DataTypeSubFlowInputComponent: React.FC<DataTypeSubFlowInputCompone
     const [suggestionDialogOpen, setSuggestionDialogOpen] = React.useState(false)
     const result = useFunctionSuggestions()
 
-    const onChangeDebounced = useDebouncedCallback((value: LiteralValue | SubFlowValue | ReferenceValue | NodeFunction | null) => {
+    const onChangeDebounced = useDebouncedCallback((value: LiteralValue | SubFlowValue | ReferenceValue | null) => {
         onChange?.(value ?? null)
     }, 200)
 
-    return React.useMemo(() => <>
+    return <>
         <SuggestionDialogComponent suggestions={[...suggestions!, ...result]}
                                    open={suggestionDialogOpen}
                                    onSuggestionSelect={value => {
@@ -47,7 +47,7 @@ export const DataTypeSubFlowInputComponent: React.FC<DataTypeSubFlowInputCompone
                                            }
                                        }
                                        formValidation?.setValue?.(value ?? null)
-                                       onChangeDebounced(value as NodeFunction)
+                                       onChangeDebounced(value as SubFlowValue)
                                    }}
                                    onOpenChange={setSuggestionDialogOpen}/>
         <InputLabel>{title}</InputLabel>
@@ -69,11 +69,11 @@ export const DataTypeSubFlowInputComponent: React.FC<DataTypeSubFlowInputCompone
                                              }
                                          }
                                          formValidation?.setValue?.(value ?? null)
-                                         onChangeDebounced(value ?? null)
+                                         onChangeDebounced(value as SubFlowValue)
                                      }}
                                      suggestions={suggestions}
                                      formValidation={formValidation}>
             <Text>Select next node</Text>
         </DataTypeInputValueComponent>
-    </>, [formValidation, defaultValue, suggestionDialogOpen])
+    </>
 }
