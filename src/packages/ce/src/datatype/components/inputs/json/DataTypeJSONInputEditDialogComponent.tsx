@@ -26,6 +26,7 @@ export interface DataTypeJSONInputEditDialogComponentProps {
     value: LiteralValue | null
     onOpenChange?: (open: boolean) => void
     onObjectChange?: (object: LiteralValue | null) => void
+    onObjectClose?: (object: LiteralValue | null) => void
 }
 
 function getValueAtPath(obj: LiteralValue | null, path: string[]): unknown {
@@ -75,6 +76,7 @@ export const DataTypeJSONInputEditDialogComponent: React.FC<DataTypeJSONInputEdi
         entry,
         value,
         onObjectChange,
+        onObjectClose,
         onOpenChange
     } = props
 
@@ -123,7 +125,10 @@ export const DataTypeJSONInputEditDialogComponent: React.FC<DataTypeJSONInputEdi
     }
 
     return (
-        <Dialog open={editOpen} onOpenChange={(open) => onOpenChange?.(open)}>
+        <Dialog open={editOpen} onOpenChange={(open) => {
+            onOpenChange?.(open)
+            if (!open) onObjectClose?.(editedObject)
+        }}>
             <DialogPortal>
                 <DialogOverlay/>
                 <DialogContent aria-describedby="DFlowInputObjectEditDialog" onPointerDownOutside={e => {
