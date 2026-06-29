@@ -1,5 +1,5 @@
 import React from "react";
-import {Alert, Spacing, Text, useForm, useService, useStore} from "@code0-tech/pictor";
+import {Alert, Button, Flex, Spacing, Text, useForm, useService, useStore} from "@code0-tech/pictor";
 import {
     Flow,
     LiteralValue,
@@ -20,6 +20,8 @@ import {
 } from "@core/util/fallback-translations";
 import {useNodes} from "@xyflow/react";
 import {NodeSchema} from "@code0-tech/triangulum";
+import * as Collapsible from "@radix-ui/react-collapsible";
+import {IconChevronDown} from "@tabler/icons-react";
 
 export interface FunctionFileDefaultComponentProps {
     nodeId: NodeFunction['id']
@@ -120,30 +122,55 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
         <Spacing spacing={"xl"}/>
         <Text size={"md"}>Parameters</Text>
         <Spacing spacing={"xs"}/>
-        {definition?.parameterDefinitions?.nodes?.map((parameterDefinition, index) => {
+        {(() => {
+            const indexedParameters = definition?.parameterDefinitions?.nodes
+                ?.map((parameterDefinition, index) => ({parameterDefinition, index}))
+                ?.filter(({parameterDefinition}) => parameterDefinition && !parameterDefinition.hidden) ?? []
 
-            if (!parameterDefinition) return null
+            const requiredParameters = indexedParameters.filter(({parameterDefinition}) => !parameterDefinition!.optional)
+            const optionalParameters = indexedParameters.filter(({parameterDefinition}) => parameterDefinition!.optional)
 
-            const title = parameterDefinition?.names?.[0]?.content ?? FALLBACK_FUNCTION_PARAMETER_NAME
-            const description = parameterDefinition?.descriptions?.[0]?.content ?? FALLBACK_FUNCTION_PARAMETER_DESCRIPTION
+            const renderParameter = (parameterDefinition: NonNullable<typeof indexedParameters[number]['parameterDefinition']>, index: number) => {
+                const title = parameterDefinition?.names?.[0]?.content ?? FALLBACK_FUNCTION_PARAMETER_NAME
+                const description = parameterDefinition?.descriptions?.[0]?.content ?? FALLBACK_FUNCTION_PARAMETER_DESCRIPTION
 
-            const schema = (flowNode?.data?.schema as NodeSchema[])?.[index]
+                const schema = (flowNode?.data?.schema as NodeSchema[])?.[index]
 
-            return <div>
-                <DataTypeInputComponent data-qa-selector={"flow-builder-parameter"}
-                                        title={title}
-                                        schema={schema}
-                                        description={description}
-                                        clearable
-                                        key={parameterDefinition.id}
-                                        onChange={() => {
-                                            changedParameter.current.add(parameterDefinition.id!)
-                                            validate()
-                                        }}
-                                        {...inputs.getInputProps(parameterDefinition.id!)}
-                />
-                <Spacing spacing={"xl"}/>
-            </div>
-        })}
+                return <div key={parameterDefinition.id}>
+                    <DataTypeInputComponent data-qa-selector={"flow-builder-parameter"}
+                                            title={title}
+                                            schema={schema}
+                                            description={description}
+                                            clearable
+                                            onChange={() => {
+                                                changedParameter.current.add(parameterDefinition.id!)
+                                                validate()
+                                            }}
+                                            {...inputs.getInputProps(parameterDefinition.id!)}
+                    />
+                    <Spacing spacing={"xl"}/>
+                </div>
+            }
+
+            return <>
+                {requiredParameters.map(({parameterDefinition, index}) => renderParameter(parameterDefinition!, index))}
+                {optionalParameters.length > 0 && (
+                    <Collapsible.Root>
+                        <Collapsible.Trigger asChild>
+                            <Flex justify={"space-between"} align={"center"} style={{gap: "0.7rem"}}>
+                                <Text size={"md"}>Optional parameters</Text>
+                                <Button variant={"none"} color={"primary"} paddingSize={"xxs"}>
+                                    <IconChevronDown size={16}/>
+                                </Button>
+                            </Flex>
+                        </Collapsible.Trigger>
+                        <Spacing spacing={"md"}/>
+                        <Collapsible.Content>
+                            {optionalParameters.map(({parameterDefinition, index}) => renderParameter(parameterDefinition!, index))}
+                        </Collapsible.Content>
+                    </Collapsible.Root>
+                )}
+            </>
+        })()}
     </>
 }

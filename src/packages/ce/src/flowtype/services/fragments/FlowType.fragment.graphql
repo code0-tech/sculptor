@@ -39,6 +39,8 @@ fragment FlowType on FlowType {
         updatedAt
         identifier
         unique
+        optional
+        hidden
         names {
             __typename
             code
