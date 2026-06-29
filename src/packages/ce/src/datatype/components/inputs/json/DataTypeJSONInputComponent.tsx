@@ -19,7 +19,6 @@ export interface EditableJSONEntry {
 
 export type DataTypeJSONInputComponentProps = DataTypeInputComponentProps
 
-//TODO render fallback value if undefined based on schema
 export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProps> = (props) => {
 
     const {schema, title, description, suggestions, formValidation, initialValue, onChange} = props
