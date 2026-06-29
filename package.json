@@ -28,6 +28,7 @@
     "@opentelemetry/instrumentation-fetch": "^0.218.0",
     "@opentelemetry/instrumentation-xml-http-request": "^0.218.0",
     "@opentelemetry/sdk-trace-web": "^2.6.1",
+    "@radix-ui/react-collapsible": "^1.1.14",
     "@rails/actioncable": "^8.1.300",
     "@types/rails__actioncable": "^8.0.3",
     "@uidotdev/usehooks": "^2.4.1",
