@@ -54,6 +54,8 @@ fragment Function on FunctionDefinition {
             createdAt
             identifier
             defaultValue
+            optional
+            hidden
             names {
                 code
                 content
