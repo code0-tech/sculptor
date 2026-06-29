@@ -9,6 +9,7 @@ import Link from "next/link";
 import {UserService} from "@edition/user/services/User.service";
 import {InputSyntaxSegment} from "@code0-tech/pictor/dist/components/form/Input.syntax.hook";
 import {UserInputComponent} from "@edition/user/components/UserInputComponent";
+import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 
 export const MemberAddPage: React.FC = () => {
 
@@ -43,13 +44,20 @@ export const MemberAddPage: React.FC = () => {
         },
         onSubmit: (values) => {
             startTransition(async () => {
-                for (const value of values.users!!) {
-                    await memberService.memberInvite({
+
+                const invitePromises = values.users!!.map((value) =>
+                    memberService.memberInvite({
                         namespaceId: namespaceId!!,
-                        userId: (value.value)._id!!
+                        userId: (value.value).id!!
                     })
-                }
-                router.push(`/namespace/${namespaceIndex}/members`)
+                )
+
+                await Promise.all(invitePromises).then(() => {
+                    router.push(`/namespace/${namespaceIndex}/members`)
+                    addIslandSuccessNotification({
+                        message: "Added members",
+                    })
+                })
             })
         }
     })

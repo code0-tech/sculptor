@@ -2,6 +2,4 @@
 
 import {MemberAddPage} from "@edition/member/pages/MemberAddPage";
 
-export default function Page() {
-    return <MemberAddPage/>
-}
+export default MemberAddPage
