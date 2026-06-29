@@ -11,8 +11,8 @@ export default function AuthLayout({children}: Readonly<{ children: React.ReactN
         borderTopLeftRadius: "1rem",
         borderTopRightRadius: "1rem"
     }}>
-        <Flex h={"100%"} w={"100%"} align={"center"} justify={"center"}>
-            <Col xs={4} style={{marginTop: "auto", marginBottom: "auto"}}>
+        <Flex h={"100%"} w={"100%"} justify={"center"}>
+            <Col xs={4} h={"100%"} py={7.5}>
                 {children}
             </Col>
         </Flex>
