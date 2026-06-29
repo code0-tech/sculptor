@@ -57,7 +57,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                     entry={editEntry}
                     value={value as LiteralValue}
                     onOpenChange={open => setEditDialogOpen(open)}
-                    onObjectChange={(value) => {
+                    onObjectClose={(value) => {
                         formValidation?.setValue?.(value)
                         onChangeDebounced(value)
                     }}
