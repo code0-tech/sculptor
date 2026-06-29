@@ -1,5 +1,5 @@
 import React from "react";
-import {Alert, Spacing, Text, useForm, useService, useStore} from "@code0-tech/pictor";
+import {Alert, Button, Flex, Spacing, Text, useForm, useService, useStore} from "@code0-tech/pictor";
 import {Flow, LiteralValue, Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
@@ -13,6 +13,8 @@ import {
 } from "@core/util/fallback-translations";
 import {useNodesData} from "@xyflow/react";
 import {NodeSchema} from "@code0-tech/triangulum";
+import * as Collapsible from "@radix-ui/react-collapsible";
+import {IconChevronDown} from "@tabler/icons-react";
 
 export interface FunctionFileTriggerComponentProps {
     flowId: Flow['id']
@@ -118,30 +120,54 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
         <Spacing spacing={"xl"}/>
         <Text size={"md"}>Settings</Text>
         <Spacing spacing={"xl"}/>
-        {definition?.flowTypeSettings?.map((settingDefinition, index) => {
+        {(() => {
+            const indexedSettings = definition?.flowTypeSettings
+                ?.map((settingDefinition, index) => ({settingDefinition, index}))
+                ?.filter(({settingDefinition}) => settingDefinition && !settingDefinition.hidden) ?? []
 
-            if (!settingDefinition) return null
+            const requiredSettings = indexedSettings.filter(({settingDefinition}) => !settingDefinition!.optional)
+            const optionalSettings = indexedSettings.filter(({settingDefinition}) => settingDefinition!.optional)
 
-            const title = settingDefinition.names?.[0]?.content ?? FALLBACK_FLOW_TYPE_SETTING_NAME
-            const description = settingDefinition?.descriptions?.[0]?.content ?? FALLBACK_FLOW_TYPE_SETTING_DESCRIPTION
+            const renderSetting = (settingDefinition: NonNullable<typeof indexedSettings[number]['settingDefinition']>, index: number) => {
+                const title = settingDefinition.names?.[0]?.content ?? FALLBACK_FLOW_TYPE_SETTING_NAME
+                const description = settingDefinition?.descriptions?.[0]?.content ?? FALLBACK_FLOW_TYPE_SETTING_DESCRIPTION
 
-            return <div>
-                {/*@ts-ignore*/}
-                <DataTypeInputComponent data-qa-selector={"flow-builder-setting"}
-                                        title={title}
-                                        schema={(flowNode?.data?.schema as NodeSchema[])?.[index]}
-                                        description={description}
-                                        clearable
-                                        key={settingDefinition.id}
-                                        onChange={() => {
-                                            changedSettings.current.add(settingDefinition.id!)
-                                            validate()
-                                        }}
-                                        {...inputs.getInputProps(settingDefinition.id!)}
-                />
-                <Spacing spacing={"xl"}/>
-            </div>
+                return <div key={settingDefinition.id}>
+                    {/*@ts-ignore*/}
+                    <DataTypeInputComponent data-qa-selector={"flow-builder-setting"}
+                                            title={title}
+                                            schema={(flowNode?.data?.schema as NodeSchema[])?.[index]}
+                                            description={description}
+                                            clearable
+                                            onChange={() => {
+                                                changedSettings.current.add(settingDefinition.id!)
+                                                validate()
+                                            }}
+                                            {...inputs.getInputProps(settingDefinition.id!)}
+                    />
+                    <Spacing spacing={"xl"}/>
+                </div>
+            }
 
-        })}
+            return <>
+                {requiredSettings.map(({settingDefinition, index}) => renderSetting(settingDefinition!, index))}
+                {optionalSettings.length > 0 && (
+                    <Collapsible.Root>
+                        <Collapsible.Trigger asChild>
+                            <Flex justify={"space-between"} align={"center"} style={{gap: "0.7rem"}}>
+                                <Text size={"md"}>Optional settings</Text>
+                                <Button variant={"none"} color={"primary"} paddingSize={"xxs"}>
+                                    <IconChevronDown size={16}/>
+                                </Button>
+                            </Flex>
+                        </Collapsible.Trigger>
+                        <Spacing spacing={"md"}/>
+                        <Collapsible.Content>
+                            {optionalSettings.map(({settingDefinition, index}) => renderSetting(settingDefinition!, index))}
+                        </Collapsible.Content>
+                    </Collapsible.Root>
+                )}
+            </>
+        })()}
     </>
 })
