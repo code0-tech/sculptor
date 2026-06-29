@@ -13,6 +13,10 @@ import {
     MenuItem,
     MenuPortal,
     MenuTrigger,
+    ScrollArea,
+    ScrollAreaScrollbar,
+    ScrollAreaThumb,
+    ScrollAreaViewport,
     SelectContent,
     SelectItem,
     SelectItemText,
@@ -141,34 +145,41 @@ export const ModuleConfigurationPage: React.FC = () => {
     })
 
     return <>
-        <Text size={"xl"} hierarchy={"primary"}>
-            {module?.names?.[0].content} plugin configuration
-        </Text>
-        <Spacing spacing={"xs"}/>
-        <Text size={"md"} hierarchy={"tertiary"}>
-            {module?.descriptions?.[0]?.content}<br/>
-            This plugin was developed by {" "}
-            <Badge color={"lightblue"}>
-                @{module?.author}
-            </Badge>
-        </Text>
-        <Spacing spacing={"xl"}/>
-        {
-            module?.configurationDefinitions?.nodes?.map((moduleConfiguration, index) => {
+        <ScrollArea h={"100%"} w={"100%"} type={"scroll"}>
+            <ScrollAreaViewport>
+                <Text size={"xl"} hierarchy={"primary"}>
+                    {module?.names?.[0].content} plugin configuration
+                </Text>
+                <Spacing spacing={"xs"}/>
+                <Text size={"md"} hierarchy={"tertiary"}>
+                    {module?.descriptions?.[0]?.content}<br/>
+                    This plugin was developed by {" "}
+                    <Badge color={"lightblue"}>
+                        @{module?.author}
+                    </Badge>
+                </Text>
+                <Spacing spacing={"xl"}/>
+                {
+                    module?.configurationDefinitions?.nodes?.map((moduleConfiguration, index) => {
 
-                if (!moduleConfiguration) return null
-                if (!moduleConfigurationSchemas[index]) return null
+                        if (!moduleConfiguration) return null
+                        if (!moduleConfigurationSchemas[index]) return null
 
-                return <div key={moduleConfiguration.id}>
-                    <DataTypeInputComponent description={moduleConfiguration.descriptions?.[0]?.content}
-                                            title={moduleConfiguration.names?.[0]?.content}
-                                            schema={moduleConfigurationSchemas[index]!}
-                                            clearable
-                                            {...inputs.getInputProps(moduleConfiguration.id!)}/>
-                    <Spacing spacing={"xl"}/>
-                </div>
-            })
-        }
+                        return <div key={moduleConfiguration.id}>
+                            <DataTypeInputComponent description={moduleConfiguration.descriptions?.[0]?.content}
+                                                    title={moduleConfiguration.names?.[0]?.content}
+                                                    schema={moduleConfigurationSchemas[index]!}
+                                                    clearable
+                                                    {...inputs.getInputProps(moduleConfiguration.id!)}/>
+                            <Spacing spacing={"xl"}/>
+                        </div>
+                    })
+                }
+            </ScrollAreaViewport>
+            <ScrollAreaScrollbar orientation={"vertical"}>
+                <ScrollAreaThumb/>
+            </ScrollAreaScrollbar>
+        </ScrollArea>
         <Panel position={"bottom-center"} style={{bottom: "1.3rem"}}>
             <ButtonGroup>
                 <Select key={runtime?.id}
