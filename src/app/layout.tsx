@@ -142,7 +142,7 @@ const toastHandler = (error: Error | GraphQLFormattedError) => {
     console.error("[ERROR]", error)
     if (error && "errorCode" in error) {
         addIslandErrorNotification({
-            message: ErrorCodeDescription[(error.errorCode as string)]
+            message: ErrorCodeDescription[(error.errorCode as string)] ?? "Internal error"
         })
     } else {
         addIslandErrorNotification({
