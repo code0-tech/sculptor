@@ -399,21 +399,18 @@ export const FlowExecutionResultView: React.FC = () => {
                                                                         }) : item.type === "trigger" ? (
                                                                             <JsonView collapsed  value={item.data.input ?? {}}/>
                                                                         ) : null}
-                                                                        {
-                                                                            item.data.error ? (
-                                                                                <>
-                                                                                    <Text size={"md"}>
-                                                                                        Error
-                                                                                    </Text>
-                                                                                    <JsonView collapsed  value={item.data.error ?? {}}/>
-                                                                                </>
-                                                                            ) : null
-                                                                        }
                                                                     </>
 
                                                                     <Spacing spacing={"xs"}/>
                                                                     {
-                                                                        item.data.success && (
+                                                                        item.data.error ? (
+                                                                            <>
+                                                                                <Text size={"md"}>
+                                                                                    Error
+                                                                                </Text>
+                                                                                <JsonView collapsed  value={item.data.error ?? {}}/>
+                                                                            </>
+                                                                            ) : (
                                                                             <div>
                                                                                 <Text size={"md"}>
                                                                                     Result
