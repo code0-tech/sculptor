@@ -32,7 +32,7 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
     const {schema, ...rest} = props
 
     const suggestions = "schema" in (schema ?? {}) ? (schema as NodeSchema)?.schema?.suggestions as (NodeFunction | ReferenceValue | LiteralValue)[] : []
-    const inputName = "schema" in (schema ?? {}) ? ((schema as NodeSchema)?.schema?.input === "generic" ? (schema as NodeSchema).functionSchema.input : (schema as NodeSchema)?.schema?.input) : (schema as Schema).input
+    const inputName = "schema" in (schema ?? {}) ? (schema as NodeSchema)?.schema?.input : (schema as Schema).input
 
     if ("schema" in (schema ?? {}) && ((schema as NodeSchema).blockedBy?.length ?? 0) > 0) {
         return null
