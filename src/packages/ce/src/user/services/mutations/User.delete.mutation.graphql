@@ -1,0 +1,17 @@
+mutation delete($userId: UserID!) {
+    usersDelete(input: {
+        userId: $userId
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        user {
+            id
+        }
+    }
+}
