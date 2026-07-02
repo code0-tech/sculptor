@@ -8,19 +8,19 @@ import {
     InMemoryCache,
     Observable,
     ServerError,
-    split,
 } from "@apollo/client";
 import {ApolloProvider} from "@apollo/client/react";
 import React, {Suspense} from "react";
 import "./global.scss"
 import {setContext} from "@apollo/client/link/context";
 import {ErrorLink} from "@apollo/client/link/error";
-import {useRouter} from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
 import {Toaster} from "sonner";
 import {Error} from "@code0-tech/sagittarius-graphql-types";
 import {Inter} from 'next/font/google'
 import {GraphQLFormattedError} from "graphql/error";
 import {addIslandErrorNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast as pictorToast} from "@code0-tech/pictor/dist/components/toast/Toast";
 import {createConsumer} from "@rails/actioncable";
 import ActionCableLink from "graphql-ruby-client/subscriptions/ActionCableLink";
 import {AIGenerationWatcherComponent} from "@edition/ai/components/AIGenerationWatcherComponent";
@@ -135,21 +135,10 @@ const ErrorCodeDescription: Record<string, string> = {
     WRONG_TOTP: "Wrong TOTP code",
 }
 
-/**
- * Handles error toasts based on error type
- */
-const toastHandler = (error: Error | GraphQLFormattedError) => {
-    console.error("[ERROR]", error)
-    if (error && "errorCode" in error) {
-        addIslandErrorNotification({
-            message: ErrorCodeDescription[(error.errorCode as string)] ?? "Internal error"
-        })
-    } else {
-        addIslandErrorNotification({
-            message: "Internal error"
-        })
-    }
-}
+const AUTH_ROUTES = ["/login", "/register", "/email", "/password", "/redirect"]
+
+const isAuthRoute = (pathname: string | null): boolean =>
+    !!pathname && AUTH_ROUTES.some(route => pathname === route || pathname.startsWith(`${route}/`))
 
 /**
  * Root layout component that sets up Apollo Client and error handling
@@ -157,6 +146,24 @@ const toastHandler = (error: Error | GraphQLFormattedError) => {
 export default function RootLayout({children}: Readonly<{ children: React.ReactNode }>) {
 
     const router = useRouter()
+    const pathname = usePathname()
+
+    /**
+     * Handles error toasts based on error type. On (auth) pages the Island is not
+     * mounted, so fall back to pictor's standalone toast.
+     */
+    const toastHandler = (error: Error | GraphQLFormattedError) => {
+        console.error("[ERROR]", error)
+        const message = (error && "errorCode" in error)
+            ? (ErrorCodeDescription[(error.errorCode as string)] ?? "Internal error")
+            : "Internal error"
+
+        if (isAuthRoute(pathname)) {
+            pictorToast({title: message, color: "error", dismissible: true})
+        } else {
+            addIslandErrorNotification({message})
+        }
+    }
 
     /**
      * Apollo Error Link to handle GraphQL and network errors
