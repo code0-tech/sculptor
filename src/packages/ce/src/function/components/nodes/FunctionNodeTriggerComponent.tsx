@@ -91,7 +91,7 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
     const validation = useFlowValidation(data.flowId)
 
     const triggerValidations = React.useMemo(
-        () => validation?.filter(v => v.nodeId === null && v.parameterIndex === null),
+        () => validation?.filter(v => v.nodeId === null),
         [validation]
     )
 
