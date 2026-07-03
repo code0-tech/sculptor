@@ -16,12 +16,15 @@ import {
     useStore
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
+import Link from "next/link";
 import {notFound} from "next/navigation";
 import {UserDataTableComponent} from "@edition/user/components/UserDataTableComponent";
 import {DataTableFilterProps, DataTableSortProps} from "@code0-tech/pictor/dist/components/data-table/DataTable";
 import {UserDataTableFilterInputComponent} from "@edition/user/components/UserDataTableFilterInputComponent";
+import {UserEditDialogComponent} from "@edition/user/components/UserEditDialogComponent";
 import {IconMinus, IconSortAscending, IconSortDescending} from "@tabler/icons-react";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
+import {User} from "@code0-tech/sagittarius-graphql-types";
 
 export const UsersPage: React.FC = () => {
 
@@ -32,6 +35,7 @@ export const UsersPage: React.FC = () => {
 
     const [filter, setFilter] = React.useState<DataTableFilterProps>({})
     const [sort, setSort] = React.useState<DataTableSortProps>({})
+    const [editUserId, setEditUserId] = React.useState<User['id'] | undefined>(undefined)
 
     if (currentUser && !currentUser.admin) {
         notFound()
@@ -54,7 +58,9 @@ export const UsersPage: React.FC = () => {
                 </Text>
             </Flex>
             <ButtonGroup>
-                <Button color={"success"}>Invite</Button>
+                <Link href={`/users/invite`}>
+                    <Button color={"success"}>Invite</Button>
+                </Link>
                 <Menu>
                     <MenuTrigger asChild>
                         <Button color={"secondary"} variant={"filled"}>Sort</Button>
@@ -124,6 +130,12 @@ export const UsersPage: React.FC = () => {
             <UserDataTableFilterInputComponent onChange={filter => setFilter(filter)}/>
         </div>
         <Spacing spacing={"xl"}/>
-        <UserDataTableComponent sort={sort} filter={filter}/>
+        <UserDataTableComponent sort={sort} filter={filter}
+                                onSelect={(item) => setEditUserId(item?.id)}/>
+        <UserEditDialogComponent userId={editUserId}
+                                 open={editUserId !== undefined}
+                                 onOpenChange={(open) => {
+                                     if (!open) setEditUserId(undefined)
+                                 }}/>
     </div>
 }
