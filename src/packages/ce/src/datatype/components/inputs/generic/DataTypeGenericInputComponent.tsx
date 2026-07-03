@@ -1,7 +1,7 @@
 import {DataTypeInputComponentProps} from "@edition/datatype/components/inputs/DataTypeInputComponent";
 import React from "react";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
-import {Button, InputDescription, InputLabel} from "@code0-tech/pictor";
+import {Button, InputDescription, InputLabel, InputMessage} from "@code0-tech/pictor";
 import {useDebouncedCallback} from "use-debounce";
 import {LiteralValue, NodeFunction, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
 
@@ -70,6 +70,9 @@ export const DataTypeGenericInputComponent: React.FC<DataTypeGenericInputCompone
                 Data Value
             </Button>
         </ButtonGroup>
+        {!formValidation?.valid && formValidation?.notValidMessage && (
+            <InputMessage>{formValidation.notValidMessage}</InputMessage>
+        )}
     </>
 
 }
