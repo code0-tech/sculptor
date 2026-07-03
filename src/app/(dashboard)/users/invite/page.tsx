@@ -1,3 +1,3 @@
-export default function Page() {
-    return null
-}
+import {UserInvitePage} from "@edition/user/pages/UserInvitePage";
+
+export default UserInvitePage
