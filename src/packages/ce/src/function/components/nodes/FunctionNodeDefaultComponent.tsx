@@ -4,7 +4,7 @@ import "./FunctionNodeComponent.style.scss";
 import {FunctionNodeComponentProps} from "./FunctionNodeComponent";
 import {Badge, Button, ButtonGroup, Card, Flex, Text, useService, useStore as usePictorStore} from "@code0-tech/pictor";
 import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
-import {IconBackspace, IconEdit, IconSparkles, IconVariable} from "@tabler/icons-react";
+import {IconBackspace, IconCircleX, IconEdit, IconSparkles, IconVariable} from "@tabler/icons-react";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {LiteralBadgeComponent} from "@edition/datatype/components/badges/LiteralBadgeComponent";
@@ -43,7 +43,7 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
     const validation = useFlowValidation(data.flowId)
 
     const nodeValidations = React.useMemo(
-        () => validation?.filter(v => v.nodeId === data.nodeId && v.parameterIndex === null && !data.functionId),
+        () => validation?.filter(v => v.nodeId === data.nodeId && !data.functionId),
         [validation]
     )
 

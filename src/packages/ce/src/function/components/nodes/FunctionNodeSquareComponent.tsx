@@ -40,7 +40,7 @@ export const FunctionNodeSquareComponent: React.FC<FunctionNodeSquareComponentPr
     const validation = useFlowValidation(data.flowId)
 
     const nodeValidations = React.useMemo(
-        () => validation?.filter(v => v.nodeId === data.nodeId && v.parameterIndex === null && !data.functionId),
+        () => validation?.filter(v => v.nodeId === data.nodeId && !data.functionId),
         [validation]
     )
 
