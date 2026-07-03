@@ -1,0 +1,24 @@
+#import "@edition/user/services/fragments/User.basic.fragment.graphql"
+mutation create($email: String!, $password: String!, $passwordRepeat: String!, $username: String!, $firstname: String, $lastname: String, $admin: Boolean) {
+    usersCreate(input: {
+        email: $email
+        password: $password
+        passwordRepeat: $passwordRepeat
+        username: $username
+        firstname: $firstname
+        lastname: $lastname
+        admin: $admin
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        user {
+            ...UserBasic
+        }
+    }
+}

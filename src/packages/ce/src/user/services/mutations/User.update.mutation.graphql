@@ -1,0 +1,26 @@
+#import "@edition/user/services/fragments/User.basic.fragment.graphql"
+mutation update($userId: UserID!, $email: String, $username: String, $firstname: String, $lastname: String, $readme: String, $admin: Boolean, $password: String, $passwordRepeat: String) {
+    usersUpdate(input: {
+        userId: $userId
+        email: $email
+        username: $username
+        firstname: $firstname
+        lastname: $lastname
+        readme: $readme
+        admin: $admin
+        password: $password
+        passwordRepeat: $passwordRepeat
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        user {
+            ...UserBasic
+        }
+    }
+}

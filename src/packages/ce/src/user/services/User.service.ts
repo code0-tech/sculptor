@@ -3,6 +3,8 @@ import {
     Mutation,
     Query,
     User,
+    UsersCreateInput,
+    UsersCreatePayload,
     UsersEmailVerificationInput,
     UsersEmailVerificationPayload,
     UsersIdentityLinkInput,
@@ -28,9 +30,13 @@ import {
     UsersPasswordResetRequestInput,
     UsersPasswordResetRequestPayload,
     UsersRegisterInput,
-    UsersRegisterPayload
+    UsersRegisterPayload,
+    UsersUpdateInput,
+    UsersUpdatePayload
 } from "@code0-tech/sagittarius-graphql-types";
 import {GraphqlClient} from "@core/util/graphql-client";
+import createMutation from "./mutations/User.create.mutation.graphql";
+import updateMutation from "./mutations/User.update.mutation.graphql";
 import loginMutation from "./mutations/User.login.mutation.graphql";
 import logoutMutation from "./mutations/User.logout.mutation.graphql";
 import registerMutation from "./mutations/User.register.mutation.graphql";
@@ -117,6 +123,40 @@ export class UserService extends ReactiveArrayService<User> {
     hasById(id: User["id"]): boolean {
         const user = super.values().find(u => u.id === id);
         return user !== undefined;
+    }
+
+    async usersCreate(payload: UsersCreateInput): Promise<UsersCreatePayload | undefined> {
+        const result = await this.client.mutate<Mutation, UsersCreateInput>({
+            mutation: createMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        if (result.data && result.data.usersCreate && result.data.usersCreate.user && !this.hasById(result.data.usersCreate.user.id)) {
+            this.add(new View(result.data.usersCreate.user))
+        }
+
+        return result.data?.usersCreate ?? undefined
+    }
+
+    async usersUpdate(payload: UsersUpdateInput): Promise<UsersUpdatePayload | undefined> {
+        const result = await this.client.mutate<Mutation, UsersUpdateInput>({
+            mutation: updateMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        if (result.data && result.data.usersUpdate && result.data.usersUpdate.user) {
+            //TODO: dont use the result. Instead merge result and already existing data together
+            const updatedUser = result.data.usersUpdate.user
+            const index = super.values().findIndex(user => user.id === updatedUser.id)
+            if (index >= 0) this.set(index, new View(updatedUser))
+            else if (!this.hasById(updatedUser.id)) this.add(new View(updatedUser))
+        }
+
+        return result.data?.usersUpdate ?? undefined
     }
 
     async usersEmailVerification(payload: UsersEmailVerificationInput): Promise<UsersEmailVerificationPayload | undefined> {
