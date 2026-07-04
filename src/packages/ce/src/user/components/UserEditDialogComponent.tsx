@@ -4,7 +4,8 @@ import React from "react";
 import {
     Button,
     ButtonGroup,
-    Card, Col,
+    Card,
+    Col,
     Dialog,
     DialogClose,
     DialogContent,
@@ -14,7 +15,8 @@ import {
     emailValidation,
     Flex,
     PasswordInput,
-    passwordValidation, Row,
+    passwordValidation,
+    Row,
     Spacing,
     SwitchInput,
     Text,
@@ -28,12 +30,10 @@ import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {User, UsersUpdateInput} from "@code0-tech/sagittarius-graphql-types";
 import {UserService} from "@edition/user/services/User.service";
-import {
-    addIslandErrorNotification,
-    addIslandSuccessNotification
-} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 import {IconAt, IconLock, IconMail, IconUser, IconX} from "@tabler/icons-react";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
+import {motion} from "framer-motion";
 
 export interface UserEditDialogComponentProps {
     userId?: User['id']
@@ -141,34 +141,60 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                 w={"75%"} h={"75%"}>
                 <Tab orientation={"vertical"} defaultValue={"general"} w={"100%"} h={"100%"}>
                     <Layout layoutGap={0} showLayoutSplitter={false}
-                            leftContent={<div style={{maxWidth: "200px", padding: "0.7rem", marginTop: "0.55rem"}}>
-                                <Text size={"lg"} hierarchy={"primary"}>
-                                    Settings of @{user?.username ?? ""}
-                                </Text>
-                                <Spacing spacing={"xxs"}/>
-                                <Text size={"sm"} hierarchy={"tertiary"} style={{textWrap: "wrap"}}>
-                                    Edit the general settings, permissions and security for user
-                                    @{user?.username ?? ""}
-                                </Text>
-                                <Spacing spacing={"md"}/>
-                                <TabList>
-                                    <TabTrigger value={"general"} w={"100%"} asChild>
-                                        <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                            <Text size={"md"}>General</Text>
-                                        </Button>
-                                    </TabTrigger>
-                                    <TabTrigger value={"permissions"} w={"100%"} asChild>
-                                        <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                            <Text size={"md"}>Permissions</Text>
-                                        </Button>
-                                    </TabTrigger>
-                                    <TabTrigger value={"security"} w={"100%"} asChild>
-                                        <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                            <Text size={"md"}>Security</Text>
-                                        </Button>
-                                    </TabTrigger>
-                                </TabList>
-                            </div>}>
+                            leftContent={
+                                <motion.div layout
+                                            transition={{
+                                                type: "spring",
+                                                stiffness: 300,
+                                                damping: 20,
+                                                mass: 0.8
+                                            }}
+                                            initial={{
+                                                width: "200px",
+                                                opacity: 0.25,
+                                            }}
+                                            whileInView={{
+                                                width: "200px",
+                                                opacity: 0.25,
+                                            }}
+                                            whileHover={{
+                                                width: "250px",
+                                                opacity: 1,
+                                            }}
+                                            style={{
+                                                padding: "0.7rem",
+                                                marginTop: "0.55rem",
+                                                height: "100%"
+                                            }}
+                                >
+                                    <Text size={"lg"} hierarchy={"primary"}>
+                                        Settings of @{user?.username ?? ""}
+                                    </Text>
+                                    <Spacing spacing={"xxs"}/>
+                                    <Text size={"sm"} maw={"150px"} hierarchy={"tertiary"} style={{textWrap: "wrap"}}>
+                                        Edit the general settings, permissions and security for user
+                                        @{user?.username ?? ""}
+                                    </Text>
+                                    <Spacing spacing={"md"}/>
+                                    <TabList>
+                                        <TabTrigger value={"general"} w={"100%"} asChild>
+                                            <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                                <Text size={"md"}>General</Text>
+                                            </Button>
+                                        </TabTrigger>
+                                        <TabTrigger value={"permissions"} w={"100%"} asChild>
+                                            <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                                <Text size={"md"}>Permissions</Text>
+                                            </Button>
+                                        </TabTrigger>
+                                        <TabTrigger value={"security"} w={"100%"} asChild>
+                                            <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                                <Text size={"md"}>Security</Text>
+                                            </Button>
+                                        </TabTrigger>
+                                    </TabList>
+                                </motion.div>
+                            }>
                         <Card color={"primary"} paddingSize={"md"} h={"100%"} w={"100%"}>
                             <TabContent value={"general"} style={{overflow: "hidden"}}>
                                 <Flex justify={"space-between"} align={"center"}>
