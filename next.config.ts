@@ -49,6 +49,10 @@ const nextConfig: NextConfig = {
                 loaders: ["graphql-tag/loader"],
                 as: "*.js"
             },
+            "*.svg": {
+                loaders: ["@svgr/webpack"],
+                as: "*.js"
+            },
         },
     },
     rewrites: () => {
