@@ -1,8 +1,6 @@
 import React from "react";
 import {DataTypeInputComponentProps} from "../DataTypeInputComponent";
-import {EditorInput, hashToColor, InputDescription, InputLabel} from "@code0-tech/pictor";
-import {StreamLanguage} from "@codemirror/language";
-import {tags} from "@lezer/highlight";
+import {EditorInput, InputDescription, InputLabel} from "@code0-tech/pictor";
 import {useDebouncedCallback} from "use-debounce";
 import {
     LiteralValue,
@@ -48,15 +46,6 @@ export const DataTypeTextInputComponent: React.FC<DataTypeTextInputComponentProp
                          formValidation={{...formValidation, setValue: undefined}}
                          maw={"100%"}
                          placeholder={String(title) ?? ""}
-                         language={StreamLanguage.define({
-                             token(stream) {
-                                 stream.next()
-                                 return null;
-                             }
-                         })}
-                         tokenStyles={[
-                             {tag: tags.keyword, color: hashToColor("bracket")},
-                         ]}
                          right={
                              <DataTypeInputControlsComponent suggestions={suggestions} onSelect={value => {
                                  formValidation?.setValue?.(value)

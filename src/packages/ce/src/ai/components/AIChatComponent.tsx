@@ -178,13 +178,7 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
                                     boxShadow: "none"
                                 }
                             }}
-                            placeholder={"Describe what you want to edit..."}
-                            language={StreamLanguage.define({
-                                token(stream) {
-                                    stream.next()
-                                    return null;
-                                }
-                            })}/>
+                            placeholder={"Describe what you want to edit..."}/>
                     )
                 }
                 <Spacing spacing={"xxs"}/>
