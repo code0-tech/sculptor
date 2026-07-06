@@ -34,48 +34,53 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
     const suggestions = "schema" in (schema ?? {}) ? (schema as NodeSchema)?.schema?.suggestions as (NodeFunction | ReferenceValue | LiteralValue)[] : []
     const inputName = "schema" in (schema ?? {}) ? (schema as NodeSchema)?.schema?.input : (schema as Schema)?.input
 
-    if ("schema" in (schema ?? {}) && (((schema as NodeSchema).blockedBy?.length ?? 0) > 0) && (rest.formValidation?.valid ?? false)) {
-        return null
-    }
+    return React.useMemo(
+        () => {
+            if ("schema" in (schema ?? {}) && (((schema as NodeSchema).blockedBy?.length ?? 0) > 0) && (rest.formValidation?.valid ?? false)) {
+                return null
+            }
 
-    switch (inputName) {
-        case "boolean":
-            return <DataTypeBooleanInputComponent
-                schema={schema}
-                suggestions={suggestions}
-                {...rest}
-            />
-        case "select":
-            return <DataTypeSelectInputComponent
-                schema={schema}
-                suggestions={suggestions}
-                {...rest}/>
-        case "number":
-            return <DataTypeNumberInputComponent
-                schema={schema}
-                suggestions={suggestions}
-                {...rest}/>
-        case "list":
-        case "data":
-            return <DataTypeJSONInputComponent
-                schema={schema}
-                suggestions={suggestions}
-                {...rest}/>
-        case "generic":
-            return <DataTypeGenericInputComponent
-                schema={schema}
-                suggestions={suggestions}
-                {...rest}/>
-        case "sub-flow":
-            return <DataTypeSubFlowInputComponent
-                schema={schema}
-                suggestions={suggestions}
-                {...rest}/>
-        default:
-            return <DataTypeTextInputComponent
-                suggestions={suggestions}
-                schema={schema}
-                {...rest}
-            />
-    }
+            switch (inputName) {
+                case "boolean":
+                    return <DataTypeBooleanInputComponent
+                        schema={schema}
+                        suggestions={suggestions}
+                        {...rest}
+                    />
+                case "select":
+                    return <DataTypeSelectInputComponent
+                        schema={schema}
+                        suggestions={suggestions}
+                        {...rest}/>
+                case "number":
+                    return <DataTypeNumberInputComponent
+                        schema={schema}
+                        suggestions={suggestions}
+                        {...rest}/>
+                case "list":
+                case "data":
+                    return <DataTypeJSONInputComponent
+                        schema={schema}
+                        suggestions={suggestions}
+                        {...rest}/>
+                case "generic":
+                    return <DataTypeGenericInputComponent
+                        schema={schema}
+                        suggestions={suggestions}
+                        {...rest}/>
+                case "sub-flow":
+                    return <DataTypeSubFlowInputComponent
+                        schema={schema}
+                        suggestions={suggestions}
+                        {...rest}/>
+                default:
+                    return <DataTypeTextInputComponent
+                        suggestions={suggestions}
+                        schema={schema}
+                        {...rest}
+                    />
+            }
+        },
+        [rest.initialValue, inputName, suggestions?.length ?? 0, rest.formValidation?.valid ?? true, rest.formValidation?.notValidMessage ?? ""]
+    )
 }
