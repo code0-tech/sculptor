@@ -48,16 +48,19 @@ export const RuntimeCreatePage: React.FC = () => {
     const [inputs, validate] = useForm({
         useInitialValidation: false,
         initialValues: {
-            name: null,
-            description: null,
+            name: "",
+            description: "",
         },
         validate: {
             name: (value) => {
                 if (!value) return "Name is required"
+                if (value.length < 3) return "Name needs to be at least 3 characters"
+                if (value.length > 50) return "Name needs to be less than 50 characters"
                 return null
             },
             description: (value) => {
                 if (!value) return "Description is required"
+                if ((value as string).length > 50) return "Description needs to be less than 50 characters"
                 return null
             }
         },
