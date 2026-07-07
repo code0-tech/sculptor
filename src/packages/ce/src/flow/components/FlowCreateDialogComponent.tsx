@@ -99,7 +99,9 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
             flowService.flowCreate({
                 // @ts-ignore
                 flow: {
-                    settings: [],
+                    settings: selectedFlowType?.flowTypeSettings?.map(setting => ({
+                        value: setting?.defaultValue !== null && setting?.defaultValue !== undefined ? setting?.defaultValue : null,
+                    })) ?? [],
                     name: name,
                     type: type,
                     nodes: [],
@@ -114,7 +116,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                 }
             })
         })
-    }, [flowService])
+    }, [flowService, selectedFlowType])
 
     React.useEffect(() => {
         setCreateDialogOpen(open)

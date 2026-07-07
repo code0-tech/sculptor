@@ -314,12 +314,12 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
             flow.settings.nodes = []
         }
 
-        flow.settings.nodes = flowType?.flowTypeSettings?.map((_, index) => {
+        flow.settings.nodes = flowType?.flowTypeSettings?.map((flowTypeSetting, index) => {
             const flowSetting = flow.settings?.nodes?.[index]
             if (!flowSetting) {
                 return {
                     __typename: 'FlowSetting',
-                    value: null,
+                    value: flowTypeSetting?.defaultValue !== null && flowTypeSetting?.defaultValue !== undefined ? flowTypeSetting?.defaultValue : null,
                 }
             }
 
@@ -365,12 +365,12 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
             node.parameters.nodes = []
         }
 
-        node.parameters.nodes = functionDefinition?.parameterDefinitions?.nodes?.map((_, index) => {
+        node.parameters.nodes = functionDefinition?.parameterDefinitions?.nodes?.map((nodeParameterDefinition, index) => {
             const nodeParameter = node.parameters?.nodes?.[index]
             if (!nodeParameter) {
                 return {
                     __typename: "NodeParameter",
-                    value: null,
+                    value: nodeParameterDefinition?.defaultValue !== null && nodeParameterDefinition?.defaultValue !== undefined ? nodeParameterDefinition?.defaultValue : null,
                 }
             }
 

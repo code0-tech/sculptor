@@ -43,7 +43,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
         setCollapsedStateRaw(prev => ({...prev, [path.join(".")]: collapsed}))
     }
 
-    const handleEntryClick = (entry: EditableJSONEntry) => {
+    const handleEntryClick = (entry: EditableJSONEntry | undefined) => {
         setEditEntry(entry)
         setEditDialogOpen(true)
     }
@@ -70,6 +70,9 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                                          onChange={(value) => {
                                              formValidation?.setValue?.(value)
                                              onChangeDebounced(value)
+                                         }}
+                                         wrapperComponent={{
+                                             onClick: () => handleEntryClick(undefined)
                                          }}
                                          suggestions={suggestions}
                                          formValidation={formValidation}>
