@@ -41,6 +41,7 @@ fragment FlowType on FlowType {
         unique
         optional
         hidden
+        defaultValue
         names {
             __typename
             code
