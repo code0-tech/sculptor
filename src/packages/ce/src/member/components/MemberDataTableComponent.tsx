@@ -48,7 +48,7 @@ export const MemberDataTableComponent: React.FC<MemberDataTableComponentProps> =
                           </Text>
                       </DataTableColumn>}
                       onSelect={(item) => item && onSelect?.(item)}
-                      data={members.map(u => u.json()).filter(preFilter)}>
+                      data={members.map(u => u).filter(preFilter)}>
         {(member, index) => {
             return <MemberDataTableRowComponent memberId={member.id}/>
         }}
