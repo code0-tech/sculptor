@@ -38,7 +38,7 @@ export const OrganizationDataTableComponent: React.FC<OrganizationDataTableCompo
                 namespace: {
                     ...o.namespace,
                     members: {
-                        nodes: members.map(m => m.json()),
+                        nodes: members,
                     }
                 }
             }
