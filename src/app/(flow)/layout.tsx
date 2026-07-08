@@ -10,7 +10,7 @@ import {
     Flow,
     FlowType,
     FunctionDefinition,
-    Namespace,
+    Namespace, NamespaceMember,
     NamespaceProject,
     Runtime, RuntimeModule, User
 } from "@code0-tech/sagittarius-graphql-types";
@@ -28,7 +28,6 @@ import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import Image from "next/image";
 import {OrganizationView} from "@edition/organization/services/Organization.view";
-import {MemberView} from "@edition/member/services/Member.view";
 import {RoleView} from "@edition/role/services/Role.view";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
@@ -58,7 +57,7 @@ export default function FlowLayout({bar, tab, children}: {
 
     const user = usePersistentReactiveArrayService<User, UserService>(`dashboard::users::${currentSession?.id}`, (store) => new UserService(graphqlClient, store))
     const organization = usePersistentReactiveArrayService<OrganizationView, OrganizationService>(`dashboard::organizations::${currentSession?.id}`, (store) => new OrganizationService(graphqlClient, store))
-    const member = usePersistentReactiveArrayService<MemberView, MemberService>(`dashboard::members::${currentSession?.id}`, (store) => new MemberService(graphqlClient, store))
+    const member = usePersistentReactiveArrayService<NamespaceMember, MemberService>(`dashboard::members::${currentSession?.id}`, (store) => new MemberService(graphqlClient, store))
     const namespace = usePersistentReactiveArrayService<Namespace, NamespaceService>(`dashboard::namespaces::${currentSession?.id}`, (store) => new NamespaceService(graphqlClient, store))
     const runtime = usePersistentReactiveArrayService<Runtime, RuntimeService>(`dashboard::global_runtimes::${currentSession?.id}`, (store) => new RuntimeService(graphqlClient, store))
     const project = usePersistentReactiveArrayService<NamespaceProject, ProjectService>(`dashboard::projects::${currentSession?.id}`, (store) => new ProjectService(graphqlClient, store))
