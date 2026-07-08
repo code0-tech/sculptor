@@ -186,7 +186,7 @@ export class RoleService extends ReactiveArrayService<RoleView, RoleDependencies
 
         if (result.data && result.data.namespacesRolesDelete && result.data.namespacesRolesDelete.namespaceRole) {
             const role = result.data.namespacesRolesDelete.namespaceRole
-            const index = this.values({namespaceId: role?.namespace?.id}).findIndex(o => o.id === role.id)
+            const index = super.values().findIndex(o => o.id == role.id)
             this.delete(index)
 
         }
