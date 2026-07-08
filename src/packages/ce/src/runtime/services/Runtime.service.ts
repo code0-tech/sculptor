@@ -44,13 +44,11 @@ export class RuntimeService extends ReactiveArrayService<Runtime, RuntimeDepende
         return this.values().find(runtime => runtime && runtime.id === id);
     }
 
-    //TODO: rework to be able to get all runtimes that you can access. If no namespace id is provided just get the global runtiimes
-    // TODO: if namespace id is provided get the runtimes for this namespace and also the global runtimes
     values(dependencies?: RuntimeDependencies): Runtime[] {
         const runtimes = super.values()
 
         if (!dependencies?.namespaceId) {
-            if (runtimes.length === 0) {
+            if (runtimes.length <= 0) {
                 this.client.query<Query>({
                     query: globalRuntimesQuery,
                     variables: {
@@ -73,7 +71,7 @@ export class RuntimeService extends ReactiveArrayService<Runtime, RuntimeDepende
         const namespaceId = dependencies.namespaceId
         const filtered = runtimes.filter(r => r.namespace?.id === namespaceId)
 
-        if (filtered.length === 0) {
+        if (filtered.length <= 0) {
             this.client.query<Query>({
                 query: namespaceRuntimesQuery,
                 variables: {
