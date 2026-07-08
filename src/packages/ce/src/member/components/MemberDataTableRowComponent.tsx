@@ -1,4 +1,4 @@
-import React, {startTransition} from "react";
+import React from "react";
 import {NamespaceMember} from "@code0-tech/sagittarius-graphql-types";
 import {
     Avatar,
@@ -32,6 +32,7 @@ import {MemberService} from "@edition/member/services/Member.service";
 import {RoleService} from "@edition/role/services/Role.service";
 import {RolePermissionComponent} from "@edition/role/components/RolePermissionComponent";
 import {IconDotsVertical, IconUserCog, IconUserOff, IconX} from "@tabler/icons-react";
+import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 
 export interface MemberDataTableRowComponentProps {
     memberId: NamespaceMember['id']
@@ -60,7 +61,7 @@ export const MemberDataTableRowComponent: React.FC<MemberDataTableRowComponentPr
 
     const assignedRoles = React.useMemo(
         () => member?.roles?.nodes?.map(role => roleService.getById(role?.id, {namespaceId: member?.namespace?.id})) || [],
-        [roleStore, member]
+        [roleStore, member?.roles?.nodes?.length]
     )
 
     const [localAssignedRoles, setLocalAssignedRoles] = React.useState(assignedRoles)
@@ -77,19 +78,29 @@ export const MemberDataTableRowComponent: React.FC<MemberDataTableRowComponentPr
 
 
     const memberAssignRoles = React.useCallback(() => {
-        startTransition(() => {
-            memberService.memberAssignRoles({
-                memberId: member?.id!,
-                roleIds: localAssignedRoles.map(r => r?.id!)
-            })
+        memberService.memberAssignRoles({
+            memberId: member?.id!,
+            roleIds: localAssignedRoles.map(r => r?.id!)
+        }).then(payload => {
+            if ((payload?.errors?.length ?? 0) <= 0) {
+                addIslandSuccessNotification({
+                    message: "Updated roles on member"
+                })
+
+            }
         })
     }, [localAssignedRoles, member])
 
     const memberDelete = React.useCallback(() => {
-        startTransition(() => {
-            memberService.memberDelete({
-                namespaceMemberId: member?.id!
-            })
+        memberService.memberDelete({
+            namespaceMemberId: member?.id!
+        }).then(payload => {
+            if ((payload?.errors?.length ?? 0) <= 0) {
+                addIslandSuccessNotification({
+                    message: "Removed member"
+                })
+
+            }
         })
     }, [member])
 
