@@ -40,7 +40,7 @@ export const OrganizationsView = () => {
                 </Text>
             </Flex>
             <ButtonGroup>
-                <Link href={"/organizations/create"}>
+                <Link href={"/workspaces/create"}>
                     <Button color={"success"}>Create</Button>
                 </Link>
                 <Menu>
