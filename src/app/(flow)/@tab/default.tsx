@@ -1,5 +1,5 @@
 "use client"
 
-export default function Page() {
-    return null
-}
+import {ApplicationTabView} from "@edition/application/views/ApplicationTabView";
+
+export default ApplicationTabView
