@@ -60,6 +60,10 @@ export const ApplicationBarView: React.FC = () => {
                     aria-selected={pathname === "/"} onClick={() => router.push(`/`)}>
                 {pathname === "/" ? <Text>Home</Text> : <IconHome size={13}/>}
             </Button>,
+            <Button paddingSize={"xxs"} key={"home"} variant={"none"}
+                    aria-selected={pathname === "/workspaces"} onClick={() => router.push(`/workspaces`)}>
+                {pathname === "/workspaces" ? <Text>Workspaces</Text> : <IconBuilding size={13}/>}
+            </Button>,
             ...(currentUser?.admin ? [
                 <Button paddingSize={"xxs"} key={"users"} variant={"none"}
                         aria-selected={pathname.startsWith("/users")} onClick={() => router.push(`/users`)}>
