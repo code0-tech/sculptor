@@ -61,7 +61,17 @@ export class UserService extends ReactiveArrayService<User> {
     values(): User[] {
         if (super.values().length > 0) return super.values();
         this.client.query<Query>({
-            query: usersQuery
+            query: usersQuery,
+            variables: {
+                firstUser: 50,
+                afterUser: null,
+                firstIdentity: 50,
+                afterIdentity: null,
+                firstSession: 50,
+                afterSession: null,
+                firstNamespaceMembership: 50,
+                afterNamespaceMembership: null,
+            }
         }).then(result => {
             const data = result.data
             if (!data) return

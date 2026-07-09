@@ -1,7 +1,16 @@
 #import '../fragments/User.fragment.graphql'
 #import '../fragments/User.basic.fragment.graphql'
 
-query Users($firstUser: Int, $afterUser: String, $firstIdentity: Int, $afterIdentity: String, $firstSession: Int, $afterSession: String) {
+query Users(
+    $firstUser: Int,
+    $afterUser: String,
+    $firstIdentity: Int,
+    $afterIdentity: String,
+    $firstSession: Int,
+    $afterSession: String,
+    $firstNamespaceMembership: Int,
+    $afterNamespaceMembership: String
+) {
     currentUser {
         ...User
     }
