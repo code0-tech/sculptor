@@ -37,7 +37,7 @@ export const NamespaceDataTableComponent: React.FC<NamespaceDataTableComponentPr
 
     const currentUser = React.useMemo(
         () => userService.getById(currentSession?.user?.id),
-        [userStore, currentSession?.user?.id]
+        [userStore, userService, currentSession?.user?.id]
     )
 
     const memberships = React.useMemo(
