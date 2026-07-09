@@ -2,8 +2,8 @@
 
 import React from "react";
 import {
+    Badge,
     Button,
-    ButtonGroup,
     Card,
     Col,
     Dialog,
@@ -31,7 +31,7 @@ import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/comp
 import {User, UsersUpdateInput} from "@code0-tech/sagittarius-graphql-types";
 import {UserService} from "@edition/user/services/User.service";
 import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
-import {IconAt, IconLock, IconMail, IconUser, IconX} from "@tabler/icons-react";
+import {IconAt, IconLock, IconMail, IconUser} from "@tabler/icons-react";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 import {motion} from "framer-motion";
 
@@ -151,20 +151,19 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                                             }}
                                             initial={{
                                                 width: "200px",
-                                                opacity: 0.25,
                                             }}
                                             whileInView={{
                                                 width: "200px",
-                                                opacity: 0.25,
                                             }}
                                             whileHover={{
                                                 width: "250px",
-                                                opacity: 1,
                                             }}
                                             style={{
                                                 padding: "0.7rem",
-                                                marginTop: "0.55rem",
-                                                height: "100%"
+                                                paddingTop: "1rem",
+                                                height: "100%",
+                                                display: "flex",
+                                                flexDirection: "column"
                                             }}
                                 >
                                     <Text size={"lg"} hierarchy={"primary"}>
@@ -193,23 +192,24 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                                             </Button>
                                         </TabTrigger>
                                     </TabList>
+                                    <DialogClose asChild style={{ marginTop: "auto" }}>
+                                        <Button paddingSize={"xxs"} w={"100%"} variant={"none"} justify={"space-between"}>
+                                            <Text size={"md"}>Close</Text>
+                                            <Badge>
+                                                ESC
+                                            </Badge>
+                                        </Button>
+                                    </DialogClose>
                                 </motion.div>
                             }>
                         <Card color={"primary"} paddingSize={"md"} h={"100%"} w={"100%"}>
                             <TabContent value={"general"} style={{overflow: "hidden"}}>
                                 <Flex justify={"space-between"} align={"center"}>
                                     <Text size={"lg"} hierarchy={"primary"} display={"block"}>General</Text>
-                                    <ButtonGroup>
-                                        <Button paddingSize={"xxs"} color={"success"} variant={"none"}
-                                                onClick={validate}>
-                                            Save changes
-                                        </Button>
-                                        <DialogClose asChild>
-                                            <Button variant={"none"} color={"tertiary"} paddingSize={"xxs"}>
-                                                <IconX size={13}/>
-                                            </Button>
-                                        </DialogClose>
-                                    </ButtonGroup>
+                                    <Button paddingSize={"xxs"} color={"success"} variant={"none"}
+                                            onClick={validate}>
+                                        Save changes
+                                    </Button>
 
                                 </Flex>
                                 <Spacing spacing={"md"}/>
@@ -254,18 +254,10 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                             <TabContent value={"permissions"} style={{overflow: "hidden"}}>
                                 <Flex justify={"space-between"} align={"center"}>
                                     <Text size={"lg"} hierarchy={"primary"} display={"block"}>Permissions</Text>
-                                    <ButtonGroup>
-                                        <Button paddingSize={"xxs"} color={"success"} variant={"none"}
-                                                onClick={validate}>
-                                            Save changes
-                                        </Button>
-                                        <DialogClose asChild>
-                                            <Button variant={"none"} color={"tertiary"} paddingSize={"xxs"}>
-                                                <IconX size={13}/>
-                                            </Button>
-                                        </DialogClose>
-                                    </ButtonGroup>
-
+                                    <Button paddingSize={"xxs"} color={"success"} variant={"none"}
+                                            onClick={validate}>
+                                        Save changes
+                                    </Button>
                                 </Flex>
                                 <Spacing spacing={"md"}/>
                                 <Card color={"secondary"}>
@@ -285,17 +277,10 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                             <TabContent value={"security"} style={{overflow: "hidden"}}>
                                 <Flex justify={"space-between"} align={"center"}>
                                     <Text size={"lg"} hierarchy={"primary"} display={"block"}>Security</Text>
-                                    <ButtonGroup>
-                                        <Button paddingSize={"xxs"} color={"success"} variant={"none"}
-                                                onClick={validate}>
-                                            Save changes
-                                        </Button>
-                                        <DialogClose asChild>
-                                            <Button variant={"none"} color={"tertiary"} paddingSize={"xxs"}>
-                                                <IconX size={13}/>
-                                            </Button>
-                                        </DialogClose>
-                                    </ButtonGroup>
+                                    <Button paddingSize={"xxs"} color={"success"} variant={"none"}
+                                            onClick={validate}>
+                                        Save changes
+                                    </Button>
 
                                 </Flex>
                                 <Spacing spacing={"md"}/>
