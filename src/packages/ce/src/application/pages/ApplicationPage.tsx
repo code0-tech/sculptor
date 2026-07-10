@@ -19,21 +19,78 @@ import {
     useStore
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
+import {NamespaceService} from "@edition/namespace/services/Namespace.service";
+import {OrganizationService} from "@edition/organization/services/Organization.service";
+import {OrganizationView} from "@edition/organization/services/Organization.view";
+import {ProjectService} from "@edition/project/services/Project.service";
+import {Namespace, Organization} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
-import {OrganizationsTopView} from "@edition/organization/views/OrganizationsTopView";
+import {NamespacesTopView} from "@edition/namespace/views/NamespacesTopView";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {IconArrowUpRight, IconMail, IconSparkles, IconTrendingUp, IconUser} from "@tabler/icons-react";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 import Link from "next/link";
 
+const withinDays = (time: string | null | undefined, days: number): boolean =>
+    !!time && Date.now() - new Date(time).getTime() < days * 24 * 60 * 60 * 1000
+
 export const ApplicationPage = () => {
 
     const userStore = useStore(UserService)
     const userService = useService(UserService)
+    const namespaceService = useService(NamespaceService)
+    const namespaceStore = useStore(NamespaceService)
+    const organizationService = useService(OrganizationService)
+    const organizationStore = useStore(OrganizationService)
+    const projectService = useService(ProjectService)
+    const projectStore = useStore(ProjectService)
 
     const userSession = useUserSession()
     const currentUser = React.useMemo(() => userService.getById(userSession?.user?.id), [userStore, userSession])
     const namespaceIndex = currentUser?.namespace?.id?.match(/Namespace\/(\d+)$/)?.[1]
+
+    const memberships = React.useMemo(
+        () => currentUser?.namespaceMemberships?.nodes ?? [],
+        [currentUser?.namespaceMemberships?.nodes?.length]
+    )
+
+    const namespaces = React.useMemo(
+        () => memberships
+            .map(membership => namespaceService.getById(membership?.namespace?.id))
+            .filter((namespace): namespace is Namespace => !!namespace),
+        [memberships.length, namespaceStore]
+    )
+
+    const organizationNamespaces = React.useMemo(
+        () => namespaces.filter(namespace => namespace.parent?.__typename === "Organization"),
+        [namespaces]
+    )
+
+    const organizations = React.useMemo(
+        () => organizationNamespaces
+            .map(namespace => organizationService.getById((namespace.parent as Organization).id))
+            .filter((organization): organization is OrganizationView => !!organization),
+        [organizationNamespaces, organizationStore]
+    )
+
+    const projects = React.useMemo(
+        () => namespaces.flatMap(namespace => projectService.values({namespaceId: namespace.id})),
+        [namespaces, projectStore]
+    )
+
+    const ownedOrganizationsCount = organizations.filter(organization => organization.userAbilities?.deleteOrganization).length
+    const memberOrganizationsCount = organizationNamespaces.length - ownedOrganizationsCount
+    const newOrganizationsLastMonth = organizations.filter(organization => withinDays(organization.createdAt, 30)).length
+
+    const totalProjectsCount = namespaces.reduce((sum, namespace) => sum + (namespace.projects?.count ?? 0), 0)
+    const personalProjectsCount = namespaces.find(namespace => namespace.id === currentUser?.namespace?.id)?.projects?.count ?? 0
+    const organizationProjectsCount = totalProjectsCount - personalProjectsCount
+    const newProjectsLastWeek = projects.filter(project => withinDays(project.createdAt, 7)).length
+
+    const totalFlowsCount = projects.reduce((sum, project) => sum + (project.flows?.count ?? 0), 0)
+    const newFlowsLastMonth = projects
+        .flatMap(project => project.flows?.nodes ?? [])
+        .filter(flow => withinDays(flow?.createdAt, 30)).length
 
     const leftContent = <ScrollArea h={"100%"} type={"scroll"}>
         <ScrollAreaViewport>
@@ -99,20 +156,21 @@ export const ApplicationPage = () => {
                                     <Text hierarchy={"primary"}>
                                         Organizations
                                     </Text>
-                                    <Badge color={"success"}>
+                                    {newOrganizationsLastMonth > 0 && <Badge color={"success"}>
                                         <IconTrendingUp size={13}/>
-                                        +2 last month
-                                    </Badge>
+                                        +{newOrganizationsLastMonth} last month
+                                    </Badge>}
                                 </Flex>
 
                                 <Spacing spacing={"xs"}/>
                                 <Card color={"primary"} paddingSize={"md"} mx={-0.9} mb={-0.9}>
                                     <Flex align={"start"} style={{gap: "1.3rem"}}>
                                         <Text size={"xl"} hierarchy={"primary"}>
-                                            7
+                                            {organizationNamespaces.length}
                                         </Text>
                                         <Text>
-                                            You are the owner of 3 organizations <br/> and a member of 4
+                                            You are the owner of {ownedOrganizationsCount} organizations <br/> and a
+                                            member of {memberOrganizationsCount}
                                         </Text>
                                     </Flex>
                                 </Card>
@@ -124,20 +182,21 @@ export const ApplicationPage = () => {
                                     <Text hierarchy={"primary"}>
                                         Projects
                                     </Text>
-                                    <Badge color={"success"}>
+                                    {newProjectsLastWeek > 0 && <Badge color={"success"}>
                                         <IconTrendingUp size={13}/>
-                                        +8 last week
-                                    </Badge>
+                                        +{newProjectsLastWeek} last week
+                                    </Badge>}
                                 </Flex>
 
                                 <Spacing spacing={"xs"}/>
                                 <Card color={"primary"} paddingSize={"md"} mx={-0.9} mb={-0.9}>
                                     <Flex align={"start"} style={{gap: "1.3rem"}}>
                                         <Text size={"xl"} hierarchy={"primary"}>
-                                            82
+                                            {totalProjectsCount}
                                         </Text>
                                         <Text>
-                                            You are the owner of 40 projects <br/> and a member of 42
+                                            {personalProjectsCount} in your personal workspace <br/> and
+                                            {" "}{organizationProjectsCount} in your organizations
                                         </Text>
                                     </Flex>
                                 </Card>
@@ -149,20 +208,21 @@ export const ApplicationPage = () => {
                                     <Text hierarchy={"primary"}>
                                         Flows
                                     </Text>
-                                    <Badge color={"success"}>
+                                    {newFlowsLastMonth > 0 && <Badge color={"success"}>
                                         <IconTrendingUp size={13}/>
-                                        +102 last month
-                                    </Badge>
+                                        +{newFlowsLastMonth} last month
+                                    </Badge>}
                                 </Flex>
 
                                 <Spacing spacing={"xs"}/>
                                 <Card color={"primary"} paddingSize={"md"} mx={-0.9} mb={-0.9}>
                                     <Flex align={"start"} style={{gap: "1.3rem"}}>
                                         <Text size={"xl"} hierarchy={"primary"}>
-                                            781
+                                            {totalFlowsCount}
                                         </Text>
                                         <Text>
-                                            You are the owner of 361 flows <br/> and a member of 420
+                                            Spread across {totalProjectsCount} projects <br/> and
+                                            {" "}{namespaces.length} workspaces
                                         </Text>
                                     </Flex>
                                 </Card>
@@ -211,12 +271,12 @@ export const ApplicationPage = () => {
                             <Card color={"tertiary"} h={"fit-content"} paddingSize={"md"}>
                                 <Flex align={"center"} justify={"space-between"}>
                                     <Text hierarchy={"secondary"}>
-                                        Top organizations
+                                        Top workspaces
                                     </Text>
                                     <ButtonGroup color={"primary"}>
                                         <Link href={"/workspaces/create"} tabIndex={-1}>
                                             <Button paddingSize={"xxs"} color={"secondary"}>
-                                                Create organization
+                                                Create workspace
                                             </Button>
                                         </Link>
                                         <Link href={"/workspaces"} tabIndex={-1}>
@@ -228,7 +288,7 @@ export const ApplicationPage = () => {
                                 </Flex>
                                 <Spacing spacing={"xs"}/>
                                 <Card color={"primary"} paddingSize={"md"} mx={-0.9} mb={-0.9}>
-                                    <OrganizationsTopView/>
+                                    <NamespacesTopView/>
                                 </Card>
                             </Card>
                         </Col>
