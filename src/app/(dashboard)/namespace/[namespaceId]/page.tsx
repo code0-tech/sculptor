@@ -2,6 +2,4 @@
 
 import {NamespaceOverviewPage} from "@edition/namespace/pages/NamespaceOverviewPage";
 
-export default function Page() {
-    return <NamespaceOverviewPage/>
-}
+export default NamespaceOverviewPage
