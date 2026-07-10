@@ -87,9 +87,9 @@ export const ApplicationPage = () => {
                     </Text>
                     <Spacing spacing={"xs"}/>
                     <Text hierarchy={"tertiary"}>
-                        Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor <br/>
-                        invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam
-                        et
+                        Track the current state of your organizations, projects and flows at a single glance <br/>
+                        and keep an eye on how your activity has developed across every area over the recent
+                        weeks
                     </Text>
                     <Spacing spacing={"xl"}/>
                     <Row>
@@ -171,13 +171,13 @@ export const ApplicationPage = () => {
                     </Row>
                     <Spacing spacing={"xl"}/>
                     <Text size={"xl"} hierarchy={"primary"}>
-                        Overview
+                        Your work
                     </Text>
                     <Spacing spacing={"xs"}/>
                     <Text hierarchy={"tertiary"}>
-                        Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor <br/>
-                        invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam
-                        et
+                        A quick summary of the personal projects you own and the organizations you belong to <br/>
+                        so you can jump straight back into your recent work or start something completely
+                        new
                     </Text>
                     <Spacing spacing={"xl"}/>
                     <Row>
