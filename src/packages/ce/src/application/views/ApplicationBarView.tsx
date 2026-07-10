@@ -6,19 +6,14 @@ import {useParams, usePathname, useRouter} from "next/navigation";
 import React from "react";
 import Link from "next/link";
 import {
-    IconBox,
+    IconArrowLeft,
+    IconArrowUpRight,
     IconBuilding,
     IconFolders,
-    IconHome,
     IconInbox,
     IconLogout,
-    IconRoute,
     IconSearch,
-    IconServer,
-    IconSettings,
-    IconUser,
-    IconUserCog,
-    IconUsers
+    IconUser
 } from "@tabler/icons-react";
 import {ApplicationBreadcrumbView} from "@edition/application/views/ApplicationBreadcrumbView";
 import UserMenuComponent from "@edition/user/components/UserMenuComponent";
@@ -58,24 +53,24 @@ export const ApplicationBarView: React.FC = () => {
         return [
             <Button paddingSize={"xxs"} key={"home"} variant={"none"}
                     aria-selected={pathname === "/"} onClick={() => router.push(`/`)}>
-                {pathname === "/" ? <Text>Home</Text> : <IconHome size={13}/>}
+                <Text>Home</Text>
             </Button>,
             <Button paddingSize={"xxs"} key={"home"} variant={"none"}
                     aria-selected={pathname === "/workspaces"} onClick={() => router.push(`/workspaces`)}>
-                {pathname === "/workspaces" ? <Text>Workspaces</Text> : <IconBuilding size={13}/>}
+                <Text>Workspaces</Text>
             </Button>,
             ...(currentUser?.admin ? [
                 <Button paddingSize={"xxs"} key={"users"} variant={"none"}
                         aria-selected={pathname.startsWith("/users")} onClick={() => router.push(`/users`)}>
-                    {pathname.startsWith("/users") ? <Text>Users</Text> : <IconUsers size={13}/>}
+                    <Text>Users</Text>
                 </Button>,
                 <Button paddingSize={"xxs"} key={"runtimes"} variant={"none"}
                         aria-selected={pathname.startsWith("/runtimes")} onClick={() => router.push(`/runtimes`)}>
-                    {pathname.startsWith("/runtimes") ? <Text>Runtimes</Text> : <IconServer size={13}/>}
+                    <Text>Servers</Text>
                 </Button>,
                 <Button paddingSize={"xxs"} key={"settings"} variant={"none"}
                         aria-selected={pathname.startsWith("/settings")} onClick={() => router.push(`/settings`)}>
-                    {pathname.startsWith("/settings") ? <Text>Settings</Text> : <IconSettings size={13}/>}
+                    <Text>Settings</Text>
                 </Button>
             ] : [])
         ]
@@ -91,29 +86,25 @@ export const ApplicationBarView: React.FC = () => {
         return [
             <Button paddingSize={"xxs"} key={"overview"} variant={"none"}
                     aria-selected={pathname === baseLink} onClick={() => router.push(baseLink)}>
-                {pathname === baseLink ? <Text>Overview</Text> : <IconHome size={13}/>}
-            </Button>,
-            <Button paddingSize={"xxs"} key={"projects"} variant={"none"}
-                    aria-selected={pathname.includes("projects")} onClick={() => router.push(`${baseLink}/projects`)}>
-                {pathname.includes("projects") ? <Text>Projects</Text> : <IconFolders size={13}/>}
+                <Text>Overview</Text>
             </Button>,
             <Button paddingSize={"xxs"} key={"members"} variant={"none"}
                     aria-selected={pathname.includes("members")} onClick={() => router.push(`${baseLink}/members`)}>
-                {pathname.includes("members") ? <Text>Members</Text> : <IconUsers size={13}/>}
+                <Text>Members</Text>
             </Button>,
             <Button paddingSize={"xxs"} key={"roles"} variant={"none"}
                     aria-selected={pathname.includes("roles")} onClick={() => router.push(`${baseLink}/roles`)}>
-                {pathname.includes("roles") ? <Text>Roles</Text> : <IconUserCog size={13}/>}
+                <Text>Roles</Text>
             </Button>,
             <Button paddingSize={"xxs"} key={"runtimes"} variant={"none"}
                     aria-selected={pathname.includes("runtimes")} onClick={() => router.push(`${baseLink}/runtimes`)}>
-                {pathname.includes("runtimes") ? <Text>Runtimes</Text> : <IconServer size={13}/>}
+                <Text>Servers</Text>
             </Button>,
             ...(showSettings ? [
                 <Button paddingSize={"xxs"} key={"settings"} variant={"none"}
                         aria-selected={pathname.includes("settings")}
                         onClick={() => router.push(`${baseLink}/settings`)}>
-                    {pathname.includes("settings") ? <Text>Settings</Text> : <IconSettings size={13}/>}
+                    <Text>Settings</Text>
                 </Button>
             ] : [])
         ]
@@ -125,19 +116,19 @@ export const ApplicationBarView: React.FC = () => {
         return [
             <Button paddingSize={"xxs"} key={"flows"} variant={"none"}
                     aria-selected={pathname.includes("flow")} onClick={() => router.push(`${baseLink}/flow`)}>
-                {pathname.includes("flow") ? <Text>Flows</Text> : <IconRoute size={13}/>}
-            </Button>,
-            <Button paddingSize={"xxs"} key={"runtimes"} variant={"none"}
-                    aria-selected={pathname.includes("runtime")} onClick={() => router.push(`${baseLink}/runtime`)}>
-                {pathname.includes("runtime") ? <Text>Runtimes</Text> : <IconServer size={13}/>}
+                <Text>Flows</Text>
             </Button>,
             <Button paddingSize={"xxs"} key={"modules"} variant={"none"}
                     aria-selected={pathname.includes("module")} onClick={() => router.push(`${baseLink}/module`)}>
-                {pathname.includes("module") ? <Text>Plugins</Text> : <IconBox size={13}/>}
+                <Text>Plugins</Text>
+            </Button>,
+            <Button paddingSize={"xxs"} key={"runtimes"} variant={"none"}
+                    aria-selected={pathname.includes("runtime")} onClick={() => router.push(`${baseLink}/runtime`)}>
+                <Text>Servers</Text>
             </Button>,
             <Button paddingSize={"xxs"} key={"settings"} variant={"none"}
                     aria-selected={pathname.includes("settings")} onClick={() => router.push(`${baseLink}/settings`)}>
-                {pathname.includes("settings") ? <Text>Settings</Text> : <IconSettings size={13}/>}
+                <Text>Settings</Text>
             </Button>
         ]
     }, [namespaceIndex, projectIndex, pathname])
@@ -184,11 +175,21 @@ export const ApplicationBarView: React.FC = () => {
     }, [currentUser, currentSession, userNamespaceIndex])
 
     return <Flex py={0.7} key={`island-${currentStep}`} align={"center"} justify={"space-between"}>
-        <ApplicationBreadcrumbView/>
+        {currentStep === "project" ? <Link tabIndex={-1} href={`/namespace/${namespaceIndex}`}>
+            <Button color={"tertiary"} paddingSize={"xxs"}>
+                <IconArrowLeft size={13}/>
+                <Text>Go back to workspace</Text>
+            </Button>
+        </Link> : currentStep === "namespace" ? <Link tabIndex={-1} href={`/`}>
+            <Button color={"tertiary"} paddingSize={"xxs"}>
+                <IconArrowLeft size={13}/>
+                <Text>Go back to home</Text>
+            </Button>
+        </Link> : <div/>}
         <Flex pos={"fixed"} top={"1rem"} left={"50%"} justify={"center"}
               style={{zIndex: 9999, transform: "translateX(-50%)"}}>
             <Island>
-                <ButtonGroup color={"primary"} bg={"transparent"} style={{boxShadow: "none"}}>
+                <ButtonGroup bg={"transparent"}>
                     {currentStep === "project" ? projectTabs : currentStep === "namespace" ? namespaceTabs : homeTabs}
                 </ButtonGroup>
             </Island>
