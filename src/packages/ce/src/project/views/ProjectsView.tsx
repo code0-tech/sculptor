@@ -43,22 +43,23 @@ export const ProjectsView: React.FC = () => {
 
     return <>
 
-        <Flex align={"center"} style={{gap: "0.35rem"}} justify={"space-between"}>
-            <Flex style={{gap: "0.35rem", flexDirection: "column"}}>
-                <Text size={"xl"} hierarchy={"primary"}>
+        <Flex align={"start"} justify={"space-between"}>
+            <div>
+                <Text size={"xl"} fz={2} hierarchy={"primary"}>
                     Projects
                 </Text>
-                <Text size={"sm"} hierarchy={"tertiary"}>
-                    Manage projects that you belong to. You can create new projects and switch between them.
+                <Spacing spacing={"xs"}/>
+                <Text hierarchy={"tertiary"}>
+                    Manage projects that you belong to. <br/>You can create new projects and switch between them.
                 </Text>
-            </Flex>
+            </div>
             <ButtonGroup>
                 <Link href={`/namespace/${namespaceId}/projects/create`}>
-                    <Button color={"success"}>Create</Button>
+                    <Button paddingSize={"xxs"} color={"success"}>Create</Button>
                 </Link>
                 <Menu>
                     <MenuTrigger asChild>
-                        <Button color={"secondary"} variant={"filled"}>Sort</Button>
+                        <Button paddingSize={"xxs"} color={"secondary"} variant={"filled"}>Sort</Button>
                     </MenuTrigger>
                     <MenuPortal>
                         <MenuContent>
