@@ -63,9 +63,11 @@ export const NamespaceOverviewOrganizationLeftView: React.FC = () => {
                 <Spacing spacing={"xs"}/>
                 <Text size={"xl"} hierarchy={"primary"}>{parentOrganization?.name}</Text>
                 <Spacing spacing={"xs"}/>
-                <Button w={"100%"} color={"tertiary"}>Edit Organization</Button>
+                <Link href={`/namespace/${namespaceIndex}/settings`}>
+                    <Button w={"100%"} color={"tertiary"}>Edit Organization</Button>
+                </Link>
                 <Spacing spacing={"xs"}/>
-                <Button color={"primary"} w={"100%"}>
+                <Button disabled color={"primary"} w={"100%"}>
                     Upgrade to Team
                     <AuroraBackground/>
                 </Button>
