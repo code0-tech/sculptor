@@ -61,12 +61,26 @@ export class UserService extends ReactiveArrayService<User> {
     values(): User[] {
         if (super.values().length > 0) return super.values();
         this.client.query<Query>({
-            query: usersQuery
+            query: usersQuery,
+            variables: {
+                firstUser: 50,
+                afterUser: null,
+                firstIdentity: 50,
+                afterIdentity: null,
+                firstSession: 50,
+                afterSession: null,
+                firstNamespaceMembership: 50,
+                afterNamespaceMembership: null,
+            }
         }).then(result => {
             const data = result.data
             if (!data) return
 
-            if (data && data.currentUser && !this.hasById(data.currentUser.id)) this.set(this.i++, new View(data.currentUser))
+            if (data && data.currentUser) {
+                const currentUser = data.currentUser
+                const index = super.values().findIndex(user => user && user.id === currentUser.id)
+                this.set(index >= 0 ? index : this.i++, new View(currentUser))
+            }
             if (data.users && data.users.nodes) {
                 data.users.nodes.forEach((user) => {
                     if (user && !(user.id === data.currentUser?.id) && !this.hasById(user.id)) this.set(this.i++, new View(user))
@@ -77,7 +91,7 @@ export class UserService extends ReactiveArrayService<User> {
     }
 
     getById(id: User["id"]): User | undefined {
-        const user = this.values().find(user => user && user.id === id)
+        const user = super.values().find(user => user && user.id === id)
         if (user) return user
 
         if (id) {

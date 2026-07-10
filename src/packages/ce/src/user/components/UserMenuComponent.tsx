@@ -3,7 +3,8 @@
 import React from "react"
 import {Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {
-    Avatar, Button,
+    Avatar,
+    Button,
     Flex,
     Menu,
     MenuContent,
@@ -29,7 +30,7 @@ const UserMenuComponent: React.FC<UserMenuComponentProps> = props => {
         return (
             <Menu {...props}>
                 <MenuTrigger asChild>
-                    <Button p={0.35} pr={0.7}  color={"secondary"} variant={"none"} style={{textAlign: "unset"}}>
+                    <Button p={0.35} color={"secondary"} variant={"none"} style={{textAlign: "unset"}}>
                         <Flex align={"center"} style={{gap: ".5rem"}}>
                             <Avatar src={currentUser?.avatarPath ?? ""} type={"character"}
                                     identifier={currentUser?.username ?? ""}/>

@@ -14,6 +14,19 @@ fragment User on User {
     namespace {
         id
     }
+    namespaceMemberships (first: $firstNamespaceMembership, after: $afterNamespaceMembership) {
+        count
+        nodes {
+            id
+            namespace {
+                id
+            }
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+    }
     identities (first: $firstIdentity, after: $afterIdentity) {
         count
         nodes {

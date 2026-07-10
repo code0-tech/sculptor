@@ -14,15 +14,15 @@ import {
 import Link from "next/link";
 import React from "react";
 import {useRouter} from "next/navigation";
-import {OrganizationDataTableComponent} from "@edition/organization/components/OrganizationDataTableComponent";
+import {NamespaceDataTableComponent} from "@edition/namespace/components/NamespaceDataTableComponent";
 import {
-    OrganizationDataTableFilterInputComponent
-} from "@edition/organization/components/OrganizationDataTableFilterInputComponent";
+    NamespaceDataTableFilterInputComponent
+} from "@edition/namespace/components/NamespaceDataTableFilterInputComponent";
 import {DataTableFilterProps, DataTableSortProps} from "@code0-tech/pictor/dist/components/data-table/DataTable";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import {IconMinus, IconSortAscending, IconSortDescending} from "@tabler/icons-react";
 
-export const OrganizationsView = () => {
+export const NamespacesView = () => {
 
     const router = useRouter()
 
@@ -30,22 +30,25 @@ export const OrganizationsView = () => {
     const [sort, setSort] = React.useState<DataTableSortProps>({})
 
     return <>
-        <Flex align={"center"} style={{gap: "0.35rem"}} justify={"space-between"}>
-            <Flex style={{gap: "0.35rem", flexDirection: "column"}}>
-                <Text size={"xl"} hierarchy={"primary"}>
-                    Organizations
+        <Flex justify={"space-between"} align={"start"}>
+            <div>
+                <Text size={"xl"} fz={2} hierarchy={"primary"}>
+                    Workspaces
                 </Text>
-                <Text size={"sm"} hierarchy={"tertiary"}>
-                    Manage organizations that you belong to. You can create new organizations and switch between them.
+                <Spacing spacing={"xs"}/>
+                <Text hierarchy={"tertiary"}>
+                    Workspaces bring your organizations, projects and flows together in one shared place <br/>
+                    so you and your team can create, organize and manage everything from a single central
+                    view
                 </Text>
-            </Flex>
+            </div>
             <ButtonGroup>
                 <Link href={"/workspaces/create"}>
-                    <Button color={"success"}>Create</Button>
+                    <Button color={"success"} paddingSize={"xxs"}>Create</Button>
                 </Link>
                 <Menu>
                     <MenuTrigger asChild>
-                        <Button color={"secondary"} variant={"filled"}>Sort</Button>
+                        <Button paddingSize={"xxs"} color={"secondary"} variant={"filled"}>Sort</Button>
                     </MenuTrigger>
                     <MenuPortal>
                         <MenuContent>
@@ -109,12 +112,11 @@ export const OrganizationsView = () => {
         </Flex>
         <Spacing spacing={"xl"}/>
         <div style={{width: "100%"}}>
-            <OrganizationDataTableFilterInputComponent onChange={filter => setFilter(filter)}/>
+            <NamespaceDataTableFilterInputComponent onChange={filter => setFilter(filter)}/>
         </div>
         <Spacing spacing={"xl"}/>
-        {/**TODO: use namespaceId*/}
-        <OrganizationDataTableComponent filter={filter} sort={sort} onSelect={(organization) => {
-            const number = organization?.namespace?.id?.match(/Namespace\/(\d+)$/)?.[1]
+        <NamespaceDataTableComponent filter={filter} sort={sort} onSelect={(namespace) => {
+            const number = namespace?.id?.match(/Namespace\/(\d+)$/)?.[1]
             router.push(`/namespace/${number}`)
         }}/>
     </>

@@ -17,6 +17,7 @@ fragment Project on NamespaceProject {
         nodes {
             __typename
             id
+            createdAt
         }
         pageInfo {
             __typename

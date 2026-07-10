@@ -82,7 +82,7 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
                     {tab}
                 </Flex>
             }>
-                <Layout showLayoutSplitter={false} px={0.7} layoutGap={"0"} topContent={<>{bar}</>}>
+                <Layout showLayoutSplitter={false} pr={0.7} layoutGap={"0"} topContent={<>{bar}</>}>
                     <Layout>
                         <>{children}</>
                     </Layout>

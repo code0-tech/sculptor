@@ -29,7 +29,7 @@ export const OrganizationCreatePage = () => {
                     name: values.name as unknown as string
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
-                        router.push("/organizations")
+                        router.push("/workspaces")
                     }
                 })
             })
@@ -55,7 +55,7 @@ export const OrganizationCreatePage = () => {
                            {...inputs.getInputProps("name")}/>
                 <Spacing spacing={"xl"}/>
                 <Flex style={{gap: "0.35rem"}} justify={"space-between"}>
-                    <Link href={"/organizations"}>
+                    <Link href={"/workspaces"}>
                         <Button color={"primary"}>
                             Go back to organizations
                         </Button>

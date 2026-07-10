@@ -21,7 +21,7 @@ export const NamespaceOverviewPage: React.FC = () => {
     const namespaceIndexCurrentUser = currentUser?.namespace?.id?.match(/Namespace\/(\d+)$/)?.[1]
     const namespaceId = params.namespaceId as any as string
 
-    return <Layout showLayoutSplitter={false} layoutGap={"0"}
+    return <Layout showLayoutSplitter={false} pl={2.6} layoutGap={"2.6rem"}
                     leftContent={namespaceIndexCurrentUser == namespaceId ? <NamespaceOverviewPersonalLeftView/> :
                         <NamespaceOverviewOrganizationLeftView/>}>
         <div style={{
