@@ -166,7 +166,7 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                                                 flexDirection: "column"
                                             }}
                                 >
-                                    <Text size={"lg"} hierarchy={"primary"}>
+                                    <Text size={"lg"} hierarchy={"secondary"}>
                                         Settings of @{user?.username ?? ""}
                                     </Text>
                                     <Spacing spacing={"xxs"}/>
