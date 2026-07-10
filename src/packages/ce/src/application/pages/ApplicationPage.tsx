@@ -4,6 +4,7 @@ import {
     Avatar,
     Badge,
     Button,
+    ButtonGroup,
     Card,
     Col,
     Flex,
@@ -21,8 +22,9 @@ import {UserService} from "@edition/user/services/User.service";
 import React from "react";
 import {OrganizationsTopView} from "@edition/organization/views/OrganizationsTopView";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
-import {IconMail, IconSparkles, IconTrendingUp, IconUser} from "@tabler/icons-react";
+import {IconArrowUpRight, IconMail, IconSparkles, IconTrendingUp, IconUser} from "@tabler/icons-react";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
+import Link from "next/link";
 
 export const ApplicationPage = () => {
 
@@ -31,6 +33,7 @@ export const ApplicationPage = () => {
 
     const userSession = useUserSession()
     const currentUser = React.useMemo(() => userService.getById(userSession?.user?.id), [userStore, userSession])
+    const namespaceIndex = currentUser?.namespace?.id?.match(/Namespace\/(\d+)$/)?.[1]
 
     const leftContent = <ScrollArea h={"100%"} type={"scroll"}>
         <ScrollAreaViewport>
@@ -184,9 +187,19 @@ export const ApplicationPage = () => {
                                     <Text hierarchy={"primary"}>
                                         Personal projects
                                     </Text>
-                                    <Button paddingSize={"xxs"} color={"primary"}>
-                                        Create project
-                                    </Button>
+                                    <ButtonGroup color={"primary"}>
+                                        <Link href={`/namespace/${namespaceIndex}/projects/create`} tabIndex={-1}>
+                                            <Button paddingSize={"xxs"} color={"secondary"}>
+                                                Create project
+                                            </Button>
+                                        </Link>
+                                        <Link href={`/namespace/${namespaceIndex}`} tabIndex={-1}>
+                                            <Button paddingSize={"xxs"} color={"secondary"} variant={"none"}>
+                                                <IconArrowUpRight size={13}/>
+                                            </Button>
+                                        </Link>
+                                    </ButtonGroup>
+
                                 </Flex>
                                 <Spacing spacing={"md"}/>
                                 <Card color={"primary"} paddingSize={"md"} mx={-0.9} mb={-0.9}>
@@ -200,9 +213,18 @@ export const ApplicationPage = () => {
                                     <Text hierarchy={"secondary"}>
                                         Top organizations
                                     </Text>
-                                    <Button paddingSize={"xxs"} color={"primary"}>
-                                        Create organization
-                                    </Button>
+                                    <ButtonGroup color={"primary"}>
+                                        <Link href={"/workspaces/create"} tabIndex={-1}>
+                                            <Button paddingSize={"xxs"} color={"secondary"}>
+                                                Create organization
+                                            </Button>
+                                        </Link>
+                                        <Link href={"/workspaces"} tabIndex={-1}>
+                                            <Button paddingSize={"xxs"} color={"secondary"} variant={"none"}>
+                                                <IconArrowUpRight size={13}/>
+                                            </Button>
+                                        </Link>
+                                    </ButtonGroup>
                                 </Flex>
                                 <Spacing spacing={"xs"}/>
                                 <Card color={"primary"} paddingSize={"md"} mx={-0.9} mb={-0.9}>
