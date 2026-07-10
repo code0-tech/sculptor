@@ -37,9 +37,9 @@ export const NamespacesView = () => {
                 </Text>
                 <Spacing spacing={"xs"}/>
                 <Text hierarchy={"tertiary"}>
-                    Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor <br/>
-                    invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam
-                    et
+                    Workspaces bring your organizations, projects and flows together in one shared place <br/>
+                    so you and your team can create, organize and manage everything from a single central
+                    view
                 </Text>
             </div>
             <ButtonGroup>
