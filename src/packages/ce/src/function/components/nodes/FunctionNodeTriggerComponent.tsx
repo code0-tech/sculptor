@@ -117,12 +117,12 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
     const displayMessage = React.useMemo(() => splitTemplate(flowType?.displayMessages?.[0]?.content ?? FALLBACK_FLOW_TYPE_DISPLAY_MESSAGE).map(item => {
 
         const nodeParameter = flow?.settings?.nodes?.find((_, index) => {
-            const parameterDefinition = flowType?.flowTypeSettings?.[index]
+            const parameterDefinition = flowType?.flowTypeSettings?.nodes?.[index]
             return parameterDefinition?.identifier == item
         })
 
-        const parameterDefinition = flowType?.flowTypeSettings?.find(pd => pd?.identifier == item)
-        const parameterIndex = parameterDefinition ? flowType?.flowTypeSettings?.findIndex(p => p?.id === parameterDefinition.id) : undefined
+        const parameterDefinition = flowType?.flowTypeSettings?.nodes?.find(pd => pd?.identifier == item)
+        const parameterIndex = parameterDefinition ? flowType?.flowTypeSettings?.nodes?.findIndex(p => p?.id === parameterDefinition.id) : undefined
         const parameterValidation = validation?.filter(v => v.parameterIndex === parameterIndex && !v.nodeId)
         const decorationStyle: CSSProperties =
             parameterValidation?.length
