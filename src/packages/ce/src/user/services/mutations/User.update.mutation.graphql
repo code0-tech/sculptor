@@ -1,5 +1,5 @@
 #import "@edition/user/services/fragments/User.basic.fragment.graphql"
-mutation update($userId: UserID!, $email: String, $username: String, $firstname: String, $lastname: String, $readme: String, $admin: Boolean, $password: String, $passwordRepeat: String) {
+mutation update($userId: UserID!, $email: String, $username: String, $firstname: String, $lastname: String, $readme: String, $admin: Boolean, $blocked: Boolean, $password: String, $passwordRepeat: String) {
     usersUpdate(input: {
         userId: $userId
         email: $email
@@ -8,6 +8,7 @@ mutation update($userId: UserID!, $email: String, $username: String, $firstname:
         lastname: $lastname
         readme: $readme
         admin: $admin
+        blocked: $blocked
         password: $password
         passwordRepeat: $passwordRepeat
     }) {

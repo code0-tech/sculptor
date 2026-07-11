@@ -4,6 +4,7 @@ fragment User on User {
     __typename
     admin
     avatarPath
+    blocked
     createdAt
     email
     emailVerifiedAt
