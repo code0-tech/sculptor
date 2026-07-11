@@ -45,19 +45,17 @@ export const MemberAddPage: React.FC = () => {
         onSubmit: (values) => {
             startTransition(async () => {
 
-                const invitePromises = values.users!!.map((value) =>
-                    memberService.memberInvite({
-                        namespaceId: namespaceId!!,
-                        userId: (value.value).id!!
-                    })
-                )
+                const payload = await memberService.memberBulkInvite({
+                    namespaceId: namespaceId!!,
+                    userIds: values.users!!.map((value) => (value.value).id!!)
+                })
 
-                await Promise.all(invitePromises).then(() => {
+                if ((payload?.errors?.length ?? 0) <= 0) {
                     router.push(`/namespace/${namespaceIndex}/members`)
                     addIslandSuccessNotification({
                         message: "Added members",
                     })
-                })
+                }
             })
         }
     })
