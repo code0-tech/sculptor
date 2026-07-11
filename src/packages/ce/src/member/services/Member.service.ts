@@ -7,17 +7,17 @@ import {
     NamespaceMember,
     NamespacesMembersAssignRolesInput,
     NamespacesMembersAssignRolesPayload,
+    NamespacesMembersBulkInviteInput,
+    NamespacesMembersBulkInvitePayload,
     NamespacesMembersDeleteInput,
     NamespacesMembersDeletePayload,
-    NamespacesMembersInviteInput,
-    NamespacesMembersInvitePayload,
     Query, User
 } from "@code0-tech/sagittarius-graphql-types"
 import {GraphqlClient} from "@core/util/graphql-client"
 import membersQuery from "./queries/Members.query.graphql"
 import memberAssignRoleMutation from "./mutations/Member.assignRoles.mutation.graphql"
 import memberDeleteMutation from "./mutations/Member.delete.mutation.graphql"
-import memberInviteMutation from "./mutations/Member.invite.mutation.graphql"
+import memberBulkInviteMutation from "./mutations/Member.bulkInvite.mutation.graphql"
 import {View} from "@code0-tech/pictor/dist/utils/view";
 
 export type MemberDependencies = {
@@ -120,20 +120,21 @@ export class MemberService extends ReactiveArrayService<NamespaceMember, MemberD
         return result.data?.namespacesMembersDelete ?? undefined
     }
 
-    async memberInvite(payload: NamespacesMembersInviteInput): Promise<NamespacesMembersInvitePayload | undefined> {
-        const result = await this.client.mutate<Mutation, NamespacesMembersInviteInput>({
-            mutation: memberInviteMutation,
+    async memberBulkInvite(payload: NamespacesMembersBulkInviteInput): Promise<NamespacesMembersBulkInvitePayload | undefined> {
+        const result = await this.client.mutate<Mutation, NamespacesMembersBulkInviteInput>({
+            mutation: memberBulkInviteMutation,
             variables: {
                 ...payload
             }
         })
 
-        if (result.data && result.data.namespacesMembersInvite && result.data.namespacesMembersInvite.namespaceMember) {
-            const member = result.data.namespacesMembersInvite.namespaceMember
-            this.set(this.i++, new View(member))
-        }
+        result.data?.namespacesMembersBulkInvite?.namespaceMembers?.forEach(member => {
+            if (!this.hasById(member.id)) {
+                this.set(this.i++, new View(member))
+            }
+        })
 
-        return result.data?.namespacesMembersInvite ?? undefined
+        return result.data?.namespacesMembersBulkInvite ?? undefined
     }
 
 }
