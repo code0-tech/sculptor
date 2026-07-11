@@ -1,7 +1,7 @@
 #import "../fragments/Member.basic.fragment.graphql"
-mutation inviteMember($userId: UserID!, $namespaceId: NamespaceID!) {
-    namespacesMembersInvite(input: {
-        userId: $userId,
+mutation bulkInviteMembers($userIds: [UserID!]!, $namespaceId: NamespaceID!) {
+    namespacesMembersBulkInvite(input: {
+        userIds: $userIds,
         namespaceId: $namespaceId
     }) {
         errors {
@@ -12,7 +12,7 @@ mutation inviteMember($userId: UserID!, $namespaceId: NamespaceID!) {
                 }
             }
         }
-        namespaceMember {
+        namespaceMembers {
             ...BasicMember
         }
     }
