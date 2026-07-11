@@ -44,6 +44,9 @@ export class FlowTypeService extends ReactiveArrayService<FlowType, FlowTypeDepe
 
                     firstFlowType: 50,
                     afterFlowType: null,
+
+                    firstFlowTypeSetting: 50,
+                    afterFlowTypeSetting: null,
                 }
             }).then(res => {
                 const nodes = res.data?.namespace?.project?.primaryRuntime?.modules?.nodes?.flatMap(module => module?.flowTypes?.nodes ?? []) ?? []

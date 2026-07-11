@@ -99,7 +99,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
             flowService.flowCreate({
                 // @ts-ignore
                 flow: {
-                    settings: selectedFlowType?.flowTypeSettings?.map(setting => ({
+                    settings: selectedFlowType?.flowTypeSettings?.nodes?.map(setting => ({
                         value: setting?.defaultValue !== null && setting?.defaultValue !== undefined ? setting?.defaultValue : null,
                     })) ?? [],
                     name: name,

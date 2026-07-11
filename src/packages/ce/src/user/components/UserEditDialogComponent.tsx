@@ -61,6 +61,7 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
         username: user?.username ?? null,
         readme: user?.readme ?? null,
         admin: user?.admin ?? false,
+        blocked: user?.blocked ?? false,
         password: null,
         repeatPassword: null,
     }), [user])
@@ -72,6 +73,7 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
         username: string | null,
         readme: string | null,
         admin: boolean | null,
+        blocked: boolean | null,
         password: string | null,
         repeatPassword: string | null,
     }>({
@@ -109,6 +111,7 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
             if (values.lastname !== (user?.lastname ?? null)) payload.lastname = values.lastname
             if (values.readme !== (user?.readme ?? null)) payload.readme = values.readme
             if (values.admin !== (user?.admin ?? false)) payload.admin = values.admin
+            if (values.blocked !== (user?.blocked ?? false)) payload.blocked = values.blocked
             if (values.password) {
                 payload.password = values.password
                 payload.passwordRepeat = values.repeatPassword
@@ -270,6 +273,17 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                                                 </Text>
                                             </Flex>
                                             <SwitchInput w={"40px"} {...inputs.getInputProps("admin")}/>
+                                        </Flex>
+                                    </CardSection>
+                                    <CardSection border>
+                                        <Flex justify={"space-between"} align={"center"}>
+                                            <Flex style={{gap: ".35rem", flexDirection: "column"}}>
+                                                <Text size={"md"} hierarchy={"primary"}>Blocked</Text>
+                                                <Text size={"md"} hierarchy={"tertiary"}>
+                                                    Block this user from accessing the application.
+                                                </Text>
+                                            </Flex>
+                                            <SwitchInput w={"40px"} {...inputs.getInputProps("blocked")}/>
                                         </Flex>
                                     </CardSection>
                                 </Card>

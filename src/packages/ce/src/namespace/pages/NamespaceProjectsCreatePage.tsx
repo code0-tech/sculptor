@@ -54,7 +54,7 @@ export const NamespaceProjectsCreatePage: React.FC = () => {
                     namespaceId: namespaceId
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
-                        router.push(`/namespace/${namespaceIndex}/projects`)
+                        router.push(`/namespace/${namespaceIndex}`)
                     }
                 })
             })

@@ -2,6 +2,7 @@ fragment UserBasic on User {
     __typename
     admin
     avatarPath
+    blocked
     createdAt
     readme
     firstname

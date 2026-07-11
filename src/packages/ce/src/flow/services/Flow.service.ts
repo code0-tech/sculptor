@@ -314,7 +314,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
             flow.settings.nodes = []
         }
 
-        flow.settings.nodes = flowType?.flowTypeSettings?.map((flowTypeSetting, index) => {
+        flow.settings.nodes = flowType?.flowTypeSettings?.nodes?.map((flowTypeSetting, index) => {
             const flowSetting = flow.settings?.nodes?.[index]
             if (!flowSetting) {
                 return {

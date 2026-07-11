@@ -44,9 +44,9 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
 
     const initialValues: Record<string | "inputType", any> = React.useMemo(() => {
         const values: Record<string, any> = {}
-        definition?.flowTypeSettings?.forEach((setting, index) => {
+        definition?.flowTypeSettings?.nodes?.forEach((setting, index) => {
             const flowSetting = instance?.settings?.nodes?.[index]
-            values[setting.id!] = {
+            values[setting!.id!] = {
                 __typename: "LiteralValue",
                 value: flowSetting?.value,
             }
@@ -63,7 +63,7 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
 
     const settingsValidations = React.useMemo(() => {
         const values: Record<string, any> = {}
-        definition?.flowTypeSettings?.forEach((setting, index) => {
+        definition?.flowTypeSettings?.nodes?.forEach((setting, index) => {
             values[setting!.id!] = (_: any) => {
                 const validationForSetting = validation?.find(v => v.parameterIndex === index && !v.nodeId)
                 if (validationForSetting) {
@@ -77,17 +77,17 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
 
     const onSubmit = React.useCallback((values: Record<string, LiteralValue | undefined>) => {
         React.startTransition(async () => {
-            for (const flowTypeSetting of definition?.flowTypeSettings ?? []) {
+            for (const flowTypeSetting of definition?.flowTypeSettings?.nodes ?? []) {
 
-                if (!changedSettings.current.has(flowTypeSetting.id!)) continue
+                if (!changedSettings.current.has(flowTypeSetting!.id!)) continue
 
-                const index = definition?.flowTypeSettings?.findIndex(p => p?.id === flowTypeSetting?.id)
+                const index = definition?.flowTypeSettings?.nodes?.findIndex(p => p?.id === flowTypeSetting?.id)
                 if (typeof index !== "number") return
 
-                const value = values[flowTypeSetting.id!]
+                const value = values[flowTypeSetting!.id!]
                 await flowService.setSettingValue(flowId, index, value?.value, definition!)
 
-                changedSettings.current.delete(flowTypeSetting.id!)
+                changedSettings.current.delete(flowTypeSetting!.id!)
             }
         })
     }, [flowService, definition])
@@ -121,7 +121,7 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
         <Text size={"md"}>Settings</Text>
         <Spacing spacing={"xl"}/>
         {(() => {
-            const indexedSettings = definition?.flowTypeSettings
+            const indexedSettings = definition?.flowTypeSettings?.nodes
                 ?.map((settingDefinition, index) => ({settingDefinition, index}))
                 ?.filter(({settingDefinition}) => settingDefinition && !settingDefinition.hidden) ?? []
 

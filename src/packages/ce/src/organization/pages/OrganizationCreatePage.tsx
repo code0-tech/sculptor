@@ -3,12 +3,14 @@
 import {Button, Col, Flex, Spacing, Text, TextInput, useForm, useService} from "@code0-tech/pictor";
 import Link from "next/link";
 import {OrganizationService} from "@edition/organization/services/Organization.service";
+import {UserService} from "@edition/user/services/User.service";
 import React from "react";
 import {useRouter} from "next/navigation";
 
 export const OrganizationCreatePage = () => {
 
     const organizationService = useService(OrganizationService)
+    const userService = useService(UserService)
     const [, startTransition] = React.useTransition()
     const router = useRouter()
 
@@ -29,7 +31,7 @@ export const OrganizationCreatePage = () => {
                     name: values.name as unknown as string
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
-                        router.push("/workspaces")
+                        userService.refetchCurrentUser().then(() => router.push("/workspaces"))
                     }
                 })
             })
