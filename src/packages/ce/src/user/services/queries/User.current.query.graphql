@@ -1,0 +1,14 @@
+#import '../fragments/User.fragment.graphql'
+
+query CurrentUser(
+    $firstIdentity: Int,
+    $afterIdentity: String,
+    $firstSession: Int,
+    $afterSession: String,
+    $firstNamespaceMembership: Int,
+    $afterNamespaceMembership: String
+) {
+    currentUser {
+        ...User
+    }
+}

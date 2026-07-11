@@ -44,6 +44,7 @@ import emailVerificationMutation from "./mutations/User.emailVerification.mutati
 import passwordResetMutation from "./mutations/User.passwordReset.mutation.graphql"
 import passwordResetRequestMutation from "./mutations/User.passwordResetRequest.mutation.graphql"
 import usersQuery from "./queries/Users.query.graphql";
+import currentUserQuery from "./queries/User.current.query.graphql";
 import userByUsernameQuery from "./queries/User.byUsername.query.graphql";
 import userByIdQuery from "./queries/User.byId.query.graphql";
 import {View} from "@code0-tech/pictor/dist/utils/view";
@@ -88,6 +89,29 @@ export class UserService extends ReactiveArrayService<User> {
             }
         })
         return super.values();
+    }
+
+    async refetchCurrentUser(): Promise<User | undefined> {
+        const result = await this.client.query<Query>({
+            query: currentUserQuery,
+            variables: {
+                firstIdentity: 50,
+                afterIdentity: null,
+                firstSession: 50,
+                afterSession: null,
+                firstNamespaceMembership: 50,
+                afterNamespaceMembership: null,
+            },
+            fetchPolicy: "network-only"
+        })
+
+        const currentUser = result.data?.currentUser
+        if (!currentUser) return undefined
+
+        const index = super.values().findIndex(user => user && user.id === currentUser.id)
+        this.set(index >= 0 ? index : this.i++, new View(currentUser))
+
+        return currentUser
     }
 
     getById(id: User["id"]): User | undefined {
