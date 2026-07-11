@@ -32,6 +32,7 @@ fragment Application on Application {
         adminStatusVisible
         organizationCreationRestricted
         userRegistrationEnabled
+        runtimeMaxHeartbeatIntervalMinutes
     }
     userAbilities {
         __typename
