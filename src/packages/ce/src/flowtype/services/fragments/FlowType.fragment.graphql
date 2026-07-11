@@ -32,25 +32,33 @@ fragment FlowType on FlowType {
         id
     }
     signature
-    flowTypeSettings {
+    flowTypeSettings (first: $firstFlowTypeSetting, after: $afterFlowTypeSetting) {
         __typename
-        id
-        createdAt
-        updatedAt
-        identifier
-        unique
-        optional
-        hidden
-        defaultValue
-        names {
+        count
+        nodes {
             __typename
-            code
-            content
+            id
+            createdAt
+            updatedAt
+            identifier
+            unique
+            optional
+            hidden
+            defaultValue
+            names {
+                __typename
+                code
+                content
+            }
+            descriptions {
+                __typename
+                code
+                content
+            }
         }
-        descriptions {
-            __typename
-            code
-            content
+        pageInfo {
+            endCursor
+            hasNextPage
         }
     }
     editable
