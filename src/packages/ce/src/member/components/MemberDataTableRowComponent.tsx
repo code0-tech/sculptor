@@ -61,7 +61,7 @@ export const MemberDataTableRowComponent: React.FC<MemberDataTableRowComponentPr
 
     const assignedRoles = React.useMemo(
         () => member?.roles?.nodes?.map(role => roleService.getById(role?.id, {namespaceId: member?.namespace?.id})) || [],
-        [roleStore, member?.roles?.nodes?.length]
+        [roleStore, member]
     )
 
     const [localAssignedRoles, setLocalAssignedRoles] = React.useState(assignedRoles)
