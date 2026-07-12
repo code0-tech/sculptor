@@ -21,6 +21,8 @@ export interface UserInputComponentProps extends TextInputProps {
     filter?: (user: User, index: number) => boolean
 }
 
+export type UserSyntaxSegment = InputSyntaxSegment & { valueData?: User }
+
 export const UserInputComponent: React.FC<UserInputComponentProps> = (props) => {
 
     const {filter = () => true, ...rest} = props
@@ -43,7 +45,7 @@ export const UserInputComponent: React.FC<UserInputComponentProps> = (props) => 
     const transformSyntax = (
         _?: string | null,
         appliedParts: (InputSuggestion | any)[] = [],
-    ): InputSyntaxSegment[] => {
+    ): UserSyntaxSegment[] => {
 
         let cursor = 0
 
@@ -51,7 +53,11 @@ export const UserInputComponent: React.FC<UserInputComponentProps> = (props) => 
             if (typeof part === "object") {
                 const segment = {
                     type: "block",
-                    value: part.valueData,
+                    // value must stay the raw suggestion value (username) so pictor can
+                    // re-match the segment to its token on re-serialization; the User
+                    // object travels alongside in valueData
+                    value: part.value,
+                    valueData: part.valueData,
                     start: cursor,
                     end: cursor + part.value.length,
                     visualLength: 1,
@@ -81,7 +87,7 @@ export const UserInputComponent: React.FC<UserInputComponentProps> = (props) => 
             }
             cursor += textString.length
             return {}
-        }) as InputSyntaxSegment[]
+        }) as UserSyntaxSegment[]
     }
 
     return <TextInput placeholder={"Enter users"}

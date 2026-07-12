@@ -28,7 +28,6 @@ export type MemberDependencies = {
 export class MemberService extends ReactiveArrayService<NamespaceMember, MemberDependencies> {
 
     private readonly client: GraphqlClient
-    private i = 0
 
     constructor(client: GraphqlClient, store: ReactiveArrayStore<View<NamespaceMember>>) {
         super(store)
@@ -56,7 +55,7 @@ export class MemberService extends ReactiveArrayService<NamespaceMember, MemberD
                 const nodes = res.data?.namespace?.members?.nodes ?? []
                 nodes.forEach(member => {
                     if (member && !this.hasById(member.id)) {
-                        this.set(this.i++, new View(member))
+                        this.add(new View(member))
                     }
                 })
             })
@@ -66,7 +65,7 @@ export class MemberService extends ReactiveArrayService<NamespaceMember, MemberD
     }
 
     hasById(id: NamespaceMember["id"]): boolean {
-        const member = super.values().find(o => o.id === id)
+        const member = super.values().find(o => o?.id === id)
         return member !== undefined
     }
 
@@ -88,7 +87,7 @@ export class MemberService extends ReactiveArrayService<NamespaceMember, MemberD
 
         if (result.data && result.data.namespacesMembersAssignRoles) {
             const currentMember = this.getById(payload.memberId)
-            const index = super.values().findIndex(m => m.id === payload.memberId)
+            const index = super.values().findIndex(m => m?.id === payload.memberId)
 
             if (currentMember && index >= 0) {
                 const newMember: NamespaceMember = {
@@ -135,8 +134,8 @@ export class MemberService extends ReactiveArrayService<NamespaceMember, MemberD
 
         if (result.data && result.data.namespacesMembersDelete && result.data.namespacesMembersDelete.namespaceMember) {
             const member = result.data.namespacesMembersDelete.namespaceMember
-            const index = super.values().findIndex(m => m.id == member.id)
-            this.delete(index)
+            const index = super.values().findIndex(m => m?.id == member.id)
+            if (index >= 0) this.delete(index)
         }
 
         return result.data?.namespacesMembersDelete ?? undefined
@@ -152,7 +151,7 @@ export class MemberService extends ReactiveArrayService<NamespaceMember, MemberD
 
         result.data?.namespacesMembersBulkInvite?.namespaceMembers?.forEach(member => {
             if (!this.hasById(member.id)) {
-                this.set(this.i++, new View(member))
+                this.add(new View(member))
             }
         })
 
