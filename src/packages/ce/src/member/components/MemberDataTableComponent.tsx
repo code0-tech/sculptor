@@ -37,7 +37,7 @@ export const MemberDataTableComponent: React.FC<MemberDataTableComponentProps> =
 
     const members = React.useMemo(
         () => memberService.values({namespaceId: namespaceId}),
-        [memberStore]
+        [memberStore, namespaceId]
     )
 
     return <DataTable filter={filter}
