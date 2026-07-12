@@ -11,6 +11,7 @@ import {
     NamespacesMembersBulkInvitePayload,
     NamespacesMembersDeleteInput,
     NamespacesMembersDeletePayload,
+    NamespaceRole,
     Query, User
 } from "@code0-tech/sagittarius-graphql-types"
 import {GraphqlClient} from "@core/util/graphql-client"
@@ -89,18 +90,39 @@ export class MemberService extends ReactiveArrayService<NamespaceMember, MemberD
             const currentMember = this.getById(payload.memberId)
             const index = super.values().findIndex(m => m.id === payload.memberId)
 
+            if (currentMember && index >= 0) {
+                const newMember: NamespaceMember = {
+                    ...currentMember,
+                    roles: {
+                        ...currentMember.roles,
+                        count: payload.roleIds.length,
+                        nodes: payload.roleIds.map(roleId => ({ id: roleId }))
+                    }
+                }
+
+                this.set(index, new View(newMember))
+            }
+        }
+
+        return result.data?.namespacesMembersAssignRoles ?? undefined
+    }
+
+    removeRoleFromMembers(roleId: NamespaceRole['id']): void {
+        super.values().forEach((member, index) => {
+            if (!member?.roles?.nodes?.some(role => role?.id === roleId)) return
+
+            const nodes = member.roles.nodes.filter(role => role?.id !== roleId)
             const newMember: NamespaceMember = {
-                ...currentMember,
+                ...member,
                 roles: {
-                    count: payload.roleIds.length,
-                    nodes: payload.roleIds.map(roleId => ({ id: roleId }))
+                    ...member.roles,
+                    count: nodes.length,
+                    nodes: nodes
                 }
             }
 
             this.set(index, new View(newMember))
-        }
-
-        return result.data?.namespacesMembersAssignRoles ?? undefined
+        })
     }
 
     async memberDelete(payload: NamespacesMembersDeleteInput): Promise<NamespacesMembersDeletePayload | undefined> {
