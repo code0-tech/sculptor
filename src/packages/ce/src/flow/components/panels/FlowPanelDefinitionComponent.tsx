@@ -68,12 +68,12 @@ export const FlowPanelDefinitionComponent: React.FC = () => {
     )
 
     const module = React.useMemo(
-        () => moduleService.getById(flowType?.runtimeModule?.id, {
+        () => moduleService.getById(flowType?.runtimeFlowType?.runtimeModule?.id, {
             namespaceId: namespaceId,
             projectId: projectId,
             runtimeId: project?.primaryRuntime?.id
         }),
-        [flowType?.runtimeModule?.id, namespaceId, projectId, project?.primaryRuntime?.id, moduleStore]
+        [flowType?.runtimeFlowType?.runtimeModule?.id, namespaceId, projectId, project?.primaryRuntime?.id, moduleStore]
     )
 
     let endpoint = `http://${module?.definitions?.nodes?.[0]?.host}:${module?.definitions?.nodes?.[0]?.port}${module?.definitions?.nodes?.[0]?.endpoint}`
@@ -82,6 +82,27 @@ export const FlowPanelDefinitionComponent: React.FC = () => {
     flow?.settings?.nodes?.forEach(setting => {
         endpoint = endpoint.replace(`\${{${setting?.flowSettingIdentifier}}}`, setting?.value)
     })
+
+    const copyEndpoint = (event: React.MouseEvent<HTMLElement>) => {
+        if (!navigator?.clipboard?.writeText) {
+            // Without a secure context there is no Clipboard API and the hook falls back to a
+            // textarea on document.body, which the modal dialog's focus trap keeps unfocusable,
+            // so Firefox copies nothing. Run the same fallback inside the dialog instead; the
+            // copyToClipboard call below still records the copied state.
+            const dialog = event.currentTarget.closest("[role='dialog']")
+            if (dialog) {
+                const textArea = document.createElement("textarea")
+                textArea.value = endpoint
+                textArea.style.position = "fixed"
+                textArea.style.opacity = "0"
+                dialog.appendChild(textArea)
+                textArea.select()
+                document.execCommand("copy")
+                dialog.removeChild(textArea)
+            }
+        }
+        copyToClipboard(endpoint)
+    }
 
     return module?.definitions?.nodes?.[0] &&
         <Panel position={"bottom-right"} data-qa-selector={"flow-builder-definition-panel"}>
@@ -110,9 +131,8 @@ export const FlowPanelDefinitionComponent: React.FC = () => {
                                           ) : undefined}
                                           right={
                                               <ButtonGroup color={"primary"}>
-                                                  <Button onClick={() => {
-                                                      copyToClipboard(endpoint)
-                                                  }} paddingSize={"xxs"} variant={"none"} color={"secondary"}>
+                                                  <Button onClick={copyEndpoint}
+                                                          paddingSize={"xxs"} variant={"none"} color={"secondary"}>
                                                       {hasCopiedText ? <IconCheck size={13}/> :
                                                           <IconCopy size={13}/>}
                                                   </Button>
