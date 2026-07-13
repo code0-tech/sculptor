@@ -55,11 +55,11 @@ export const ProjectsView: React.FC = () => {
             </div>
             <ButtonGroup>
                 <Link href={`/namespace/${namespaceId}/projects/create`}>
-                    <Button paddingSize={"xxs"} color={"success"}>Create</Button>
+                    <Button color={"success"}>Create</Button>
                 </Link>
                 <Menu>
                     <MenuTrigger asChild>
-                        <Button paddingSize={"xxs"} color={"secondary"} variant={"filled"}>Sort</Button>
+                        <Button color={"secondary"} variant={"filled"}>Sort</Button>
                     </MenuTrigger>
                     <MenuPortal>
                         <MenuContent>
