@@ -43,7 +43,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                 flowId: flowId,
                 nodeId: undefined,
                 color: hashToColor(flowId!),
-                schema: flowSchema?.filter(nodeSchema => nodeSchema?.some(schema => !schema.nodeId))?.flat()!
+                schema: flowSchema?.find(signatureSchema => !signatureSchema.nodeId)?.parameters ?? []
             },
         })
 
@@ -73,7 +73,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                         flowId: flowId,
                         index: globalIndex,
                         color: hashToColor(nodeId),
-                        schema: flowSchema?.filter(nodeSchema => nodeSchema?.some(schema => schema.nodeId === node.id))?.flat()!
+                        schema: flowSchema?.find(signatureSchema => signatureSchema.nodeId === node.id)?.parameters ?? []
                     },
                 })
             }

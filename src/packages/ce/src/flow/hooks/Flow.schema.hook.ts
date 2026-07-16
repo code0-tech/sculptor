@@ -5,13 +5,13 @@ import React from "react";
 import {useSchemaAction} from "@edition/flow/components/FlowWorkerProvider";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FunctionService} from "@edition/function/services/Function.service";
-import {NodeSchema} from "@code0-tech/triangulum";
+import {SignatureSchema} from "@code0-tech/triangulum";
 
 export const useFlowSchema = (
     flowId: Flow['id'],
     namespaceId: Namespace['id'],
     projectId: NamespaceProject['id'],
-): NodeSchema[][] | undefined => {
+): SignatureSchema[] | undefined => {
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
     const dataTypeStore = useStore(DatatypeService)
@@ -20,7 +20,7 @@ export const useFlowSchema = (
     const functionStore = useStore(FunctionService)
     const {execute} = useSchemaAction()
 
-    const [schema, setSchema] = React.useState<NodeSchema[][] | undefined>([]);
+    const [schema, setSchema] = React.useState<SignatureSchema[] | undefined>([]);
 
     const flow = React.useMemo(
         () => flowService.getById(flowId, {namespaceId, projectId}),
@@ -61,7 +61,7 @@ export const useFlowSchema = (
 
         Promise.all([triggerSchema!, ...schemas!]).then((value) => {
             if (cancelled) return
-            setSchema(value as NodeSchema[][])
+            setSchema(value as SignatureSchema[])
         })
 
         return () => {

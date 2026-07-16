@@ -48,6 +48,9 @@ addEventListener("message", (event) => {
                 result = 0;
                 break;
             case 'schema':
+                // getSignatureSchema now returns a SignatureSchema ({nodeId, parameters, return}).
+                // We forward the whole object so callers can associate parameters by nodeId;
+                // the return schema is unused for now.
                 result = getSignatureSchema(payload.flow, payload.dataTypes, payload.functions, payload.nodeId);
                 break;
         }
