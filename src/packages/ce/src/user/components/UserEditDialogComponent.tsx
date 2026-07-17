@@ -30,6 +30,7 @@ import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {User, UsersUpdateInput} from "@code0-tech/sagittarius-graphql-types";
 import {UserService} from "@edition/user/services/User.service";
+import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 import {IconAt, IconBackground, IconLock, IconMail, IconSettings2, IconShieldLock} from "@tabler/icons-react";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
@@ -49,10 +50,13 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
     const userStore = useStore(UserService)
     const [, startTransition] = React.useTransition()
 
+    const currentSession = useUserSession()
     const user = React.useMemo(
         () => userService.getById(userId),
         [userStore, userId]
     )
+
+    const isSelf = !!user && !!currentSession?.user?.id && user.id === currentSession.user.id
 
     const initialValues = React.useMemo(() => ({
         firstname: user?.firstname ?? null,
@@ -110,8 +114,10 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
             if (values.firstname !== (user?.firstname ?? null)) payload.firstname = values.firstname
             if (values.lastname !== (user?.lastname ?? null)) payload.lastname = values.lastname
             if (values.readme !== (user?.readme ?? null)) payload.readme = values.readme
-            if (values.admin !== (user?.admin ?? false)) payload.admin = values.admin
-            if (values.blocked !== (user?.blocked ?? false)) payload.blocked = values.blocked
+            if (!isSelf) {
+                if (values.admin !== (user?.admin ?? false)) payload.admin = values.admin
+                if (values.blocked !== (user?.blocked ?? false)) payload.blocked = values.blocked
+            }
             if (values.password) {
                 payload.password = values.password
                 payload.passwordRepeat = values.repeatPassword
@@ -185,12 +191,14 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                                                 <Text size={"md"}>General</Text>
                                             </Button>
                                         </TabTrigger>
-                                        <TabTrigger value={"permissions"} w={"100%"} asChild>
-                                            <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                                <IconShieldLock size={13}/>
-                                                <Text size={"md"}>Access</Text>
-                                            </Button>
-                                        </TabTrigger>
+                                        {!isSelf && (
+                                            <TabTrigger value={"permissions"} w={"100%"} asChild>
+                                                <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                                    <IconShieldLock size={13}/>
+                                                    <Text size={"md"}>Access</Text>
+                                                </Button>
+                                            </TabTrigger>
+                                        )}
                                         <TabTrigger value={"security"} w={"100%"} asChild>
                                             <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
                                                 <IconSettings2 opacity={0} size={13}/>
@@ -256,7 +264,7 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                                                description={"A short bio or notes shown on the user's profile."}
                                                {...inputs.getInputProps("readme")}/>
                             </TabContent>
-                            <TabContent value={"permissions"} style={{overflow: "hidden"}}>
+                            <TabContent value={"permissions"} style={{overflow: "hidden", display: isSelf ? "none" : undefined}}>
                                 <Flex justify={"space-between"} align={"center"}>
                                     <Text size={"lg"} hierarchy={"primary"} display={"block"}>Access</Text>
                                     <Button paddingSize={"xxs"} color={"success"} variant={"none"}
