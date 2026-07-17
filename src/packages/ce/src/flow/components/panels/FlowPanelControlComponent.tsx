@@ -28,7 +28,7 @@ import {SuggestionDialogComponent} from "@edition/function/components/suggestion
 import {useHotkeys} from "react-hotkeys-hook";
 import {useSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
 import {useFunctionSuggestions} from "@edition/function/hooks/Function.suggestion.hook";
-import {IconArrowBigUp, IconBackspace, IconLetterA, IconLetterQ} from "@tabler/icons-react";
+import {IconArrowBigUp, IconBackspace, IconLetterA, IconLetterQ, IconLetterX} from "@tabler/icons-react";
 import {HoverCard, HoverCardContent, HoverCardPortal, HoverCardTrigger} from "@radix-ui/react-hover-card";
 import 'ldrs/react/ChaoticOrbit.css'
 import {AIChatComponent} from "@edition/ai/components/AIChatComponent";
@@ -36,6 +36,7 @@ import {mapAiGenerationFlowToFlowInput} from "@edition/ai/util/AI.flow.mapper";
 import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 import {useFlowCompareStore} from "@edition/flow/hooks/Flow.compare.hook";
 import {FlowView} from "@edition/flow/services/Flow.view";
+import {FlowExecuteDialogComponent} from "@edition/flow/components/FlowExecuteDialogComponent";
 
 export interface FlowPanelControlComponentProps {
     namespaceId: Namespace['id']
@@ -130,6 +131,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
     }, [flowId, flowService, flowStore, selectedNode])
 
     const [aiOpen, setAiOpen] = React.useState(false)
+    const [executeDialogOpen, setExecuteDialogOpen] = React.useState(false)
 
     useHotkeys('shift+a', (keyboardEvent) => {
         if (selectedNode && !selectedNode.data.functionId) setSuggestionDialogOpen(true)
@@ -147,6 +149,12 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
 
     useHotkeys('shift+q', (keyboardEvent) => {
         setAiOpen(prevState => !prevState)
+        keyboardEvent.stopPropagation()
+        keyboardEvent.preventDefault()
+    }, [])
+
+    useHotkeys('shift+x', (keyboardEvent) => {
+        setExecuteDialogOpen(prevState => !prevState)
         keyboardEvent.stopPropagation()
         keyboardEvent.preventDefault()
     }, [])
@@ -169,7 +177,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                                     paddingSize={"xxs"}
                                     variant={"none"}
                                     color={"error"}>
-                                <Text>Delete current node</Text>
+                                <Text>Delete node</Text>
                                 <Badge color={"tertiary"}>
                                     <IconBackspace size={11}/>
                                 </Badge>
@@ -192,7 +200,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                                     }}
                                     color={"tertiary"}>
                                 <Text display={"flex"} align={"center"} style={{gap: "0.35rem"}}>
-                                    Add next node
+                                    Add node
                                     <Badge color={"tertiary"}>
                                         <IconArrowBigUp size={10}/>
                                         +
@@ -217,7 +225,25 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                             <IconLetterQ size={10}/>
                         </Badge>
                     </Button>
+                    <Button data-qa-selector={"flow-builder-control-panel-execute"}
+                            paddingSize={"xxs"}
+                            variant={"none"}
+                            color={"tertiary"}
+                            onClick={() => setExecuteDialogOpen(true)}>
+                        Execute
+                        <Badge color={"tertiary"}>
+                            <IconArrowBigUp size={10}/>
+                            +
+                            <IconLetterX size={10}/>
+                        </Badge>
+                    </Button>
                 </ButtonGroup>
+
+                <FlowExecuteDialogComponent flowId={flowId}
+                                            namespaceId={namespaceId}
+                                            projectId={projectId}
+                                            open={executeDialogOpen}
+                                            onOpenChange={setExecuteDialogOpen}/>
 
 
             </Panel>
