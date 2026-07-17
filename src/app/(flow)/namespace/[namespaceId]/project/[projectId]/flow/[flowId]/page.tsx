@@ -14,6 +14,8 @@ import {
 } from "@code0-tech/pictor/dist/components/resizable/Resizable";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 import {FlowExecutionResultView} from "@edition/flow/views/FlowExecutionResultView";
+import {FlowExecutionWatcherComponent} from "@edition/flow/components/FlowExecutionWatcherComponent";
+import {useFlowViewStore} from "@edition/flow/hooks/Flow.view.hook";
 import {useHotkeys} from "react-hotkeys-hook";
 import {Node, useReactFlow} from "@xyflow/react";
 
@@ -28,17 +30,18 @@ export default function Page() {
     const flowIndex = params.flowId as any as number
     const flowId: Flow['id'] = `gid://sagittarius/Flow/${flowIndex}`
 
-    const [tab, setTab] = React.useState<string | undefined>(undefined);
+    const tab = useFlowViewStore(s => s.tab)
+    const toggleTab = useFlowViewStore(s => s.toggleTab)
     const reactFlow = useReactFlow()
 
     useHotkeys('shift+1', (keyboardEvent) => {
-        setTab(prevState => prevState === "file" ? undefined : "file")
+        toggleTab("file")
         keyboardEvent.stopPropagation()
         keyboardEvent.preventDefault()
     }, [])
 
     useHotkeys('shift+2', (keyboardEvent) => {
-        setTab(prevState => prevState === "execution" ? undefined : "execution")
+        toggleTab("execution")
         keyboardEvent.stopPropagation()
         keyboardEvent.preventDefault()
     }, [])
@@ -57,15 +60,16 @@ export default function Page() {
     }, [tab, reactFlow])
 
     return <ResizablePanel id={"2"}>
+        <FlowExecutionWatcherComponent/>
         <Layout layoutGap={0} showLayoutSplitter={false} rightContent={
             <Flex pl={0.7} style={{flexDirection: "column", gap: "0.7rem"}}>
                 <Button aria-selected={tab === "file"}
-                        onClick={() => setTab(prevState => prevState === "file" ? undefined : "file")} variant={"none"}
+                        onClick={() => toggleTab("file")} variant={"none"}
                         paddingSize={"xs"}>
                     <IconFile size={16}/>
                 </Button>
                 <Button aria-selected={tab === "execution"}
-                        onClick={() => setTab(prevState => prevState === "execution" ? undefined : "execution")}
+                        onClick={() => toggleTab("execution")}
                         variant={"none"}
                         paddingSize={"xs"}>
                     <IconPlayerPlay size={16}/>
