@@ -1,6 +1,6 @@
 import React from "react"
 import {DataType, Flow, FunctionDefinition, LiteralValue, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
-import {NodeSchema} from "@code0-tech/triangulum";
+import {SignatureSchema} from "@code0-tech/triangulum";
 
 interface Deferred {
     resolve: (value: any) => void
@@ -182,4 +182,4 @@ export const useValueExtractionAction = () =>
     useWorkerAction<any[], FlowWorkerValueExtractionPayload>("value_extraction");
 
 export const useSchemaAction = () =>
-    useWorkerAction<NodeSchema[], FlowWorkerSchemaPayload>("schema");
+    useWorkerAction<SignatureSchema, FlowWorkerSchemaPayload>("schema");

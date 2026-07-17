@@ -31,7 +31,7 @@ import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/comp
 import {User, UsersUpdateInput} from "@code0-tech/sagittarius-graphql-types";
 import {UserService} from "@edition/user/services/User.service";
 import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
-import {IconAt, IconLock, IconMail, IconUser} from "@tabler/icons-react";
+import {IconAt, IconBackground, IconLock, IconMail, IconSettings2, IconShieldLock} from "@tabler/icons-react";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 import {motion} from "framer-motion";
 
@@ -172,31 +172,35 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                                     <Text size={"lg"} hierarchy={"secondary"}>
                                         Settings of @{user?.username ?? ""}
                                     </Text>
-                                    <Spacing spacing={"xxs"}/>
+                                    <Spacing spacing={"xl"}/>
                                     <Text size={"sm"} maw={"150px"} hierarchy={"tertiary"} style={{textWrap: "wrap"}}>
                                         Edit the general settings, permissions and security for user
                                         @{user?.username ?? ""}
                                     </Text>
-                                    <Spacing spacing={"md"}/>
+                                    <Spacing spacing={"xl"}/>
                                     <TabList>
                                         <TabTrigger value={"general"} w={"100%"} asChild>
                                             <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                                <IconBackground size={13}/>
                                                 <Text size={"md"}>General</Text>
                                             </Button>
                                         </TabTrigger>
                                         <TabTrigger value={"permissions"} w={"100%"} asChild>
                                             <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                                <Text size={"md"}>Permissions</Text>
+                                                <IconShieldLock size={13}/>
+                                                <Text size={"md"}>Access</Text>
                                             </Button>
                                         </TabTrigger>
                                         <TabTrigger value={"security"} w={"100%"} asChild>
                                             <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                                <IconSettings2 opacity={0} size={13}/>
                                                 <Text size={"md"}>Security</Text>
                                             </Button>
                                         </TabTrigger>
                                     </TabList>
-                                    <DialogClose asChild style={{ marginTop: "auto" }}>
-                                        <Button paddingSize={"xxs"} w={"100%"} variant={"none"} justify={"space-between"}>
+                                    <DialogClose asChild style={{marginTop: "auto"}}>
+                                        <Button paddingSize={"xxs"} w={"100%"} variant={"none"}
+                                                justify={"space-between"}>
                                             <Text size={"md"}>Close</Text>
                                             <Badge>
                                                 ESC
@@ -221,14 +225,12 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                                         <TextInput placeholder={"Firstname"}
                                                    title={"Firstname"}
                                                    description={"The user's given name."}
-                                                   left={<IconUser size={16}/>} leftType={"icon"}
                                                    {...inputs.getInputProps("firstname")}/>
                                     </Col>
                                     <Col xs={6}>
                                         <TextInput placeholder={"Lastname"}
                                                    title={"Lastname"}
                                                    description={"The user's family name."}
-                                                   left={<IconUser size={16}/>} leftType={"icon"}
                                                    {...inputs.getInputProps("lastname")}/>
                                     </Col>
                                 </Row>
@@ -256,7 +258,7 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                             </TabContent>
                             <TabContent value={"permissions"} style={{overflow: "hidden"}}>
                                 <Flex justify={"space-between"} align={"center"}>
-                                    <Text size={"lg"} hierarchy={"primary"} display={"block"}>Permissions</Text>
+                                    <Text size={"lg"} hierarchy={"primary"} display={"block"}>Access</Text>
                                     <Button paddingSize={"xxs"} color={"success"} variant={"none"}
                                             onClick={validate}>
                                         Save changes
