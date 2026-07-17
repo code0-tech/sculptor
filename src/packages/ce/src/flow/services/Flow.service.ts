@@ -1,5 +1,6 @@
 import {ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor";
 import {
+    ExecutionResult,
     FlowInput,
     FlowSetting,
     FlowType,
@@ -13,6 +14,8 @@ import {
     NamespacesProjectsFlowsCreatePayload,
     NamespacesProjectsFlowsDeleteInput,
     NamespacesProjectsFlowsDeletePayload,
+    NamespacesProjectsFlowsTriggerExecutionInput,
+    NamespacesProjectsFlowsTriggerExecutionPayload,
     NamespacesProjectsFlowsUpdateInput,
     NamespacesProjectsFlowsUpdatePayload,
     NodeFunction,
@@ -29,6 +32,7 @@ import flowQuery from "@edition/flow/services/queries/Flow.query.graphql";
 import flowCreateMutation from "@edition/flow/services/mutations/Flow.create.mutation.graphql";
 import flowDeleteMutation from "@edition/flow/services/mutations/Flow.delete.mutation.graphql";
 import flowUpdateMutation from "@edition/flow/services/mutations/Flow.update.mutation.graphql";
+import flowTriggerExecutionMutation from "@edition/flow/services/mutations/Flow.triggerExecution.mutation.graphql";
 import {View} from "@code0-tech/pictor/dist/utils/view";
 import {FlowView} from "@edition/flow/services/Flow.view";
 
@@ -535,6 +539,34 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         }
 
         return result.data?.namespacesProjectsFlowsUpdate ?? undefined
+    }
+
+    async triggerExecution(payload: NamespacesProjectsFlowsTriggerExecutionInput): Promise<NamespacesProjectsFlowsTriggerExecutionPayload | undefined> {
+        const result = await this.client.mutate<Mutation, NamespacesProjectsFlowsTriggerExecutionInput>({
+            mutation: flowTriggerExecutionMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        return result.data?.namespacesProjectsFlowsTriggerExecution ?? undefined
+    }
+
+    addExecutionResult(flowId: FlowView['id'], executionResult: ExecutionResult): void {
+        const flow = this.getById(flowId)
+        const index = this.values().findIndex(f => f.id === flowId)
+        if (!flow || index < 0) return
+
+        const existingNodes = flow.executionResults?.nodes ?? []
+        if (existingNodes.some(node => node?.id === executionResult.id)) return
+
+        flow.executionResults = {
+            __typename: "ExecutionResultConnection",
+            ...flow.executionResults,
+            nodes: [...existingNodes, executionResult],
+        }
+
+        this.set(index, new View(flow))
     }
 
 }
