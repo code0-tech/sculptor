@@ -35,6 +35,7 @@ import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/i
 import {IconAt, IconBackground, IconLock, IconMail, IconSettings2, IconShieldLock} from "@tabler/icons-react";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 import {motion} from "framer-motion";
+import {UserSessionsDataTableComponent} from "@edition/user/components/UserSessionsDataTableComponent";
 
 export interface UserEditDialogComponentProps {
     userId?: User['id']
@@ -205,6 +206,12 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                                                 <Text size={"md"}>Security</Text>
                                             </Button>
                                         </TabTrigger>
+                                        <TabTrigger value={"sessions"} w={"100%"} asChild>
+                                            <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                                <IconSettings2 opacity={0} size={13}/>
+                                                <Text size={"md"}>Sessions</Text>
+                                            </Button>
+                                        </TabTrigger>
                                     </TabList>
                                     <DialogClose asChild style={{marginTop: "auto"}}>
                                         <Button paddingSize={"xxs"} w={"100%"} variant={"none"}
@@ -264,7 +271,8 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                                                description={"A short bio or notes shown on the user's profile."}
                                                {...inputs.getInputProps("readme")}/>
                             </TabContent>
-                            <TabContent value={"permissions"} style={{overflow: "hidden", display: isSelf ? "none" : undefined}}>
+                            <TabContent value={"permissions"}
+                                        style={{overflow: "hidden", display: isSelf ? "none" : undefined}}>
                                 <Flex justify={"space-between"} align={"center"}>
                                     <Text size={"lg"} hierarchy={"primary"} display={"block"}>Access</Text>
                                     <Button paddingSize={"xxs"} color={"success"} variant={"none"}
@@ -321,6 +329,24 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                                                left={<IconLock size={16}/>} leftType={"icon"}
                                                onChange={() => validate("repeatPassword")}
                                                {...inputs.getInputProps("repeatPassword")}/>
+                            </TabContent>
+                            <TabContent value={"sessions"}
+                                        style={{
+                                            overflow: "hidden",
+                                            height: "100%",
+                                            display: "flex",
+                                            flexDirection: "column"
+                                        }}>
+                                <Flex justify={"space-between"} align={"center"}>
+                                    <Text size={"lg"} hierarchy={"primary"} display={"block"}>Sessions</Text>
+                                </Flex>
+                                <Spacing spacing={"xs"}/>
+                                <Text size={"md"} hierarchy={"tertiary"}>
+                                    Active sign-in sessions for @{user?.username ?? ""}. Log out a session to revoke
+                                    its access.
+                                </Text>
+                                <Spacing spacing={"md"}/>
+                                <UserSessionsDataTableComponent userId={userId}/>
                             </TabContent>
                         </Card>
                     </Layout>
