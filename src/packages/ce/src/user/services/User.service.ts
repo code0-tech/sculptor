@@ -256,8 +256,20 @@ export class UserService extends ReactiveArrayService<User> {
             }
         })
 
-        if (result.data && result.data.usersLogout && result.data.usersLogout.userSession && result.data.usersLogout.userSession.user) {
-            this.deleteById(result.data.usersLogout.userSession.user.id)
+        const loggedOutSession = result.data?.usersLogout?.userSession
+        if (loggedOutSession && (result.data?.usersLogout?.errors?.length ?? 0) <= 0) {
+            const index = super.values().findIndex(user => user?.sessions?.nodes?.some(session => session?.id === loggedOutSession.id))
+            const user = index >= 0 ? super.values()[index] : undefined
+            if (user?.sessions) {
+                this.set(index, new View({
+                    ...user,
+                    sessions: {
+                        ...user.sessions,
+                        count: Math.max((user.sessions.count ?? 1) - 1, 0),
+                        nodes: (user.sessions.nodes ?? []).filter(session => session?.id !== loggedOutSession.id)
+                    }
+                }))
+            }
         }
 
         return result.data?.usersLogout ?? undefined
