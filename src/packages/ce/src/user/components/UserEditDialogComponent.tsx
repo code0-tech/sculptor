@@ -30,10 +30,12 @@ import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {User, UsersUpdateInput} from "@code0-tech/sagittarius-graphql-types";
 import {UserService} from "@edition/user/services/User.service";
+import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 import {IconAt, IconBackground, IconLock, IconMail, IconSettings2, IconShieldLock} from "@tabler/icons-react";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 import {motion} from "framer-motion";
+import {UserSessionsDataTableComponent} from "@edition/user/components/UserSessionsDataTableComponent";
 
 export interface UserEditDialogComponentProps {
     userId?: User['id']
@@ -49,10 +51,13 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
     const userStore = useStore(UserService)
     const [, startTransition] = React.useTransition()
 
+    const currentSession = useUserSession()
     const user = React.useMemo(
         () => userService.getById(userId),
         [userStore, userId]
     )
+
+    const isSelf = !!user && !!currentSession?.user?.id && user.id === currentSession.user.id
 
     const initialValues = React.useMemo(() => ({
         firstname: user?.firstname ?? null,
@@ -110,8 +115,10 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
             if (values.firstname !== (user?.firstname ?? null)) payload.firstname = values.firstname
             if (values.lastname !== (user?.lastname ?? null)) payload.lastname = values.lastname
             if (values.readme !== (user?.readme ?? null)) payload.readme = values.readme
-            if (values.admin !== (user?.admin ?? false)) payload.admin = values.admin
-            if (values.blocked !== (user?.blocked ?? false)) payload.blocked = values.blocked
+            if (!isSelf) {
+                if (values.admin !== (user?.admin ?? false)) payload.admin = values.admin
+                if (values.blocked !== (user?.blocked ?? false)) payload.blocked = values.blocked
+            }
             if (values.password) {
                 payload.password = values.password
                 payload.passwordRepeat = values.repeatPassword
@@ -185,16 +192,24 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                                                 <Text size={"md"}>General</Text>
                                             </Button>
                                         </TabTrigger>
-                                        <TabTrigger value={"permissions"} w={"100%"} asChild>
-                                            <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                                <IconShieldLock size={13}/>
-                                                <Text size={"md"}>Access</Text>
-                                            </Button>
-                                        </TabTrigger>
+                                        {!isSelf && (
+                                            <TabTrigger value={"permissions"} w={"100%"} asChild>
+                                                <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                                    <IconShieldLock size={13}/>
+                                                    <Text size={"md"}>Access</Text>
+                                                </Button>
+                                            </TabTrigger>
+                                        )}
                                         <TabTrigger value={"security"} w={"100%"} asChild>
                                             <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
                                                 <IconSettings2 opacity={0} size={13}/>
                                                 <Text size={"md"}>Security</Text>
+                                            </Button>
+                                        </TabTrigger>
+                                        <TabTrigger value={"sessions"} w={"100%"} asChild>
+                                            <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                                <IconSettings2 opacity={0} size={13}/>
+                                                <Text size={"md"}>Sessions</Text>
                                             </Button>
                                         </TabTrigger>
                                     </TabList>
@@ -256,7 +271,8 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                                                description={"A short bio or notes shown on the user's profile."}
                                                {...inputs.getInputProps("readme")}/>
                             </TabContent>
-                            <TabContent value={"permissions"} style={{overflow: "hidden"}}>
+                            <TabContent value={"permissions"}
+                                        style={{overflow: "hidden", display: isSelf ? "none" : undefined}}>
                                 <Flex justify={"space-between"} align={"center"}>
                                     <Text size={"lg"} hierarchy={"primary"} display={"block"}>Access</Text>
                                     <Button paddingSize={"xxs"} color={"success"} variant={"none"}
@@ -313,6 +329,24 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                                                left={<IconLock size={16}/>} leftType={"icon"}
                                                onChange={() => validate("repeatPassword")}
                                                {...inputs.getInputProps("repeatPassword")}/>
+                            </TabContent>
+                            <TabContent value={"sessions"}
+                                        style={{
+                                            overflow: "hidden",
+                                            height: "100%",
+                                            display: "flex",
+                                            flexDirection: "column"
+                                        }}>
+                                <Flex justify={"space-between"} align={"center"}>
+                                    <Text size={"lg"} hierarchy={"primary"} display={"block"}>Sessions</Text>
+                                </Flex>
+                                <Spacing spacing={"xs"}/>
+                                <Text size={"md"} hierarchy={"tertiary"}>
+                                    Active sign-in sessions for @{user?.username ?? ""}. Log out a session to revoke
+                                    its access.
+                                </Text>
+                                <Spacing spacing={"md"}/>
+                                <UserSessionsDataTableComponent userId={userId}/>
                             </TabContent>
                         </Card>
                     </Layout>

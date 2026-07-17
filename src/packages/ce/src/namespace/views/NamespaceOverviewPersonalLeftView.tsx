@@ -86,9 +86,11 @@ export const NamespaceOverviewPersonalLeftView: React.FC = () => {
                     </Text>
                 </Flex>
                 <Spacing spacing={"xs"}/>
-                <Button w={"100%"} color={"tertiary"}>Edit Profile</Button>
+                <Link href={"/users/@me/settings"}>
+                    <Button w={"100%"} color={"tertiary"}>Edit Profile</Button>
+                </Link>
                 <Spacing spacing={"xs"}/>
-                <Button color={"primary"} w={"100%"}>
+                <Button disabled color={"primary"} w={"100%"}>
                     Upgrade to Pro
                     <AuroraBackground/>
                 </Button>

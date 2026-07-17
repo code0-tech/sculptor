@@ -119,7 +119,9 @@ export const ApplicationPage = () => {
                     </Text>
                 </Flex>
                 <Spacing spacing={"xs"}/>
-                <Button w={"100%"} disabled color={"tertiary"}>Edit Profile</Button>
+                <Link href={"/users/@me/settings"}>
+                    <Button w={"100%"} color={"tertiary"}>Edit Profile</Button>
+                </Link>
                 <Spacing spacing={"xs"}/>
                 <Button color={"primary"} disabled w={"100%"}>
                     Upgrade to Pro

@@ -12,7 +12,7 @@ import {
     IconFolders,
     IconInbox,
     IconLogout,
-    IconSearch,
+    IconSearch, IconSettings,
     IconUser
 } from "@tabler/icons-react";
 import {ApplicationBreadcrumbView} from "@edition/application/views/ApplicationBreadcrumbView";
@@ -151,15 +151,20 @@ export const ApplicationBarView: React.FC = () => {
         }
 
         return <UserMenuComponent userId={currentSession.user?.id!!}>
-            <Link href={`/users/${userIndex}`}>
+            <Link href={`/users/@me`}>
                 <MenuItem>
                     <IconUser size={16}/>Profile
+                </MenuItem>
+            </Link>
+            <Link href={`/users/@me/settings`}>
+                <MenuItem>
+                    <IconSettings size={16}/>Settings
                 </MenuItem>
             </Link>
             <MenuSeparator/>
             <Link href={"/workspaces"}>
                 <MenuItem>
-                    <IconBuilding size={16}/>Organizations
+                    <IconBuilding size={16}/>Workspaces
                 </MenuItem>
             </Link>
             <Link href={`/namespace/${userNamespaceIndex}`}>

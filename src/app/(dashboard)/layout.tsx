@@ -26,9 +26,10 @@ interface ApplicationLayoutProps {
     children: React.ReactNode
     bar: React.ReactNode
     tab: React.ReactNode
+    modal: React.ReactNode
 }
 
-const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab}) => {
+const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab, modal}) => {
 
     const client = useApolloClient()
     const pathname = usePathname()
@@ -83,9 +84,12 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, bar, tab
                 </Flex>
             }>
                 <Layout showLayoutSplitter={false} pr={0.7} layoutGap={"0"} topContent={<>{bar}</>}>
-                    <Layout>
-                        <>{children}</>
-                    </Layout>
+                    <>
+                        <Layout>
+                            <>{children}</>
+                        </Layout>
+                        {modal}
+                    </>
                 </Layout>
             </Layout>
         </ApplicationMiddlewareComponent>
