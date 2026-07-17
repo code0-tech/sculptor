@@ -37,9 +37,18 @@ export const UserSettingsPage: React.FC = () => {
                                     open={true}
                                     onOpenChange={(open) => {
                                         if (open) return
-                                        const [nav] = performance.getEntriesByType("navigation") as PerformanceNavigationTiming[]
-                                        const openedDirectly = !nav || new URL(nav.name).pathname === window.location.pathname
-                                        if (openedDirectly) router.push(isMe ? "/users/@me" : "/")
-                                        else router.back()
+
+                                        const nav = (window as unknown as { navigation?: { entries(): { url: string }[], currentEntry?: { index: number } } }).navigation
+                                        if (!nav?.entries) {
+                                            router.back()
+                                            return
+                                        }
+
+                                        const index = nav.currentEntry?.index ?? 0
+                                        const previous = index > 0 ? nav.entries()[index - 1] : undefined
+                                        const previousIsSettings = !!previous && new URL(previous.url).pathname.endsWith("/settings")
+
+                                        if (previous && !previousIsSettings) router.back()
+                                        else router.push(isMe ? "/users/@me" : `/users/${userIndex}`)
                                     }}/>
 }
