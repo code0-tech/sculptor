@@ -1,0 +1,77 @@
+subscription flowExecutionResult($executionIdentifier: String!) {
+    namespacesProjectsFlowsExecutionResult(executionIdentifier: $executionIdentifier) {
+        executionResult {
+            __typename
+            id
+            createdAt
+            updatedAt
+            startedAt
+            finishedAt
+            input
+            success
+            flow {
+                __typename
+                id
+            }
+            error {
+                __typename
+                category
+                code
+                dependencies
+                details
+                message
+                timestamp
+                version
+            }
+            nodeResults(first: 50) {
+                __typename
+                count
+                nodes {
+                    __typename
+                    id
+                    createdAt
+                    updatedAt
+                    startedAt
+                    finishedAt
+                    position
+                    success
+                    parameterResults {
+                        __typename
+                        id
+                        createdAt
+                        updatedAt
+                        value
+                        position
+                    }
+                    functionDefinition {
+                        __typename
+                        id
+                    }
+                    nodeFunction {
+                        __typename
+                        id
+                        functionDefinition {
+                            __typename
+                            id
+                        }
+                    }
+                    error {
+                        __typename
+                        category
+                        code
+                        dependencies
+                        details
+                        message
+                        timestamp
+                        version
+                    }
+                }
+                pageInfo {
+                    __typename
+                    endCursor
+                    hasNextPage
+                }
+            }
+        }
+    }
+}

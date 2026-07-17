@@ -1,0 +1,17 @@
+mutation flowTriggerExecution($flowId: FlowID!, $input: JSON!, $runtimeId: RuntimeID!) {
+    namespacesProjectsFlowsTriggerExecution(input: {
+        flowId: $flowId
+        input: $input
+        runtimeId: $runtimeId
+    }) {
+        errors {
+            ...on Error {
+                errorCode
+                details {
+                    __typename
+                }
+            }
+        }
+        executionIdentifier
+    }
+}
