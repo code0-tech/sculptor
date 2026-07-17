@@ -17,17 +17,16 @@ import {
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import Link from "next/link";
-import {notFound} from "next/navigation";
+import {notFound, useRouter} from "next/navigation";
 import {UserDataTableComponent} from "@edition/user/components/UserDataTableComponent";
 import {DataTableFilterProps, DataTableSortProps} from "@code0-tech/pictor/dist/components/data-table/DataTable";
 import {UserDataTableFilterInputComponent} from "@edition/user/components/UserDataTableFilterInputComponent";
-import {UserEditDialogComponent} from "@edition/user/components/UserEditDialogComponent";
 import {IconMinus, IconSortAscending, IconSortDescending} from "@tabler/icons-react";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
-import {User} from "@code0-tech/sagittarius-graphql-types";
 
 export const UsersPage: React.FC = () => {
 
+    const router = useRouter()
     const currentSession = useUserSession()
     const userStore = useStore(UserService)
     const userService = useService(UserService)
@@ -35,7 +34,6 @@ export const UsersPage: React.FC = () => {
 
     const [filter, setFilter] = React.useState<DataTableFilterProps>({})
     const [sort, setSort] = React.useState<DataTableSortProps>({})
-    const [editUserId, setEditUserId] = React.useState<User['id'] | undefined>(undefined)
 
     if (currentUser && !currentUser.admin) {
         notFound()
@@ -131,11 +129,8 @@ export const UsersPage: React.FC = () => {
         </div>
         <Spacing spacing={"xl"}/>
         <UserDataTableComponent sort={sort} filter={filter}
-                                onSelect={(item) => setEditUserId(item?.id)}/>
-        <UserEditDialogComponent userId={editUserId}
-                                 open={editUserId !== undefined}
-                                 onOpenChange={(open) => {
-                                     if (!open) setEditUserId(undefined)
-                                 }}/>
+                                onSelect={(item) => {
+                                    if (item?.id) router.push(`/users/${item.id.split("/").pop()}/settings`)
+                                }}/>
     </div>
 }
