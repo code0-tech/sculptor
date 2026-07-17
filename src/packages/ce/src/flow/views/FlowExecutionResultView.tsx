@@ -57,6 +57,11 @@ import Link from "next/link";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {icon} from "@core/util/icons";
 import {formatDistanceToNow} from "date-fns";
+import {useFlowExecutionStore} from "@edition/flow/hooks/Flow.execution.hook";
+import {IconLoader2} from "@tabler/icons-react";
+import {motion} from "framer-motion";
+import {LineWobble} from 'ldrs/react'
+import 'ldrs/react/LineWobble.css'
 
 export interface NodeGanttItem extends GanttItem {
     data?: {
@@ -154,6 +159,33 @@ export const FlowExecutionResultView: React.FC = () => {
         () => [...(flow?.executionResults?.nodes ?? [])]?.reverse() ?? [],
         [flow?.executionResults?.nodes]
     )
+
+    const executions = useFlowExecutionStore(s => s.executions)
+    const pendingExecutions = React.useMemo(
+        () => executions.filter(execution => execution.flowId === flowId),
+        [executions, flowId]
+    )
+
+    // When a manual execution is triggered elsewhere (the definition panel) its pending
+    // entry appears here; focus its loading tab so the user sees the spinner immediately.
+    const previousPendingRef = React.useRef<string[]>([])
+    React.useEffect(() => {
+        const currentIds = pendingExecutions.map(execution => execution.executionIdentifier)
+        const newlyAdded = currentIds.find(id => !previousPendingRef.current.includes(id))
+        if (newlyAdded) setActiveTab(newlyAdded)
+        previousPendingRef.current = currentIds
+    }, [pendingExecutions])
+
+    // Once the pending execution resolves its loading tab disappears; fall back to the
+    // newest result so the freshly arrived execution result becomes visible.
+    React.useEffect(() => {
+        if (!activeTab) return
+        const stillPending = pendingExecutions.some(execution => execution.executionIdentifier === activeTab)
+        const isResult = flowExecutionResults.some(result => result?.id === activeTab)
+        if (!stillPending && !isResult) {
+            setActiveTab(flowExecutionResults[0]?.id ?? undefined)
+        }
+    }, [pendingExecutions, flowExecutionResults, activeTab])
 
     const ganttItems = React.useMemo<Map<ExecutionResult['id'], NodeGanttItem[]>>(
         () => {
@@ -256,6 +288,21 @@ export const FlowExecutionResultView: React.FC = () => {
                     ) : null
                 }
             >
+                {pendingExecutions.map(execution => (
+                    <FileTabsTrigger value={execution.executionIdentifier}
+                                     key={execution.executionIdentifier}>
+                        <Flex align={"center"} style={{gap: "0.35rem"}}>
+                            <motion.div style={{display: "flex"}}
+                                        animate={{rotate: 360}}
+                                        transition={{duration: 1, ease: "linear", repeat: Infinity}}>
+                                <IconLoader2 size={13}/>
+                            </motion.div>
+                            <Text size={"sm"}>
+                                Executing...
+                            </Text>
+                        </Flex>
+                    </FileTabsTrigger>
+                ))}
                 {Array.from(ganttItems)?.map(([id, items]) => {
 
                     const execution = flowExecutionResults.find(execution => execution?.id === id)
@@ -275,6 +322,34 @@ export const FlowExecutionResultView: React.FC = () => {
                 })}
             </FileTabsList>}>
                 <>
+                    {pendingExecutions.map(execution => (
+                        <FileTabsContent h={"100%"}
+                                         p={"0"}
+                                         value={execution.executionIdentifier}
+                                         key={execution.executionIdentifier}>
+                            <Flex align={"center"} justify={"center"} h={"100%"}
+                                  style={{textAlign: "center", flexDirection: "column"}}>
+                                <LineWobble
+                                    size="200"
+                                    stroke="5"
+                                    bgOpacity="0.5"
+                                    speed="2"
+                                    color="rgba(255, 255, 255, 0.15)"
+                                />
+                                <Spacing spacing={"xl"}/>
+                                <Text size={"md"}>
+                                    Executing flow
+                                </Text>
+                                <Spacing spacing={"xs"}/>
+                                <Text hierarchy={"tertiary"} style={{
+                                    margin: "0 35%",
+                                    textAlign: "center"
+                                }}>
+                                    We are running your flow. This may take a few moments to load every data object.
+                                </Text>
+                            </Flex>
+                        </FileTabsContent>
+                    ))}
                     {
                         ganttItems.size > 0 ? Array.from(ganttItems)?.map(([id, items]) => {
                             return <FileTabsContent h={"100%"}
@@ -428,7 +503,7 @@ export const FlowExecutionResultView: React.FC = () => {
                                     }}
                                 </Gantt>
                             </FileTabsContent>
-                        }) : (
+                        }) : pendingExecutions.length > 0 ? null : (
                             <Flex align={"center"} justify={"center"} h={"100%"}
                                   style={{textAlign: "center", flexDirection: "column"}}>
                                 <Flex align={"center"} justify={"center"}
