@@ -3,6 +3,7 @@
 import React from "react";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 import {useParams} from "next/navigation";
+import Link from "next/link";
 import {
     AuroraBackground,
     Avatar,
@@ -29,14 +30,16 @@ export const UserPage: React.FC = () => {
     const userService = useService(UserService)
     const userStore = useStore(UserService)
 
-    const userIndex = params.userId as any as number
-    const userId: User['id'] = `gid://sagittarius/User/${userIndex}`
-
     const currentSession = useUserSession()
     const currentUser = React.useMemo(
         () => userService.getById(currentSession?.user?.id),
         [userStore, currentSession]
     )
+
+    const userIndex = decodeURIComponent(String(params.userId ?? ""))
+    const userId: User['id'] = userIndex === "@me"
+        ? currentSession?.user?.id!
+        : `gid://sagittarius/User/${userIndex as any as number}`
 
     const user = React.useMemo(
         () => userService.getById(userId),
@@ -74,7 +77,9 @@ export const UserPage: React.FC = () => {
                 {currentUser?.id === userId && (
                     <>
                         <Spacing spacing={"xs"}/>
-                        <Button w={"100%"} color={"tertiary"}>Edit Profile</Button>
+                        <Link href={"/users/@me/settings"} style={{width: "100%"}}>
+                            <Button w={"100%"} color={"tertiary"}>Edit Profile</Button>
+                        </Link>
                         <Spacing spacing={"xs"}/>
                         <Button color={"primary"} w={"100%"}>
                             Upgrade to Pro
