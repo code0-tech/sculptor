@@ -4,7 +4,7 @@ import "./FunctionNodeComponent.style.scss";
 import {FunctionNodeComponentProps} from "./FunctionNodeComponent";
 import {Badge, Button, ButtonGroup, Card, Flex, Text, useService, useStore as usePictorStore} from "@code0-tech/pictor";
 import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
-import {IconBackspace, IconCircleX, IconEdit, IconSparkles, IconVariable} from "@tabler/icons-react";
+import {IconBackspace, IconPencil, IconSparkles, IconVariable} from "@tabler/icons-react";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {LiteralBadgeComponent} from "@edition/datatype/components/badges/LiteralBadgeComponent";
@@ -162,7 +162,7 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
                         e.stopPropagation();
                         e.preventDefault();
                     }}>
-                        <IconEdit size={13}/>
+                        <IconPencil size={13}/>
                     </Button>
                     <Button variant={"none"} color={"tertiary"} paddingSize={"xxs"} onClick={(e) => {
                         const event = new KeyboardEvent('keydown', {
@@ -240,7 +240,8 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
 
             <Flex align={"center"} style={{gap: "0.7rem", ...nodeValidationStyle}}>
                 <DisplayIcon color={data.color} size={16}/>
-                <Text size={"md"}>{node ? displayMessage : definition?.names?.[0].content ?? FALLBACK_FUNCTION_NAME}</Text>
+                <Text
+                    size={"md"}>{node ? displayMessage : definition?.names?.[0].content ?? FALLBACK_FUNCTION_NAME}</Text>
             </Flex>
         </Card>
     );
