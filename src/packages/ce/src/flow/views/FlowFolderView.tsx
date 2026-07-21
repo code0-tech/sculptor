@@ -4,6 +4,7 @@ import React from "react";
 import {
     Button,
     Flex,
+    Spacing,
     Text,
     Tooltip,
     TooltipArrow,
@@ -24,7 +25,6 @@ import {
     FlowFolderContextMenuComponentGroupData,
     FlowFolderContextMenuComponentItemData
 } from "@edition/flow/components/folder/FlowFolderContextMenuComponent";
-import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 
 export const FlowFolderView: React.FC = () => {
@@ -73,80 +73,89 @@ export const FlowFolderView: React.FC = () => {
                                    onOpenChange={(open) => setDeleteDialogOpen(open)}
                                    contextData={contextData}
                                    onDelete={deleteFlow}/>
-
-        <Layout layoutGap={"0.7rem"} showLayoutSplitter={false} topContent={
-            <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
-                <Flex style={{gap: "0.35rem"}} align={"center"} justify={"space-between"}>
-                    <Button data-qa-selector={"flow-send"} color={"tertiary"} paddingSize={"xxs"}
-                            style={{textWrap: "nowrap"}} onClick={() => {
-                        setCreateDialogOpen(true)
-                        setFlowTypeId(undefined)
-                    }}>
-                        <IconPlus size={13}/>
-                        Create flow
-                    </Button>
-                    <ButtonGroup color={"secondary"} style={{boxShadow: "none"}} p={0}>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button variant={"none"} paddingSize={"xxs"}
-                                        onClick={() => ref.current?.openActivePath()}>
-                                    <IconCircleDot size={13}/>
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipPortal>
-                                <TooltipContent side={"bottom"}>
-                                    <Text>Open active flow</Text>
-                                    <TooltipArrow/>
-                                </TooltipContent>
-                            </TooltipPortal>
-                        </Tooltip>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button variant={"none"} paddingSize={"xxs"}
-                                        onClick={() => ref.current?.closeAll()}>
-                                    <IconArrowsMinimize size={13}/>
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipPortal>
-                                <TooltipContent side={"bottom"}>
-                                    <Text>Close all</Text>
-                                    <TooltipArrow/>
-                                </TooltipContent>
-                            </TooltipPortal>
-                        </Tooltip>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button paddingSize={"xxs"} variant={"none"}
-                                        onClick={() => ref.current?.openAll()}>
-                                    <IconArrowsMaximize size={13}/>
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipPortal>
-                                <TooltipContent side={"bottom"}>
-                                    <Text>Open all</Text>
-                                    <TooltipArrow/>
-                                </TooltipContent>
-                            </TooltipPortal>
-                        </Tooltip>
-                    </ButtonGroup>
-                </Flex>
-            </Flex>
-        }>
-            <FlowFolderComponent ref={ref} activeFlowId={flowId}
-                                 onSelect={(flow) => {
-                                     const number = flow.id?.match(/Flow\/(\d+)$/)?.[1]
-                                     router.push(`/namespace/${namespaceIndex}/project/${projectIndex}/flow/${number}`)
-                                 }}
-                                 onCreate={flowTypeId => {
-                                     setCreateDialogOpen(true)
-                                     setFlowTypeId(flowTypeId)
-                                 }}
-                                 onDelete={contextData => {
-                                     setDeleteDialogOpen(true)
-                                     setContextData(contextData)
-                                 }}
-                                 namespaceId={`gid://sagittarius/Namespace/${namespaceIndex}`}
-                                 projectId={`gid://sagittarius/NamespaceProject/${projectIndex}`}/>
-        </Layout>
+        <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"}>
+            <Text pl={0.7} hierarchy={"tertiary"}>
+                Workflows
+            </Text>
+            <ButtonGroup color={"secondary"} style={{boxShadow: "none"}} p={0}>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button variant={"none"} paddingSize={"xxs"}
+                                onClick={() => ref.current?.openActivePath()}>
+                            <IconCircleDot size={13}/>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipPortal>
+                        <TooltipContent side={"bottom"}>
+                            <Text>Open active flow</Text>
+                            <TooltipArrow/>
+                        </TooltipContent>
+                    </TooltipPortal>
+                </Tooltip>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button variant={"none"} paddingSize={"xxs"}
+                                onClick={() => ref.current?.closeAll()}>
+                            <IconArrowsMinimize size={13}/>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipPortal>
+                        <TooltipContent side={"bottom"}>
+                            <Text>Close all</Text>
+                            <TooltipArrow/>
+                        </TooltipContent>
+                    </TooltipPortal>
+                </Tooltip>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button paddingSize={"xxs"} variant={"none"}
+                                onClick={() => ref.current?.openAll()}>
+                            <IconArrowsMaximize size={13}/>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipPortal>
+                        <TooltipContent side={"bottom"}>
+                            <Text>Open all</Text>
+                            <TooltipArrow/>
+                        </TooltipContent>
+                    </TooltipPortal>
+                </Tooltip>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button data-qa-selector={"flow-send"}
+                                paddingSize={"xxs"}
+                                color={"tertiary"}
+                                onClick={() => {
+                                    setCreateDialogOpen(true)
+                                    setFlowTypeId(undefined)
+                                }}>
+                            <IconPlus size={13}/>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipPortal>
+                        <TooltipContent side={"bottom"}>
+                            <Text>Create workflow</Text>
+                            <TooltipArrow/>
+                        </TooltipContent>
+                    </TooltipPortal>
+                </Tooltip>
+            </ButtonGroup>
+        </Flex>
+        <Spacing spacing={"xxs"}/>
+        <FlowFolderComponent ref={ref} activeFlowId={flowId}
+                             onSelect={(flow) => {
+                                 const number = flow.id?.match(/Flow\/(\d+)$/)?.[1]
+                                 router.push(`/namespace/${namespaceIndex}/project/${projectIndex}/flow/${number}`)
+                             }}
+                             onCreate={flowTypeId => {
+                                 setCreateDialogOpen(true)
+                                 setFlowTypeId(flowTypeId)
+                             }}
+                             onDelete={contextData => {
+                                 setDeleteDialogOpen(true)
+                                 setContextData(contextData)
+                             }}
+                             namespaceId={`gid://sagittarius/Namespace/${namespaceIndex}`}
+                             projectId={`gid://sagittarius/NamespaceProject/${projectIndex}`}/>
     </>
 }
