@@ -2,7 +2,7 @@
 
 import {Button, Flex,} from "@code0-tech/pictor";
 import React from "react";
-import {IconFile, IconPlayerPlay} from "@tabler/icons-react";
+import {IconPencilFilled, IconPlayerPlayFilled} from "@tabler/icons-react";
 import {useParams} from "next/navigation";
 import {Flow, Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {FlowBuilderComponent} from "@edition/flow/components/builder/FlowBuilderComponent";
@@ -61,18 +61,18 @@ export default function Page() {
 
     return <ResizablePanel id={"2"}>
         <FlowExecutionWatcherComponent/>
-        <Layout layoutGap={0} showLayoutSplitter={false} rightContent={
-            <Flex pl={0.7} style={{flexDirection: "column", gap: "0.7rem"}}>
+        <Layout layoutGap={16} showLayoutSplitter={false} rightContent={
+            <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
                 <Button aria-selected={tab === "file"}
                         onClick={() => toggleTab("file")} variant={"none"}
-                        paddingSize={"xs"}>
-                    <IconFile size={16}/>
+                        p={0.5}>
+                    <IconPencilFilled color={"#fff"} size={16}/>
                 </Button>
                 <Button aria-selected={tab === "execution"}
                         onClick={() => toggleTab("execution")}
                         variant={"none"}
-                        paddingSize={"xs"}>
-                    <IconPlayerPlay size={16}/>
+                        p={0.5}>
+                    <IconPlayerPlayFilled color={"#fff"} size={16}/>
                 </Button>
             </Flex>
         }>
@@ -81,10 +81,7 @@ export default function Page() {
                     <ResizablePanelGroup orientation={"vertical"}>
                         <ResizablePanel id={"1"} color={"primary"}
                                         style={{
-                                            ...(tab === "execution" ? {borderRadius: "1rem"} : {
-                                                borderTopLeftRadius: "1rem",
-                                                borderTopRightRadius: "1rem"
-                                            })
+                                            borderRadius: "1rem"
                                         }}>
                             <FlowBuilderComponent flowId={flowId} namespaceId={namespaceId} projectId={projectId}/>
                         </ResizablePanel>
@@ -93,7 +90,7 @@ export default function Page() {
                                 <>
                                     <ResizableHandle/>
                                     <ResizablePanel id={"2"} color={"primary"}
-                                                    style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
+                                                    style={{borderRadius: "1rem"}}>
                                         <FlowExecutionResultView/>
                                     </ResizablePanel>
                                 </>
