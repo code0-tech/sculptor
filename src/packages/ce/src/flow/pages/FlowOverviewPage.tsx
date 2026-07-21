@@ -81,7 +81,7 @@ export const FlowOverviewPage: React.FC = () => {
     }, [flowService, flowStore, namespaceId, projectId])
 
     return <ResizablePanel id={"2"} color={"primary"}
-                           style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
+                           style={{borderRadius: "1rem"}}>
         <AuroraBackground/>
         <Flex align={"center"} justify={"center"} style={{flexDirection: "column", gap: "1.3rem"}} w={"100%"}
               h={"100%"}>
