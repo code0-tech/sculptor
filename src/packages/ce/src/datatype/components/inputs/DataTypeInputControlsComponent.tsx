@@ -187,7 +187,7 @@ export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsCompo
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <MenuTrigger asChild disabled={menuEntries.length <= 0}>
-                            <Button paddingSize={"xxs"}>
+                            <Button tabIndex={menuEntries.length <= 0 ? -1 : 0} paddingSize={"xxs"}>
                                 <IconVariable size={13}/>
                             </Button>
                         </MenuTrigger>
@@ -258,7 +258,7 @@ export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsCompo
                 </MenuPortal>
             </Menu>
         ) : <></>}
-        <Button paddingSize={"xxs"} onClick={(event) => {
+        <Button paddingSize={"xxs"} tabIndex={-1} onClick={(event) => {
             onSelect?.(null)
             event.stopPropagation()
             event.preventDefault()
