@@ -56,8 +56,18 @@ export const ApplicationGeneralSettingsView: React.FC = () => {
     })
 
     return <TabContent value={"general"}>
-        <Text size={"xl"} hierarchy={"primary"}>General</Text>
-        <Spacing spacing={"xl"}/>
+        <Flex justify={"space-between"} align={"center"}>
+            <Text size={"lg"} hierarchy={"primary"} display={"block"}>Settings</Text>
+            <Button paddingSize={"xxs"} color={"success"} variant={"none"} onClick={validate}>Save changes</Button>
+        </Flex>
+        <Spacing spacing={"xs"}/>
+        <Text size={"md"} hierarchy={"tertiary"}>
+            General configuration for your Sculptor application, including version information, legal links and runtime
+            behaviour.
+        </Text>
+        <Spacing spacing={"md"}/>
+        <Text size={"md"} hierarchy={"secondary"} pl={1.3}>Versions</Text>
+        <Spacing spacing={"xs"}/>
         <Card color={"secondary"}>
             <CardSection border>
                 <Flex justify={"space-between"} align={"center"}>
@@ -90,12 +100,9 @@ export const ApplicationGeneralSettingsView: React.FC = () => {
                 </Flex>
             </CardSection>
         </Card>
-        <Spacing spacing={"xl"}/>
-        <Flex justify={"space-between"} align={"center"}>
-            <Text size={"lg"} hierarchy={"primary"}>Legal url's</Text>
-            <Button color={"success"} onClick={validate}>Save</Button>
-        </Flex>
-        <Spacing spacing={"xl"}/>
+        <Spacing spacing={"lg"}/>
+        <Text size={"md"} hierarchy={"secondary"} pl={1.3}>Legal URLs</Text>
+        <Spacing spacing={"xs"}/>
         <Card color={"secondary"}>
             <CardSection border>
                 <Flex justify={"space-between"} align={"center"}>
@@ -122,12 +129,9 @@ export const ApplicationGeneralSettingsView: React.FC = () => {
                 </Flex>
             </CardSection>
         </Card>
-        <Spacing spacing={"xl"}/>
-        <Flex justify={"space-between"} align={"center"}>
-            <Text size={"lg"} hierarchy={"primary"}>Runtimes</Text>
-            <Button color={"success"} onClick={validate}>Save</Button>
-        </Flex>
-        <Spacing spacing={"xl"}/>
+        <Spacing spacing={"lg"}/>
+        <Text size={"md"} hierarchy={"secondary"} pl={1.3}>Runtimes</Text>
+        <Spacing spacing={"xs"}/>
         <Card color={"secondary"}>
             <CardSection border>
                 <Flex justify={"space-between"} align={"center"}>

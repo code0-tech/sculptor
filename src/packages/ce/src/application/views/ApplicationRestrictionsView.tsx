@@ -47,10 +47,14 @@ export const ApplicationRestrictionsView: React.FC = () => {
 
     return <TabContent value={"restrictions"}>
         <Flex justify={"space-between"} align={"center"}>
-            <Text size={"xl"} hierarchy={"primary"}>Restrictions</Text>
-            <Button color={"success"} onClick={validate}>Save</Button>
+            <Text size={"lg"} hierarchy={"primary"} display={"block"}>Restrictions</Text>
+            <Button paddingSize={"xxs"} color={"success"} variant={"none"} onClick={validate}>Save changes</Button>
         </Flex>
-        <Spacing spacing={"xl"}/>
+        <Spacing spacing={"xs"}/>
+        <Text size={"md"} hierarchy={"tertiary"}>
+            Control who can register, create organizations, and view administrator status across the application.
+        </Text>
+        <Spacing spacing={"md"}/>
         <Card color={"secondary"}>
             <CardSection border>
                 <Flex justify={"space-between"} align={"center"}>
