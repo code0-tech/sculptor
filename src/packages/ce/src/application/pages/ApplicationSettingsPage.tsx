@@ -2,23 +2,14 @@
 
 import React from "react";
 import {useService, useStore} from "@code0-tech/pictor";
+import {notFound, useRouter} from "next/navigation";
 import {UserService} from "@edition/user/services/User.service";
-import {notFound} from "next/navigation";
-import {Tab} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
-import {
-    ResizableHandle,
-    ResizablePanel,
-    ResizablePanelGroup
-} from "@code0-tech/pictor/dist/components/resizable/Resizable";
-import {SidebarComponent} from "@core/components/SidebarComponent";
-import {ApplicationGeneralSettingsView} from "@edition/application/views/ApplicationGeneralSettingsView";
-import {ApplicationRestrictionsView} from "@edition/application/views/ApplicationRestrictionsView";
-import {ApplicationTabListView} from "@edition/application/views/ApplicationTabListView";
-import {ApplicationLicensesView} from "@edition/application/views/ApplicationLicensesView";
+import {ApplicationSettingsDialogComponent} from "@edition/application/components/ApplicationSettingsDialogComponent";
 
 export const ApplicationSettingsPage: React.FC = () => {
 
+    const router = useRouter()
     const userStore = useStore(UserService)
     const userService = useService(UserService)
 
@@ -33,21 +24,18 @@ export const ApplicationSettingsPage: React.FC = () => {
         notFound()
     }
 
-    return <Tab orientation={"vertical"} defaultValue={"general"} h={"100%"}>
-        <ResizablePanelGroup>
-            <SidebarComponent id={"1"}
-                              title={"Application settings"}
-                              description={"General settings and restrictions for your Sculptor application. These settings affect all users and organizations within the application."}>
-                <ApplicationTabListView/>
-            </SidebarComponent>
-            <ResizableHandle/>
-            <ResizablePanel id={"2"} color={"primary"} p={2} style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
-                <>
-                    <ApplicationGeneralSettingsView/>
-                    <ApplicationRestrictionsView/>
-                    <ApplicationLicensesView/>
-                </>
-            </ResizablePanel>
-        </ResizablePanelGroup>
-    </Tab>
+    return <ApplicationSettingsDialogComponent open={true}
+                                               onOpenChange={(open) => {
+                                                   if (open) return
+
+                                                   const nav = (window as unknown as { navigation?: { entries(): { url: string }[], currentEntry?: { index: number } } }).navigation
+                                                   if (!nav?.entries) {
+                                                       router.back()
+                                                       return
+                                                   }
+
+                                                   const index = nav.currentEntry?.index ?? 0
+                                                   if (index > 0) router.back()
+                                                   else router.push("/")
+                                               }}/>
 }
