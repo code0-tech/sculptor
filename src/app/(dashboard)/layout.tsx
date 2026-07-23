@@ -92,8 +92,12 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, sidebar,
         services={[application, user, organization, member, namespace, runtime, project, role, flow, functions, datatype, flowtype, module, ai]}>
         <ApplicationMiddlewareComponent>
             <FullScreen bg={"var(--secondary)"}>
-                <Layout p={1} showLayoutSplitter={false} layoutGap={16} leftContent={<ApplicationNavigationView/>}>
-                    <Layout showLayoutSplitter={false} layoutGap={16} leftContent={<>{sidebar}</>}>
+                <Layout p={1} showLayoutSplitter={false} layoutGap={32} leftContent={<ApplicationNavigationView/>}>
+                    <Layout showLayoutSplitter={false} layoutGap={32} leftContent={<div style={{
+                        height: "100%",
+                        boxSizing: "border-box",
+                        maxWidth: "20vw"
+                    }}>{sidebar}</div>}>
                         <>
                             {children}
                             {modal}
