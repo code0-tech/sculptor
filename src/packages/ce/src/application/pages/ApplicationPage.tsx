@@ -24,16 +24,10 @@ export const ApplicationPage = () => {
         <ScrollArea h={"100%"} type={"scroll"}>
             <ScrollAreaViewport>
                 <div style={{maxWidth: "52rem", margin: "0 auto", padding: "4rem 1rem"}}>
-                    {/* ── Account-wide summary: four numbers, hairline dividers ── */}
                     <ApplicationStatsView/>
-
                     <Spacing spacing={"xl"}/>
-
-                    {/* ── Slim attention banner: flows across workspaces needing action ── */}
                     <ApplicationAttentionFlowsComponent/>
-
                     <Spacing spacing={"xl"}/>
-
                     <NamespaceRowView/>
                 </div>
             </ScrollAreaViewport>

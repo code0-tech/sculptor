@@ -11,16 +11,21 @@ import {
     MenuLabel,
     MenuPortal,
     MenuSeparator,
-    MenuTrigger, Text, Tooltip, TooltipContent, TooltipPortal, TooltipTrigger,
+    MenuTrigger,
+    Text,
+    Tooltip,
+    TooltipContent,
+    TooltipPortal,
+    TooltipTrigger,
     useService,
     useStore
 } from "@code0-tech/pictor";
 import {
+    IconAdjustmentsFilled,
     IconApps,
     IconArrowAutofitLeft,
     IconArrowAutofitLeftFilled,
     IconHomeFilled,
-    IconSettings,
     IconSettingsFilled,
     IconUser
 } from "@tabler/icons-react";
@@ -91,7 +96,7 @@ export const ApplicationNavigationView: React.FC = () => {
                 <TooltipTrigger asChild>
                     <Link href={"/settings"} prefetch>
                         <Button variant={"none"} p={0.5}>
-                            <IconSettings color={"#fff"} size={16}/>
+                            <IconAdjustmentsFilled color={"#fff"} size={16}/>
                         </Button>
                     </Link>
                 </TooltipTrigger>

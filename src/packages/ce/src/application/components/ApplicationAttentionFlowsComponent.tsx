@@ -2,11 +2,12 @@
 
 import React from "react";
 import {
-    Badge,
+    Avatar,
     Card,
     DataTable,
     DataTableColumn,
     Flex,
+    hashToColor,
     Spacing,
     Text,
     useService,
@@ -31,9 +32,6 @@ export interface ApplicationAttentionFlowsComponentProps {
 
 export const ApplicationAttentionFlowsComponent: React.FC<ApplicationAttentionFlowsComponentProps> = ({namespaceId}) => {
 
-    const [open, setOpen] = React.useState(false)
-    const router = useRouter()
-
     const userService = useService(UserService)
     const userStore = useStore(UserService)
     const namespaceService = useService(NamespaceService)
@@ -43,6 +41,8 @@ export const ApplicationAttentionFlowsComponent: React.FC<ApplicationAttentionFl
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
 
+    const [open, setOpen] = React.useState(false)
+    const router = useRouter()
     const userSession = useUserSession()
     const currentUser = React.useMemo(() => userService.getById(userSession?.user?.id), [userStore, userSession])
 
@@ -95,10 +95,6 @@ export const ApplicationAttentionFlowsComponent: React.FC<ApplicationAttentionFl
     if (attentionFlows.length === 0) return null
 
     const count = attentionFlows.length
-    const distinctProjects = Array.from(new Set(attentionFlows.map(projectNameOf)))
-    const subtitle = distinctProjects.length <= 2
-        ? `in ${distinctProjects.join(" and ")}`
-        : `in ${distinctProjects.slice(0, 2).join(", ")} and ${distinctProjects.length - 2} more`
 
     return <Card color={"secondary"} clickable onClick={() => setOpen(previous => !previous)}>
         <Flex align={"center"} justify={"space-between"} style={{gap: "0.75rem"}}>
@@ -111,9 +107,6 @@ export const ApplicationAttentionFlowsComponent: React.FC<ApplicationAttentionFl
                     flexShrink: 0
                 }}/>
                 <Text size={"md"}>{count} {count === 1 ? "flow needs" : "flows need"} attention</Text>
-                <Text size={"sm"} hierarchy={"tertiary"}>
-                    {subtitle}
-                </Text>
             </Flex>
             <IconChevronRight size={16} style={{
                 transform: open ? "rotate(90deg)" : "none",
@@ -126,22 +119,15 @@ export const ApplicationAttentionFlowsComponent: React.FC<ApplicationAttentionFl
                 <DataTable data={attentionFlows} onSelect={(flow) => flow && openFlow(flow)}>
                     {(flow) => <>
                         <DataTableColumn>
-                            <Flex align={"center"} style={{gap: "0.75rem", minWidth: 0}}>
-                                <div style={{
-                                    width: 8,
-                                    height: 8,
-                                    borderRadius: "50%",
-                                    background: "#FFBE0B",
-                                    flexShrink: 0
-                                }}/>
-                                <Text size={"md"}>{flow.name}</Text>
-                            </Flex>
+                            <Text size={"md"}>{flow.name}</Text>
                         </DataTableColumn>
                         <DataTableColumn>
-                            <Text size={"sm"} hierarchy={"tertiary"}>{projectNameOf(flow)}</Text>
-                        </DataTableColumn>
-                        <DataTableColumn>
-                            <Badge color={"warning"}>Invalid</Badge>
+                            <Text size={"sm"} hierarchy={"tertiary"} display={"flex"}
+                                  style={{alignItems: "center", gap: "0.35rem"}}>
+                                <Avatar size={13} color={hashToColor(projectNameOf(flow), 0, 180)}
+                                        identifier={projectNameOf(flow)}/>
+                                {projectNameOf(flow)}
+                            </Text>
                         </DataTableColumn>
                         <DataTableColumn>
                             <Text size={"sm"} hierarchy={"tertiary"}>
