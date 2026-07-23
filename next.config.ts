@@ -38,7 +38,10 @@ const nextConfig: NextConfig = {
         ]
     },
     reactStrictMode: true,
-    reactCompiler: true,
+    // Enable React Compiler in production builds only. In dev it forces a
+    // per-file Babel pass (the compiler is a Babel plugin) which is the
+    // dominant cost of Turbopack dev compile time and memory here.
+    reactCompiler: process.env.NODE_ENV === "production",
     turbopack: {
         resolveAlias: {
             "@edition": path.resolve(__dirname, `src/packages/${EDITION}/src`),
