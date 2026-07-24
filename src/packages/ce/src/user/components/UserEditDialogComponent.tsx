@@ -2,15 +2,9 @@
 
 import React from "react";
 import {
-    Badge,
     Button,
     Card,
     Col,
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogOverlay,
-    DialogPortal,
     EmailInput,
     emailValidation,
     Flex,
@@ -27,15 +21,14 @@ import {
     useStore
 } from "@code0-tech/pictor";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
-import {Tab, TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
+import {TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {User, UsersUpdateInput} from "@code0-tech/sagittarius-graphql-types";
 import {UserService} from "@edition/user/services/User.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 import {IconAt, IconBackground, IconLock, IconMail, IconSettings2, IconShieldLock} from "@tabler/icons-react";
-import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
-import {motion} from "framer-motion";
 import {UserSessionsDataTableComponent} from "@edition/user/components/UserSessionsDataTableComponent";
+import {SettingDialog} from "@core/components/SettingDialog";
 
 export interface UserEditDialogComponentProps {
     userId?: User['id']
@@ -143,215 +136,160 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
         }
     })
 
-    return <Dialog open={open} onOpenChange={(open) => onOpenChange?.(open)}>
-        <DialogPortal>
-            <DialogOverlay/>
-            <DialogContent
-                style={{padding: "2px"}}
-                w={"75%"} h={"75%"}>
-                <Tab orientation={"vertical"} defaultValue={"general"} w={"100%"} h={"100%"}>
-                    <Layout layoutGap={0} showLayoutSplitter={false}
-                            leftContent={
-                                <motion.div layout
-                                            transition={{
-                                                type: "spring",
-                                                stiffness: 300,
-                                                damping: 20,
-                                                mass: 0.8
-                                            }}
-                                            initial={{
-                                                width: "200px",
-                                            }}
-                                            whileInView={{
-                                                width: "200px",
-                                            }}
-                                            whileHover={{
-                                                width: "250px",
-                                            }}
-                                            style={{
-                                                padding: "0.7rem",
-                                                paddingTop: "1rem",
-                                                height: "100%",
-                                                display: "flex",
-                                                flexDirection: "column"
-                                            }}
-                                >
-                                    <Text size={"lg"} hierarchy={"secondary"}>
-                                        Settings of @{user?.username ?? ""}
-                                    </Text>
-                                    <Spacing spacing={"xl"}/>
-                                    <Text size={"sm"} maw={"150px"} hierarchy={"tertiary"} style={{textWrap: "wrap"}}>
-                                        Edit the general settings, permissions and security for user
-                                        @{user?.username ?? ""}
-                                    </Text>
-                                    <Spacing spacing={"xl"}/>
-                                    <TabList>
-                                        <TabTrigger value={"general"} w={"100%"} asChild>
-                                            <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                                <IconBackground size={13}/>
-                                                <Text size={"md"}>General</Text>
-                                            </Button>
-                                        </TabTrigger>
-                                        {!isSelf && (
-                                            <TabTrigger value={"permissions"} w={"100%"} asChild>
-                                                <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                                    <IconShieldLock size={13}/>
-                                                    <Text size={"md"}>Access</Text>
-                                                </Button>
-                                            </TabTrigger>
-                                        )}
-                                        <TabTrigger value={"security"} w={"100%"} asChild>
-                                            <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                                <IconSettings2 opacity={0} size={13}/>
-                                                <Text size={"md"}>Security</Text>
-                                            </Button>
-                                        </TabTrigger>
-                                        <TabTrigger value={"sessions"} w={"100%"} asChild>
-                                            <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                                <IconSettings2 opacity={0} size={13}/>
-                                                <Text size={"md"}>Sessions</Text>
-                                            </Button>
-                                        </TabTrigger>
-                                    </TabList>
-                                    <DialogClose asChild style={{marginTop: "auto"}}>
-                                        <Button paddingSize={"xxs"} w={"100%"} variant={"none"}
-                                                justify={"space-between"}>
-                                            <Text size={"md"}>Close</Text>
-                                            <Badge>
-                                                ESC
-                                            </Badge>
-                                        </Button>
-                                    </DialogClose>
-                                </motion.div>
-                            }>
-                        <Card color={"primary"} paddingSize={"md"} h={"100%"} w={"100%"}>
-                            <TabContent value={"general"} style={{overflow: "hidden"}}>
-                                <Flex justify={"space-between"} align={"center"}>
-                                    <Text size={"lg"} hierarchy={"primary"} display={"block"}>General</Text>
-                                    <Button paddingSize={"xxs"} color={"success"} variant={"none"}
-                                            onClick={validate}>
-                                        Save changes
-                                    </Button>
+    return <SettingDialog open={open}
+                          onOpenChange={(open) => onOpenChange?.(open)}
+                          title={`Settings of @${user?.username ?? ""}`}
+                          description={`Edit the general settings, permissions and security for user @${user?.username ?? ""}`}
+                          trigger={<TabList>
+                              <TabTrigger value={"general"} w={"100%"} asChild>
+                                  <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                      <IconBackground size={13}/>
+                                      <Text size={"md"}>General</Text>
+                                  </Button>
+                              </TabTrigger>
+                              {!isSelf && (
+                                  <TabTrigger value={"permissions"} w={"100%"} asChild>
+                                      <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                          <IconShieldLock size={13}/>
+                                          <Text size={"md"}>Access</Text>
+                                      </Button>
+                                  </TabTrigger>
+                              )}
+                              <TabTrigger value={"security"} w={"100%"} asChild>
+                                  <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                      <IconSettings2 opacity={0} size={13}/>
+                                      <Text size={"md"}>Security</Text>
+                                  </Button>
+                              </TabTrigger>
+                              <TabTrigger value={"sessions"} w={"100%"} asChild>
+                                  <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                      <IconSettings2 opacity={0} size={13}/>
+                                      <Text size={"md"}>Sessions</Text>
+                                  </Button>
+                              </TabTrigger>
+                          </TabList>}>
+        <TabContent value={"general"} style={{overflow: "hidden"}}>
+            <Flex justify={"space-between"} align={"center"}>
+                <Text size={"lg"} hierarchy={"primary"} display={"block"}>General</Text>
+                <Button paddingSize={"xxs"} color={"success"} variant={"none"}
+                        onClick={validate}>
+                    Save changes
+                </Button>
 
-                                </Flex>
-                                <Spacing spacing={"md"}/>
-                                <Row>
-                                    <Col xs={6}>
-                                        <TextInput placeholder={"Firstname"}
-                                                   title={"Firstname"}
-                                                   description={"The user's given name."}
-                                                   {...inputs.getInputProps("firstname")}/>
-                                    </Col>
-                                    <Col xs={6}>
-                                        <TextInput placeholder={"Lastname"}
-                                                   title={"Lastname"}
-                                                   description={"The user's family name."}
-                                                   {...inputs.getInputProps("lastname")}/>
-                                    </Col>
-                                </Row>
+            </Flex>
+            <Spacing spacing={"md"}/>
+            <Row>
+                <Col xs={6}>
+                    <TextInput placeholder={"Firstname"}
+                               title={"Firstname"}
+                               description={"The user's given name."}
+                               {...inputs.getInputProps("firstname")}/>
+                </Col>
+                <Col xs={6}>
+                    <TextInput placeholder={"Lastname"}
+                               title={"Lastname"}
+                               description={"The user's family name."}
+                               {...inputs.getInputProps("lastname")}/>
+                </Col>
+            </Row>
 
-                                <Spacing spacing={"md"}/>
+            <Spacing spacing={"md"}/>
 
-                                <EmailInput w={"100%"}
-                                            placeholder={"Email"}
-                                            title={"Email"}
-                                            description={"The email address used to sign in and receive notifications."}
-                                            left={<IconMail size={16}/>} leftType={"icon"}
-                                            {...inputs.getInputProps("email")}/>
-                                <Spacing spacing={"md"}/>
-                                <TextInput w={"100%"}
-                                           placeholder={"Username"}
-                                           title={"Username"}
-                                           description={"The unique handle used to identify the user."}
-                                           left={<IconAt size={16}/>} leftType={"icon"}
-                                           {...inputs.getInputProps("username")}/>
-                                <Spacing spacing={"md"}/>
-                                <TextAreaInput w={"100%"} placeholder={"Readme"}
-                                               title={"Readme"}
-                                               description={"A short bio or notes shown on the user's profile."}
-                                               {...inputs.getInputProps("readme")}/>
-                            </TabContent>
-                            <TabContent value={"permissions"}
-                                        style={{overflow: "hidden", display: isSelf ? "none" : undefined}}>
-                                <Flex justify={"space-between"} align={"center"}>
-                                    <Text size={"lg"} hierarchy={"primary"} display={"block"}>Access</Text>
-                                    <Button paddingSize={"xxs"} color={"success"} variant={"none"}
-                                            onClick={validate}>
-                                        Save changes
-                                    </Button>
-                                </Flex>
-                                <Spacing spacing={"md"}/>
-                                <Card color={"secondary"}>
-                                    <CardSection border>
-                                        <Flex justify={"space-between"} align={"center"}>
-                                            <Flex style={{gap: ".35rem", flexDirection: "column"}}>
-                                                <Text size={"md"} hierarchy={"primary"}>Admin</Text>
-                                                <Text size={"md"} hierarchy={"tertiary"}>
-                                                    Grant this user administrator privileges.
-                                                </Text>
-                                            </Flex>
-                                            <SwitchInput w={"40px"} {...inputs.getInputProps("admin")}/>
-                                        </Flex>
-                                    </CardSection>
-                                    <CardSection border>
-                                        <Flex justify={"space-between"} align={"center"}>
-                                            <Flex style={{gap: ".35rem", flexDirection: "column"}}>
-                                                <Text size={"md"} hierarchy={"primary"}>Blocked</Text>
-                                                <Text size={"md"} hierarchy={"tertiary"}>
-                                                    Block this user from accessing the application.
-                                                </Text>
-                                            </Flex>
-                                            <SwitchInput w={"40px"} {...inputs.getInputProps("blocked")}/>
-                                        </Flex>
-                                    </CardSection>
-                                </Card>
-                            </TabContent>
-                            <TabContent value={"security"} style={{overflow: "hidden"}}>
-                                <Flex justify={"space-between"} align={"center"}>
-                                    <Text size={"lg"} hierarchy={"primary"} display={"block"}>Security</Text>
-                                    <Button paddingSize={"xxs"} color={"success"} variant={"none"}
-                                            onClick={validate}>
-                                        Save changes
-                                    </Button>
+            <EmailInput w={"100%"}
+                        placeholder={"Email"}
+                        title={"Email"}
+                        description={"The email address used to sign in and receive notifications."}
+                        left={<IconMail size={16}/>} leftType={"icon"}
+                        {...inputs.getInputProps("email")}/>
+            <Spacing spacing={"md"}/>
+            <TextInput w={"100%"}
+                       placeholder={"Username"}
+                       title={"Username"}
+                       description={"The unique handle used to identify the user."}
+                       left={<IconAt size={16}/>} leftType={"icon"}
+                       {...inputs.getInputProps("username")}/>
+            <Spacing spacing={"md"}/>
+            <TextAreaInput w={"100%"} placeholder={"Readme"}
+                           title={"Readme"}
+                           description={"A short bio or notes shown on the user's profile."}
+                           {...inputs.getInputProps("readme")}/>
+        </TabContent>
+        <TabContent value={"permissions"}
+                    style={{overflow: "hidden", display: isSelf ? "none" : undefined}}>
+            <Flex justify={"space-between"} align={"center"}>
+                <Text size={"lg"} hierarchy={"primary"} display={"block"}>Access</Text>
+                <Button paddingSize={"xxs"} color={"success"} variant={"none"}
+                        onClick={validate}>
+                    Save changes
+                </Button>
+            </Flex>
+            <Spacing spacing={"md"}/>
+            <Card color={"secondary"}>
+                <CardSection border>
+                    <Flex justify={"space-between"} align={"center"}>
+                        <Flex style={{gap: ".35rem", flexDirection: "column"}}>
+                            <Text size={"md"} hierarchy={"primary"}>Admin</Text>
+                            <Text size={"md"} hierarchy={"tertiary"}>
+                                Grant this user administrator privileges.
+                            </Text>
+                        </Flex>
+                        <SwitchInput w={"40px"} {...inputs.getInputProps("admin")}/>
+                    </Flex>
+                </CardSection>
+                <CardSection border>
+                    <Flex justify={"space-between"} align={"center"}>
+                        <Flex style={{gap: ".35rem", flexDirection: "column"}}>
+                            <Text size={"md"} hierarchy={"primary"}>Blocked</Text>
+                            <Text size={"md"} hierarchy={"tertiary"}>
+                                Block this user from accessing the application.
+                            </Text>
+                        </Flex>
+                        <SwitchInput w={"40px"} {...inputs.getInputProps("blocked")}/>
+                    </Flex>
+                </CardSection>
+            </Card>
+        </TabContent>
+        <TabContent value={"security"} style={{overflow: "hidden"}}>
+            <Flex justify={"space-between"} align={"center"}>
+                <Text size={"lg"} hierarchy={"primary"} display={"block"}>Security</Text>
+                <Button paddingSize={"xxs"} color={"success"} variant={"none"}
+                        onClick={validate}>
+                    Save changes
+                </Button>
 
-                                </Flex>
-                                <Spacing spacing={"md"}/>
-                                <PasswordInput w={"100%"} placeholder={"New password"}
-                                               title={"New password"}
-                                               description={"Set a new password for the user. Leave blank to keep the current one."}
-                                               left={<IconLock size={16}/>} leftType={"icon"}
-                                               onChange={() => validate("password")}
-                                               {...inputs.getInputProps("password")}/>
-                                <Spacing spacing={"md"}/>
-                                <PasswordInput w={"100%"} placeholder={"Repeat new password"}
-                                               title={"Repeat new password"}
-                                               description={"Re-enter the new password to check for typos."}
-                                               left={<IconLock size={16}/>} leftType={"icon"}
-                                               onChange={() => validate("repeatPassword")}
-                                               {...inputs.getInputProps("repeatPassword")}/>
-                            </TabContent>
-                            <TabContent value={"sessions"}
-                                        style={{
-                                            overflow: "hidden",
-                                            height: "100%",
-                                            display: "flex",
-                                            flexDirection: "column"
-                                        }}>
-                                <Flex justify={"space-between"} align={"center"}>
-                                    <Text size={"lg"} hierarchy={"primary"} display={"block"}>Sessions</Text>
-                                </Flex>
-                                <Spacing spacing={"xs"}/>
-                                <Text size={"md"} hierarchy={"tertiary"}>
-                                    Active sign-in sessions for @{user?.username ?? ""}. Log out a session to revoke
-                                    its access.
-                                </Text>
-                                <Spacing spacing={"md"}/>
-                                <UserSessionsDataTableComponent userId={userId}/>
-                            </TabContent>
-                        </Card>
-                    </Layout>
-                </Tab>
-            </DialogContent>
-        </DialogPortal>
-    </Dialog>
+            </Flex>
+            <Spacing spacing={"md"}/>
+            <PasswordInput w={"100%"} placeholder={"New password"}
+                           title={"New password"}
+                           description={"Set a new password for the user. Leave blank to keep the current one."}
+                           left={<IconLock size={16}/>} leftType={"icon"}
+                           onChange={() => validate("password")}
+                           {...inputs.getInputProps("password")}/>
+            <Spacing spacing={"md"}/>
+            <PasswordInput w={"100%"} placeholder={"Repeat new password"}
+                           title={"Repeat new password"}
+                           description={"Re-enter the new password to check for typos."}
+                           left={<IconLock size={16}/>} leftType={"icon"}
+                           onChange={() => validate("repeatPassword")}
+                           {...inputs.getInputProps("repeatPassword")}/>
+        </TabContent>
+        <TabContent value={"sessions"}
+                    style={{
+                        overflow: "hidden",
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column"
+                    }}>
+            <Flex justify={"space-between"} align={"center"}>
+                <Text size={"lg"} hierarchy={"primary"} display={"block"}>Sessions</Text>
+            </Flex>
+            <Spacing spacing={"xs"}/>
+            <Text size={"md"} hierarchy={"tertiary"}>
+                Active sign-in sessions for @{user?.username ?? ""}. Log out a session to revoke
+                its access.
+            </Text>
+            <Spacing spacing={"md"}/>
+            <UserSessionsDataTableComponent userId={userId}/>
+        </TabContent>
+    </SettingDialog>
 }
