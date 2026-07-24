@@ -2,13 +2,17 @@
 
 import React from "react";
 import {
-    Badge,
     Button,
     Card,
-    Dialog, DialogClose,
+    Dialog,
+    DialogClose,
     DialogContent,
     DialogOverlay,
     DialogPortal,
+    ScrollArea,
+    ScrollAreaScrollbar,
+    ScrollAreaThumb,
+    ScrollAreaViewport,
     Spacing,
     Text
 } from "@code0-tech/pictor";
@@ -59,10 +63,17 @@ export const InputDialog: React.FC<InputDialogProps> = (props) => {
                         </DialogClose>
                     </div>
                 }>
-                    <Card color={"primary"} paddingSize={"md"} h={"100%"} w={"100%"}>
-                        <div style={{maxWidth: "75%", margin: "0 auto", padding: "4rem 1rem"}}>
-                            {children!}
-                        </div>
+                    <Card color={"primary"} p={"0"} paddingSize={"md"} h={"100%"} w={"100%"}>
+                        <ScrollArea h={"100%"} type={"scroll"}>
+                            <ScrollAreaViewport>
+                                <div style={{maxWidth: "75%", margin: "0 auto", padding: "4rem 1rem"}}>
+                                    {children!}
+                                </div>
+                            </ScrollAreaViewport>
+                            <ScrollAreaScrollbar orientation={"vertical"}>
+                                <ScrollAreaThumb/>
+                            </ScrollAreaScrollbar>
+                        </ScrollArea>
                     </Card>
                 </Layout>
             </DialogContent>
