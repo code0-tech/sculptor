@@ -1,5 +1,17 @@
 import React, {startTransition} from "react";
-import {Badge, Button, Card, Flex, NumberInput, Spacing, Text, TextInput, useForm, useService, useStore} from "@code0-tech/pictor";
+import {
+    Badge,
+    Button,
+    Card,
+    Flex,
+    NumberInput,
+    Spacing,
+    Text,
+    TextInput,
+    useForm,
+    useService,
+    useStore
+} from "@code0-tech/pictor";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {ApplicationService} from "@edition/application/services/Application.service";
@@ -66,7 +78,7 @@ export const ApplicationGeneralSettingsView: React.FC = () => {
             behaviour.
         </Text>
         <Spacing spacing={"md"}/>
-        <Text size={"md"} hierarchy={"secondary"} pl={1.3}>Versions</Text>
+        <Text size={"md"} hierarchy={"secondary"}>Versions</Text>
         <Spacing spacing={"xs"}/>
         <Card color={"secondary"}>
             <CardSection border>
@@ -101,7 +113,7 @@ export const ApplicationGeneralSettingsView: React.FC = () => {
             </CardSection>
         </Card>
         <Spacing spacing={"lg"}/>
-        <Text size={"md"} hierarchy={"secondary"} pl={1.3}>Legal URLs</Text>
+        <Text size={"md"} hierarchy={"secondary"}>Legal URLs</Text>
         <Spacing spacing={"xs"}/>
         <Card color={"secondary"}>
             <CardSection border>
@@ -130,7 +142,7 @@ export const ApplicationGeneralSettingsView: React.FC = () => {
             </CardSection>
         </Card>
         <Spacing spacing={"lg"}/>
-        <Text size={"md"} hierarchy={"secondary"} pl={1.3}>Runtimes</Text>
+        <Text size={"md"} hierarchy={"secondary"}>Runtimes</Text>
         <Spacing spacing={"xs"}/>
         <Card color={"secondary"}>
             <CardSection border>
