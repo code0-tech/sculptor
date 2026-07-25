@@ -142,12 +142,10 @@ export const UserCreateDialogComponent: React.FC<UserCreateDialogComponentProps>
             </CardSection>
         </Card>
         <Spacing spacing={"xl"}/>
-        <Flex justify={"end"}>
-            <Button color={"success"} onClick={validate}>
-                <Text>
-                    Create new user
-                </Text>
-            </Button>
-        </Flex>
+        <Button color={"success"} w={"100%"} onClick={validate}>
+            <Text>
+                Create new user
+            </Text>
+        </Button>
     </InputDialog>
 }
