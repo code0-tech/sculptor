@@ -54,7 +54,7 @@ export const ProjectsView: React.FC = () => {
                 </Text>
             </div>
             <ButtonGroup>
-                <Link href={`/namespace/${namespaceId}/projects/create`}>
+                <Link href={`/namespace/${namespaceId}/project/create`}>
                     <Button color={"success"}>Create</Button>
                 </Link>
                 <Menu>
