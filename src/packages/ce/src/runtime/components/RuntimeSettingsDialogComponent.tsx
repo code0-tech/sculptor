@@ -3,7 +3,6 @@
 import React from "react";
 import {
     Button,
-    Card,
     Flex,
     Spacing,
     Text,
@@ -12,7 +11,6 @@ import {
     useService,
     useStore
 } from "@code0-tech/pictor";
-import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {Runtime} from "@code0-tech/sagittarius-graphql-types";
 import {RuntimeService} from "@edition/runtime/services/Runtime.service";
@@ -169,44 +167,22 @@ export const RuntimeSettingsDialogComponent: React.FC<RuntimeSettingsDialogCompo
                 Connect your runtime to Sculptor using an access token. Keep it secret and rotate it when exposed.
             </Text>
             <Spacing spacing={"md"}/>
-            <Card color={"secondary"}>
-                <CardSection border>
-                    <Flex justify={"space-between"} align={"center"}>
-                        <Flex style={{gap: ".35rem", flexDirection: "column"}}>
-                            <Text size={"md"} hierarchy={"primary"}>Access token</Text>
-                            <Text size={"md"} hierarchy={"tertiary"}>Is used to connect the runtime to our
-                                service</Text>
-                        </Flex>
-                        {token ? (
-                            <TextInput value={runtime?.token ?? ""}/>
-                        ) : (
-                            <Button color={"tertiary"} onClick={rotateToken}>
-                                Generate new token
-                            </Button>
-                        )}
-                    </Flex>
-                </CardSection>
-            </Card>
+            {token ? (
+                <TextInput w={"100%"} value={runtime?.token ?? ""}/>
+            ) : (
+                <Button color={"tertiary"} w={"100%"} onClick={rotateToken}>
+                    Generate new token
+                </Button>
+            )}
         </TabContent>
         <TabContent value={"delete"} style={{overflow: "hidden"}}>
-            <Text size={"lg"} hierarchy={"primary"} display={"block"}>Delete</Text>
+            <Text size={"lg"} hierarchy={"primary"} display={"block"}>Delete runtime</Text>
             <Spacing spacing={"xs"}/>
             <Text size={"md"} hierarchy={"tertiary"}>
                 Permanently remove this runtime from your application. This action cannot be undone.
             </Text>
             <Spacing spacing={"md"}/>
-            <Card color={"secondary"}>
-                <Flex justify={"space-between"} align={"center"}>
-                    <Flex style={{gap: ".35rem", flexDirection: "column"}}>
-                        <Text size={"md"} hierarchy={"primary"}>
-                            This will delete the runtime and cannot be undone.
-                        </Text>
-                    </Flex>
-                    <Button color={"tertiary"} onClick={deleteRuntime}>
-                        Delete runtime
-                    </Button>
-                </Flex>
-            </Card>
+            <Button color={"error"} w={"100%"} onClick={deleteRuntime}>Delete runtime</Button>
         </TabContent>
     </SettingDialog>
 }

@@ -3,7 +3,6 @@
 import React, {startTransition} from "react";
 import {
     Button,
-    Flex,
     Spacing,
     TextInput,
     toast,
@@ -106,12 +105,10 @@ export const RuntimeCreateDialogComponent: React.FC<RuntimeCreateDialogComponent
                        description={"This token is used to link your runtime to our internal system."}/>
         )}
         <Spacing spacing={"xl"}/>
-        <Flex justify={"end"}>
-            {!token ? (
-                <Button color={"success"} onClick={validate}>Create runtime</Button>
-            ) : (
-                <Button color={"success"} onClick={() => onOpenChange?.(false)}>Done</Button>
-            )}
-        </Flex>
+        {!token ? (
+            <Button color={"success"} w={"100%"} onClick={validate}>Create runtime</Button>
+        ) : (
+            <Button color={"success"} w={"100%"} onClick={() => onOpenChange?.(false)}>Done</Button>
+        )}
     </InputDialog>
 }
