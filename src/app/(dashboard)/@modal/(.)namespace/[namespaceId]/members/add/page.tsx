@@ -1,0 +1,3 @@
+import {MemberAddPage} from "@edition/member/pages/MemberAddPage";
+
+export default MemberAddPage
