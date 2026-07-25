@@ -47,7 +47,7 @@ export const ProjectListView: React.FC = () => {
                 </Button>
             </Link>
         })}
-        <Link href={`/namespace/${namespaceNumber}/projects/create`} style={{width: "100%"}} prefetch>
+        <Link href={`/namespace/${namespaceNumber}/project/create`} style={{width: "100%"}} prefetch>
             <Button variant={"none"} w={"100%"} justify={"flex-start"} paddingSize={"xxs"}>
                 <IconPlus size={13}/>
                 <Text size={"md"} hierarchy={"tertiary"}>
