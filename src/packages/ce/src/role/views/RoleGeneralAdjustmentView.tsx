@@ -1,8 +1,7 @@
 "use client"
 
 import React from "react";
-import {Button, Card, Flex, Spacing, Text, TextInput, useForm, useService, useStore} from "@code0-tech/pictor";
-import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
+import {Button, Flex, Spacing, Text, TextInput, useForm, useService, useStore} from "@code0-tech/pictor";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {RoleService} from "@edition/role/services/Role.service";
 import type {Namespace, NamespaceRole} from "@code0-tech/sagittarius-graphql-types";
@@ -61,21 +60,17 @@ export const RoleGeneralAdjustmentView: React.FC = () => {
 
     return <TabContent pl={"0.7"} value={"general"} style={{overflow: "hidden"}}>
         <Flex align={"center"} justify={"space-between"}>
-            <Text size={"xl"} hierarchy={"primary"}>
-                General
-            </Text>
-            <Button color={"success"} onClick={validate}>
-                Save changes
-            </Button>
+            <Text size={"lg"} hierarchy={"primary"} display={"block"}>General</Text>
+            <Button paddingSize={"xxs"} color={"success"} variant={"none"} onClick={validate}>Save changes</Button>
         </Flex>
-        <Spacing spacing={"xl"}/>
-        <Card color={"secondary"}>
-            <CardSection border>
-                <Flex justify={"space-between"} align={"center"}>
-                    <Text size={"md"} hierarchy={"primary"}>Name</Text>
-                    <TextInput {...inputs.getInputProps("name")}/>
-                </Flex>
-            </CardSection>
-        </Card>
+        <Spacing spacing={"xs"}/>
+        <Text size={"md"} hierarchy={"tertiary"}>
+            The name and general settings for this role, visible to every member it is assigned to.
+        </Text>
+        <Spacing spacing={"md"}/>
+        <TextInput w={"100%"}
+                   title={"Name"}
+                   description={"The display name shown for this role."}
+                   {...inputs.getInputProps("name")}/>
     </TabContent>
 }

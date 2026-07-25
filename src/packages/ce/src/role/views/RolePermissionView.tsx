@@ -230,14 +230,16 @@ export const RolePermissionView: React.FC = () => {
 
     return <TabContent pl={"0.7"} value={"permission"} style={{overflow: "hidden"}}>
         <Flex align={"center"} justify={"space-between"}>
-            <Text size={"xl"} hierarchy={"primary"}>
-                Select from role templates
-            </Text>
-            <Button color={"success"} onClick={validate}>
-                Save changes
-            </Button>
+            <Text size={"lg"} hierarchy={"primary"} display={"block"}>Permissions</Text>
+            <Button paddingSize={"xxs"} color={"success"} variant={"none"} onClick={validate}>Save changes</Button>
         </Flex>
-        <Spacing spacing={"xl"}/>
+        <Spacing spacing={"xs"}/>
+        <Text size={"md"} hierarchy={"tertiary"}>
+            Assign permissions to this role. Members with this role inherit every permission you enable here.
+        </Text>
+        <Spacing spacing={"md"}/>
+        <Text size={"md"} hierarchy={"secondary"}>Role templates</Text>
+        <Spacing spacing={"xs"}/>
         {React.useMemo(() => {
             return <Row>
                 {permissionTemplates.map(permissionTemplate => {
@@ -276,9 +278,7 @@ export const RolePermissionView: React.FC = () => {
             </Row>
         }, [initialValues, role])}
         <Spacing spacing={"xl"}/>
-        <Text size={"xl"} hierarchy={"primary"}>
-            Current stored permissions
-        </Text>
+        <Text size={"md"} hierarchy={"secondary"}>Current stored permissions</Text>
         <Spacing spacing={"xxs"}/>
         <RolePermissionComponent abilities={role?.abilities!!}/>
         <Spacing spacing={"xl"}/>

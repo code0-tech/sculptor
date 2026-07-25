@@ -2,7 +2,7 @@
 
 import React from "react";
 import {useParams, useRouter} from "next/navigation";
-import {Button, Card, Flex, Spacing, Text, useService} from "@code0-tech/pictor";
+import {Button, Spacing, Text, useService} from "@code0-tech/pictor";
 import {RoleService} from "@edition/role/services/Role.service";
 import {MemberService} from "@edition/member/services/Member.service";
 import type {NamespaceRole} from "@code0-tech/sagittarius-graphql-types";
@@ -32,28 +32,19 @@ export const RoleDeleteView: React.FC = () => {
                         message: "Deleted role"
                     })
                 }
-                router.push(`/namespace/${namespaceIndex}/roles`)
+                router.push(`/namespace/${namespaceIndex}/settings`)
             })
         })
     }, [])
 
     return <TabContent pl={"0.7"} value={"delete"} style={{overflow: "hidden"}}>
-        <Text size={"xl"} hierarchy={"primary"}>
-            Delete role
+        <Text size={"lg"} hierarchy={"primary"} display={"block"}>Delete role</Text>
+        <Spacing spacing={"xs"}/>
+        <Text size={"md"} hierarchy={"tertiary"}>
+            Permanently delete this role and unassign it from all members. This action cannot be undone.
         </Text>
-        <Spacing spacing={"xl"}/>
-        <Card p={1.3} color={"error"}>
-            <Flex justify={"space-between"} align={"center"}>
-                <Flex style={{gap: ".35rem", flexDirection: "column"}}>
-                    <Text size={"md"} hierarchy={"primary"}>
-                        This will delete the role and cannot be undone.
-                    </Text>
-                </Flex>
-                <Button color={"secondary"} variant={"filled"} onClick={deleteRole}>
-                    Delete role
-                </Button>
-            </Flex>
-        </Card>
+        <Spacing spacing={"md"}/>
+        <Button color={"error"} w={"100%"} onClick={deleteRole}>Delete role</Button>
     </TabContent>
 
 }
