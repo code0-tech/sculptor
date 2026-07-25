@@ -2,109 +2,167 @@
 
 import React from "react";
 import {useParams} from "next/navigation";
-import {Button, DataTableFilterProps, DataTableSortProps, Flex, Spacing, Text, ButtonGroup, Menu, MenuTrigger, MenuPortal, MenuContent, MenuCheckboxItem} from "@code0-tech/pictor";
+import {
+    Badge,
+    Button,
+    ButtonGroup,
+    Flex,
+    Menu,
+    MenuCheckboxItem,
+    MenuContent,
+    MenuItem,
+    MenuLabel,
+    MenuPortal,
+    MenuTrigger,
+    Spacing,
+    Text,
+    useService,
+    useStore
+} from "@code0-tech/pictor";
+import {DataTableSortProps} from "@code0-tech/pictor/dist/components/data-table/DataTable";
+import {IconAdjustmentsHorizontal, IconArrowsSort, IconCheck, IconPlus} from "@tabler/icons-react";
 import Link from "next/link";
+import {Namespace, NamespaceMember} from "@code0-tech/sagittarius-graphql-types";
+import {MemberService} from "@edition/member/services/Member.service";
 import {MemberDataTableComponent} from "@edition/member/components/MemberDataTableComponent";
-import {MemberDataTableFilterInputComponent} from "@edition/member/components/MemberDataTableFilterInputComponent";
-import {IconMinus, IconSortAscending, IconSortDescending} from "@tabler/icons-react";
+import {RoleService} from "@edition/role/services/Role.service";
+
+const sortLabels = {
+    "user.username": "Username",
+    createdAt: "Created",
+    updatedAt: "Updated",
+} as const
+
+const toggle = (value: string, setter: React.Dispatch<React.SetStateAction<string[]>>) =>
+    setter(prev => prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value])
 
 //TODO: user abilities for add user as member within namespace
 export const MembersView: React.FC = () => {
 
     const params = useParams()
-    const namespaceId = params.namespaceId as any as number
+    const memberService = useService(MemberService)
+    const memberStore = useStore(MemberService)
+    const roleService = useService(RoleService)
+    const roleStore = useStore(RoleService)
 
-    const [filter, setFilter] = React.useState<DataTableFilterProps>({})
-    const [sort, setSort] = React.useState<DataTableSortProps>({})
+    const namespaceIndex = params.namespaceId as any as number
+    const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
+
+    const members = React.useMemo(
+        () => memberService.values({namespaceId: namespaceId}),
+        [memberStore, namespaceId]
+    )
+
+    const roles = React.useMemo(
+        () => roleService.values({namespaceId: namespaceId}),
+        [roleStore, namespaceId]
+    )
+
+    const usernames = React.useMemo(
+        () => members.map(m => m?.user?.username).filter(Boolean) as string[],
+        [members]
+    )
+
+    const [sort, setSort] = React.useState<keyof typeof sortLabels>("user.username")
+    const [usernameFilter, setUsernameFilter] = React.useState<string[]>([])
+    const [roleFilter, setRoleFilter] = React.useState<string[]>([])
+
+    const preFilter = React.useCallback((member: NamespaceMember) => {
+        if (usernameFilter.length > 0 && !usernameFilter.includes(member?.user?.username!)) return false
+        if (roleFilter.length > 0 && !member?.roles?.nodes?.some(n => roleFilter.includes(n?.id!))) return false
+        return true
+    }, [usernameFilter, roleFilter])
+
+    const visibleCount = React.useMemo(
+        () => members.filter(preFilter).length,
+        [members, preFilter]
+    )
+
+    const hasFilter = usernameFilter.length > 0 || roleFilter.length > 0
+
+    const sortProps: DataTableSortProps = {[sort]: "asc"}
 
     return <>
-
-        <Flex align={"center"} justify={"space-between"}>
-            <Flex style={{gap: "0.35rem", flexDirection: "column"}}>
-                <Text size={"xl"} hierarchy={"primary"}>
-                    Members
-                </Text>
-                <Text size={"sm"} hierarchy={"tertiary"}>
-                    Manage members that belong to this namespace. You can add new members and manage their permissions.
-                </Text>
+        <Flex justify={"space-between"} align={"center"}>
+            <Flex align={"center"} style={{gap: "0.5rem"}}>
+                <Text size={"lg"} hierarchy={"primary"} display={"block"}>Members</Text>
+                <Badge color={"secondary"}>{visibleCount}</Badge>
             </Flex>
             <ButtonGroup>
-                <Link href={`/namespace/${namespaceId}/members/add`}>
-                    <Button color={"success"}>Add user</Button>
-                </Link>
+                {/* Filter */}
                 <Menu>
                     <MenuTrigger asChild>
-                        <Button color={"secondary"} variant={"filled"}>Sort</Button>
+                        <Button variant={"none"} paddingSize={"xxs"} active={hasFilter}>
+                            <IconAdjustmentsHorizontal size={13}/>
+                        </Button>
                     </MenuTrigger>
                     <MenuPortal>
-                        <MenuContent>
-                            <MenuCheckboxItem
-                                checked={sort["user.username"] === undefined ? "indeterminate" : sort["user.username"] === "asc"}
-                                onSelect={event => {
-                                    if (sort["user.username"] === undefined)
-                                        setSort(prev => ({...prev, "user.username": "asc"}))
-                                    else if (sort["user.username"] === "asc")
-                                        setSort(prev => ({...prev, "user.username": "desc"}))
-                                    else
-                                        setSort(prev => ({...prev, "user.username": undefined}))
-
-                                    event.preventDefault()
-                                    event.stopPropagation()
-                                }}>
-                                {sort["user.username"] === undefined ? <IconMinus size={13}/> : sort["user.username"] === "asc" ?
-                                    <IconSortDescending size={13}/> : <IconSortAscending size={13}/>}
-                                Username
-                            </MenuCheckboxItem>
-                            <MenuCheckboxItem
-                                checked={sort["createdAt"] === undefined ? "indeterminate" : sort["createdAt"] === "asc"}
-                                onSelect={event => {
-                                    if (sort["createdAt"] === undefined)
-                                        setSort(prev => ({...prev, createdAt: "asc"}))
-                                    else if (sort["createdAt"] === "asc")
-                                        setSort(prev => ({...prev, createdAt: "desc"}))
-                                    else
-                                        setSort(prev => ({...prev, createdAt: undefined}))
-
-                                    event.preventDefault()
-                                    event.stopPropagation()
-                                }}>
-                                {sort["createdAt"] === undefined ?
-                                    <IconMinus size={13}/> : sort["createdAt"] === "asc" ?
-                                        <IconSortDescending size={13}/> : <IconSortAscending size={13}/>}
-                                Created At
-                            </MenuCheckboxItem>
-                            <MenuCheckboxItem
-                                checked={sort["updatedAt"] === undefined ? "indeterminate" : sort["updatedAt"] === "asc"}
-                                onSelect={event => {
-                                    if (sort["updatedAt"] === undefined)
-                                        setSort(prev => ({...prev, updatedAt: "asc"}))
-                                    else if (sort["updatedAt"] === "asc")
-                                        setSort(prev => ({...prev, updatedAt: "desc"}))
-                                    else
-                                        setSort(prev => ({...prev, updatedAt: undefined}))
-
-                                    event.preventDefault()
-                                    event.stopPropagation()
-                                }}>
-                                {sort["updatedAt"] === undefined ?
-                                    <IconMinus size={13}/> : sort["updatedAt"] === "asc" ?
-                                        <IconSortDescending size={13}/> : <IconSortAscending size={13}/>}
-                                Updated At
-                            </MenuCheckboxItem>
+                        <MenuContent sideOffset={8} align={"end"}>
+                            <MenuLabel>Username</MenuLabel>
+                            {usernames.map(username => (
+                                <MenuCheckboxItem key={username} checked={usernameFilter.includes(username)}
+                                                  onSelect={e => {
+                                                      e.preventDefault()
+                                                      e.stopPropagation()
+                                                      toggle(username, setUsernameFilter)
+                                                  }}>
+                                    <IconCheck size={13}
+                                               color={usernameFilter.includes(username) ? undefined : "transparent"}/>
+                                    @{username}
+                                </MenuCheckboxItem>
+                            ))}
+                            <MenuLabel>Roles</MenuLabel>
+                            {roles.map(role => (
+                                <MenuCheckboxItem key={role.id} checked={roleFilter.includes(role?.id!)}
+                                                  onSelect={e => {
+                                                      e.preventDefault()
+                                                      e.stopPropagation()
+                                                      toggle(role?.id!, setRoleFilter)
+                                                  }}>
+                                    <IconCheck size={13}
+                                               color={roleFilter.includes(role?.id!) ? undefined : "transparent"}/>
+                                    {role?.name}
+                                </MenuCheckboxItem>
+                            ))}
                         </MenuContent>
                     </MenuPortal>
                 </Menu>
+
+                {/* Sort */}
+                <Menu>
+                    <MenuTrigger asChild>
+                        <Button variant={"none"} paddingSize={"xxs"}>
+                            <IconArrowsSort size={13}/>
+                        </Button>
+                    </MenuTrigger>
+                    <MenuPortal>
+                        <MenuContent sideOffset={8} align={"end"}>
+                            <MenuLabel>Sort by</MenuLabel>
+                            {(Object.keys(sortLabels) as (keyof typeof sortLabels)[]).map(k => (
+                                <MenuItem key={k} onSelect={() => setSort(k)}>
+                                    <IconCheck size={13} color={sort === k ? undefined : "transparent"}/>
+                                    {sortLabels[k]}
+                                </MenuItem>
+                            ))}
+                        </MenuContent>
+                    </MenuPortal>
+                </Menu>
+
+                {/* Add */}
+                <Link href={`/namespace/${namespaceIndex}/members/add`}>
+                    <Button variant={"none"} paddingSize={"xxs"}>
+                        <IconPlus size={13}/>
+                    </Button>
+                </Link>
             </ButtonGroup>
         </Flex>
-        <Spacing spacing={"xl"}/>
-        <div style={{width: "100%"}}>
-            <MemberDataTableFilterInputComponent namespaceId={`gid://sagittarius/Namespace/${namespaceId}`}
-                                                 onChange={filter => setFilter(filter)}/>
-        </div>
-        <Spacing spacing={"xl"}/>
-        <MemberDataTableComponent filter={filter} sort={sort}
-                                  namespaceId={`gid://sagittarius/Namespace/${namespaceId}`}/>
-
+        <Spacing spacing={"xs"}/>
+        <Text size={"md"} hierarchy={"tertiary"}>
+            Manage members that belong to this namespace. You can add new members and manage their permissions.
+        </Text>
+        <Spacing spacing={"md"}/>
+        <MemberDataTableComponent sort={sortProps}
+                                  namespaceId={namespaceId}
+                                  preFilter={preFilter}/>
     </>
-
 }

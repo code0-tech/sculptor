@@ -1,8 +1,7 @@
 "use client"
 
 import React from "react";
-import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
-import {Button, Card, Flex, Spacing, Text, TextInput, useForm, useService, useStore} from "@code0-tech/pictor";
+import {Button, Flex, Spacing, Text, TextInput, useForm, useService, useStore} from "@code0-tech/pictor";
 import {useParams} from "next/navigation";
 import {NamespaceService} from "@edition/namespace/services/Namespace.service";
 import {OrganizationService} from "@edition/organization/services/Organization.service";
@@ -56,23 +55,17 @@ export const NamespaceGeneralSettingsView: React.FC = () => {
 
     return <>
         <Flex justify={"space-between"} align={"center"}>
-            <Text size={"xl"} hierarchy={"primary"}>
-                General
-            </Text>
-            <Button color={"success"} onClick={validate}>
-                Save changes
-            </Button>
+            <Text size={"lg"} hierarchy={"primary"} display={"block"}>General</Text>
+            <Button paddingSize={"xxs"} color={"success"} variant={"none"} onClick={validate}>Save changes</Button>
         </Flex>
-        <Spacing spacing={"xl"}/>
-        <Card color={"secondary"}>
-            <CardSection border>
-                <Flex justify={"space-between"} align={"center"}>
-                    <Text size={"md"} hierarchy={"primary"}>
-                        Name
-                    </Text>
-                    <TextInput {...inputs.getInputProps("name")}/>
-                </Flex>
-            </CardSection>
-        </Card>
+        <Spacing spacing={"xs"}/>
+        <Text size={"md"} hierarchy={"tertiary"}>
+            The name and general settings for this workspace, visible to everyone who has access to it.
+        </Text>
+        <Spacing spacing={"md"}/>
+        <TextInput w={"100%"}
+                   title={"Name"}
+                   description={"The display name shown for this workspace."}
+                   {...inputs.getInputProps("name")}/>
     </>
 }
