@@ -6,7 +6,7 @@ import {useParams, useRouter} from "next/navigation";
 import {NamespaceService} from "@edition/namespace/services/Namespace.service";
 import {OrganizationService} from "@edition/organization/services/Organization.service";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
 export const NamespaceDeleteView: React.FC = () => {
 
@@ -32,9 +32,7 @@ export const NamespaceDeleteView: React.FC = () => {
                 organizationId: parentOrganization?.id!!
             }).then(payload => {
                 if ((payload?.errors?.length ?? 0) <= 0) {
-                    addIslandSuccessNotification({
-                        message: "Deleted organization"
-                    })
+                    toast({title: "Deleted organization", color: "success"})
                 }
                 router.push("/")
             })

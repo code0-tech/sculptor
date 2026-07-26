@@ -29,7 +29,7 @@ import type {Namespace, NamespaceProject, NamespaceRole, Scalars} from "@code0-t
 import {ProjectDataTableComponent} from "@edition/project/components/ProjectDataTableComponent";
 import {ProjectMenuComponent} from "@edition/project/components/ProjectMenuComponent";
 import {IconAdjustmentsHorizontal, IconArrowsSort, IconCheck, IconPlus, IconTrash} from "@tabler/icons-react";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
 const sortLabels = {
     name: "Name",
@@ -81,9 +81,7 @@ export const RoleProjectView: React.FC = () => {
                 projectIds: assignedProjectIds as Scalars['NamespaceProjectID']['output'][]
             }).then(payload => {
                 if ((payload?.errors?.length ?? 0) <= 0) {
-                    addIslandSuccessNotification({
-                        message: "Assigned project"
-                    })
+                    toast({title: "Assigned project", color: "success"})
                 }
             })
         })

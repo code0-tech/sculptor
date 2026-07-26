@@ -42,7 +42,6 @@ export const ProjectCreateDialogComponent: React.FC<ProjectCreateDialogComponent
                     toast({
                         title: "The current user does not have a personal namespace.",
                         color: "error",
-                        dismissible: true,
                     })
                     return
                 }

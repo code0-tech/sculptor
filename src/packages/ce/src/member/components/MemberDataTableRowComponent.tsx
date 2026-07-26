@@ -32,7 +32,7 @@ import {MemberService} from "@edition/member/services/Member.service";
 import {RoleService} from "@edition/role/services/Role.service";
 import {RolePermissionComponent} from "@edition/role/components/RolePermissionComponent";
 import {IconDotsVertical, IconUserCog, IconUserOff, IconX} from "@tabler/icons-react";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
 export interface MemberDataTableRowComponentProps {
     memberId: NamespaceMember['id']
@@ -83,9 +83,7 @@ export const MemberDataTableRowComponent: React.FC<MemberDataTableRowComponentPr
             roleIds: localAssignedRoles.map(r => r?.id!)
         }).then(payload => {
             if ((payload?.errors?.length ?? 0) <= 0) {
-                addIslandSuccessNotification({
-                    message: "Updated roles on member"
-                })
+                toast({title: "Updated roles on member", color: "success"})
 
             }
         })
@@ -96,9 +94,7 @@ export const MemberDataTableRowComponent: React.FC<MemberDataTableRowComponentPr
             namespaceMemberId: member?.id!
         }).then(payload => {
             if ((payload?.errors?.length ?? 0) <= 0) {
-                addIslandSuccessNotification({
-                    message: "Removed member"
-                })
+                toast({title: "Removed member", color: "success"})
 
             }
         })

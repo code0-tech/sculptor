@@ -26,7 +26,7 @@ import {IconFileInfoFilled, IconX} from "@tabler/icons-react";
 import {FileUploadFileChangeDetails} from "@ark-ui/react";
 import {ApplicationService} from "@ee-internal/application/services/Application.service";
 import {useRouter} from "next/navigation";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
 export const LicenseAddPage: React.FC = () => {
 
@@ -51,9 +51,7 @@ export const LicenseAddPage: React.FC = () => {
                     data: fileContent ?? ""
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
-                        addIslandSuccessNotification({
-                            message: "Added license"
-                        })
+                        toast({title: "Added license", color: "success"})
                         router.push("/")
                     }
                 })

@@ -15,7 +15,7 @@ import {
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {ApplicationService} from "@edition/application/services/Application.service";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
 export const ApplicationGeneralSettingsView: React.FC = () => {
 
@@ -58,9 +58,7 @@ export const ApplicationGeneralSettingsView: React.FC = () => {
                     runtimeMaxHeartbeatIntervalMinutes: !!runtimeMaxHeartbeatIntervalMinutes ? Number(runtimeMaxHeartbeatIntervalMinutes) : null,
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
-                        addIslandSuccessNotification({
-                            message: "Updated application"
-                        })
+                        toast({title: "Updated application", color: "success"})
                     }
                 })
             })

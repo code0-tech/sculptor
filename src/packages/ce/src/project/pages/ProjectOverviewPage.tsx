@@ -25,7 +25,7 @@ import {
 } from "@code0-tech/sagittarius-graphql-types";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {mapAiGenerationFlowToFlowInput} from "@edition/ai/util/AI.flow.mapper";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
 const flowTemplates = [
     {
@@ -75,7 +75,7 @@ export const ProjectOverviewPage: React.FC = () => {
             projectId: projectId,
         }).then(result => {
             if ((result?.errors?.length ?? 0) <= 0) {
-                addIslandSuccessNotification({message: "Created flow"})
+                toast({title: "Created flow", color: "success"})
             }
         })
     }, [flowService, flowStore, namespaceId, projectId])

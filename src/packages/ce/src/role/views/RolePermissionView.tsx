@@ -21,7 +21,7 @@ import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {useParams} from "next/navigation";
 import {RoleService} from "@edition/role/services/Role.service";
 import {RolePermissionComponent} from "@edition/role/components/RolePermissionComponent";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
 type Permission = {
     label: string
@@ -219,9 +219,7 @@ export const RolePermissionView: React.FC = () => {
                     abilities: updatedAbilities
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
-                        addIslandSuccessNotification({
-                            message: "Updated role permissions"
-                        })
+                        toast({title: "Updated role permissions", color: "success"})
                     }
                 })
             })

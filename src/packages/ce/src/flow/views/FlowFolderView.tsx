@@ -25,7 +25,7 @@ import {
     FlowFolderContextMenuComponentGroupData,
     FlowFolderContextMenuComponentItemData
 } from "@edition/flow/components/folder/FlowFolderContextMenuComponent";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
 export const FlowFolderView: React.FC = () => {
 
@@ -55,9 +55,7 @@ export const FlowFolderView: React.FC = () => {
             flowId: flow.id!
         }).then(payload => {
             if ((payload?.errors?.length ?? 0) <= 0) {
-                addIslandSuccessNotification({
-                    message: "Deleted flow"
-                })
+                toast({title: "Deleted flow", color: "success"})
                 router.push(`/namespace/${namespaceIndex}/project/${projectIndex}`)
             }
         })

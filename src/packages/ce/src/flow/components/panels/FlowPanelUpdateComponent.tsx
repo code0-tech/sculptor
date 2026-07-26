@@ -15,7 +15,7 @@ import {
     useStore
 } from "@code0-tech/pictor";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
 export interface FlowPanelUpdateComponentProps {
     flowId: Flow['id']
@@ -52,9 +52,7 @@ export const FlowPanelUpdateComponent: React.FC<FlowPanelUpdateComponentProps> =
             flowId: flowId!
         }).then(payload => {
             if ((payload?.errors?.length ?? 0) <= 0) {
-                addIslandSuccessNotification({
-                    message: "Synced flow"
-                })
+                toast({title: "Synced flow", color: "success"})
             }
         })
 

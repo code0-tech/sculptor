@@ -11,7 +11,6 @@ import {
 } from "@code0-tech/pictor";
 import {RuntimeService} from "@edition/runtime/services/Runtime.service";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 import {InputDialog} from "@core/components/InputDialog";
 
 export interface RuntimeCreateDialogComponentProps {
@@ -59,12 +58,11 @@ export const RuntimeCreateDialogComponent: React.FC<RuntimeCreateDialogComponent
                     if ((payload?.errors?.length ?? 0) <= 0) {
                         if (payload?.runtime?.token) {
                             setToken(payload.runtime.token)
-                            addIslandSuccessNotification({message: "Created runtime"})
+                            toast({title: "Created runtime", color: "success"})
                         } else {
                             toast({
                                 title: "The runtime was created but no token was provided.",
                                 color: "error",
-                                dismissible: true,
                             })
                             onOpenChange?.(false)
                         }

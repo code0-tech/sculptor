@@ -25,7 +25,7 @@ import {TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/component
 import {User, UsersUpdateInput} from "@code0-tech/sagittarius-graphql-types";
 import {UserService} from "@edition/user/services/User.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 import {IconAt, IconBackground, IconLock, IconMail, IconSettings2, IconShieldLock} from "@tabler/icons-react";
 import {UserSessionsDataTableComponent} from "@edition/user/components/UserSessionsDataTableComponent";
 import {SettingDialog} from "@core/components/SettingDialog";
@@ -127,9 +127,7 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                 await userService.usersUpdate(payload).then(payload => {
                     if (payload?.user && (payload?.errors?.length ?? 0) <= 0) {
                         onOpenChange?.(false)
-                        addIslandSuccessNotification({
-                            message: "Updated user",
-                        })
+                        toast({title: "Updated user", color: "success"})
                     }
                 })
             })

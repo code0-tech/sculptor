@@ -48,7 +48,7 @@ import {Select} from "@radix-ui/react-select";
 import {IconChevronDown} from "@tabler/icons-react";
 import {RuntimeService} from "@ce-internal/runtime/services/Runtime.service";
 import {ProjectService} from "@ce-internal/project/services/Project.service";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
 export const ModuleConfigurationPage: React.FC = () => {
 
@@ -129,9 +129,7 @@ export const ModuleConfigurationPage: React.FC = () => {
             moduleConfigurations
         }).then(payload => {
             if ((payload?.errors?.length ?? 0) <= 0) {
-                addIslandSuccessNotification({
-                    message: "Saved configuration"
-                })
+                toast({title: "Saved configuration", color: "success"})
             }
         })
 
@@ -255,9 +253,7 @@ export const ModuleConfigurationPage: React.FC = () => {
                                             moduleConfigurations: lModuleConfigurations
                                         }).then(payload => {
                                             if ((payload?.errors?.length ?? 0) <= 0) {
-                                                addIslandSuccessNotification({
-                                                    message: "Copied and saved configuration"
-                                                })
+                                                toast({title: "Copied and saved configuration", color: "success"})
                                             }
                                         })
 

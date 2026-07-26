@@ -26,7 +26,7 @@ import {
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {IconAt, IconLock, IconMail, IconUser} from "@tabler/icons-react";
 import {UserService} from "@edition/user/services/User.service";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 import {InputDialog} from "@core/components/InputDialog";
 
 export interface UserCreateDialogComponentProps {
@@ -90,7 +90,7 @@ export const UserCreateDialogComponent: React.FC<UserCreateDialogComponentProps>
                 }).then(payload => {
                     if (payload?.user) {
                         onOpenChange?.(false)
-                        addIslandSuccessNotification({message: "Invited user"})
+                        toast({title: "Invited user", color: "success"})
                     }
                 })
             })

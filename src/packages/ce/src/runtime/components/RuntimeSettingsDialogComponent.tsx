@@ -15,7 +15,7 @@ import {TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/component
 import {Runtime} from "@code0-tech/sagittarius-graphql-types";
 import {RuntimeService} from "@edition/runtime/services/Runtime.service";
 import {useRouter} from "next/navigation";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 import {IconBackground, IconPlugConnected, IconTrash} from "@tabler/icons-react";
 import {SettingDialog} from "@core/components/SettingDialog";
 
@@ -68,9 +68,7 @@ export const RuntimeSettingsDialogComponent: React.FC<RuntimeSettingsDialogCompo
                     runtimeId: runtime.id!
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
-                        addIslandSuccessNotification({
-                            message: "Updated runtime"
-                        })
+                        toast({title: "Updated runtime", color: "success"})
                     }
                 })
             })
@@ -84,9 +82,7 @@ export const RuntimeSettingsDialogComponent: React.FC<RuntimeSettingsDialogCompo
                 runtimeId: runtime.id!
             }).then(payload => {
                 if ((payload?.errors?.length ?? 0) <= 0) {
-                    addIslandSuccessNotification({
-                        message: "Deleted runtime"
-                    })
+                    toast({title: "Deleted runtime", color: "success"})
                 }
                 onOpenChange?.(false)
                 router.push(namespaceId ? `/namespace/${namespaceId}/runtimes` : "/runtimes")
@@ -103,9 +99,7 @@ export const RuntimeSettingsDialogComponent: React.FC<RuntimeSettingsDialogCompo
                 if ((payload?.errors?.length ?? 0) <= 0) {
                     if (payload?.runtime?.token) {
                         setToken(payload.runtime.token)
-                        addIslandSuccessNotification({
-                            message: "Rotated runtime token"
-                        })
+                        toast({title: "Rotated runtime token", color: "success"})
                     }
                 }
             })

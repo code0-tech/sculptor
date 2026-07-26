@@ -33,7 +33,7 @@ import {HoverCard, HoverCardContent, HoverCardPortal, HoverCardTrigger} from "@r
 import 'ldrs/react/ChaoticOrbit.css'
 import {AIChatComponent} from "@edition/ai/components/AIChatComponent";
 import {mapAiGenerationFlowToFlowInput} from "@edition/ai/util/AI.flow.mapper";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 import {useFlowCompareStore} from "@edition/flow/hooks/Flow.compare.hook";
 import {FlowView} from "@edition/flow/services/Flow.view";
 import {FlowExecuteDialogComponent} from "@edition/flow/components/FlowExecuteDialogComponent";
@@ -96,7 +96,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
         }, true).then(result => {
             if ((result?.errors?.length ?? 0) <= 0) {
                 setCompareFlow(oldFlowSnapshot)
-                addIslandSuccessNotification({message: "Updated flow"})
+                toast({title: "Updated flow", color: "success"})
             }
         })
     }, [flowService, flowStore, namespaceId, projectId, flowId, setCompareFlow])

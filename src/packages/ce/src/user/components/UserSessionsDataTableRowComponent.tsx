@@ -7,7 +7,7 @@ import {UserService} from "@edition/user/services/User.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {formatDistanceToNow} from "date-fns";
 import {IconDeviceDesktop, IconLogout} from "@tabler/icons-react";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
 export interface UserSessionsDataTableRowComponentProps {
     userId: User['id']
@@ -33,9 +33,7 @@ export const UserSessionsDataTableRowComponent: React.FC<UserSessionsDataTableRo
         if (!sessionId) return
         userService.usersLogout({userSessionId: sessionId}).then(payload => {
             if ((payload?.errors?.length ?? 0) <= 0) {
-                addIslandSuccessNotification({
-                    message: "Logged out session"
-                })
+                toast({title: "Logged out session", color: "success"})
             }
         })
     }, [sessionId])

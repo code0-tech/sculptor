@@ -3,7 +3,7 @@
 import React, {startTransition} from "react";
 import {Button, Spacing, useForm, useService, useStore} from "@code0-tech/pictor";
 import {Namespace, User} from "@code0-tech/sagittarius-graphql-types";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 import {MemberService} from "@edition/member/services/Member.service";
 import {UserService} from "@edition/user/services/User.service";
 import {UserInputComponent, UserSyntaxSegment} from "@edition/user/components/UserInputComponent";
@@ -57,9 +57,7 @@ export const MemberAddDialogComponent: React.FC<MemberAddDialogComponentProps> =
                 })
 
                 if ((payload?.errors?.length ?? 0) <= 0) {
-                    addIslandSuccessNotification({
-                        message: "Added members",
-                    })
+                    toast({title: "Added members", color: "success"})
                     onOpenChange?.(false)
                 }
             })

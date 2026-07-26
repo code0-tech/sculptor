@@ -6,7 +6,7 @@ import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {RoleService} from "@edition/role/services/Role.service";
 import type {Namespace, NamespaceRole} from "@code0-tech/sagittarius-graphql-types";
 import {useParams} from "next/navigation";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
 export const RoleGeneralAdjustmentView: React.FC = () => {
 
@@ -49,9 +49,7 @@ export const RoleGeneralAdjustmentView: React.FC = () => {
                     name: values.name!
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
-                        addIslandSuccessNotification({
-                            message: "Updated role name"
-                        })
+                        toast({title: "Updated role name", color: "success"})
                     }
                 })
             })

@@ -41,7 +41,7 @@ import {FlowService} from "@edition/flow/services/Flow.service";
 import Link from "next/link";
 import {icon, IconString} from "@core/util/icons";
 import {FALLBACK_FLOW_TYPE_NAME} from "@core/util/fallback-translations";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
 export interface FlowCreateDialogComponentProps {
     open?: boolean
@@ -159,9 +159,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                 projectId: projectId
             }).then(payload => {
                 if ((payload?.errors?.length ?? 0) <= 0) {
-                    addIslandSuccessNotification({
-                        message: "Created flow"
-                    })
+                    toast({title: "Created flow", color: "success"})
 
                 }
             })

@@ -2,7 +2,8 @@
 
 import React from "react"
 import {useAIGenerationStore} from "@edition/ai/hooks/AI.generation.hook"
-import {useIsland} from "@code0-tech/pictor/dist/components/island/Island.hook"
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast"
+import {toast as sonnerToast} from "sonner"
 import {IconSparkles2Filled} from "@tabler/icons-react"
 import {AIGeneratingMessageComponent} from "@edition/ai/components/AIGeneratingMessageComponent"
 import {AIGenerationSubscriberComponent} from "@edition/ai/components/AIGenerationSubscriberComponent"
@@ -10,35 +11,29 @@ import {AIGenerationSubscriberComponent} from "@edition/ai/components/AIGenerati
 export const AIGenerationWatcherComponent: React.FC = () => {
 
     const generations = useAIGenerationStore(s => s.generations)
-    const islandToastIdRef = React.useRef<number | null>(null)
-    const addToast = useIsland(s => s.addToast)
-    const removeToast = useIsland(s => s.removeToast)
+    const toastIdRef = React.useRef<string | number | null>(null)
 
     const isGenerating = generations.length > 0
 
     React.useEffect(() => {
-        if (isGenerating && islandToastIdRef.current === null) {
-            const id = Date.now()
-            islandToastIdRef.current = id
-            addToast({
-                id,
+        if (isGenerating && toastIdRef.current === null) {
+            toastIdRef.current = toast({
                 duration: Infinity,
-                index: 2,
                 icon: <IconSparkles2Filled size={16} color={"#e270ff"}/>,
-                message: <AIGeneratingMessageComponent/>,
+                title: <AIGeneratingMessageComponent/>,
             })
-        } else if (!isGenerating && islandToastIdRef.current !== null) {
-            removeToast(islandToastIdRef.current)
-            islandToastIdRef.current = null
+        } else if (!isGenerating && toastIdRef.current !== null) {
+            sonnerToast.dismiss(toastIdRef.current)
+            toastIdRef.current = null
         }
-    }, [isGenerating, addToast, removeToast])
+    }, [isGenerating])
 
     React.useEffect(() => () => {
-        if (islandToastIdRef.current !== null) {
-            removeToast(islandToastIdRef.current)
-            islandToastIdRef.current = null
+        if (toastIdRef.current !== null) {
+            sonnerToast.dismiss(toastIdRef.current)
+            toastIdRef.current = null
         }
-    }, [removeToast])
+    }, [])
 
     return <>
         {generations.map(generation => (

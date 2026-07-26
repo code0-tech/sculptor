@@ -5,7 +5,7 @@ import {Button, Spacing, Text, useService} from "@code0-tech/pictor";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {useParams, useRouter} from "next/navigation";
 import {ProjectService} from "@edition/project/services/Project.service";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
 export const ProjectSettingsDeleteView: React.FC = () => {
 
@@ -22,9 +22,7 @@ export const ProjectSettingsDeleteView: React.FC = () => {
                 namespaceProjectId: `gid://sagittarius/NamespaceProject/${projectId}`
             }).then(payload => {
                 if ((payload?.errors?.length ?? 0) <= 0) {
-                    addIslandSuccessNotification({
-                        message: "Deleted project"
-                    })
+                    toast({title: "Deleted project", color: "success"})
                 }
                 router.push(`/namespace/${namespaceId}`)
             })

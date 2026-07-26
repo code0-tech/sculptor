@@ -17,7 +17,7 @@ import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {useParams} from "next/navigation";
 import {ProjectService} from "@edition/project/services/Project.service";
 import {Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
 export const ProjectSettingsGeneralView: React.FC = () => {
 
@@ -77,9 +77,7 @@ export const ProjectSettingsGeneralView: React.FC = () => {
                     namespaceProjectId: projectId
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
-                        addIslandSuccessNotification({
-                            message: "Updated project"
-                        })
+                        toast({title: "Updated project", color: "success"})
                     }
                 })
             })

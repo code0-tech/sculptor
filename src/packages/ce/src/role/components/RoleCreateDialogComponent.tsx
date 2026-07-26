@@ -3,7 +3,6 @@
 import React, {startTransition} from "react";
 import {Button, Spacing, TextInput, toast, useForm, useService} from "@code0-tech/pictor";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
 import {RoleService} from "@edition/role/services/Role.service";
 import {InputDialog} from "@core/components/InputDialog";
 
@@ -38,7 +37,6 @@ export const RoleCreateDialogComponent: React.FC<RoleCreateDialogComponentProps>
                     toast({
                         title: "The current user does not have a personal namespace.",
                         color: "error",
-                        dismissible: true,
                     })
                     return
                 }
@@ -47,7 +45,7 @@ export const RoleCreateDialogComponent: React.FC<RoleCreateDialogComponentProps>
                     namespaceId: namespaceId
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
-                        addIslandSuccessNotification({message: "Created role"})
+                        toast({title: "Created role", color: "success"})
                         onOpenChange?.(false)
                     }
                 })

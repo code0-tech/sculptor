@@ -6,7 +6,7 @@ import {useParams} from "next/navigation";
 import {NamespaceService} from "@edition/namespace/services/Namespace.service";
 import {OrganizationService} from "@edition/organization/services/Organization.service";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
 export const NamespaceGeneralSettingsView: React.FC = () => {
 
@@ -44,9 +44,7 @@ export const NamespaceGeneralSettingsView: React.FC = () => {
                     organizationId: parentOrganization?.id!!
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
-                        addIslandSuccessNotification({
-                            message: "Updated organization"
-                        })
+                        toast({title: "Updated organization", color: "success"})
                     }
                 })
             })
