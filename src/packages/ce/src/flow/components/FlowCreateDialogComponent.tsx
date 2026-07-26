@@ -213,22 +213,17 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                         </Text>
                     )}
                     <Spacing spacing={"xl"}/>
-                    <Flex justify={"space-between"} align={"center"}>
-                        <DialogClose asChild>
-                            <Button color={"tertiary"}>No, go back!</Button>
-                        </DialogClose>
-                        <ButtonGroup color={"tertiary"}>
-                            <Link href={`/namespace/${namespaceIndex}/project/${projectIndex}/runtime`}>
-                                <Button color={"info"} variant={"none"}>
-                                    <Text>Assign</Text>
-                                </Button>
-                            </Link>
-                            <Link href={`/namespace/${namespaceIndex}/runtimes/create`}>
-                                <Button color={"success"} variant={"none"}>
-                                    <Text>Create</Text>
-                                </Button>
-                            </Link>
-                        </ButtonGroup>
+                    <Flex justify={"space-between"} align={"center"} style={{gap: "1.3rem"}}>
+                        <Link style={{width: "100%"}} tabIndex={-1} href={`/namespace/${namespaceIndex}/project/${projectIndex}/settings`}>
+                            <Button w={"100%"} color={"tertiary"}>
+                                <Text>Assign</Text>
+                            </Button>
+                        </Link>
+                        <Link style={{width: "100%"}} tabIndex={-1} href={`/namespace/${namespaceIndex}/runtimes/create`}>
+                            <Button w={"100%"} color={"tertiary"}>
+                                <Text>Create</Text>
+                            </Button>
+                        </Link>
                     </Flex>
                 </DialogContent>
             </DialogPortal>
