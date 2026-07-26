@@ -2,13 +2,13 @@
 
 import {Flex} from "@code0-tech/pictor";
 import {FlowFolderView} from "@edition/flow/views/FlowFolderView";
-import {NamespaceMenuView} from "@edition/namespace/views/NamespaceMenuView";
+import {ProjectMenuView} from "@edition/project/views/ProjectMenuView";
 
 export default () => {
     return <Flex h={"100%"} style={{boxSizing: "border-box", flexDirection: 'column'}}>
         <FlowFolderView/>
         <div style={{marginTop: "auto"}}>
-            <NamespaceMenuView/>
+            <ProjectMenuView/>
         </div>
     </Flex>
 }
