@@ -54,7 +54,7 @@ export const ProjectRecentListView: React.FC = () => {
             const namespaceNumber = project.namespace?.id?.match(/Namespace\/(\d+)$/)?.[1]
             const projectNumber = project.id?.match(/NamespaceProject\/(\d+)$/)?.[1]
             return <Link key={project.id}
-                         href={`/namespace/${namespaceNumber}/project/${projectNumber}/flow`}
+                         href={`/namespace/${namespaceNumber}/project/${projectNumber}`}
                          style={{width: "100%"}}
                          prefetch>
                 <Button variant={"none"} w={"100%"} justify={"flex-start"} paddingSize={"xxs"}>

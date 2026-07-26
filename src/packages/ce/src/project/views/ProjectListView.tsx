@@ -36,7 +36,7 @@ export const ProjectListView: React.FC = () => {
         {projects.map(project => {
             const projectNumber = project.id?.match(/NamespaceProject\/(\d+)$/)?.[1]
             return <Link key={project.id}
-                         href={`/namespace/${namespaceNumber}/project/${projectNumber}/flow`}
+                         href={`/namespace/${namespaceNumber}/project/${projectNumber}`}
                          style={{width: "100%"}}
                          prefetch>
                 <Button variant={"none"} w={"100%"} justify={"flex-start"} paddingSize={"xxs"}>

@@ -1,7 +1,7 @@
 "use client"
 
 import React, {startTransition} from "react";
-import {Button, Card, Flex, Spacing, Text, useService} from "@code0-tech/pictor";
+import {Button, Spacing, Text, useService} from "@code0-tech/pictor";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {useParams, useRouter} from "next/navigation";
 import {ProjectService} from "@edition/project/services/Project.service";
@@ -32,22 +32,13 @@ export const ProjectSettingsDeleteView: React.FC = () => {
     }, [projectId])
 
 
-    return <TabContent value={"delete"}>
-        <Flex justify={"space-between"} align={"end"}>
-            <Text size={"xl"} hierarchy={"primary"}>Delete</Text>
-        </Flex>
-        <Spacing spacing={"xl"}/>
-        <Card p={1.3} color={"error"}>
-            <Flex justify={"space-between"} align={"center"}>
-                <Flex style={{gap: ".35rem", flexDirection: "column"}}>
-                    <Text size={"md"} hierarchy={"primary"}>
-                        This will delete the project and cannot be undone.
-                    </Text>
-                </Flex>
-                <Button color={"secondary"} variant={"filled"} onClick={deleteProject}>
-                    Delete project
-                </Button>
-            </Flex>
-        </Card>
+    return <TabContent value={"delete"} style={{overflow: "hidden"}}>
+        <Text size={"lg"} hierarchy={"primary"} display={"block"}>Delete project</Text>
+        <Spacing spacing={"xs"}/>
+        <Text size={"md"} hierarchy={"tertiary"}>
+            Permanently delete this project and everything in it. This action cannot be undone.
+        </Text>
+        <Spacing spacing={"md"}/>
+        <Button color={"error"} w={"100%"} onClick={deleteProject}>Delete project</Button>
     </TabContent>
 }

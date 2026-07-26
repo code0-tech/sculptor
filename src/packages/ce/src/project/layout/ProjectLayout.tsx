@@ -3,11 +3,11 @@ import {ResizablePanelGroup} from "@code0-tech/pictor/dist/components/resizable/
 import {WorkerProvider} from "@edition/flow/components/FlowWorkerProvider";
 import {ReactFlowProvider} from "@xyflow/react";
 
-interface FlowLayoutProps {
+interface ProjectLayoutProps {
     children: React.ReactNode
 }
 
-export const FlowLayout: React.FC<FlowLayoutProps> = ({children}) => {
+export const ProjectLayout: React.FC<ProjectLayoutProps> = ({children}) => {
 
     return <ResizablePanelGroup orientation={"horizontal"}>
         <WorkerProvider>

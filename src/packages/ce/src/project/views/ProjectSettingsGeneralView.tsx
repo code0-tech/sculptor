@@ -86,14 +86,18 @@ export const ProjectSettingsGeneralView: React.FC = () => {
         }
     })
 
-    return <TabContent value={"general"}>
-        <Flex justify={"space-between"} align={"start"}>
-            <Text size={"xl"} hierarchy={"primary"}>General</Text>
-            <Button color={"success"} onClick={validate}>
+    return <TabContent value={"general"} style={{overflow: "hidden"}}>
+        <Flex justify={"space-between"} align={"center"}>
+            <Text size={"lg"} hierarchy={"primary"} display={"block"}>General</Text>
+            <Button paddingSize={"xxs"} color={"success"} variant={"none"} onClick={validate}>
                 Save changes
             </Button>
         </Flex>
-        <Spacing spacing={"xl"}/>
+        <Spacing spacing={"xs"}/>
+        <Text size={"md"} hierarchy={"tertiary"}>
+            The name, description and general settings for this project.
+        </Text>
+        <Spacing spacing={"md"}/>
         <Card color={"secondary"}>
             <CardSection border>
                 <Flex justify={"space-between"} align={"center"}>
