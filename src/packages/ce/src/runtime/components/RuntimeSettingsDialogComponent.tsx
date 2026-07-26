@@ -1,16 +1,7 @@
 "use client"
 
 import React from "react";
-import {
-    Button,
-    Flex,
-    Spacing,
-    Text,
-    TextInput,
-    useForm,
-    useService,
-    useStore
-} from "@code0-tech/pictor";
+import {Button, DialogClose, Flex, Spacing, Text, TextInput, useForm, useService, useStore} from "@code0-tech/pictor";
 import {TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {Runtime} from "@code0-tech/sagittarius-graphql-types";
 import {RuntimeService} from "@edition/runtime/services/Runtime.service";
@@ -176,7 +167,9 @@ export const RuntimeSettingsDialogComponent: React.FC<RuntimeSettingsDialogCompo
                 Permanently remove this runtime from your application. This action cannot be undone.
             </Text>
             <Spacing spacing={"md"}/>
-            <Button color={"error"} w={"100%"} onClick={deleteRuntime}>Delete runtime</Button>
+            <DialogClose asChild>
+                <Button color={"error"} w={"100%"} onClick={deleteRuntime}>Delete runtime</Button>
+            </DialogClose>
         </TabContent>
     </SettingDialog>
 }

@@ -2,7 +2,7 @@
 
 import React from "react";
 import {useParams, useRouter} from "next/navigation";
-import {Button, Spacing, Text, useService} from "@code0-tech/pictor";
+import {Button, DialogClose, Spacing, Text, useService} from "@code0-tech/pictor";
 import {RoleService} from "@edition/role/services/Role.service";
 import {MemberService} from "@edition/member/services/Member.service";
 import type {NamespaceRole} from "@code0-tech/sagittarius-graphql-types";
@@ -42,7 +42,9 @@ export const RoleDeleteView: React.FC = () => {
             Permanently delete this role and unassign it from all members. This action cannot be undone.
         </Text>
         <Spacing spacing={"md"}/>
-        <Button color={"error"} w={"100%"} onClick={deleteRole}>Delete role</Button>
+        <DialogClose asChild>
+            <Button color={"error"} w={"100%"} onClick={deleteRole}>Delete role</Button>
+        </DialogClose>
     </TabContent>
 
 }

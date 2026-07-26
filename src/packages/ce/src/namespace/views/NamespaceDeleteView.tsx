@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react";
-import {Button, Spacing, Text, useService, useStore} from "@code0-tech/pictor";
+import {Button, DialogClose, Spacing, Text, useService, useStore} from "@code0-tech/pictor";
 import {useParams, useRouter} from "next/navigation";
 import {NamespaceService} from "@edition/namespace/services/Namespace.service";
 import {OrganizationService} from "@edition/organization/services/Organization.service";
@@ -46,6 +46,8 @@ export const NamespaceDeleteView: React.FC = () => {
             Permanently delete this workspace and everything in it. This action cannot be undone.
         </Text>
         <Spacing spacing={"md"}/>
-        <Button color={"error"} w={"100%"} onClick={deleteOrganization}>Delete workspace</Button>
+        <DialogClose asChild>
+            <Button color={"error"} w={"100%"} onClick={deleteOrganization}>Delete workspace</Button>
+        </DialogClose>
     </>
 }

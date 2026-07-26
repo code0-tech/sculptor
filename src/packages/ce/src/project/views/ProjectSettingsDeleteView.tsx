@@ -1,7 +1,7 @@
 "use client"
 
 import React, {startTransition} from "react";
-import {Button, Spacing, Text, useService} from "@code0-tech/pictor";
+import {Button, DialogClose, Spacing, Text, useService} from "@code0-tech/pictor";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {useParams, useRouter} from "next/navigation";
 import {ProjectService} from "@edition/project/services/Project.service";
@@ -37,6 +37,9 @@ export const ProjectSettingsDeleteView: React.FC = () => {
             Permanently delete this project and everything in it. This action cannot be undone.
         </Text>
         <Spacing spacing={"md"}/>
-        <Button color={"error"} w={"100%"} onClick={deleteProject}>Delete project</Button>
+        <DialogClose asChild>
+            <Button color={"error"} w={"100%"} onClick={deleteProject}>Delete project</Button>
+        </DialogClose>
+
     </TabContent>
 }
