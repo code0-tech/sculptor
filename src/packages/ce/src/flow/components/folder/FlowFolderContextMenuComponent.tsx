@@ -16,6 +16,7 @@ import {
 } from "@code0-tech/pictor/dist/components/context-menu/ContextMenu";
 import {Flex, Text, useService, useStore} from "@code0-tech/pictor";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
+import {ProjectService} from "@edition/project/services/Project.service";
 import {FALLBACK_FLOW_TYPE_NAME} from "@core/util/fallback-translations";
 
 export interface FlowFolderContextMenuComponentGroupData {
@@ -37,12 +38,26 @@ export interface FlowFolderContextMenuComponentProps extends FlowFolderComponent
 
 export const FlowFolderContextMenuComponent: React.FC<FlowFolderContextMenuComponentProps> = (props) => {
 
-    const {children} = props
+    const {children, namespaceId, projectId} = props
 
     const flowTypeService = useService(FlowTypeService)
     const flowTypeStore = useStore(FlowTypeService)
+    const projectService = useService(ProjectService)
+    const projectStore = useStore(ProjectService)
 
-    const flowTypes = React.useMemo(() => flowTypeService.values(), [flowTypeStore])
+    const project = React.useMemo(
+        () => projectService.getById(projectId, {namespaceId}),
+        [projectStore, projectId, namespaceId]
+    )
+
+    // Scope the flow types to this project's primary runtime, otherwise the store
+    // still holds the previously visited project's flow types. Without a runtime
+    // there is nothing to create, and values() would fall back to the whole store.
+    const flowTypes = React.useMemo(() => {
+        const runtimeId = project?.primaryRuntime?.id
+        if (!runtimeId) return []
+        return flowTypeService.values({runtimeId, projectId, namespaceId})
+    }, [flowTypeStore, project, projectId, namespaceId])
 
     return <>
         <ContextMenu>
