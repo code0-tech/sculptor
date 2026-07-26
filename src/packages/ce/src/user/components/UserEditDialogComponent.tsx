@@ -175,6 +175,10 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                 </Button>
 
             </Flex>
+            <Spacing spacing={"xs"}/>
+            <Text size={"md"} hierarchy={"tertiary"}>
+                The name, email and general profile details for @{user?.username ?? ""}.
+            </Text>
             <Spacing spacing={"md"}/>
             <Row>
                 <Col xs={6}>
@@ -221,6 +225,10 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                     Save changes
                 </Button>
             </Flex>
+            <Spacing spacing={"xs"}/>
+            <Text size={"md"} hierarchy={"tertiary"}>
+                Manage administrator privileges and access for @{user?.username ?? ""}.
+            </Text>
             <Spacing spacing={"md"}/>
             <Card color={"secondary"}>
                 <CardSection border>
@@ -256,6 +264,10 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                 </Button>
 
             </Flex>
+            <Spacing spacing={"xs"}/>
+            <Text size={"md"} hierarchy={"tertiary"}>
+                Update the password used to sign in to @{user?.username ?? ""}.
+            </Text>
             <Spacing spacing={"md"}/>
             <PasswordInput w={"100%"} placeholder={"New password"}
                            title={"New password"}
