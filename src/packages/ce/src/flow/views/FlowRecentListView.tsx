@@ -1,12 +1,14 @@
 "use client"
 
 import React from "react";
-import {Avatar, Badge, Button, Flex, hashToColor, Spacing, Text, useService, useStore} from "@code0-tech/pictor";
+import {Badge, Button, Flex, hashToColor, Spacing, Text, useService, useStore} from "@code0-tech/pictor";
 import Link from "next/link";
 import {useParams} from "next/navigation";
 import {Flow, Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {ProjectService} from "@edition/project/services/Project.service";
+import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
+import {icon, IconString} from "@core/util/icons";
 
 const RECENT_FLOWS_LIMIT = 10
 
@@ -59,7 +61,7 @@ export const FlowRecentListView: React.FC = () => {
                          style={{width: "100%"}}
                          prefetch>
                 <Button variant={"none"} w={"100%"} justify={"flex-start"} paddingSize={"xxs"}>
-                    <Avatar identifier={displayName} color={hashToColor(name, 180, 360)} size={13}/>
+                    <FlowRecentListIcon flow={flow} project={project}/>
                     <Text size={"md"}>
                         {displayName}
                     </Text>
@@ -67,4 +69,25 @@ export const FlowRecentListView: React.FC = () => {
             </Link>
         })}
     </Flex>
+}
+
+const FlowRecentListIcon: React.FC<{flow: Flow, project: NamespaceProject}> = ({flow, project}) => {
+
+    const flowTypeService = useService(FlowTypeService)
+    const flowTypeStore = useStore(FlowTypeService)
+
+    const flowType = React.useMemo(() => {
+        // Populate the flow types for this project's primary runtime, the same way
+        // the flow builder does, so getById can resolve the display icon.
+        flowTypeService.values({
+            runtimeId: project.primaryRuntime?.id,
+            projectId: project.id,
+            namespaceId: project.namespace?.id,
+        })
+        return flowTypeService.getById(flow.type?.id)
+    }, [flowTypeStore, flow, project])
+
+    const DisplayIcon = icon(flowType?.displayIcon as IconString)
+
+    return <DisplayIcon color={hashToColor(flow?.id ?? "")} size={13}/>
 }
