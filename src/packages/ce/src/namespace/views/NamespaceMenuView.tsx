@@ -131,7 +131,7 @@ export const NamespaceMenuView: React.FC = () => {
                         Roles
                     </MenuItem>
                 </Link>
-                <Link href={`/namespace/${namespaceNumber}/runtimes`} prefetch style={{display: "contents"}}>
+                <Link href={`/namespace/${namespaceNumber}/settings`} prefetch style={{display: "contents"}}>
                     <MenuItem>
                         <IconSettings color={"transparent"} size={16}/>
                         Servers
