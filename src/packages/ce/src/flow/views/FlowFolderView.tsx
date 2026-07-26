@@ -58,7 +58,7 @@ export const FlowFolderView: React.FC = () => {
                 addIslandSuccessNotification({
                     message: "Deleted flow"
                 })
-                router.push(`/namespace/${namespaceIndex}/project/${projectIndex}/flow`)
+                router.push(`/namespace/${namespaceIndex}/project/${projectIndex}`)
             }
         })
     }, [flowService])
