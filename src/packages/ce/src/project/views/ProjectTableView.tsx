@@ -17,6 +17,7 @@ import {
     DataTablePaginationForwardTrigger,
     DataTablePaginationValue,
     Flex,
+    hashToColor,
     Menu,
     MenuContent,
     MenuItem,
@@ -174,7 +175,7 @@ export const ProjectTableView: React.FC = () => {
                 {(project) => <>
                     <DataTableColumn>
                         <Flex align={"center"} style={{gap: "0.75rem", minWidth: 0}}>
-                            <Avatar identifier={project.name} size={13}/>
+                            <Avatar identifier={project.name} color={hashToColor(project.name, 0, 180)} size={13}/>
                             <Text size={"md"}>{project.name}</Text>
                         </Flex>
                     </DataTableColumn>
