@@ -265,7 +265,7 @@ export const DFlowFolderGroup: React.FC<FlowFolderComponentGroupProps> = (props)
         }} {...contextMenuProps}>
             <div onClick={() => setOpen(prevState => !prevState)} {...mergeComponentProps(`d-folder`, code0Props)}>
                 <Flex align={"center"} justify={"space-between"} style={{gap: "0.35rem"}}>
-                    {open ? <IconFolderOpen size={12}/> : <IconFolderFilled size={12}/>}
+                    {open ? <IconFolderOpen color={"#fff"} size={13}/> : <IconFolderFilled color={"#fff"} size={13}/>}
                     <Text>{name}</Text>
                 </Flex>
             </div>
@@ -335,7 +335,7 @@ export const DFlowFolderItem: React.FC<FlowFolderComponentItemProps> = (props) =
                         ref={wrapperRef} {...mergeComponentProps(`d-folder__item ${active ? "d-folder__item--active" : ""}`, code0Props)}
                         onClick={() => onSelect?.(flow)}>
                         <Flex align={"center"} style={{gap: "0.35rem"}}>
-                            <DisplayIcon color={hashToColor(flow?.id ?? "")} size={12}/>
+                            <DisplayIcon color={hashToColor(flow?.id ?? "")} size={13}/>
                             <Text>{text}</Text>
                         </Flex>
                     </div>
@@ -345,7 +345,7 @@ export const DFlowFolderItem: React.FC<FlowFolderComponentItemProps> = (props) =
                         <div {...mergeComponentProps(`d-folder__item-hover-card`, code0Props)}
                              onClick={() => onSelect?.(flow)} style={{padding: "0.35rem 0.7rem"}}>
                             <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                <DisplayIcon color={hashToColor(flow?.id ?? "")} size={12}/>
+                                <DisplayIcon color={hashToColor(flow?.id ?? "")} size={13}/>
                                 <Text>{props.name}</Text>
                             </Flex>
                         </div>

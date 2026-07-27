@@ -107,7 +107,9 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
         [validation]
     )
 
-    return <>
+    return <div style={{
+        padding: "0.7rem"
+    }}>
         <Text size={"md"}>{definition?.names?.[0]?.content ?? FALLBACK_FUNCTION_NAME}</Text>
         <Spacing spacing={"xs"}/>
         <Text hierarchy={"tertiary"}>{definition?.descriptions?.[0]?.content ?? FALLBACK_FUNCTION_DESCRIPTION}</Text>
@@ -172,5 +174,5 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                 )}
             </>
         })()}
-    </>
+    </div>
 }

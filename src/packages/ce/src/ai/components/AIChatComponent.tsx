@@ -19,7 +19,6 @@ import {
     useStore
 } from "@code0-tech/pictor";
 import Link from "next/link";
-import {StreamLanguage} from "@codemirror/language";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {Select} from "@radix-ui/react-select";
 import {IconChevronDown, IconPlayerStop, IconSend, IconSparkles2Filled, IconX} from "@tabler/icons-react";
@@ -28,6 +27,7 @@ import {motion} from "framer-motion";
 import {AiGenerateFlowSubscriptionPayload, Flow, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {useAIGenerationStore} from "@edition/ai/hooks/AI.generation.hook";
 import {AIGeneratingMessageComponent} from "@edition/ai/components/AIGeneratingMessageComponent";
+import BorderBeam from "border-beam";
 
 export interface AIChatComponentProps {
     projectId: NamespaceProject['id']
@@ -46,6 +46,8 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
     const aiStore = useStore(AIService)
     const addGeneration = useAIGenerationStore(s => s.addGeneration)
     const removeGeneration = useAIGenerationStore(s => s.removeGeneration)
+    const suppressToast = useAIGenerationStore(s => s.suppressToast)
+    const unsuppressToast = useAIGenerationStore(s => s.unsuppressToast)
 
     const [promptState, setPromptState] = React.useState<string>(prompt)
     const [model, setModel] = React.useState<string | undefined>(undefined)
@@ -70,6 +72,15 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
 
     const aiLoading = !!executionIdentifier && isThisGenerating
 
+    // While this chat is mounted it displays its own generation inline, so the
+    // global watcher toast stays hidden for it (suppression is set synchronously in
+    // onSend to avoid a flash). Unmounting (e.g. navigating away) releases the
+    // suppression so the toast appears where the generation is no longer visible.
+    React.useEffect(() => {
+        if (!executionIdentifier) return
+        return () => unsuppressToast(executionIdentifier)
+    }, [executionIdentifier, unsuppressToast])
+
     const onSend = React.useCallback(() => {
         setAiErrorMessage(null)
         aiService.generateFlow({
@@ -81,6 +92,9 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
             if ((payload?.errors?.length ?? 0) <= 0 && payload?.executionIdentifier) {
                 const id = payload.executionIdentifier
                 setExecutionIdentifier(id)
+                // Suppress synchronously together with adding the generation so the
+                // watcher's first render already sees it hidden (no toast flash).
+                suppressToast(id)
                 addGeneration({
                     executionIdentifier: id,
                     onData: (data) => onData?.(data),
@@ -88,7 +102,7 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
                 })
             }
         })
-    }, [aiService, model, promptState, projectId, flowId, onData, addGeneration])
+    }, [aiService, model, promptState, projectId, flowId, onData, addGeneration, suppressToast])
 
     const onStop = React.useCallback(() => {
         if (executionIdentifier) removeGeneration(executionIdentifier)
@@ -117,150 +131,158 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
             mass: 0.8
         }}
     >
+
         <Card paddingSize={"xs"} color={"secondary"} w={"var(--radix-popper-anchor-width)"}>
 
-            <Card color={"primary"} paddingSize={"xxs"} mx={-0.6} mt={-0.6} pos={"relative"}>
-                {
-                    models.length <= 0 && (
-                        <Card color={"primary"}
-                              paddingSize={"xxs"}
-                              w={"100%"}
-                              h={"100%"}
-                              pos={"absolute"}
-                              top={"0"}
-                              left={"0"}
-                              display={"flex"}
-                              align={"center"}
-                              justify={"center"}
-                              bg={"rgba(7,5,20, 0.5)"}
-                              style={{
-                                  zIndex: 2,
-                                  backdropFilter: "blur(0.25rem)",
-                                  WebkitBackdropFilter: "blur(0.25rem)"
-                              }}>
-                            <ButtonGroup>
-                                <Link href={"https://docs.codezero.build/"}>
-                                    <Button paddingSize={"xxs"} color={"tertiary"} variant={"none"}>
-                                        Learn how to enable AI
-                                    </Button>
-                                </Link>
-                                <Link href={"https://docs.codezero.build/"}>
-                                    <Button paddingSize={"xxs"} color={"tertiary"} variant={"none"}>
-                                        Learn how to add AI models
-                                    </Button>
-                                </Link>
-                            </ButtonGroup>
-                        </Card>
-                    )
-                }
-                {
-                    aiLoading ? (
-                        <div
-                            style={{
-                                padding: "0.7rem",
-                                position: "relative",
-                                overflow: "hidden",
-                                height: "2.3rem",
-                            }}
-                        >
-                            <AIGeneratingMessageComponent/>
-                        </div>
-                    ) : (
-                        <EditorInput
-                            key={prompt}
-                            value={prompt}
-                            onChange={(value) => {
-                                setPromptState(value)
-                            }}
-                            wrapperComponent={{
-                                style: {
-                                    background: "transparent",
-                                    boxShadow: "none"
-                                }
-                            }}
-                            placeholder={"Describe what you want to edit..."}/>
-                    )
-                }
-                <Spacing spacing={"xxs"}/>
-                <CardSection>
-                    <Flex justify={"space-between"} align={"center"}>
-                        <Flex align={"center"} style={{gap: "0.35rem"}}>
-                            <Select defaultValue={"generate"}>
-                                <SelectTrigger w={"fit-content"} asChild>
-                                    <Button paddingSize={"xxs"} variant={"none"}>
-                                        <SelectValue placeholder={"Select mode"}/>
-                                        <IconChevronDown size={13}/>
-                                    </Button>
-                                </SelectTrigger>
-                                <SelectPortal>
-                                    <SelectContent>
-                                        <SelectViewport>
-                                            <SelectItem value={"generate"}>
-                                                <SelectItemText>
-                                                    <Text>
-                                                        Generate
-                                                    </Text>
-                                                </SelectItemText>
-                                            </SelectItem>
-                                        </SelectViewport>
-                                    </SelectContent>
-                                </SelectPortal>
-                            </Select>
-                            <Select value={model} onValueChange={setModel} key={models.length}>
-                                <SelectTrigger w={"fit-content"} asChild>
-                                    <Button paddingSize={"xxs"} variant={"none"}>
-                                        <SelectValue placeholder={"Select modal"}/>
-                                        <IconChevronDown size={13}/>
-                                    </Button>
-                                </SelectTrigger>
-                                <SelectPortal>
-                                    <SelectContent>
-                                        <SelectViewport>
-                                            {models.map((model) => (
-                                                <SelectItem value={model?.identifier ?? ""}>
+            <BorderBeam style={{
+                marginTop: "-0.6rem",
+                marginLeft: "-0.6rem",
+                marginRight: "-0.6rem"
+
+            }} strength={1} theme={"dark"} size={aiLoading ? "line" : "md"} duration={aiLoading ? 2 : 5}>
+                <Card color={"primary"} paddingSize={"xxs"} pos={"relative"}>
+                    {
+                        models.length <= 0 && (
+                            <Card color={"primary"}
+                                  paddingSize={"xxs"}
+                                  w={"100%"}
+                                  h={"100%"}
+                                  pos={"absolute"}
+                                  top={"0"}
+                                  left={"0"}
+                                  display={"flex"}
+                                  align={"center"}
+                                  justify={"center"}
+                                  bg={"rgba(7,5,20, 0.5)"}
+                                  style={{
+                                      zIndex: 2,
+                                      backdropFilter: "blur(0.25rem)",
+                                      WebkitBackdropFilter: "blur(0.25rem)"
+                                  }}>
+                                <ButtonGroup>
+                                    <Link href={"https://docs.codezero.build/"}>
+                                        <Button paddingSize={"xxs"} color={"tertiary"} variant={"none"}>
+                                            Learn how to enable AI
+                                        </Button>
+                                    </Link>
+                                    <Link href={"https://docs.codezero.build/"}>
+                                        <Button paddingSize={"xxs"} color={"tertiary"} variant={"none"}>
+                                            Learn how to add AI models
+                                        </Button>
+                                    </Link>
+                                </ButtonGroup>
+                            </Card>
+                        )
+                    }
+                    {
+                        aiLoading ? (
+                            <div
+                                style={{
+                                    padding: "0.7rem",
+                                    position: "relative",
+                                    overflow: "hidden",
+                                    height: "2.3rem",
+                                }}
+                            >
+                                <AIGeneratingMessageComponent/>
+                            </div>
+                        ) : (
+                            <EditorInput
+                                key={prompt}
+                                value={prompt}
+                                onChange={(value) => {
+                                    setPromptState(value)
+                                }}
+                                wrapperComponent={{
+                                    style: {
+                                        background: "transparent",
+                                        boxShadow: "none"
+                                    }
+                                }}
+                                placeholder={"Describe what you want to edit..."}/>
+                        )
+                    }
+                    <Spacing spacing={"xxs"}/>
+                    <CardSection>
+                        <Flex justify={"space-between"} align={"center"}>
+                            <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                <Select defaultValue={"generate"}>
+                                    <SelectTrigger w={"fit-content"} asChild>
+                                        <Button paddingSize={"xxs"} variant={"none"}>
+                                            <SelectValue placeholder={"Select mode"}/>
+                                            <IconChevronDown size={13}/>
+                                        </Button>
+                                    </SelectTrigger>
+                                    <SelectPortal>
+                                        <SelectContent>
+                                            <SelectViewport>
+                                                <SelectItem value={"generate"}>
                                                     <SelectItemText>
-                                                        <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                                            <Text display={"flex"} align={"center"}
-                                                                  style={{gap: "0.35rem"}}>
-                                                                <IconSparkles2Filled size={13}/>
-                                                                {model.name}
-                                                            </Text>
-                                                            <Text hierarchy={"tertiary"}>
-                                                                ({model.tokenCost}x)
-                                                            </Text>
-                                                        </Flex>
+                                                        <Text>
+                                                            Generate
+                                                        </Text>
                                                     </SelectItemText>
                                                 </SelectItem>
-                                            ))}
-                                        </SelectViewport>
-                                    </SelectContent>
-                                </SelectPortal>
-                            </Select>
+                                            </SelectViewport>
+                                        </SelectContent>
+                                    </SelectPortal>
+                                </Select>
+                                <Select value={model} onValueChange={setModel} key={models.length}>
+                                    <SelectTrigger w={"fit-content"} asChild>
+                                        <Button paddingSize={"xxs"} variant={"none"}>
+                                            <SelectValue placeholder={"Select modal"}/>
+                                            <IconChevronDown size={13}/>
+                                        </Button>
+                                    </SelectTrigger>
+                                    <SelectPortal>
+                                        <SelectContent>
+                                            <SelectViewport>
+                                                {models.map((model) => (
+                                                    <SelectItem value={model?.identifier ?? ""}>
+                                                        <SelectItemText>
+                                                            <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                                                <Text display={"flex"} align={"center"}
+                                                                      style={{gap: "0.35rem"}}>
+                                                                    <IconSparkles2Filled size={13}/>
+                                                                    {model.name}
+                                                                </Text>
+                                                                <Text hierarchy={"tertiary"}>
+                                                                    ({model.tokenCost}x)
+                                                                </Text>
+                                                            </Flex>
+                                                        </SelectItemText>
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectViewport>
+                                        </SelectContent>
+                                    </SelectPortal>
+                                </Select>
+                            </Flex>
+                            <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                {!aiLoading && aiErrorMessage ? (
+                                    <Text c={"#D90429"}>
+                                        {aiErrorMessage}
+                                    </Text>
+                                ) : null}
+                                {aiLoading ? (
+                                    <Button onClick={onStop} color={"secondary"}>
+                                        <IconPlayerStop size={13}/>
+                                    </Button>
+                                ) : (
+                                    <Button onClick={onSend} variant={"none"} color={"secondary"}>
+                                        <IconSend size={13}/>
+                                    </Button>
+                                )}
+                                {onClose ? (
+                                    <Button onClick={onClose} variant={"none"} color={"secondary"}>
+                                        <IconX size={13}/>
+                                    </Button>
+                                ) : null}
+                            </Flex>
                         </Flex>
-                        <Flex align={"center"} style={{gap: "0.35rem"}}>
-                            {!aiLoading && aiErrorMessage ? (
-                                <Text c={"#D90429"}>
-                                    {aiErrorMessage}
-                                </Text>
-                            ) : null}
-                            {aiLoading ? (
-                                <Button onClick={onStop} color={"secondary"}>
-                                    <IconPlayerStop size={13}/>
-                                </Button>
-                            ) : (
-                                <Button onClick={onSend} variant={"none"} color={"secondary"}>
-                                    <IconSend size={13}/>
-                                </Button>
-                            )}
-                            {onClose ? (
-                                <Button onClick={onClose} variant={"none"} color={"secondary"}>
-                                    <IconX size={13}/>
-                                </Button>
-                            ) : null}
-                        </Flex>
-                    </Flex>
-                </CardSection>
-            </Card>
+                    </CardSection>
+                </Card>
+            </BorderBeam>
 
             <motion.div
                 layout

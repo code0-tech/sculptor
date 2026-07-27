@@ -41,7 +41,7 @@ import {FlowService} from "@edition/flow/services/Flow.service";
 import Link from "next/link";
 import {icon, IconString} from "@core/util/icons";
 import {FALLBACK_FLOW_TYPE_NAME} from "@core/util/fallback-translations";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
 export interface FlowCreateDialogComponentProps {
     open?: boolean
@@ -159,9 +159,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                 projectId: projectId
             }).then(payload => {
                 if ((payload?.errors?.length ?? 0) <= 0) {
-                    addIslandSuccessNotification({
-                        message: "Created flow"
-                    })
+                    toast({title: "Created flow", color: "success"})
 
                 }
             })
@@ -213,22 +211,17 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                         </Text>
                     )}
                     <Spacing spacing={"xl"}/>
-                    <Flex justify={"space-between"} align={"center"}>
-                        <DialogClose asChild>
-                            <Button color={"tertiary"}>No, go back!</Button>
-                        </DialogClose>
-                        <ButtonGroup color={"tertiary"}>
-                            <Link href={`/namespace/${namespaceIndex}/project/${projectIndex}/runtime`}>
-                                <Button color={"info"} variant={"none"}>
-                                    <Text>Assign</Text>
-                                </Button>
-                            </Link>
-                            <Link href={`/namespace/${namespaceIndex}/runtimes/create`}>
-                                <Button color={"success"} variant={"none"}>
-                                    <Text>Create</Text>
-                                </Button>
-                            </Link>
-                        </ButtonGroup>
+                    <Flex justify={"space-between"} align={"center"} style={{gap: "1.3rem"}}>
+                        <Link style={{width: "100%"}} tabIndex={-1} href={`/namespace/${namespaceIndex}/project/${projectIndex}/settings`}>
+                            <Button w={"100%"} color={"tertiary"}>
+                                <Text>Assign</Text>
+                            </Button>
+                        </Link>
+                        <Link style={{width: "100%"}} tabIndex={-1} href={`/namespace/${namespaceIndex}/runtimes/create`}>
+                            <Button w={"100%"} color={"tertiary"}>
+                                <Text>Create</Text>
+                            </Button>
+                        </Link>
                     </Flex>
                 </DialogContent>
             </DialogPortal>

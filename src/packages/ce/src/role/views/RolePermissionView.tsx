@@ -21,7 +21,8 @@ import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {useParams} from "next/navigation";
 import {RoleService} from "@edition/role/services/Role.service";
 import {RolePermissionComponent} from "@edition/role/components/RolePermissionComponent";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
+import BorderBeam from "border-beam";
 
 type Permission = {
     label: string
@@ -219,9 +220,7 @@ export const RolePermissionView: React.FC = () => {
                     abilities: updatedAbilities
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
-                        addIslandSuccessNotification({
-                            message: "Updated role permissions"
-                        })
+                        toast({title: "Updated role permissions", color: "success"})
                     }
                 })
             })
@@ -230,14 +229,16 @@ export const RolePermissionView: React.FC = () => {
 
     return <TabContent pl={"0.7"} value={"permission"} style={{overflow: "hidden"}}>
         <Flex align={"center"} justify={"space-between"}>
-            <Text size={"xl"} hierarchy={"primary"}>
-                Select from role templates
-            </Text>
-            <Button color={"success"} onClick={validate}>
-                Save changes
-            </Button>
+            <Text size={"lg"} hierarchy={"primary"} display={"block"}>Permissions</Text>
+            <Button paddingSize={"xxs"} color={"success"} variant={"none"} onClick={validate}>Save changes</Button>
         </Flex>
-        <Spacing spacing={"xl"}/>
+        <Spacing spacing={"xs"}/>
+        <Text size={"md"} hierarchy={"tertiary"}>
+            Assign permissions to this role. Members with this role inherit every permission you enable here.
+        </Text>
+        <Spacing spacing={"md"}/>
+        <Text size={"md"} hierarchy={"secondary"}>Role templates</Text>
+        <Spacing spacing={"xs"}/>
         {React.useMemo(() => {
             return <Row>
                 {permissionTemplates.map(permissionTemplate => {
@@ -253,32 +254,30 @@ export const RolePermissionView: React.FC = () => {
                     const isSelected = templateAbilities.length === roleAbilities.length
                         && templateAbilities.every(a => new Set(roleAbilities).has(a));
 
+                    const card = <Card color={"secondary"}>
+                        <Text style={{fontWeight: 500}} size={"lg"} hierarchy={"secondary"}>
+                            {permissionTemplate.name}
+                        </Text>
+                        <Spacing spacing={"xs"}/>
+                        <RolePermissionComponent
+                            abilities={Object.entries(permissionTemplate.abilities)
+                                .filter(([_, enabled]) => enabled)
+                                .map(([ability, _]) => ability as NamespaceRoleAbility)}/>
+                        <Spacing spacing={"xl"}/>
+                        <Button disabled={isSelected} color={"tertiary"}
+                                w={"100%"}
+                                onClick={() => setInitialValues(permissionTemplate.abilities)}>Select
+                            template</Button>
+                    </Card>
 
-                    return <Col>
-                        <Card>
-                            <Text style={{fontWeight: 500}} size={"lg"} hierarchy={"secondary"}>
-                                {permissionTemplate.name}
-                            </Text>
-                            <Spacing spacing={"xs"}/>
-                            <RolePermissionComponent
-                                abilities={Object.entries(permissionTemplate.abilities)
-                                    .filter(([_, enabled]) => enabled)
-                                    .map(([ability, _]) => ability as NamespaceRoleAbility)}/>
-                            <Spacing spacing={"xl"}/>
-                            <Button disabled={isSelected} color={"secondary"} variant={"filled"}
-                                    w={"100%"}
-                                    onClick={() => setInitialValues(permissionTemplate.abilities)}>Select
-                                template</Button>
-                            {isSelected ? <AuroraBackground/> : null}
-                        </Card>
+                    return <Col xs={6} mb={1.3}>
+                        {isSelected ? <BorderBeam strength={1} size={"pulse-inner"} theme={"dark"} duration={5}>{card}</BorderBeam> : card}
                     </Col>
                 })}
             </Row>
         }, [initialValues, role])}
         <Spacing spacing={"xl"}/>
-        <Text size={"xl"} hierarchy={"primary"}>
-            Current stored permissions
-        </Text>
+        <Text size={"md"} hierarchy={"secondary"}>Current stored permissions</Text>
         <Spacing spacing={"xxs"}/>
         <RolePermissionComponent abilities={role?.abilities!!}/>
         <Spacing spacing={"xl"}/>

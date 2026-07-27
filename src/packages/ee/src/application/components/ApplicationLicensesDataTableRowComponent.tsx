@@ -4,7 +4,7 @@ import {Badge, Button, DataTableColumn, Flex, Progress, Spacing, Text, useServic
 import {ApplicationService} from "@ee-internal/application/services/Application.service";
 import {formatDistanceToNow, isFuture, isPast} from "date-fns";
 import {IconX} from "@tabler/icons-react";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
 export interface LicensesDataTableRowComponentProps {
     licenseId: License['id']
@@ -27,9 +27,7 @@ export const ApplicationLicensesDataTableRowComponent: React.FC<LicensesDataTabl
             licenseId: licenseId!
         }).then(payload => {
             if ((payload?.errors?.length ?? 0) <= 0) {
-                addIslandSuccessNotification({
-                    message: "Deleted license"
-                })
+                toast({title: "Deleted license", color: "success"})
             }
         })
     }, [])

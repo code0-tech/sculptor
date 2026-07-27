@@ -2,50 +2,64 @@
 
 import React from "react"
 import {useAIGenerationStore} from "@edition/ai/hooks/AI.generation.hook"
-import {useIsland} from "@code0-tech/pictor/dist/components/island/Island.hook"
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast"
+import {toast as sonnerToast} from "sonner"
 import {IconSparkles2Filled} from "@tabler/icons-react"
 import {AIGeneratingMessageComponent} from "@edition/ai/components/AIGeneratingMessageComponent"
 import {AIGenerationSubscriberComponent} from "@edition/ai/components/AIGenerationSubscriberComponent"
+import BorderBeam from "border-beam";
+
+// Owns a single watcher toast for one generation. The toast is shown unless the
+// generation is currently displayed inline by a mounted AIChatComponent (i.e. the
+// page where it was triggered). Unmounting this component dismisses its toast, so
+// removing a generation from the store cleans up automatically.
+const AIGenerationToastComponent: React.FC<{ suppressed: boolean }> = ({suppressed}) => {
+
+    const toastIdRef = React.useRef<string | number | null>(null)
+
+    React.useEffect(() => {
+        if (!suppressed && toastIdRef.current === null) {
+            toastIdRef.current = toast({
+                duration: Infinity,
+                wrapper: (children) => {
+                    return <BorderBeam strength={1} theme={"dark"} duration={2}>
+                        {children}
+                    </BorderBeam>
+                },
+                icon: <IconSparkles2Filled size={16}/>,
+                title: <AIGeneratingMessageComponent/>,
+            })
+        } else if (suppressed && toastIdRef.current !== null) {
+            sonnerToast.dismiss(toastIdRef.current)
+            toastIdRef.current = null
+        }
+    }, [suppressed])
+
+    React.useEffect(() => () => {
+        if (toastIdRef.current !== null) {
+            sonnerToast.dismiss(toastIdRef.current)
+            toastIdRef.current = null
+        }
+    }, [])
+
+    return null
+}
 
 export const AIGenerationWatcherComponent: React.FC = () => {
 
     const generations = useAIGenerationStore(s => s.generations)
-    const islandToastIdRef = React.useRef<number | null>(null)
-    const addToast = useIsland(s => s.addToast)
-    const removeToast = useIsland(s => s.removeToast)
-
-    const isGenerating = generations.length > 0
-
-    React.useEffect(() => {
-        if (isGenerating && islandToastIdRef.current === null) {
-            const id = Date.now()
-            islandToastIdRef.current = id
-            addToast({
-                id,
-                duration: Infinity,
-                index: 2,
-                icon: <IconSparkles2Filled size={16} color={"#e270ff"}/>,
-                message: <AIGeneratingMessageComponent/>,
-            })
-        } else if (!isGenerating && islandToastIdRef.current !== null) {
-            removeToast(islandToastIdRef.current)
-            islandToastIdRef.current = null
-        }
-    }, [isGenerating, addToast, removeToast])
-
-    React.useEffect(() => () => {
-        if (islandToastIdRef.current !== null) {
-            removeToast(islandToastIdRef.current)
-            islandToastIdRef.current = null
-        }
-    }, [removeToast])
+    const suppressedIdentifiers = useAIGenerationStore(s => s.suppressedIdentifiers)
 
     return <>
         {generations.map(generation => (
-            <AIGenerationSubscriberComponent
-                key={generation.executionIdentifier}
-                generation={generation}
-            />
+            <React.Fragment key={generation.executionIdentifier}>
+                <AIGenerationToastComponent
+                    suppressed={suppressedIdentifiers.includes(generation.executionIdentifier)}
+                />
+                <AIGenerationSubscriberComponent
+                    generation={generation}
+                />
+            </React.Fragment>
         ))}
     </>
 }

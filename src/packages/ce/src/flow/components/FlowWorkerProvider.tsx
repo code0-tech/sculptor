@@ -90,10 +90,15 @@ export const WorkerProvider: React.FC<{ children: React.ReactNode }> = ({childre
     const workerRef = React.useRef<Worker | null>(null)
     const resolvers = React.useRef<Map<string, Deferred>>(new Map())
 
-    React.useEffect(() => {
-        workerRef.current = new Worker(new URL('./Flow.worker.js', import.meta.url))
+    // Lazily (re)create the worker. Runs client-side only. This must not depend on
+    // effect ordering: child components may trigger worker actions in their own mount
+    // effects, which fire before this provider's effect (React runs effects child-first).
+    const ensureWorker = React.useCallback((): Worker | null => {
+        if (typeof Worker === "undefined") return null
+        if (workerRef.current) return workerRef.current
 
-        workerRef.current.onmessage = (e) => {
+        const worker = new Worker(new URL('./Flow.worker.js', import.meta.url))
+        worker.onmessage = (e) => {
             const {id, data, error} = e.data
             const deferred = resolvers.current.get(id)
 
@@ -107,20 +112,30 @@ export const WorkerProvider: React.FC<{ children: React.ReactNode }> = ({childre
             }
         }
 
-        return () => workerRef.current?.terminate()
+        workerRef.current = worker
+        return worker
     }, [])
+
+    React.useEffect(() => {
+        ensureWorker()
+        return () => {
+            workerRef.current?.terminate()
+            workerRef.current = null
+        }
+    }, [ensureWorker])
 
     const calculate = React.useCallback((action: FlowWorkerActions, payload: FlowWorkerPayload) => {
         return new Promise((resolve, reject) => {
-            if (!workerRef.current) {
+            const worker = ensureWorker()
+            if (!worker) {
                 return reject("Worker ist nicht initialisiert");
             }
 
             const id = Math.random().toString(36).substring(2, 9);
             resolvers.current.set(id, {resolve, reject});
-            workerRef.current.postMessage({id, action, payload});
+            worker.postMessage({id, action, payload});
         });
-    }, []);
+    }, [ensureWorker]);
 
     return (
         <WorkerContext.Provider value={{calculate}}>

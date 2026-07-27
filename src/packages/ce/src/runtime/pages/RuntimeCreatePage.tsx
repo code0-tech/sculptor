@@ -1,144 +1,45 @@
 "use client"
 
 import React from "react";
-import {
-    Button,
-    Col,
-    Flex,
-    Spacing,
-    Text,
-    TextInput,
-    toast,
-    useForm,
-    useService,
-    useStore
-} from "@code0-tech/pictor";
-import Link from "next/link";
+import {useService, useStore} from "@code0-tech/pictor";
 import {notFound, useParams, useRouter} from "next/navigation";
-import {RuntimeService} from "@edition/runtime/services/Runtime.service";
+import {RuntimeCreateDialogComponent} from "@edition/runtime/components/RuntimeCreateDialogComponent";
 import {UserService} from "@edition/user/services/User.service";
-import {NamespaceService} from "@edition/namespace/services/Namespace.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 
 export const RuntimeCreatePage: React.FC = () => {
 
     const params = useParams()
+    const router = useRouter()
     const namespaceIndex = params.namespaceId as any as number
 
-    const runtimeService = useService(RuntimeService)
-    const [, startTransition] = React.useTransition()
-    const [token, setToken] = React.useState<string | null | undefined>(undefined)
-    const router = useRouter()
     const currentSession = useUserSession()
-    const userStore = useStore(UserService)
     const userService = useService(UserService)
-    const namespaceService = useService(NamespaceService)
-    const namespaceStore = useStore(NamespaceService)
-
-    const currentUser = React.useMemo(() => userService.getById(currentSession?.user?.id), [userStore, currentSession])
-    const namespace = React.useMemo(() => namespaceService.getById(`gid://sagittarius/Namespace/${namespaceIndex}`), [namespaceStore, namespaceIndex])
+    const userStore = useStore(UserService)
+    const currentUser = React.useMemo(
+        () => userService.getById(currentSession?.user?.id),
+        [userStore, currentSession]
+    )
 
     if (!namespaceIndex && currentUser && !currentUser.admin) {
         notFound()
     }
 
-    //TODO: user abilities for runtime creation within namespace
-    // if (namespace.)
+    const runtimesHref = namespaceIndex ? `/namespace/${namespaceIndex}/runtimes` : "/runtimes"
 
-    const [inputs, validate] = useForm({
-        useInitialValidation: false,
-        initialValues: {
-            name: "",
-            description: "",
-        },
-        validate: {
-            name: (value) => {
-                if (!value) return "Name is required"
-                if (value.length < 3) return "Name needs to be at least 3 characters"
-                if (value.length > 50) return "Name needs to be less than 50 characters"
-                return null
-            },
-            description: (value) => {
-                if (!value) return "Description is required"
-                if ((value as string).length > 50) return "Description needs to be less than 50 characters"
-                return null
-            }
-        },
-        onSubmit: (values) => {
-            startTransition(() => {
-                runtimeService.runtimeCreate({
-                    name: values.name as unknown as string,
-                    description: values.description as unknown as string,
-                    ...(namespaceIndex ? {namespaceId: `gid://sagittarius/Namespace/${namespaceIndex}`} : {})
-                }).then(payload => {
-                    if ((payload?.errors?.length ?? 0) <= 0) {
-                        if (payload?.runtime?.token) {
-                            if (!token) setToken(payload.runtime.token)
-                        } else {
-                            toast({
-                                title: "The runtime was created but no token was provided.",
-                                color: "error",
-                                dismissible: true,
-                            })
-                            router.push(namespaceIndex ? `/namespace/${namespaceIndex}/runtimes` : "/runtimes")
-                        }
-                    }
-                })
-            })
-        }
-    })
+    return <RuntimeCreateDialogComponent open={true}
+                                         namespaceId={namespaceIndex ? `gid://sagittarius/Namespace/${namespaceIndex}` : undefined}
+                                         onOpenChange={(open) => {
+                                             if (open) return
 
-    return <div style={{background: "#070514", height: "100%", padding: "2rem", borderTopLeftRadius: "1rem"}}>
-        <Flex mih={"100%"} miw={"100%"} align={"center"} justify={"center"}>
-            <Col xs={4}>
-                <Text size={"xl"} hierarchy={"primary"} display={"block"}>
-                    {!token ? "Create new runtime" : "Runtime created successfully"}
-                </Text>
-                <Spacing spacing={"xs"}/>
-                <Text size={"md"} hierarchy={"tertiary"} display={"block"}>
-                    Runtimes are shared runtimes that can be used across multiple organizations.
-                </Text>
-                <Spacing spacing={"xl"}/>
-                {!token ? (
-                    <>
-                        <TextInput data-qa-selector={"dashboard-runtime-create-name"}
-                                   required
-                                   title={"Name"}
-                                   description={"Provide a simple runtime name"}
-                                   placeholder={"E.g. CodeZero Runtime #1"}
-                                   {...inputs.getInputProps("name")}/>
-                        <Spacing spacing={"xl"}/>
-                        <TextInput data-qa-selector={"dashboard-runtime-create-description"}
-                                   required
-                                   title={"Description"}
-                                   description={"Provide a simple runtime description"}
-                                   placeholder={"E.g. CodeZero main http runtime"}
-                                   {...inputs.getInputProps("description")}/>
-                        <Spacing spacing={"xl"}/>
-                    </>
-                ) : (
-                    <>
-                        <TextInput data-qa-selector={"dashboard-runtime-create-token"}
-                                   required
-                                   title={"Copy token"}
-                                   value={token}
-                                   description={"This token is used to link your runtime to our internal system."}/>
-                        <Spacing spacing={"xl"}/>
-                    </>
-                )}
-                <Flex style={{gap: "0.35rem"}} justify={"space-between"}>
-                    <Link href={namespaceIndex ? `/namespace/${namespaceIndex}/runtimes` : "/runtimes"}>
-                        <Button color={"primary"}>
-                            Go back to runtimes
-                        </Button>
-                    </Link>
-                    {!token ? (
-                        <Button data-qa-selector={"dashboard-runtime-create-send"} color={"success"} onClick={validate}>
-                            Create runtime
-                        </Button>
-                    ) : null}
-                </Flex>
-            </Col>
-        </Flex>
-    </div>
+                                             const nav = (window as unknown as { navigation?: { entries(): { url: string }[], currentEntry?: { index: number } } }).navigation
+                                             if (!nav?.entries) {
+                                                 router.back()
+                                                 return
+                                             }
+
+                                             const index = nav.currentEntry?.index ?? 0
+                                             if (index > 0) router.back()
+                                             else router.push(runtimesHref)
+                                         }}/>
 }

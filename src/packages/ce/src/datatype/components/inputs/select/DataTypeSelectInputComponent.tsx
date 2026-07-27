@@ -3,6 +3,7 @@ import React from "react";
 import {useDebouncedCallback} from "use-debounce";
 import {
     Button,
+    ButtonGroup,
     Flex,
     InputDescription,
     InputLabel,
@@ -48,16 +49,18 @@ export const DataTypeSelectInputComponent: React.FC<DataTypeSelectInputComponent
                          onChangeDebounced?.(value)
                      }}
                      right={
-                         <Button color={"primary"} onClick={() => {
-                             formValidation?.setValue?.(null)
-                             onChangeDebounced(null)
-                         }} paddingSize={"xxs"}>
-                             <IconX size={13}/>
-                         </Button>
+                         <ButtonGroup color={"primary"}>
+                             <Button tabIndex={-1} color={"secondary"} onClick={() => {
+                                 formValidation?.setValue?.(null)
+                                 onChangeDebounced(null)
+                             }} paddingSize={"xxs"}>
+                                 <IconX size={13}/>
+                             </Button>
+                         </ButtonGroup>
                      }
                      rightType={"action"}>
             <SelectTrigger asChild>
-                <Flex justify={"space-between"} align={"center"}>
+                <Flex justify={"space-between"} tabIndex={0} align={"center"}>
                     <Text hierarchy={defaultValue < 0 ? "tertiary" : "secondary"}>
                         <SelectValue placeholder={title}/>
                     </Text>

@@ -24,3 +24,12 @@ a {
   display: block !important;
   height: 100%;
 }
+
+[data-sonner-toast] {
+  width: 100%;
+  filter: drop-shadow(0px 0px 1rem #070514);
+}
+
+[data-sonner-toaster][data-y-position=top] {
+  top: 1rem;
+}

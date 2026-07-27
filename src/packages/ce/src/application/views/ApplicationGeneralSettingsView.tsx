@@ -1,9 +1,21 @@
 import React, {startTransition} from "react";
-import {Badge, Button, Card, Flex, NumberInput, Spacing, Text, TextInput, useForm, useService, useStore} from "@code0-tech/pictor";
+import {
+    Badge,
+    Button,
+    Card,
+    Flex,
+    NumberInput,
+    Spacing,
+    Text,
+    TextInput,
+    useForm,
+    useService,
+    useStore
+} from "@code0-tech/pictor";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {ApplicationService} from "@edition/application/services/Application.service";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
 export const ApplicationGeneralSettingsView: React.FC = () => {
 
@@ -46,9 +58,7 @@ export const ApplicationGeneralSettingsView: React.FC = () => {
                     runtimeMaxHeartbeatIntervalMinutes: !!runtimeMaxHeartbeatIntervalMinutes ? Number(runtimeMaxHeartbeatIntervalMinutes) : null,
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
-                        addIslandSuccessNotification({
-                            message: "Updated application"
-                        })
+                        toast({title: "Updated application", color: "success"})
                     }
                 })
             })
@@ -56,8 +66,18 @@ export const ApplicationGeneralSettingsView: React.FC = () => {
     })
 
     return <TabContent value={"general"}>
-        <Text size={"xl"} hierarchy={"primary"}>General</Text>
-        <Spacing spacing={"xl"}/>
+        <Flex justify={"space-between"} align={"center"}>
+            <Text size={"lg"} hierarchy={"primary"} display={"block"}>Settings</Text>
+            <Button paddingSize={"xxs"} color={"success"} variant={"none"} onClick={validate}>Save changes</Button>
+        </Flex>
+        <Spacing spacing={"xs"}/>
+        <Text size={"md"} hierarchy={"tertiary"}>
+            General configuration for your Sculptor application, including version information, legal links and runtime
+            behaviour.
+        </Text>
+        <Spacing spacing={"md"}/>
+        <Text size={"md"} hierarchy={"secondary"}>Versions</Text>
+        <Spacing spacing={"xs"}/>
         <Card color={"secondary"}>
             <CardSection border>
                 <Flex justify={"space-between"} align={"center"}>
@@ -90,12 +110,9 @@ export const ApplicationGeneralSettingsView: React.FC = () => {
                 </Flex>
             </CardSection>
         </Card>
-        <Spacing spacing={"xl"}/>
-        <Flex justify={"space-between"} align={"center"}>
-            <Text size={"lg"} hierarchy={"primary"}>Legal url's</Text>
-            <Button color={"success"} onClick={validate}>Save</Button>
-        </Flex>
-        <Spacing spacing={"xl"}/>
+        <Spacing spacing={"lg"}/>
+        <Text size={"md"} hierarchy={"secondary"}>Legal URLs</Text>
+        <Spacing spacing={"xs"}/>
         <Card color={"secondary"}>
             <CardSection border>
                 <Flex justify={"space-between"} align={"center"}>
@@ -122,12 +139,9 @@ export const ApplicationGeneralSettingsView: React.FC = () => {
                 </Flex>
             </CardSection>
         </Card>
-        <Spacing spacing={"xl"}/>
-        <Flex justify={"space-between"} align={"center"}>
-            <Text size={"lg"} hierarchy={"primary"}>Runtimes</Text>
-            <Button color={"success"} onClick={validate}>Save</Button>
-        </Flex>
-        <Spacing spacing={"xl"}/>
+        <Spacing spacing={"lg"}/>
+        <Text size={"md"} hierarchy={"secondary"}>Runtimes</Text>
+        <Spacing spacing={"xs"}/>
         <Card color={"secondary"}>
             <CardSection border>
                 <Flex justify={"space-between"} align={"center"}>

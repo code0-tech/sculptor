@@ -2,12 +2,12 @@
 
 import React from "react";
 import {useParams, useRouter} from "next/navigation";
-import {Button, Card, Flex, Spacing, Text, useService} from "@code0-tech/pictor";
+import {Button, DialogClose, Spacing, Text, useService} from "@code0-tech/pictor";
 import {RoleService} from "@edition/role/services/Role.service";
 import {MemberService} from "@edition/member/services/Member.service";
 import type {NamespaceRole} from "@code0-tech/sagittarius-graphql-types";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
 export const RoleDeleteView: React.FC = () => {
 
@@ -28,32 +28,23 @@ export const RoleDeleteView: React.FC = () => {
             }).then(payload => {
                 if ((payload?.errors?.length ?? 0) <= 0) {
                     memberService.removeRoleFromMembers(roleId)
-                    addIslandSuccessNotification({
-                        message: "Deleted role"
-                    })
+                    toast({title: "Deleted role", color: "success"})
                 }
-                router.push(`/namespace/${namespaceIndex}/roles`)
+                router.push(`/namespace/${namespaceIndex}/settings`)
             })
         })
     }, [])
 
     return <TabContent pl={"0.7"} value={"delete"} style={{overflow: "hidden"}}>
-        <Text size={"xl"} hierarchy={"primary"}>
-            Delete role
+        <Text size={"lg"} hierarchy={"primary"} display={"block"}>Delete role</Text>
+        <Spacing spacing={"xs"}/>
+        <Text size={"md"} hierarchy={"tertiary"}>
+            Permanently delete this role and unassign it from all members. This action cannot be undone.
         </Text>
-        <Spacing spacing={"xl"}/>
-        <Card p={1.3} color={"error"}>
-            <Flex justify={"space-between"} align={"center"}>
-                <Flex style={{gap: ".35rem", flexDirection: "column"}}>
-                    <Text size={"md"} hierarchy={"primary"}>
-                        This will delete the role and cannot be undone.
-                    </Text>
-                </Flex>
-                <Button color={"secondary"} variant={"filled"} onClick={deleteRole}>
-                    Delete role
-                </Button>
-            </Flex>
-        </Card>
+        <Spacing spacing={"md"}/>
+        <DialogClose asChild>
+            <Button color={"error"} w={"100%"} onClick={deleteRole}>Delete role</Button>
+        </DialogClose>
     </TabContent>
 
 }

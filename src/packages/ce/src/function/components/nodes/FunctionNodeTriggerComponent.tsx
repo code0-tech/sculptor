@@ -13,7 +13,7 @@ import {
 import {FunctionNodeComponentProps} from "@edition/function/components/nodes/FunctionNodeComponent";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import {IconEdit, IconSparkles, IconVariable} from "@tabler/icons-react";
+import {IconPencil, IconSparkles, IconVariable} from "@tabler/icons-react";
 import {Namespace, NamespaceProject, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {icon, IconString} from "@core/util/icons";
 import {FALLBACK_FLOW_TYPE_DISPLAY_MESSAGE, FALLBACK_FLOW_TYPE_NAME} from "@core/util/fallback-translations";
@@ -194,7 +194,7 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
                             e.stopPropagation();
                             e.preventDefault();
                         }}>
-                            <IconEdit size={13}/>
+                            <IconPencil size={13}/>
                         </Button>
                         <Button variant={"none"} color={"tertiary"} paddingSize={"xxs"} onClick={(e) => {
                             const event = new KeyboardEvent('keydown', {

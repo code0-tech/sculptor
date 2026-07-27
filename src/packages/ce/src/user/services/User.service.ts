@@ -187,11 +187,21 @@ export class UserService extends ReactiveArrayService<User> {
         })
 
         if (result.data && result.data.usersUpdate && result.data.usersUpdate.user) {
-            //TODO: dont use the result. Instead merge result and already existing data together
             const updatedUser = result.data.usersUpdate.user
             const index = super.values().findIndex(user => user.id === updatedUser.id)
-            if (index >= 0) this.set(index, new View(updatedUser))
-            else if (!this.hasById(updatedUser.id)) this.add(new View(updatedUser))
+            if (index >= 0) {
+                // The update mutation only returns the UserBasic fragment, which omits
+                // connection fields (namespaceMemberships, identities, sessions). Merge the
+                // result into the existing user so those connections are preserved.
+                const existingUser = super.values()[index]
+                this.set(index, new View({
+                    ...existingUser,
+                    ...updatedUser,
+                    namespaceMemberships: existingUser.namespaceMemberships,
+                    identities: existingUser.identities,
+                    sessions: existingUser.sessions,
+                }))
+            } else if (!this.hasById(updatedUser.id)) this.add(new View(updatedUser))
         }
 
         return result.data?.usersUpdate ?? undefined

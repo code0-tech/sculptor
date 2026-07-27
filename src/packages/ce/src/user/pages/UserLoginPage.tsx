@@ -32,7 +32,6 @@ export const UserLoginPage: React.FC = () => {
         if (!values.password || !values.email || !emailValidation(values.email)) return
         if (isInTimeout) {
             toast({
-                dismissible: false,
                 title: "Too many failed attempts. Please try again in 5 seconds.",
                 color: "error",
                 duration: 5000,

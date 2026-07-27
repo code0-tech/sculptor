@@ -33,7 +33,7 @@ export const AIGeneratingMessageComponent: React.FC = () => {
         <motion.div
             style={{
                 backgroundImage:
-                    "linear-gradient(90deg, rgba(226,112,255,0.45) 0%, rgba(226,112,255,0.45) 40%, rgba(226,112,255,1) 50%, rgba(226,112,255,0.45) 60%, rgba(226,112,255,0.45) 100%)",
+                    "linear-gradient(90deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.45) 40%, rgba(226,255,255,1) 50%, rgba(255,255,255,0.45) 60%, rgba(255,255,255,0.45) 100%)",
                 backgroundSize: "200% 100%",
                 WebkitBackgroundClip: "text",
                 backgroundClip: "text",

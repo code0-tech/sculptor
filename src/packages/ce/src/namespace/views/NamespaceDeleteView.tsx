@@ -1,12 +1,12 @@
 "use client"
 
 import React from "react";
-import {Button, Card, Flex, Spacing, Text, useService, useStore} from "@code0-tech/pictor";
+import {Button, DialogClose, Spacing, Text, useService, useStore} from "@code0-tech/pictor";
 import {useParams, useRouter} from "next/navigation";
 import {NamespaceService} from "@edition/namespace/services/Namespace.service";
 import {OrganizationService} from "@edition/organization/services/Organization.service";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
-import {addIslandSuccessNotification} from "@code0-tech/pictor/dist/components/island/Island.hook";
+import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
 export const NamespaceDeleteView: React.FC = () => {
 
@@ -32,9 +32,7 @@ export const NamespaceDeleteView: React.FC = () => {
                 organizationId: parentOrganization?.id!!
             }).then(payload => {
                 if ((payload?.errors?.length ?? 0) <= 0) {
-                    addIslandSuccessNotification({
-                        message: "Deleted organization"
-                    })
+                    toast({title: "Deleted organization", color: "success"})
                 }
                 router.push("/")
             })
@@ -42,21 +40,14 @@ export const NamespaceDeleteView: React.FC = () => {
     }, [parentOrganization])
 
     return <>
-        <Flex justify={"space-between"} align={"end"}>
-            <Text size={"xl"} hierarchy={"primary"}>Delete organization</Text>
-        </Flex>
-        <Spacing spacing={"xl"}/>
-        <Card p={1.3} color={"error"}>
-            <Flex justify={"space-between"} align={"center"}>
-                <Flex style={{gap: ".35rem", flexDirection: "column"}}>
-                    <Text size={"md"} hierarchy={"primary"}>
-                        This will delete the organization and cannot be undone.
-                    </Text>
-                </Flex>
-                <Button color={"secondary"} variant={"filled"} onClick={deleteOrganization}>
-                    Delete organization forever
-                </Button>
-            </Flex>
-        </Card>
+        <Text size={"lg"} hierarchy={"primary"} display={"block"}>Delete workspace</Text>
+        <Spacing spacing={"xs"}/>
+        <Text size={"md"} hierarchy={"tertiary"}>
+            Permanently delete this workspace and everything in it. This action cannot be undone.
+        </Text>
+        <Spacing spacing={"md"}/>
+        <DialogClose asChild>
+            <Button color={"error"} w={"100%"} onClick={deleteOrganization}>Delete workspace</Button>
+        </DialogClose>
     </>
 }
