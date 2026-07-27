@@ -13,7 +13,7 @@ import {
     TooltipTrigger,
     useService
 } from "@code0-tech/pictor";
-import {IconArrowsMaximize, IconArrowsMinimize, IconCircleDot, IconPlus} from "@tabler/icons-react";
+import {IconApps, IconArrowsMaximize, IconArrowsMinimize, IconCircleDot, IconPlus} from "@tabler/icons-react";
 import {useParams, useRouter} from "next/navigation";
 import {Flow, FlowType} from "@code0-tech/sagittarius-graphql-types";
 import {FlowService} from "@edition/flow/services/Flow.service";
@@ -26,6 +26,7 @@ import {
     FlowFolderContextMenuComponentItemData
 } from "@edition/flow/components/folder/FlowFolderContextMenuComponent";
 import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
+import Link from "next/link";
 
 export const FlowFolderView: React.FC = () => {
 
@@ -73,7 +74,7 @@ export const FlowFolderView: React.FC = () => {
                                    onDelete={deleteFlow}/>
         <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"}>
             <Text pl={0.7} hierarchy={"tertiary"}>
-                Workflows
+                Explorer
             </Text>
             <ButtonGroup color={"secondary"} style={{boxShadow: "none"}} p={0}>
                 <Tooltip>
@@ -118,28 +119,27 @@ export const FlowFolderView: React.FC = () => {
                         </TooltipContent>
                     </TooltipPortal>
                 </Tooltip>
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button data-qa-selector={"flow-send"}
-                                paddingSize={"xxs"}
-                                color={"tertiary"}
-                                onClick={() => {
-                                    setCreateDialogOpen(true)
-                                    setFlowTypeId(undefined)
-                                }}>
-                            <IconPlus size={13}/>
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipPortal>
-                        <TooltipContent side={"bottom"}>
-                            <Text>Create workflow</Text>
-                            <TooltipArrow/>
-                        </TooltipContent>
-                    </TooltipPortal>
-                </Tooltip>
             </ButtonGroup>
         </Flex>
         <Spacing spacing={"xxs"}/>
+        <Link href={`/namespace/${namespaceIndex}/project/${projectIndex}/module`} style={{width: "100%"}}>
+            <Button style={{borderRadius: "50rem"}} w={"100%"} paddingSize={"xxs"} color={"tertiary"} variant={"none"}
+                    justify={"start"}>
+                <IconApps size={13}/>
+                Integrations
+            </Button>
+        </Link>
+        <Button style={{borderRadius: "50rem"}} w={"100%"} paddingSize={"xxs"} color={"tertiary"} variant={"none"}
+                justify={"start"} onClick={() => {
+            setCreateDialogOpen(true)
+            setFlowTypeId(undefined)
+        }}>
+            <IconPlus size={13}/>
+            Create workflow
+        </Button>
+        <Spacing spacing={"xl"}/>
+        <div style={{borderTop: "1px dashed rgba(255,255,255, .1)"}}/>
+        <Spacing spacing={"xl"}/>
         <FlowFolderComponent ref={ref} activeFlowId={flowId}
                              onSelect={(flow) => {
                                  const number = flow.id?.match(/Flow\/(\d+)$/)?.[1]
