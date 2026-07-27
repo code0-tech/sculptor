@@ -9,8 +9,6 @@ export interface AIGeneration {
 
 interface AIGenerationState {
     generations: AIGeneration[]
-    // Execution identifiers whose generation is currently displayed inline by a
-    // mounted AIChatComponent, so the global watcher toast must stay hidden for them.
     suppressedIdentifiers: string[]
     addGeneration: (generation: AIGeneration) => void
     removeGeneration: (executionIdentifier: string) => void
