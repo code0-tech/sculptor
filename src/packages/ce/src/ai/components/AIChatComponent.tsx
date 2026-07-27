@@ -46,6 +46,8 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
     const aiStore = useStore(AIService)
     const addGeneration = useAIGenerationStore(s => s.addGeneration)
     const removeGeneration = useAIGenerationStore(s => s.removeGeneration)
+    const suppressToast = useAIGenerationStore(s => s.suppressToast)
+    const unsuppressToast = useAIGenerationStore(s => s.unsuppressToast)
 
     const [promptState, setPromptState] = React.useState<string>(prompt)
     const [model, setModel] = React.useState<string | undefined>(undefined)
@@ -70,6 +72,15 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
 
     const aiLoading = !!executionIdentifier && isThisGenerating
 
+    // While this chat is mounted it displays its own generation inline, so the
+    // global watcher toast stays hidden for it (suppression is set synchronously in
+    // onSend to avoid a flash). Unmounting (e.g. navigating away) releases the
+    // suppression so the toast appears where the generation is no longer visible.
+    React.useEffect(() => {
+        if (!executionIdentifier) return
+        return () => unsuppressToast(executionIdentifier)
+    }, [executionIdentifier, unsuppressToast])
+
     const onSend = React.useCallback(() => {
         setAiErrorMessage(null)
         aiService.generateFlow({
@@ -81,6 +92,9 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
             if ((payload?.errors?.length ?? 0) <= 0 && payload?.executionIdentifier) {
                 const id = payload.executionIdentifier
                 setExecutionIdentifier(id)
+                // Suppress synchronously together with adding the generation so the
+                // watcher's first render already sees it hidden (no toast flash).
+                suppressToast(id)
                 addGeneration({
                     executionIdentifier: id,
                     onData: (data) => onData?.(data),
@@ -88,7 +102,7 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
                 })
             }
         })
-    }, [aiService, model, promptState, projectId, flowId, onData, addGeneration])
+    }, [aiService, model, promptState, projectId, flowId, onData, addGeneration, suppressToast])
 
     const onStop = React.useCallback(() => {
         if (executionIdentifier) removeGeneration(executionIdentifier)
@@ -123,13 +137,10 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
             <BorderBeam style={{
                 marginTop: "-0.6rem",
                 marginLeft: "-0.6rem",
-                marginRight: "-0.6rem",
-                filter: "hue-rotate(135deg)",
+                marginRight: "-0.6rem"
 
-            }} strength={1} theme={"dark"} size={aiLoading ? "line" : "md"} saturation={0.75} duration={5} colorVariant={"sunset"}>
-                <Card style={{
-                    filter: "hue-rotate(-135deg)",
-                }} color={"primary"} paddingSize={"xxs"} pos={"relative"}>
+            }} strength={1} theme={"dark"} size={aiLoading ? "line" : "md"} duration={aiLoading ? 2 : 5}>
+                <Card color={"primary"} paddingSize={"xxs"} pos={"relative"}>
                     {
                         models.length <= 0 && (
                             <Card color={"primary"}
