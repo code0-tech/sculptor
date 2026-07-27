@@ -22,6 +22,7 @@ import {useParams} from "next/navigation";
 import {RoleService} from "@edition/role/services/Role.service";
 import {RolePermissionComponent} from "@edition/role/components/RolePermissionComponent";
 import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
+import BorderBeam from "border-beam";
 
 type Permission = {
     label: string
@@ -253,24 +254,24 @@ export const RolePermissionView: React.FC = () => {
                     const isSelected = templateAbilities.length === roleAbilities.length
                         && templateAbilities.every(a => new Set(roleAbilities).has(a));
 
+                    const card = <Card color={"secondary"}>
+                        <Text style={{fontWeight: 500}} size={"lg"} hierarchy={"secondary"}>
+                            {permissionTemplate.name}
+                        </Text>
+                        <Spacing spacing={"xs"}/>
+                        <RolePermissionComponent
+                            abilities={Object.entries(permissionTemplate.abilities)
+                                .filter(([_, enabled]) => enabled)
+                                .map(([ability, _]) => ability as NamespaceRoleAbility)}/>
+                        <Spacing spacing={"xl"}/>
+                        <Button disabled={isSelected} color={"tertiary"}
+                                w={"100%"}
+                                onClick={() => setInitialValues(permissionTemplate.abilities)}>Select
+                            template</Button>
+                    </Card>
 
-                    return <Col>
-                        <Card>
-                            <Text style={{fontWeight: 500}} size={"lg"} hierarchy={"secondary"}>
-                                {permissionTemplate.name}
-                            </Text>
-                            <Spacing spacing={"xs"}/>
-                            <RolePermissionComponent
-                                abilities={Object.entries(permissionTemplate.abilities)
-                                    .filter(([_, enabled]) => enabled)
-                                    .map(([ability, _]) => ability as NamespaceRoleAbility)}/>
-                            <Spacing spacing={"xl"}/>
-                            <Button disabled={isSelected} color={"secondary"} variant={"filled"}
-                                    w={"100%"}
-                                    onClick={() => setInitialValues(permissionTemplate.abilities)}>Select
-                                template</Button>
-                            {isSelected ? <AuroraBackground/> : null}
-                        </Card>
+                    return <Col xs={6} mb={1.3}>
+                        {isSelected ? <BorderBeam strength={1} size={"pulse-inner"} theme={"dark"} duration={5}>{card}</BorderBeam> : card}
                     </Col>
                 })}
             </Row>
