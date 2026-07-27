@@ -51,10 +51,10 @@ export const ProjectRecentListView: React.FC = () => {
         </Flex>
         <Spacing spacing={"xxs"}/>
         {projects.map(project => {
-            const namespaceNumber = project.namespace?.id?.match(/Namespace\/(\d+)$/)?.[1]
-            const projectNumber = project.id?.match(/NamespaceProject\/(\d+)$/)?.[1]
+            const namespaceIndex = project.namespace?.id?.match(/Namespace\/(\d+)$/)?.[1]
+            const projectIndex = project.id?.match(/NamespaceProject\/(\d+)$/)?.[1]
             return <Link key={project.id}
-                         href={`/namespace/${namespaceNumber}/project/${projectNumber}`}
+                         href={`/namespace/${namespaceIndex}/project/${projectIndex}`}
                          style={{width: "100%"}}
                          prefetch>
                 <Button variant={"none"} w={"100%"} justify={"flex-start"} paddingSize={"xxs"}>

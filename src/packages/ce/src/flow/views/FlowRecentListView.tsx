@@ -20,8 +20,8 @@ export const FlowRecentListView: React.FC = () => {
     const projectService = useService(ProjectService)
     const projectStore = useStore(ProjectService)
 
-    const namespaceNumber = params.namespaceId as any as number
-    const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceNumber}`
+    const namespaceIndex = params.namespaceId as any as number
+    const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
 
     const projects = React.useMemo(
         () => projectService.values({namespaceId})
@@ -52,12 +52,12 @@ export const FlowRecentListView: React.FC = () => {
         </Flex>
         <Spacing spacing={"xxs"}/>
         {flows.map(({flow, project}) => {
-            const projectNumber = project.id?.match(/NamespaceProject\/(\d+)$/)?.[1]
-            const flowNumber = flow.id?.match(/Flow\/(\d+)$/)?.[1]
+            const projectIndex = project.id?.match(/NamespaceProject\/(\d+)$/)?.[1]
+            const flowIndex = flow.id?.match(/Flow\/(\d+)$/)?.[1]
             const name = flow.name ?? ""
             const displayName = name.split("/").filter(Boolean).pop() ?? name
             return <Link key={flow.id}
-                         href={`/namespace/${namespaceNumber}/project/${projectNumber}/flow/${flowNumber}`}
+                         href={`/namespace/${namespaceIndex}/project/${projectIndex}/flow/${flowIndex}`}
                          style={{width: "100%"}}
                          prefetch>
                 <Button variant={"none"} w={"100%"} justify={"flex-start"} paddingSize={"xxs"}>

@@ -51,8 +51,8 @@ export const NamespaceMenuView: React.FC = () => {
 
     const currentSession = useUserSession()
 
-    const namespaceNumber = params.namespaceId as any as number
-    const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceNumber}`
+    const namespaceIndex = params.namespaceId as any as number
+    const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
 
     const namespace = React.useMemo(
         () => namespaceService.getById(namespaceId),
@@ -113,25 +113,25 @@ export const NamespaceMenuView: React.FC = () => {
                 <MenuLabel>
                     Workspace
                 </MenuLabel>
-                <Link href={`/namespace/${namespaceNumber}/settings`} prefetch style={{display: "contents"}}>
+                <Link href={`/namespace/${namespaceIndex}/settings`} prefetch style={{display: "contents"}}>
                     <MenuItem>
                         <IconSettings size={16}/>
                         Settings
                     </MenuItem>
                 </Link>
-                <Link href={`/namespace/${namespaceNumber}/settings`} prefetch style={{display: "contents"}}>
+                <Link href={`/namespace/${namespaceIndex}/settings`} prefetch style={{display: "contents"}}>
                     <MenuItem>
                         <IconSettings color={"transparent"} size={16}/>
                         Members
                     </MenuItem>
                 </Link>
-                <Link href={`/namespace/${namespaceNumber}/settings`} prefetch style={{display: "contents"}}>
+                <Link href={`/namespace/${namespaceIndex}/settings`} prefetch style={{display: "contents"}}>
                     <MenuItem>
                         <IconSettings color={"transparent"} size={16}/>
                         Roles
                     </MenuItem>
                 </Link>
-                <Link href={`/namespace/${namespaceNumber}/settings`} prefetch style={{display: "contents"}}>
+                <Link href={`/namespace/${namespaceIndex}/settings`} prefetch style={{display: "contents"}}>
                     <MenuItem>
                         <IconSettings color={"transparent"} size={16}/>
                         Servers

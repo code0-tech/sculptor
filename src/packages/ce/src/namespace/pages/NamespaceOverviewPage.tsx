@@ -26,8 +26,7 @@ export const NamespaceOverviewPage: React.FC = () => {
         height: "100%",
         position: "relative",
         boxSizing: "border-box",
-        borderRadius: "1rem",
-        padding: "1rem",
+        borderRadius: "1rem"
     }}>
         <ScrollArea h={"100%"} type={"scroll"}>
             <ScrollAreaViewport>

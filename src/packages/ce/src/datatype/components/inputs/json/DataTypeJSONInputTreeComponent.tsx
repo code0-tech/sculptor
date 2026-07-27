@@ -89,7 +89,7 @@ export const DataTypeJSONInputTreeComponent: React.FC<DataTypeJSONInputTreeCompo
                     {icon}
                     <Text hierarchy="tertiary">{Array.isArray(value) ? "is a list of" : "is a nested object"}</Text>
                 </Flex>
-                {!isCollapsed && (renderNodes?.length ?? 0) > 0 && <ul className="jsonTree">{renderNodes}</ul>}
+                {!isCollapsed && (renderNodes?.length ?? 0) > 0 && <ul className="json-tree">{renderNodes}</ul>}
             </div>
         )
     }
@@ -139,7 +139,7 @@ export const DataTypeJSONInputTreeComponent: React.FC<DataTypeJSONInputTreeCompo
                 />
             ) : null
             return (
-                <li key={pathKey} className="jsonTree__item">
+                <li key={pathKey} className="json-tree__item">
                     <div
                         onClick={e => {
                             e.stopPropagation()
@@ -162,5 +162,5 @@ export const DataTypeJSONInputTreeComponent: React.FC<DataTypeJSONInputTreeCompo
     const nodes = rootNode && isRoot ? [rootNode] : renderNodes
     const validNodes = (nodes ?? []).filter(Boolean)
     if (validNodes.length <= 0) return null
-    return <ul className="jsonTree">{validNodes}</ul>
+    return <ul className="json-tree">{validNodes}</ul>
 }

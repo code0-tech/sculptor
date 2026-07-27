@@ -2,7 +2,7 @@
 @use "@core/style/box";
 @use "@core/style/variables";
 
-.jsonTree {
+.json-tree {
   list-style: none;
   margin: 0;
   margin-inline-start: 2px;
@@ -15,7 +15,7 @@
   gap: variables.$xxs;
 }
 
-.jsonTree__item {
+.json-tree__item {
   position: relative;
   padding-inline-start: variables.$xs;
   list-style: none;

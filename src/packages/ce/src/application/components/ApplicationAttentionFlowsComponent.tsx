@@ -20,13 +20,11 @@ import {FlowService} from "@edition/flow/services/Flow.service";
 import {FlowView} from "@edition/flow/services/Flow.view";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
-import {IconChevronRight} from "@tabler/icons-react";
+import {IconChevronRight, IconPointFilled} from "@tabler/icons-react";
 import {formatDistanceToNow} from "date-fns";
 import {useRouter} from "next/navigation";
 
 export interface ApplicationAttentionFlowsComponentProps {
-    // When omitted, flows across every namespace the user is a member of are
-    // considered. When set, only flows inside that namespace are shown.
     namespaceId?: Namespace['id']
 }
 
@@ -105,19 +103,10 @@ export const ApplicationAttentionFlowsComponent: React.FC<ApplicationAttentionFl
     return <Card color={"secondary"} clickable onClick={() => setOpen(previous => !previous)}>
         <Flex align={"center"} justify={"space-between"} style={{gap: "0.75rem"}}>
             <Flex align={"center"} style={{gap: "0.75rem", minWidth: 0}}>
-                <div style={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: "50%",
-                    background: "#FFBE0B",
-                    flexShrink: 0
-                }}/>
+                <IconPointFilled size={16} color={"#FFBE0B"} style={{flexShrink: 0}}/>
                 <Text size={"md"}>{count} {count === 1 ? "flow needs" : "flows need"} attention</Text>
             </Flex>
-            <IconChevronRight size={16} style={{
-                transform: open ? "rotate(90deg)" : "none",
-                transition: "transform 0.2s"
-            }}/>
+            <IconChevronRight size={16} style={{transform: open ? "rotate(90deg)" : "none"}}/>
         </Flex>
         {open && (
             <div onClick={(e) => e.stopPropagation()}>
