@@ -15,6 +15,7 @@ import {
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
+import {UserReadmeComponent} from "@edition/user/components/UserReadmeComponent";
 import {User} from "@code0-tech/sagittarius-graphql-types";
 
 export const UserPage: React.FC = () => {
@@ -34,7 +35,7 @@ export const UserPage: React.FC = () => {
 
     const user = React.useMemo(
         () => userService.getById(userId) ?? (userId === sessionUser?.id ? sessionUser : undefined),
-        [userStore, userId, userService, sessionUser]
+        [userStore, userId, currentSession]
     )
 
     const readme = user?.readme?.trim()
@@ -53,10 +54,7 @@ export const UserPage: React.FC = () => {
                     <div style={{maxWidth: "48rem", margin: "0 auto", padding: "3rem 1rem"}}>
                         <Text hierarchy={"tertiary"}>Readme</Text>
                         <Spacing spacing={"md"}/>
-                        <Text size={"md"} hierarchy={"secondary"}
-                              style={{whiteSpace: "pre-wrap", lineHeight: 1.8}}>
-                            {readme}
-                        </Text>
+                        <UserReadmeComponent readme={readme}/>
                     </div>
                 ) : (
                     <Flex h={"100%"} align={"center"} justify={"center"}
