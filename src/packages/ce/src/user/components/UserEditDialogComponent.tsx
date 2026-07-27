@@ -119,14 +119,12 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
 
             // nothing but the userId changed, so there is nothing to update
             if (Object.keys(payload).length <= 1) {
-                onOpenChange?.(false)
                 return
             }
 
             startTransition(async () => {
                 await userService.usersUpdate(payload).then(payload => {
                     if (payload?.user && (payload?.errors?.length ?? 0) <= 0) {
-                        onOpenChange?.(false)
                         toast({title: "Updated user", color: "success"})
                     }
                 })
