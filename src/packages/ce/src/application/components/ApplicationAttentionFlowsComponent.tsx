@@ -80,6 +80,12 @@ export const ApplicationAttentionFlowsComponent: React.FC<ApplicationAttentionFl
     const projectNameOf = (flow: FlowView): string =>
         projectNames.get(flow.project?.id ?? "") || "Unknown project"
 
+    const updatedAgoOf = (flow: FlowView): string => {
+        const date = flow.updatedAt ? new Date(flow.updatedAt) : null
+        if (!date || isNaN(date.getTime())) return "Unknown"
+        return `${formatDistanceToNow(date)} ago`
+    }
+
     const openFlow = (flow: FlowView): void => {
         const namespaceIndex = flow.project?.namespace?.id?.match(/Namespace\/(\d+)$/)?.[1]
         const projectIndex = flow.project?.id?.match(/NamespaceProject\/(\d+)$/)?.[1]
@@ -131,7 +137,7 @@ export const ApplicationAttentionFlowsComponent: React.FC<ApplicationAttentionFl
                         </DataTableColumn>
                         <DataTableColumn>
                             <Text size={"sm"} hierarchy={"tertiary"}>
-                                {formatDistanceToNow(flow.updatedAt!)} ago
+                                {updatedAgoOf(flow)}
                             </Text>
                         </DataTableColumn>
                     </>}
