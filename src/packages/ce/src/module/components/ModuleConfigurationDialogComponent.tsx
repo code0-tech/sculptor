@@ -4,7 +4,6 @@ import React from "react";
 import {useParams, useRouter} from "next/navigation";
 import {
     Avatar,
-    Badge,
     Button,
     Flex,
     hashToColor,
@@ -211,7 +210,7 @@ export const ModuleConfigurationDialogComponent: React.FC<ModuleConfigurationDia
                     <MenuPortal>
                         <MenuContent side={"top"} sideOffset={8}>
                             {
-                                runtimes.map(pRuntime => {
+                                selectableRuntimes.map(pRuntime => {
                                     return <MenuItem onSelect={() => {
                                         const lRuntime = runtimes.find(r => r.id === pRuntime.id)
                                         const lModule = lRuntime?.modules?.nodes?.find(m => m?.identifier === module?.identifier)
@@ -239,16 +238,15 @@ export const ModuleConfigurationDialogComponent: React.FC<ModuleConfigurationDia
                                         const number = lModule?.id?.match(/RuntimeModule\/(\d+)$/)?.[1]
                                         router.push(`/namespace/${namespaceIndex}/project/${projectIndex}/module/${number}`)
                                     }}>
-                                        <Flex align={"center"} style={{gap: "0.7rem"}}>
-                                            <Avatar size={16}
+                                        <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                            <Avatar size={13}
                                                     color={hashToColor(pRuntime.name!, 0, 180)}
                                                     identifier={pRuntime.name!}/>
                                             <Text>
                                                 {pRuntime.name}
                                             </Text>
-                                            {pRuntime.id === project?.primaryRuntime?.id && <Badge color={"secondary"}>
-                                                Primary
-                                            </Badge>}
+                                            {pRuntime.id === project?.primaryRuntime?.id &&
+                                                <IconBadgeFilled size={13}/>}
                                         </Flex>
                                     </MenuItem>
                                 })
