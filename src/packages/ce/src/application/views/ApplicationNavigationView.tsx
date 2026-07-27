@@ -157,7 +157,7 @@ export const ApplicationNavigationView: React.FC = () => {
                             </MenuItem>
                         </Link>
                         <MenuSeparator/>
-                        <Link href={"/workspaces"}>
+                        <Link href={"/"}>
                             <MenuItem>
                                 <IconApps size={16}/>Workspaces
                             </MenuItem>
