@@ -80,9 +80,8 @@ export default function Page() {
                 <ResizablePanel id={"2"}>
                     <ResizablePanelGroup orientation={"vertical"}>
                         <ResizablePanel id={"1"} color={"primary"}
-                                        style={{
-                                            borderRadius: "1rem"
-                                        }}>
+                                        style={{borderRadius: "1rem"}}
+                        >
                             <FlowBuilderComponent flowId={flowId} namespaceId={namespaceId} projectId={projectId}/>
                         </ResizablePanel>
                         {
@@ -102,7 +101,7 @@ export default function Page() {
                     <>
                         <ResizableHandle/>
                         <ResizablePanel id={"3"} defaultSize={"40%"} color={"primary"}
-                                        style={{borderTopLeftRadius: "1rem", borderTopRightRadius: "1rem"}}>
+                                        style={{borderRadius: "1rem"}}>
                             <FunctionFilesComponent flowId={flowId} namespaceId={undefined}
                                                     projectId={undefined}/>
                         </ResizablePanel>
