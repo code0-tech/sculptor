@@ -1,0 +1,103 @@
+@use "@core/style/variables";
+
+.user-readme {
+  color: rgba(variables.$white, variables.$hierarchySecondary);
+  font-size: variables.$md;
+  line-height: 1.8;
+  word-break: break-word;
+
+  h1, h2, h3, h4, h5, h6 {
+    color: rgba(variables.$white, variables.$hierarchyPrimary);
+    line-height: 1.3;
+    margin: 2rem 0 1rem;
+    font-weight: 600;
+  }
+
+  h1 { font-size: variables.$xl; }
+  h2 { font-size: variables.$lg; }
+  h3 { font-size: variables.$md; }
+  h4, h5, h6 { font-size: variables.$sm; }
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  p {
+    margin: 0 0 1rem;
+  }
+
+  a {
+    color: variables.$info;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  ul, ol {
+    margin: 0 0 1rem;
+    padding-left: 1.5rem;
+  }
+
+  li {
+    margin: 0.25rem 0;
+  }
+
+  blockquote {
+    margin: 0 0 1rem;
+    padding: 0.25rem 0 0.25rem 1rem;
+    border-left: 2px solid rgba(variables.$white, 0.2);
+    color: rgba(variables.$white, variables.$hierarchyTertiary);
+  }
+
+  code {
+    font-family: monospace;
+    font-size: variables.$sm;
+    background: rgba(variables.$white, 0.08);
+    padding: 0.1rem 0.35rem;
+    border-radius: 0.35rem;
+  }
+
+  pre {
+    margin: 0 0 1rem;
+    padding: 1rem;
+    background: rgba(variables.$white, 0.05);
+    border-radius: variables.$xs;
+    overflow-x: auto;
+
+    code {
+      background: none;
+      padding: 0;
+    }
+  }
+
+  img {
+    max-width: 100%;
+    border-radius: variables.$xs;
+  }
+
+  hr {
+    border: none;
+    border-top: 1px dashed rgba(variables.$white, 0.1);
+    margin: 2rem 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 1rem;
+    font-size: variables.$sm;
+  }
+
+  th, td {
+    border: 1px solid rgba(variables.$white, 0.1);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+
+  th {
+    color: rgba(variables.$white, variables.$hierarchyPrimary);
+    font-weight: 600;
+  }
+}
