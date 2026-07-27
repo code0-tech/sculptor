@@ -1,17 +1,12 @@
 "use client"
 
 import React from "react";
-import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 import {useParams} from "next/navigation";
-import Link from "next/link";
 import {
-    AuroraBackground,
-    Avatar,
-    Badge,
-    Button,
-    Col,
     Flex,
     ScrollArea,
+    ScrollAreaScrollbar,
+    ScrollAreaThumb,
     ScrollAreaViewport,
     Spacing,
     Text,
@@ -21,96 +16,64 @@ import {
 import {UserService} from "@edition/user/services/User.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {User} from "@code0-tech/sagittarius-graphql-types";
-import {IconMail, IconSparkles, IconUser} from "@tabler/icons-react";
 
 export const UserPage: React.FC = () => {
-
 
     const params = useParams()
     const userService = useService(UserService)
     const userStore = useStore(UserService)
 
     const currentSession = useUserSession()
-    const currentUser = React.useMemo(
-        () => userService.getById(currentSession?.user?.id),
-        [userStore, currentSession]
-    )
+
+    const sessionUser = currentSession?.user
 
     const userIndex = decodeURIComponent(String(params.userId ?? ""))
     const userId: User['id'] = userIndex === "@me"
-        ? currentSession?.user?.id!
+        ? sessionUser?.id!
         : `gid://sagittarius/User/${userIndex as any as number}`
 
     const user = React.useMemo(
-        () => userService.getById(userId),
-        [userStore, userId, userService]
+        () => userService.getById(userId) ?? (userId === sessionUser?.id ? sessionUser : undefined),
+        [userStore, userId, userService, sessionUser]
     )
 
+    const readme = user?.readme?.trim()
 
-    const leftContent = <ScrollArea h={"100%"} type={"scroll"}>
-        <ScrollAreaViewport>
-            <Flex pr={0.7} miw={"17vw"} style={{flexDirection: "column"}}>
-                <div style={{position: "relative"}}>
-                    <Avatar type={"character"} size={150} identifier={user?.username!}/>
-                    <Badge pos={"absolute"} right={"20%"} bottom={"20%"}>
-                        <Text size={"md"}>👋</Text>
-                    </Badge>
-                </div>
-                <Spacing spacing={"xs"}/>
-                <Text size={"xl"} hierarchy={"primary"}>{user?.firstname} {user?.lastname}</Text>
-                <Spacing spacing={"xs"}/>
-                <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
-                    <Text display={"flex"} align={"center"} size={"sm"} style={{gap: "0.7rem"}}>
-                        <IconUser size={16}/>
-                        @{user?.username}
-                    </Text>
-                    <Text display={"flex"} align={"center"} size={"sm"} style={{gap: "0.7rem"}}>
-                        <IconMail size={16}/>
-                        {user?.email}
-                    </Text>
-                    <Text display={"flex"} align={"center"} size={"sm"} style={{gap: "0.7rem"}}>
-                        <IconSparkles size={16}/>
-                        <Badge color={"primary"}>BASIC</Badge>
-                    </Text>
-                </Flex>
-                <Spacing spacing={"xs"}/>
-                {currentUser?.id === userId && (
-                    <>
+    return <div style={{
+        background: "var(--primary)",
+        height: "100%",
+        position: "relative",
+        boxSizing: "border-box",
+        borderRadius: "1rem",
+        padding: "1rem",
+    }}>
+        <ScrollArea h={"100%"} type={"scroll"}>
+            <ScrollAreaViewport>
+                {readme ? (
+                    <div style={{maxWidth: "48rem", margin: "0 auto", padding: "3rem 1rem"}}>
+                        <Text hierarchy={"tertiary"}>Readme</Text>
+                        <Spacing spacing={"md"}/>
+                        <Text size={"md"} hierarchy={"secondary"}
+                              style={{whiteSpace: "pre-wrap", lineHeight: 1.8}}>
+                            {readme}
+                        </Text>
+                    </div>
+                ) : (
+                    <Flex h={"100%"} align={"center"} justify={"center"}
+                          style={{flexDirection: "column", minHeight: "70vh", textAlign: "center"}}>
+                        <Text size={"lg"} hierarchy={"secondary"}>
+                            @{user?.username} hasn't written a readme yet
+                        </Text>
                         <Spacing spacing={"xs"}/>
-                        <Link href={"/users/@me/settings"} style={{width: "100%"}}>
-                            <Button w={"100%"} color={"tertiary"}>Edit Profile</Button>
-                        </Link>
-                        <Spacing spacing={"xs"}/>
-                        <Button color={"primary"} w={"100%"}>
-                            Upgrade to Pro
-                            <AuroraBackground/>
-                        </Button>
-                    </>
+                        <Text size={"sm"} hierarchy={"tertiary"}>
+                            When they add a profile description, it'll show up here.
+                        </Text>
+                    </Flex>
                 )}
-            </Flex>
-        </ScrollAreaViewport>
-    </ScrollArea>
-
-    return <Layout showLayoutSplitter={false} layoutGap={"0"} leftContent={leftContent}>
-        <div style={{
-            background: "#070514",
-            height: "100%",
-            padding: "2rem",
-            borderTopLeftRadius: "1rem",
-            borderTopRightRadius: "1rem"
-        }}>
-            <Flex h={"100%"} w={"100%"} align={"center"} justify={"center"}>
-                <Col xs={4} style={{textAlign: "center"}}>
-                    <Text size={"xl"} hierarchy={"primary"}>
-                        @{user?.username}'s readme
-                    </Text>
-                    <Spacing spacing={"xs"}/>
-                    <Text>
-                        The user currently does not have a publicly available profile description.
-                    </Text>
-                </Col>
-            </Flex>
-        </div>
-    </Layout>
+            </ScrollAreaViewport>
+            <ScrollAreaScrollbar orientation={"vertical"}>
+                <ScrollAreaThumb/>
+            </ScrollAreaScrollbar>
+        </ScrollArea>
+    </div>
 }
-
