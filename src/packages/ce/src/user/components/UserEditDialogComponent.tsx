@@ -26,8 +26,17 @@ import {User, UsersUpdateInput} from "@code0-tech/sagittarius-graphql-types";
 import {UserService} from "@edition/user/services/User.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
-import {IconAt, IconBackground, IconLock, IconMail, IconSettings2, IconShieldLock} from "@tabler/icons-react";
+import {
+    IconAt,
+    IconBackground,
+    IconLock,
+    IconMail,
+    IconSettings2,
+    IconShield,
+    IconShieldLock
+} from "@tabler/icons-react";
 import {UserSessionsDataTableComponent} from "@edition/user/components/UserSessionsDataTableComponent";
+import {UserMfaView} from "@edition/user/views/UserMfaView";
 import {SettingDialog} from "@core/components/SettingDialog";
 
 export interface UserEditDialogComponentProps {
@@ -153,10 +162,18 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                               )}
                               <TabTrigger value={"security"} w={"100%"} asChild>
                                   <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                      <IconSettings2 opacity={0} size={13}/>
+                                      <IconShield size={13}/>
                                       <Text size={"md"}>Security</Text>
                                   </Button>
                               </TabTrigger>
+                              {isSelf && (
+                                  <TabTrigger value={"mfa"} w={"100%"} asChild>
+                                      <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                          <IconSettings2 opacity={0} size={13}/>
+                                          <Text size={"md"}>2-Step Verification</Text>
+                                      </Button>
+                                  </TabTrigger>
+                              )}
                               <TabTrigger value={"sessions"} w={"100%"} asChild>
                                   <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
                                       <IconSettings2 opacity={0} size={13}/>
@@ -281,6 +298,7 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                            onChange={() => validate("repeatPassword")}
                            {...inputs.getInputProps("repeatPassword")}/>
         </TabContent>
+        {isSelf ? <UserMfaView/> : <></>}
         <TabContent value={"sessions"}
                     style={{
                         overflow: "hidden",
