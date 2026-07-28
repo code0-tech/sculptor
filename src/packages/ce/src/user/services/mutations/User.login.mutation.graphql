@@ -1,9 +1,10 @@
 #import '../fragments/User.basic.fragment.graphql'
-mutation login($email: String!, $password: String!, $username: String) {
+mutation login($email: String!, $password: String!, $username: String, $mfa: MfaInput) {
     usersLogin(input: {
         email: $email
         password: $password
         username: $username
+        mfa: $mfa
     }) {
         errors {
             ...on Error {

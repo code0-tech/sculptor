@@ -10,5 +10,10 @@ query CurrentUser(
 ) {
     currentUser {
         ...User
+        mfaStatus {
+            enabled
+            totpEnabled
+            backupCodesCount
+        }
     }
 }
