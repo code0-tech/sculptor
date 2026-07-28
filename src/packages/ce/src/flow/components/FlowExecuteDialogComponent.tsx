@@ -137,7 +137,8 @@ export const FlowExecuteDialogComponent: React.FC<FlowExecuteDialogComponentProp
         }
     }, [open, flow, dataTypes.length, functions.length, flow?.editedAt])
 
-    let endpoint = `http://${module?.definitions?.nodes?.[0]?.host}:${module?.definitions?.nodes?.[0]?.port}${module?.definitions?.nodes?.[0]?.endpoint}`
+    const definition = module?.definitions?.nodes?.[0]
+    let endpoint = `${definition?.protocol ?? "http"}://${definition?.host}:${definition?.port}${definition?.endpoint}`
         .replace("${{project_slug}}", project?.slug ?? "${{project_slug}}")
 
     flow?.settings?.nodes?.forEach(setting => {
