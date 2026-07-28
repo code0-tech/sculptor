@@ -24,14 +24,16 @@ export const UserRegistrationPage: React.FC = () => {
     const router = useRouter()
     const [loading, startTransition] = React.useTransition()
 
+    const initialValues = React.useMemo(() => ({
+        email: null,
+        username: null,
+        password: null,
+        repeatPassword: null,
+    }), [])
+
     const [inputs, validate] = useForm({
         useInitialValidation: false,
-        initialValues: {
-            email: null,
-            username: null,
-            password: null,
-            repeatPassword: null,
-        },
+        initialValues,
         validate: {
             email: (value) => {
                 if (!value) return "Email is required"
