@@ -6,4 +6,5 @@ fragment ModuleDefinition on RuntimeModuleDefinition {
     endpoint
     host
     port
+    protocol
 }
