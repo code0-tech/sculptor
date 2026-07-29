@@ -35,6 +35,7 @@ import {
     UsersUpdatePayload
 } from "@code0-tech/sagittarius-graphql-types";
 import {GraphqlClient} from "@core/util/graphql-client";
+import {withMfaRetry} from "@core/util/mfa";
 import createMutation from "./mutations/User.create.mutation.graphql";
 import updateMutation from "./mutations/User.update.mutation.graphql";
 import loginMutation from "./mutations/User.login.mutation.graphql";
@@ -43,6 +44,9 @@ import registerMutation from "./mutations/User.register.mutation.graphql";
 import emailVerificationMutation from "./mutations/User.emailVerification.mutation.graphql";
 import passwordResetMutation from "./mutations/User.passwordReset.mutation.graphql"
 import passwordResetRequestMutation from "./mutations/User.passwordResetRequest.mutation.graphql"
+import mfaTotpGenerateSecretMutation from "./mutations/User.mfaTotpGenerateSecret.mutation.graphql"
+import mfaTotpValidateSecretMutation from "./mutations/User.mfaTotpValidateSecret.mutation.graphql"
+import mfaBackupCodesRotateMutation from "./mutations/User.mfaBackupCodesRotate.mutation.graphql"
 import usersQuery from "./queries/Users.query.graphql";
 import currentUserQuery from "./queries/User.current.query.graphql";
 import userByUsernameQuery from "./queries/User.byUsername.query.graphql";
@@ -179,32 +183,41 @@ export class UserService extends ReactiveArrayService<User> {
     }
 
     async usersUpdate(payload: UsersUpdateInput): Promise<UsersUpdatePayload | undefined> {
-        const result = await this.client.mutate<Mutation, UsersUpdateInput>({
-            mutation: updateMutation,
-            variables: {
-                ...payload
-            }
+        // usersUpdate may require a fresh MFA confirmation. withMfaRetry transparently
+        // prompts for a code via the shared step-up dialog and retries with the mfa input.
+        const result = await withMfaRetry<UsersUpdatePayload | undefined>(async (mfa) => {
+            const response = await this.client.mutate<Mutation, UsersUpdateInput>({
+                mutation: updateMutation,
+                variables: {
+                    ...payload,
+                    ...(mfa ? {mfa} : {})
+                }
+            })
+            return response.data?.usersUpdate ?? undefined
         })
 
-        if (result.data && result.data.usersUpdate && result.data.usersUpdate.user) {
-            const updatedUser = result.data.usersUpdate.user
-            const index = super.values().findIndex(user => user.id === updatedUser.id)
-            if (index >= 0) {
-                // The update mutation only returns the UserBasic fragment, which omits
-                // connection fields (namespaceMemberships, identities, sessions). Merge the
-                // result into the existing user so those connections are preserved.
-                const existingUser = super.values()[index]
-                this.set(index, new View({
-                    ...existingUser,
-                    ...updatedUser,
-                    namespaceMemberships: existingUser.namespaceMemberships,
-                    identities: existingUser.identities,
-                    sessions: existingUser.sessions,
-                }))
-            } else if (!this.hasById(updatedUser.id)) this.add(new View(updatedUser))
-        }
+        if (result?.user) this.mergeUser(result.user)
 
-        return result.data?.usersUpdate ?? undefined
+        return result
+    }
+
+    /**
+     * Merges a user returned from a mutation into the store. Mutations return the
+     * UserBasic fragment, which omits connection fields (namespaceMemberships,
+     * identities, sessions), so those are preserved from the existing entry.
+     */
+    private mergeUser(updatedUser: User): void {
+        const index = super.values().findIndex(user => user.id === updatedUser.id)
+        if (index >= 0) {
+            const existingUser = super.values()[index]
+            this.set(index, new View({
+                ...existingUser,
+                ...updatedUser,
+                namespaceMemberships: existingUser.namespaceMemberships,
+                identities: existingUser.identities,
+                sessions: existingUser.sessions,
+            }))
+        } else if (!this.hasById(updatedUser.id)) this.add(new View(updatedUser))
     }
 
     async usersEmailVerification(payload: UsersEmailVerificationInput): Promise<UsersEmailVerificationPayload | undefined> {
@@ -285,19 +298,48 @@ export class UserService extends ReactiveArrayService<User> {
         return result.data?.usersLogout ?? undefined
     }
 
-    /** @alpha **/
-    usersMfaBackupCodesRotate(payload: UsersMfaBackupCodesRotateInput): Promise<UsersMfaBackupCodesRotatePayload | undefined> {
-        return Promise.resolve(undefined);
+    async usersMfaBackupCodesRotate(payload: UsersMfaBackupCodesRotateInput): Promise<UsersMfaBackupCodesRotatePayload | undefined> {
+        const result = await this.client.mutate<Mutation, UsersMfaBackupCodesRotateInput>({
+            mutation: mfaBackupCodesRotateMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        const data = result.data?.usersMfaBackupCodesRotate ?? undefined
+        // The acting user's remaining backup code count changed — refresh it in the store.
+        if (data?.codes && (data.errors?.length ?? 0) <= 0) {
+            await this.refetchCurrentUser()
+        }
+
+        return data
     }
 
-    /** @alpha **/
-    usersMfaTotpGenerateSecret(payload: UsersMfaTotpGenerateSecretInput): Promise<UsersMfaTotpGenerateSecretPayload | undefined> {
-        return Promise.resolve(undefined);
+    async usersMfaTotpGenerateSecret(payload: UsersMfaTotpGenerateSecretInput): Promise<UsersMfaTotpGenerateSecretPayload | undefined> {
+        const result = await this.client.mutate<Mutation, UsersMfaTotpGenerateSecretInput>({
+            mutation: mfaTotpGenerateSecretMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        return result.data?.usersMfaTotpGenerateSecret ?? undefined
     }
 
-    /** @alpha **/
-    usersMfaTotpValidateSecret(payload: UsersMfaTotpValidateSecretInput): Promise<UsersMfaTotpValidateSecretPayload | undefined> {
-        return Promise.resolve(undefined);
+    async usersMfaTotpValidateSecret(payload: UsersMfaTotpValidateSecretInput): Promise<UsersMfaTotpValidateSecretPayload | undefined> {
+        const result = await this.client.mutate<Mutation, UsersMfaTotpValidateSecretInput>({
+            mutation: mfaTotpValidateSecretMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        const data = result.data?.usersMfaTotpValidateSecret ?? undefined
+        if (data?.user && (data.errors?.length ?? 0) <= 0) {
+            this.mergeUser(data.user)
+        }
+
+        return data
     }
 
     async usersPasswordReset(payload: UsersPasswordResetInput): Promise<UsersPasswordResetPayload | undefined> {
