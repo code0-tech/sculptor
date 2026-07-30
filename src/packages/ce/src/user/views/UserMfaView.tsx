@@ -14,17 +14,24 @@ import {QrCodeComponent} from "@core/components/QrCodeComponent";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 
-const TOTP_ISSUER = "codezero.build"
+// Fallback used during SSR (no `window`) or when the hostname can't be read.
+const DEFAULT_ISSUER = "codezero.build"
 
-const buildOtpAuthUri = (secret: string, account: string): string => {
-    const label = encodeURIComponent(`${TOTP_ISSUER}:${account}`)
-    const params = new URLSearchParams({secret, issuer: TOTP_ISSUER})
+// The issuer identifies which instance a TOTP entry belongs to in the
+// authenticator app. Derive it from the hostname the user accessed the app
+// over so entries from different instances stay distinguishable.
+const resolveIssuer = (): string =>
+    (typeof window !== "undefined" && window.location.hostname) || DEFAULT_ISSUER
+
+const buildOtpAuthUri = (secret: string, account: string, issuer: string): string => {
+    const label = encodeURIComponent(`${issuer}:${account}`)
+    const params = new URLSearchParams({secret, issuer})
     return `otpauth://totp/${label}?${params.toString()}`
 }
 
-const downloadBackupCodes = (codes: string[]): void => {
+const downloadBackupCodes = (codes: string[], issuer: string): void => {
     const content = [
-        `${TOTP_ISSUER} backup codes`,
+        `${issuer} backup codes`,
         `Generated: ${new Date().toLocaleString()}`,
         "",
         ...codes,
@@ -37,7 +44,7 @@ const downloadBackupCodes = (codes: string[]): void => {
     const url = URL.createObjectURL(blob)
     const anchor = document.createElement("a")
     anchor.href = url
-    anchor.download = "codezero-backup-codes.txt"
+    anchor.download = `${issuer}-backup-codes.txt`
     anchor.click()
     URL.revokeObjectURL(url)
 }
@@ -63,6 +70,7 @@ export const UserMfaView: React.FC = () => {
     const totpEnabled = user?.mfaStatus?.totpEnabled ?? false
     const backupCodesCount = user?.mfaStatus?.backupCodesCount ?? 0
     const account = user?.email ?? user?.username ?? "account"
+    const issuer = React.useMemo(resolveIssuer, [])
 
     const initialValues = React.useMemo(() => ({code: ""}), [])
 
@@ -128,7 +136,7 @@ export const UserMfaView: React.FC = () => {
                 <Spacing spacing={"md"}/>
                 <Flex style={{gap: ".7rem", textWrap: "nowrap"}}>
                     <Flex style={{gap: ".35rem"}}>
-                        <Button color={"primary"} onClick={() => downloadBackupCodes(backupCodes)}>
+                        <Button color={"primary"} onClick={() => downloadBackupCodes(backupCodes, issuer)}>
                             <IconDownload size={16}/>
                             Download backup codes
                         </Button>
@@ -173,7 +181,7 @@ export const UserMfaView: React.FC = () => {
                                 </InputWrapper>
                             </div>
                             <div>
-                                <QrCodeComponent value={buildOtpAuthUri(secret, account)} size={132}/>
+                                <QrCodeComponent value={buildOtpAuthUri(secret, account, issuer)} size={132}/>
                             </div>
                         </Flex>
                     </CardSection>
