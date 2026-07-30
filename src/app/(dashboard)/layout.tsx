@@ -29,6 +29,7 @@ import {
     User
 } from "@code0-tech/sagittarius-graphql-types";
 import {ApplicationMiddlewareComponent} from "@edition/application/components/ApplicationMiddlewareComponent";
+import {MfaProviderComponent} from "@edition/user/components/MfaProviderComponent";
 import {FullScreen} from "@code0-tech/pictor/dist/components/fullscreen/FullScreen";
 import {ApplicationNavigationView} from "@edition/application/views/ApplicationNavigationView";
 import {FlowService} from "@edition/flow/services/Flow.service";
@@ -91,6 +92,7 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, sidebar,
     return <ContextStoreProvider
         services={[application, user, organization, member, namespace, runtime, project, role, flow, functions, datatype, flowtype, module, ai]}>
         <ApplicationMiddlewareComponent>
+            <MfaProviderComponent>
             <FullScreen bg={"var(--secondary)"}>
                 <Layout p={1} showLayoutSplitter={false} layoutGap={32} leftContent={<ApplicationNavigationView/>}>
                     <Layout showLayoutSplitter={false} layoutGap={32} leftContent={<div style={{
@@ -105,6 +107,7 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, sidebar,
                     </Layout>
                 </Layout>
             </FullScreen>
+            </MfaProviderComponent>
         </ApplicationMiddlewareComponent>
     </ContextStoreProvider>
 }
