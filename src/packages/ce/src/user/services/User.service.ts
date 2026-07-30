@@ -35,7 +35,6 @@ import {
     UsersUpdatePayload
 } from "@code0-tech/sagittarius-graphql-types";
 import {GraphqlClient} from "@core/util/graphql-client";
-import {withMfaRetry} from "@core/util/mfa";
 import createMutation from "./mutations/User.create.mutation.graphql";
 import updateMutation from "./mutations/User.update.mutation.graphql";
 import loginMutation from "./mutations/User.login.mutation.graphql";
@@ -183,22 +182,16 @@ export class UserService extends ReactiveArrayService<User> {
     }
 
     async usersUpdate(payload: UsersUpdateInput): Promise<UsersUpdatePayload | undefined> {
-        // usersUpdate may require a fresh MFA confirmation. withMfaRetry transparently
-        // prompts for a code via the shared step-up dialog and retries with the mfa input.
-        const result = await withMfaRetry<UsersUpdatePayload | undefined>(async (mfa) => {
-            const response = await this.client.mutate<Mutation, UsersUpdateInput>({
-                mutation: updateMutation,
-                variables: {
-                    ...payload,
-                    ...(mfa ? {mfa} : {})
-                }
-            })
-            return response.data?.usersUpdate ?? undefined
+        const result = await this.client.mutate<Mutation, UsersUpdateInput>({
+            mutation: updateMutation,
+            variables: {
+                ...payload
+            }
         })
 
-        if (result?.user) this.mergeUser(result.user)
+        if (result.data?.usersUpdate?.user) this.mergeUser(result.data.usersUpdate.user)
 
-        return result
+        return result.data?.usersUpdate ?? undefined
     }
 
     /**
