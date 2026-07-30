@@ -26,8 +26,18 @@ import {User, UsersUpdateInput} from "@code0-tech/sagittarius-graphql-types";
 import {UserService} from "@edition/user/services/User.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
-import {IconAt, IconBackground, IconLock, IconMail, IconSettings2, IconShieldLock} from "@tabler/icons-react";
+import {
+    IconAt,
+    IconBackground,
+    IconLock,
+    IconMail,
+    IconSettings2,
+    IconShield,
+    IconShieldLock
+} from "@tabler/icons-react";
 import {UserSessionsDataTableComponent} from "@edition/user/components/UserSessionsDataTableComponent";
+import {useMfa} from "@edition/user/components/MfaProviderComponent";
+import {UserMfaView} from "@edition/user/views/UserMfaView";
 import {SettingDialog} from "@core/components/SettingDialog";
 
 export interface UserEditDialogComponentProps {
@@ -42,6 +52,7 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
 
     const userService = useService(UserService)
     const userStore = useStore(UserService)
+    const withMfa = useMfa()
     const [, startTransition] = React.useTransition()
 
     const currentSession = useUserSession()
@@ -123,11 +134,12 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
             }
 
             startTransition(async () => {
-                await userService.usersUpdate(payload).then(payload => {
-                    if (payload?.user && (payload?.errors?.length ?? 0) <= 0) {
-                        toast({title: "Updated user", color: "success"})
-                    }
-                })
+                // usersUpdate may require a fresh MFA confirmation. withMfa shows the step-up
+                // dialog and retries with the mfa merged into the payload.
+                const result = await withMfa((mfa) => userService.usersUpdate({...payload, ...(mfa ? {mfa} : {})}))
+                if (result?.user && (result?.errors?.length ?? 0) <= 0) {
+                    toast({title: "Updated user", color: "success"})
+                }
             })
         }
     })
@@ -153,10 +165,18 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                               )}
                               <TabTrigger value={"security"} w={"100%"} asChild>
                                   <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                      <IconSettings2 opacity={0} size={13}/>
+                                      <IconShield size={13}/>
                                       <Text size={"md"}>Security</Text>
                                   </Button>
                               </TabTrigger>
+                              {isSelf && (
+                                  <TabTrigger value={"mfa"} w={"100%"} asChild>
+                                      <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                          <IconSettings2 opacity={0} size={13}/>
+                                          <Text size={"md"}>2-Step Verification</Text>
+                                      </Button>
+                                  </TabTrigger>
+                              )}
                               <TabTrigger value={"sessions"} w={"100%"} asChild>
                                   <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
                                       <IconSettings2 opacity={0} size={13}/>
@@ -281,6 +301,7 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                            onChange={() => validate("repeatPassword")}
                            {...inputs.getInputProps("repeatPassword")}/>
         </TabContent>
+        {isSelf ? <UserMfaView/> : <></>}
         <TabContent value={"sessions"}
                     style={{
                         overflow: "hidden",

@@ -37,6 +37,7 @@ export const InputDialog: React.FC<InputDialogProps> = (props) => {
             <DialogContent style={{padding: "2px"}}
                            w={"75%"} h={"75%"}
                            autoFocus
+                           tabIndex={-1}
                            showCloseButton={false}>
                 <Layout layoutGap={0} showLayoutSplitter={false} leftContent={
                     <div style={{

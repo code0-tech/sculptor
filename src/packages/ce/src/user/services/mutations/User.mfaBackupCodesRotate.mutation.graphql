@@ -1,0 +1,13 @@
+mutation mfaBackupCodesRotate {
+    usersMfaBackupCodesRotate(input: {}) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        codes
+    }
+}

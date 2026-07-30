@@ -19,8 +19,6 @@ import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {User} from "@code0-tech/sagittarius-graphql-types";
 import {IconMail, IconSparkles, IconUser} from "@tabler/icons-react";
 
-const separator = <div style={{borderTop: "1px dashed rgba(255,255,255, .1)"}}/>
-
 export const UserProfileView: React.FC = () => {
 
     const params = useParams()
@@ -62,7 +60,7 @@ export const UserProfileView: React.FC = () => {
             </Flex>
         </Flex>
 
-        {separator}
+        <div style={{borderTop: "1px dashed rgba(255,255,255, .1)"}}/>
 
         <Flex style={{flexDirection: "column", gap: "0.6rem"}}>
             <Text hierarchy={"tertiary"}>Details</Text>

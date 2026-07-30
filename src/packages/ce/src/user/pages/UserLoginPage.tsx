@@ -7,16 +7,20 @@ import {
     EmailInput,
     emailValidation,
     PasswordInput,
+    SegmentedControl,
+    SegmentedControlItem,
     Spacing,
-    Text, toast,
+    Text,
+    toast,
     useForm,
     useService
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import Link from "next/link";
 import {useRouter, useSearchParams} from "next/navigation";
-import {setUserSession, useUserSession} from "@edition/user/hooks/User.session.hook";
-import {isValidRedirect} from "@core/util/redirect";
+import {setUserSession} from "@edition/user/hooks/User.session.hook";
+import {MfaInputComponent} from "@edition/user/components/MfaInputComponent";
+import {MfaType} from "@code0-tech/sagittarius-graphql-types";
 
 export const UserLoginPage: React.FC = () => {
 
@@ -27,23 +31,84 @@ export const UserLoginPage: React.FC = () => {
 
     const [_, setFailedAttempts] = React.useState(0)
     const [isInTimeout, setIsInTimeout] = React.useState(false)
+    const [needsMfa, setNeedsMfa] = React.useState(false)
+    const [mfaType, setMfaType] = React.useState<string>("TOTP")
 
-    const onSubmit = React.useCallback((values: any) => {
-        if (!values.password || !values.email || !emailValidation(values.email)) return
-        if (isInTimeout) {
-            toast({
-                title: "Too many failed attempts. Please try again in 5 seconds.",
-                color: "error",
-                duration: 5000,
-            })
-            return
+    // Focus the relevant field: the MFA code input while stepping up, otherwise
+    // the email input. autoFocus is unreliable here (React skips it on SSR
+    // hydration), so we imperatively focus the first input in the active view.
+    const focusContainerRef = React.useRef<HTMLDivElement>(null)
+    React.useEffect(() => {
+        const focusFirst = () => {
+            const input = focusContainerRef.current?.querySelector<HTMLInputElement>(
+                "input:not([type=hidden]):not([disabled])"
+            )
+            if (input && document.activeElement !== input) input.focus()
         }
-        startTransition(async () => {
-            await userService.usersLogin({
-                password: (values.password as unknown as string),
-                email: (values.email as unknown as string),
-            }).then(payload => {
+        // Defer past Radix's roving-focus/collection setup (the OTP field
+        // registers its inputs via layout effects and would otherwise steal
+        // focus back), then retry once in case the first attempt is pre-empted.
+        let retry = 0
+        const raf = requestAnimationFrame(() => {
+            focusFirst()
+            retry = requestAnimationFrame(focusFirst)
+        })
+        return () => {
+            cancelAnimationFrame(raf)
+            cancelAnimationFrame(retry)
+        }
+    }, [needsMfa, mfaType])
+
+    const initialValues = React.useMemo(
+        () => ({email: null, password: null, mfa: null}),
+        []
+    )
+
+    const [inputs, validate] = useForm<{
+        email: null
+        password: null
+        mfa: string | null
+    }>({
+        useInitialValidation: false,
+        initialValues,
+        validate: {
+            email: (value) => {
+                if (!value) return "Email is required"
+                if (!emailValidation(value)) return "Please provide a valid email"
+                return null
+            },
+            password: (value) => {
+                if (!value) return "Password is required"
+                return null
+            },
+            mfa: (value) => {
+                return needsMfa && !value ? "Enter your authentication code" : null
+            }
+        },
+        onSubmit: (values) => {
+            if (isInTimeout) {
+                toast({
+                    title: "Too many failed attempts. Please try again in 5 seconds.",
+                    color: "error",
+                    duration: 5000
+                })
+                return
+            }
+            startTransition(async () => {
+                const payload = await userService.usersLogin({
+                    email: values.email!,
+                    password: values.password!,
+                    ...(values.mfa ? {mfa: {type: mfaType as MfaType, value: values.mfa}} : {})
+                })
+                if (!values.mfa && (!!payload?.errors?.some(error => error?.errorCode === "MFA_REQUIRED" || error?.errorCode === "MFA_FAILED"))) {
+                    setNeedsMfa(true)
+                    return
+                }
                 if ((payload?.errors?.length ?? 0) > 0) {
+                    if (needsMfa) {
+                        toast({title: "That code isn't valid. Please try again.", color: "error"})
+                        return
+                    }
                     setFailedAttempts(prevState => {
                         const newState = prevState + 1
                         if (newState % 3 === 0 || newState > 3) {
@@ -58,35 +123,61 @@ export const UserLoginPage: React.FC = () => {
                     setUserSession(payload.userSession)
                     router.push("/")
                     router.refresh()
+                    return
                 }
+                return
             })
-        })
-    }, [isInTimeout])
-
-    const initialValues = React.useMemo(() => ({
-        email: null,
-        password: null
-    }), [])
-
-    const [inputs, validate] = useForm({
-        useInitialValidation: false,
-        initialValues: initialValues,
-        validate: {
-            email: (value) => {
-                if (!value) return "Email is required"
-                if (!emailValidation(value)) return "Please provide a valid email"
-                return null
-            },
-            password: (value) => {
-                if (!value) return "Password is required"
-                return null
-            }
-        },
-        onSubmit: onSubmit
+        }
     })
 
+    if (needsMfa) {
+        return <div ref={focusContainerRef} style={{display: "contents"}}>
+            <Text size={"lg"} hierarchy={"primary"} display={"block"}>
+                Two-factor authentication
+            </Text>
+            <Spacing spacing={"md"}/>
+            <Text size={"md"} hierarchy={"tertiary"} display={"block"}>
+                Enter a code from your authenticator app or one of your backup codes to finish signing in.
+            </Text>
+            <Spacing spacing={"xl"}/>
+            <SegmentedControl type={"single"}
+                              value={mfaType}
+                              tabIndex={-1}
+                              onValueChange={(next) => {
+                                  setMfaType(next)
+                                  inputs.getInputProps("mfa").formValidation?.setValue?.(null)
+                              }}>
+                <SegmentedControlItem tabIndex={-1} w={"100%"} value={"TOTP"}>
+                    <Text>Authenticator</Text>
+                </SegmentedControlItem>
+                <SegmentedControlItem tabIndex={-1} w={"100%"} value={"BACKUP_CODE"}>
+                    <Text>Backup code</Text>
+                </SegmentedControlItem>
+            </SegmentedControl>
+            <Spacing spacing={"xl"}/>
+            <MfaInputComponent type={mfaType as MfaType}
+                               disabled={loading}
+                               onComplete={() => {
+                                   validate()
+                               }}
+                               {...inputs.getInputProps("mfa")}/>
+            <Spacing spacing={"md"}/>
+            <Button disabled={loading} color={"success"} w={"100%"} onClick={() => validate()}>
+                {loading ? "Verifying..." : "Verify & Login"}
+            </Button>
+            <Text display={"block"} hierarchy={"tertiary"} size={"md"} mt={1.3}
+                  style={{cursor: "pointer"}}
+                  onClick={() => {
+                      setNeedsMfa(false)
+                      setMfaType("TOTP")
+                      inputs.getInputProps("mfa").formValidation?.setValue?.(null)
+                  }}>
+                Back to login
+            </Text>
+        </div>
+    }
 
-    return <>
+    return <div ref={focusContainerRef} style={{display: "contents"}}>
         <form noValidate onSubmit={(e) => {
             validate()
             e.stopPropagation()
@@ -110,7 +201,8 @@ export const UserLoginPage: React.FC = () => {
             <PasswordInput data-qa-selector={"auth-login-password"} placeholder={"Password"}
                            {...inputs.getInputProps("password")}/>
             <div style={{marginBottom: "1.3rem"}}/>
-            <Button disabled={loading} type={"submit"} data-qa-selector={"auth-login-send"} color={"success"} w={"100%"} mb={1.3}>
+            <Button disabled={loading} type={"submit"} data-qa-selector={"auth-login-send"} color={"success"} w={"100%"}
+                    mb={1.3}>
                 {loading ? "Loading..." : "Login"}
             </Button>
         </form>
@@ -127,6 +219,6 @@ export const UserLoginPage: React.FC = () => {
                 </Text>
             </Link>
         </Text>
-    </>
+    </div>
 
 }

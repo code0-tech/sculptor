@@ -43,6 +43,9 @@ import registerMutation from "./mutations/User.register.mutation.graphql";
 import emailVerificationMutation from "./mutations/User.emailVerification.mutation.graphql";
 import passwordResetMutation from "./mutations/User.passwordReset.mutation.graphql"
 import passwordResetRequestMutation from "./mutations/User.passwordResetRequest.mutation.graphql"
+import mfaTotpGenerateSecretMutation from "./mutations/User.mfaTotpGenerateSecret.mutation.graphql"
+import mfaTotpValidateSecretMutation from "./mutations/User.mfaTotpValidateSecret.mutation.graphql"
+import mfaBackupCodesRotateMutation from "./mutations/User.mfaBackupCodesRotate.mutation.graphql"
 import usersQuery from "./queries/Users.query.graphql";
 import currentUserQuery from "./queries/User.current.query.graphql";
 import userByUsernameQuery from "./queries/User.byUsername.query.graphql";
@@ -186,25 +189,28 @@ export class UserService extends ReactiveArrayService<User> {
             }
         })
 
-        if (result.data && result.data.usersUpdate && result.data.usersUpdate.user) {
-            const updatedUser = result.data.usersUpdate.user
-            const index = super.values().findIndex(user => user.id === updatedUser.id)
-            if (index >= 0) {
-                // The update mutation only returns the UserBasic fragment, which omits
-                // connection fields (namespaceMemberships, identities, sessions). Merge the
-                // result into the existing user so those connections are preserved.
-                const existingUser = super.values()[index]
-                this.set(index, new View({
-                    ...existingUser,
-                    ...updatedUser,
-                    namespaceMemberships: existingUser.namespaceMemberships,
-                    identities: existingUser.identities,
-                    sessions: existingUser.sessions,
-                }))
-            } else if (!this.hasById(updatedUser.id)) this.add(new View(updatedUser))
-        }
+        if (result.data?.usersUpdate?.user) this.mergeUser(result.data.usersUpdate.user)
 
         return result.data?.usersUpdate ?? undefined
+    }
+
+    /**
+     * Merges a user returned from a mutation into the store. Mutations return the
+     * UserBasic fragment, which omits connection fields (namespaceMemberships,
+     * identities, sessions), so those are preserved from the existing entry.
+     */
+    private mergeUser(updatedUser: User): void {
+        const index = super.values().findIndex(user => user.id === updatedUser.id)
+        if (index >= 0) {
+            const existingUser = super.values()[index]
+            this.set(index, new View({
+                ...existingUser,
+                ...updatedUser,
+                namespaceMemberships: existingUser.namespaceMemberships,
+                identities: existingUser.identities,
+                sessions: existingUser.sessions,
+            }))
+        } else if (!this.hasById(updatedUser.id)) this.add(new View(updatedUser))
     }
 
     async usersEmailVerification(payload: UsersEmailVerificationInput): Promise<UsersEmailVerificationPayload | undefined> {
@@ -285,19 +291,48 @@ export class UserService extends ReactiveArrayService<User> {
         return result.data?.usersLogout ?? undefined
     }
 
-    /** @alpha **/
-    usersMfaBackupCodesRotate(payload: UsersMfaBackupCodesRotateInput): Promise<UsersMfaBackupCodesRotatePayload | undefined> {
-        return Promise.resolve(undefined);
+    async usersMfaBackupCodesRotate(payload: UsersMfaBackupCodesRotateInput): Promise<UsersMfaBackupCodesRotatePayload | undefined> {
+        const result = await this.client.mutate<Mutation, UsersMfaBackupCodesRotateInput>({
+            mutation: mfaBackupCodesRotateMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        const data = result.data?.usersMfaBackupCodesRotate ?? undefined
+        // The acting user's remaining backup code count changed — refresh it in the store.
+        if (data?.codes && (data.errors?.length ?? 0) <= 0) {
+            await this.refetchCurrentUser()
+        }
+
+        return data
     }
 
-    /** @alpha **/
-    usersMfaTotpGenerateSecret(payload: UsersMfaTotpGenerateSecretInput): Promise<UsersMfaTotpGenerateSecretPayload | undefined> {
-        return Promise.resolve(undefined);
+    async usersMfaTotpGenerateSecret(payload: UsersMfaTotpGenerateSecretInput): Promise<UsersMfaTotpGenerateSecretPayload | undefined> {
+        const result = await this.client.mutate<Mutation, UsersMfaTotpGenerateSecretInput>({
+            mutation: mfaTotpGenerateSecretMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        return result.data?.usersMfaTotpGenerateSecret ?? undefined
     }
 
-    /** @alpha **/
-    usersMfaTotpValidateSecret(payload: UsersMfaTotpValidateSecretInput): Promise<UsersMfaTotpValidateSecretPayload | undefined> {
-        return Promise.resolve(undefined);
+    async usersMfaTotpValidateSecret(payload: UsersMfaTotpValidateSecretInput): Promise<UsersMfaTotpValidateSecretPayload | undefined> {
+        const result = await this.client.mutate<Mutation, UsersMfaTotpValidateSecretInput>({
+            mutation: mfaTotpValidateSecretMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        const data = result.data?.usersMfaTotpValidateSecret ?? undefined
+        if (data?.user && (data.errors?.length ?? 0) <= 0) {
+            this.mergeUser(data.user)
+        }
+
+        return data
     }
 
     async usersPasswordReset(payload: UsersPasswordResetInput): Promise<UsersPasswordResetPayload | undefined> {
