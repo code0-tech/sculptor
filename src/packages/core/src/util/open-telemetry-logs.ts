@@ -1,7 +1,8 @@
 import {OTLPLogExporter} from "@opentelemetry/exporter-logs-otlp-http"
 import {BatchLogRecordProcessor, LoggerProvider} from "@opentelemetry/sdk-logs"
-import {resource, serverResource} from "@core/util/open-telemetry"
+import {buildClientResource, ClientOtelConfig, serverResource} from "@core/util/open-telemetry"
 import {recordException} from "@core/util/open-telemetry-exceptions"
+import {logs} from "@opentelemetry/api-logs"
 import {parseHeaders} from "@core/util/headers";
 
 export const openTelemetryServerLogsReader = process.env.OTEL_LOGS_ENDPOINT ? new OTLPLogExporter({
@@ -9,29 +10,18 @@ export const openTelemetryServerLogsReader = process.env.OTEL_LOGS_ENDPOINT ? ne
     headers: parseHeaders(process.env.OTEL_HEADER),
 }) : undefined
 
-export const openTelemetryClientLogsReader = process.env.NEXT_PUBLIC_OTEL_LOGS_ENDPOINT ? new OTLPLogExporter({
-    url: process.env.NEXT_PUBLIC_OTEL_LOGS_ENDPOINT,
-    headers: parseHeaders(process.env.NEXT_PUBLIC_OTEL_HEADER),
-}) : undefined
-
 export const openTelemetryServerLogsProvider = openTelemetryServerLogsReader ? new LoggerProvider({
     resource: serverResource,
     processors: [new BatchLogRecordProcessor(openTelemetryServerLogsReader)]
 }) : undefined
 
-export const openTelemetryClientLogsProvider = openTelemetryClientLogsReader ? new LoggerProvider({
-    resource: resource,
-    processors: [new BatchLogRecordProcessor(openTelemetryClientLogsReader)]
-}) : undefined
+/**
+ * Patches the global `console` methods to forward messages to the given
+ * OpenTelemetry logger provider (in addition to the original console output).
+ */
+const instrumentConsole = (provider: LoggerProvider) => {
 
-export default (level: 'server' | "client" = "server") => {
-
-    if (level === 'server' && !openTelemetryServerLogsProvider) return
-    if (level === 'client' && !openTelemetryClientLogsProvider) return
-
-    const logger = level === "server" ?
-        openTelemetryServerLogsProvider?.getLogger("default", "1.0.0") :
-        openTelemetryClientLogsProvider?.getLogger("default", "1.0.0")
+    const logger = provider.getLogger("default", "1.0.0")
 
     const originalConsole = {
         log: console.log,
@@ -147,4 +137,35 @@ export default (level: 'server' | "client" = "server") => {
         originalConsole.debug.apply(console, args)
     }
 
+}
+
+export default () => {
+
+    if (!openTelemetryServerLogsProvider) return
+    instrumentConsole(openTelemetryServerLogsProvider)
+}
+
+/**
+ * Builds and registers the browser logger provider from runtime configuration,
+ * then patches `console` to forward log records to it. Returns the provider, or
+ * undefined when logging is not configured.
+ */
+export const initializeClientLogs = (config: ClientOtelConfig) => {
+
+    if (!config.logsEndpoint) return undefined
+
+    const exporter = new OTLPLogExporter({
+        url: config.logsEndpoint,
+        headers: parseHeaders(config.header ?? undefined),
+    })
+
+    const provider = new LoggerProvider({
+        resource: buildClientResource(config),
+        processors: [new BatchLogRecordProcessor(exporter)]
+    })
+
+    logs.setGlobalLoggerProvider(provider)
+    instrumentConsole(provider)
+
+    return provider
 }
