@@ -36,6 +36,7 @@ import {
     IconShieldLock
 } from "@tabler/icons-react";
 import {UserSessionsDataTableComponent} from "@edition/user/components/UserSessionsDataTableComponent";
+import {useMfa} from "@edition/user/components/MfaProviderComponent";
 import {UserMfaView} from "@edition/user/views/UserMfaView";
 import {SettingDialog} from "@core/components/SettingDialog";
 
@@ -51,6 +52,7 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
 
     const userService = useService(UserService)
     const userStore = useStore(UserService)
+    const withMfa = useMfa()
     const [, startTransition] = React.useTransition()
 
     const currentSession = useUserSession()
@@ -132,11 +134,12 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
             }
 
             startTransition(async () => {
-                await userService.usersUpdate(payload).then(payload => {
-                    if (payload?.user && (payload?.errors?.length ?? 0) <= 0) {
-                        toast({title: "Updated user", color: "success"})
-                    }
-                })
+                // usersUpdate may require a fresh MFA confirmation. withMfa shows the step-up
+                // dialog and retries with the mfa merged into the payload.
+                const result = await withMfa((mfa) => userService.usersUpdate({...payload, ...(mfa ? {mfa} : {})}))
+                if (result?.user && (result?.errors?.length ?? 0) <= 0) {
+                    toast({title: "Updated user", color: "success"})
+                }
             })
         }
     })
