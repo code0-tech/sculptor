@@ -563,6 +563,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         flow.executionResults = {
             __typename: "ExecutionResultConnection",
             ...flow.executionResults,
+            count: (flow.executionResults?.count ?? 0) + 1,
             nodes: [...existingNodes, executionResult],
         }
 
