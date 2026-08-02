@@ -21,6 +21,7 @@ import {useRouter, useSearchParams} from "next/navigation";
 import {setUserSession} from "@edition/user/hooks/User.session.hook";
 import {MfaInputComponent} from "@edition/user/components/MfaInputComponent";
 import {MfaType} from "@code0-tech/sagittarius-graphql-types";
+import {IdentityProviderButtonsComponent} from "@edition/user/components/IdentityProviderButtonsComponent";
 
 export const UserLoginPage: React.FC = () => {
 
@@ -206,6 +207,11 @@ export const UserLoginPage: React.FC = () => {
                 {loading ? "Loading..." : "Login"}
             </Button>
         </form>
+        <Text size={"md"} hierarchy={"tertiary"} display={"block"} style={{textAlign: "center"}}>
+            or continue with
+        </Text>
+        <Spacing spacing={"md"}/>
+        <IdentityProviderButtonsComponent intent={"login"}/>
         <Link href={`/password?${query.toString()}`}>
             <Text display={"block"} hierarchy={"tertiary"} size={"md"} mb={0.7}>
                 Forgot password?
