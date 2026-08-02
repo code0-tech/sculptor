@@ -10,6 +10,7 @@ import {Payload, View} from "@code0-tech/pictor/dist/utils/view";
 import {GraphqlClient} from "@core/util/graphql-client";
 import applicationQuery from "@edition/application/services/queries/Application.query.graphql"
 import applicationUpdateMutation from "@edition/application/services/mutations/Application.update.mutation.graphql"
+import identityProviderLoginUrlQuery from "@edition/application/services/queries/IdentityProviderLoginUrl.query.graphql"
 
 export type Application = SApplication & Payload
 
@@ -63,5 +64,14 @@ export class ApplicationService extends ReactiveArrayService<Application> {
         }
 
         return result.data?.applicationSettingsUpdate ?? undefined
+    }
+
+    async getIdentityProviderLoginUrl(id: string): Promise<string | undefined> {
+        const result = await this.client.query<Query>({
+            query: identityProviderLoginUrlQuery,
+            variables: {id}
+        })
+
+        return result.data?.application?.identityProviderLoginUrl ?? undefined
     }
 }
