@@ -14,6 +14,7 @@ import {
     Text
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
+import {Application, ApplicationService} from "@edition/application/services/Application.service";
 import {useApolloClient} from "@apollo/client/react";
 import {GraphqlClient} from "@core/util/graphql-client";
 import Image from "next/image";
@@ -33,13 +34,14 @@ export default function AuthLayout({children}: Readonly<{ children: React.ReactN
 
     const [store, service] = usePersistentReactiveArrayService<User, UserService>("auth-users", (store) => new UserService(graphqlClient, store))
     const organization = usePersistentReactiveArrayService<OrganizationView, OrganizationService>(`dashboard::organizations::${currentSession?.id}`, (store) => new OrganizationService(graphqlClient, store))
+    const application = usePersistentReactiveArrayService<Application, ApplicationService>(`auth::application::${currentSession?.id}`, (store) => new ApplicationService(graphqlClient, store))
 
     return (
         <FullScreen>
             <ScrollArea mah={"100%"} h={"100%"}>
                 <ScrollAreaViewport>
                     <AuroraBackground/>
-                    <ContextStoreProvider services={[[store, service], organization]}>
+                    <ContextStoreProvider services={[[store, service], organization, application]}>
                         <Container h={"100%"} w={"100%"}>
                             <Flex h={"100%"} w={"100%"} align={"center"} justify={"center"}>
                                 <Col xs={4} style={{marginTop: "auto", marginBottom: "auto"}}>
