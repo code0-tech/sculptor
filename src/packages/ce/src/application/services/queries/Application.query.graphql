@@ -1,6 +1,9 @@
 #import "../fragments/Application.fragment.graphql"
 
-query Application {
+query Application(
+    $firstIdentityProvider: Int,
+    $afterIdentityProvider: String
+) {
     application {
         ...Application
     }
