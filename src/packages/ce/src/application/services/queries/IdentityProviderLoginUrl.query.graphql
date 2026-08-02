@@ -1,0 +1,5 @@
+query IdentityProviderLoginUrl($id: String!) {
+    application {
+        identityProviderLoginUrl(id: $id)
+    }
+}

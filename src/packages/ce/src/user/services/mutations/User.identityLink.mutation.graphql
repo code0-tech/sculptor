@@ -1,0 +1,22 @@
+mutation identityLink($providerId: String!, $args: IdentityInput!) {
+    usersIdentityLink(input: {
+        providerId: $providerId
+        args: $args
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        userIdentity {
+            id
+            providerId
+            identifier
+            createdAt
+            updatedAt
+        }
+    }
+}

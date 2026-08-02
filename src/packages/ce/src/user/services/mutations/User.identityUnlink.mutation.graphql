@@ -1,0 +1,17 @@
+mutation identityUnlink($identityId: UserIdentityID!) {
+    usersIdentityUnlink(input: {
+        identityId: $identityId
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        userIdentity {
+            id
+        }
+    }
+}
