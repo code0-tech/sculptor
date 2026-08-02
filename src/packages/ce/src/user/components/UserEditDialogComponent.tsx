@@ -29,6 +29,7 @@ import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 import {
     IconAt,
     IconBackground,
+    IconLink,
     IconLock,
     IconMail,
     IconSettings2,
@@ -38,6 +39,7 @@ import {
 import {UserSessionsDataTableComponent} from "@edition/user/components/UserSessionsDataTableComponent";
 import {useMfa} from "@edition/user/components/MfaProviderComponent";
 import {UserMfaView} from "@edition/user/views/UserMfaView";
+import {UserIdentitiesView} from "@edition/user/views/UserIdentitiesView";
 import {SettingDialog} from "@core/components/SettingDialog";
 
 export interface UserEditDialogComponentProps {
@@ -177,6 +179,14 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                                       </Button>
                                   </TabTrigger>
                               )}
+                              {isSelf && (
+                                  <TabTrigger value={"connections"} w={"100%"} asChild>
+                                      <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                          <IconLink size={13}/>
+                                          <Text size={"md"}>Connected accounts</Text>
+                                      </Button>
+                                  </TabTrigger>
+                              )}
                               <TabTrigger value={"sessions"} w={"100%"} asChild>
                                   <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
                                       <IconSettings2 opacity={0} size={13}/>
@@ -302,6 +312,7 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                            {...inputs.getInputProps("repeatPassword")}/>
         </TabContent>
         {isSelf ? <UserMfaView/> : <></>}
+        {isSelf ? <UserIdentitiesView/> : <></>}
         <TabContent value={"sessions"}
                     style={{
                         overflow: "hidden",
