@@ -40,6 +40,10 @@ import updateMutation from "./mutations/User.update.mutation.graphql";
 import loginMutation from "./mutations/User.login.mutation.graphql";
 import logoutMutation from "./mutations/User.logout.mutation.graphql";
 import registerMutation from "./mutations/User.register.mutation.graphql";
+import identityLoginMutation from "./mutations/User.identityLogin.mutation.graphql";
+import identityRegisterMutation from "./mutations/User.identityRegister.mutation.graphql";
+import identityLinkMutation from "./mutations/User.identityLink.mutation.graphql";
+import identityUnlinkMutation from "./mutations/User.identityUnlink.mutation.graphql";
 import emailVerificationMutation from "./mutations/User.emailVerification.mutation.graphql";
 import passwordResetMutation from "./mutations/User.passwordReset.mutation.graphql"
 import passwordResetRequestMutation from "./mutations/User.passwordResetRequest.mutation.graphql"
@@ -229,24 +233,74 @@ export class UserService extends ReactiveArrayService<User> {
         return result.data?.usersEmailVerification ?? undefined
     }
 
-    /** @alpha **/
-    usersIdentityLink(payload: UsersIdentityLinkInput): Promise<UsersIdentityLinkPayload | undefined> {
-        return Promise.resolve(undefined);
+    async usersIdentityLink(payload: UsersIdentityLinkInput): Promise<UsersIdentityLinkPayload | undefined> {
+        const result = await this.client.mutate<Mutation, UsersIdentityLinkInput>({
+            mutation: identityLinkMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        return result.data?.usersIdentityLink ?? undefined
     }
 
-    /** @alpha **/
-    usersIdentityLogin(payload: UsersIdentityLoginInput): Promise<UsersIdentityLoginPayload | undefined> {
-        return Promise.resolve(undefined);
+    async usersIdentityLogin(payload: UsersIdentityLoginInput): Promise<UsersIdentityLoginPayload | undefined> {
+        const result = await this.client.mutate<Mutation, UsersIdentityLoginInput>({
+            mutation: identityLoginMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        const user = result.data?.usersIdentityLogin?.userSession?.user
+        if (user && !this.hasById(user.id)) {
+            this.add(new View(user))
+        }
+
+        return result.data?.usersIdentityLogin ?? undefined
     }
 
-    /** @alpha **/
-    usersIdentityRegister(payload: UsersIdentityRegisterInput): Promise<UsersIdentityRegisterPayload | undefined> {
-        return Promise.resolve(undefined);
+    async usersIdentityRegister(payload: UsersIdentityRegisterInput): Promise<UsersIdentityRegisterPayload | undefined> {
+        const result = await this.client.mutate<Mutation, UsersIdentityRegisterInput>({
+            mutation: identityRegisterMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        const user = result.data?.usersIdentityRegister?.userSession?.user
+        if (user && !this.hasById(user.id)) {
+            this.add(new View(user))
+        }
+
+        return result.data?.usersIdentityRegister ?? undefined
     }
 
-    /** @alpha **/
-    usersIdentityUnlink(payload: UsersIdentityUnlinkInput): Promise<UsersIdentityUnlinkPayload | undefined> {
-        return Promise.resolve(undefined);
+    async usersIdentityUnlink(payload: UsersIdentityUnlinkInput): Promise<UsersIdentityUnlinkPayload | undefined> {
+        const result = await this.client.mutate<Mutation, UsersIdentityUnlinkInput>({
+            mutation: identityUnlinkMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        const removed = result.data?.usersIdentityUnlink?.userIdentity
+        if (removed && (result.data?.usersIdentityUnlink?.errors?.length ?? 0) <= 0) {
+            const index = super.values().findIndex(user => user?.identities?.nodes?.some(identity => identity?.id === removed.id))
+            const user = index >= 0 ? super.values()[index] : undefined
+            if (user?.identities) {
+                this.set(index, new View({
+                    ...user,
+                    identities: {
+                        ...user.identities,
+                        count: Math.max((user.identities.count ?? 1) - 1, 0),
+                        nodes: user.identities.nodes?.filter(identity => identity?.id !== removed.id) ?? []
+                    }
+                }))
+            }
+        }
+
+        return result.data?.usersIdentityUnlink ?? undefined
     }
 
     async usersLogin(payload: UsersLoginInput): Promise<UsersLoginPayload | undefined> {
