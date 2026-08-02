@@ -1,4 +1,4 @@
-mutation ApplicationUpdate($userRegistrationEnabled: Boolean, $organizationCreationRestricted: Boolean, $adminStatusVisible: Boolean, $termsAndConditionsUrl: String, $privacyUrl: String, $legalNoticeUrl: String, $runtimeMaxHeartbeatIntervalMinutes: Int) {
+mutation ApplicationUpdate($userRegistrationEnabled: Boolean, $organizationCreationRestricted: Boolean, $adminStatusVisible: Boolean, $termsAndConditionsUrl: String, $privacyUrl: String, $legalNoticeUrl: String, $runtimeMaxHeartbeatIntervalMinutes: Int, $identityProviders: [IdentityProviderInput!]) {
     applicationSettingsUpdate(input: {
         userRegistrationEnabled: $userRegistrationEnabled
         organizationCreationRestricted: $organizationCreationRestricted
@@ -7,6 +7,7 @@ mutation ApplicationUpdate($userRegistrationEnabled: Boolean, $organizationCreat
         privacyUrl: $privacyUrl
         legalNoticeUrl: $legalNoticeUrl
         runtimeMaxHeartbeatIntervalMinutes: $runtimeMaxHeartbeatIntervalMinutes
+        identityProviders: $identityProviders
     }) {
         errors {
             ...on Error {
