@@ -48,10 +48,14 @@ export const UserIdentitiesView: React.FC = () => {
             Link an identity provider to sign in without a password, or unlink one you no longer use.
         </Text>
         <Spacing spacing={"md"}/>
-        <div style={{flex: 1, minHeight: 0}}>
-            <UserIdentitiesDataTableComponent userId={user?.id}/>
-        </div>
-        <Spacing spacing={"md"}/>
+        {identities.length > 0 ? (
+            <>
+                <div style={{flex: 1, minHeight: 0}}>
+                    <UserIdentitiesDataTableComponent userId={user?.id}/>
+                </div>
+                <Spacing spacing={"md"}/>
+            </>
+        ) : null}
         <IdentityProviderButtonsComponent intent={"link"}
                                           returnTo={returnTo}
                                           excludeProviderIds={linkedProviderIds}/>
