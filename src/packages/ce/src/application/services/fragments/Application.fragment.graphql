@@ -10,6 +10,19 @@ fragment Application on Application {
     legalNoticeUrl
     privacyUrl
     termsAndConditionsUrl
+    identityProviders(first: $firstIdentityProvider, after: $afterIdentityProvider) {
+        __typename
+        count
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+        nodes {
+            __typename
+            id
+            type
+        }
+    }
     settings {
         __typename
         termsAndConditionsUrl
