@@ -5,7 +5,8 @@ import {
     Badge,
     Button,
     ButtonGroup,
-    Card,
+    DataTable,
+    DataTableColumn,
     Flex,
     Menu,
     MenuContent,
@@ -17,7 +18,6 @@ import {
     useService,
     useStore
 } from "@code0-tech/pictor";
-import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 import {
@@ -122,53 +122,50 @@ export const ApplicationIdentityProvidersView: React.FC = () => {
             Configure OAuth / OpenID Connect providers your users can log in and register with.
         </Text>
         <Spacing spacing={"md"}/>
-        {providers.length <= 0 ? (
-            <Card color={"secondary"}>
-                <CardSection border>
-                    <Text size={"md"} hierarchy={"tertiary"}>
-                        No identity providers configured. Add one to enable single sign-on.
-                    </Text>
-                </CardSection>
-            </Card>
-        ) : (
-            <Card color={"secondary"}>
-                {providers.map(provider => {
-                    const meta = PROVIDER_TYPES.find(t => t.value === provider.type)
-                        ?? {value: provider.type, label: provider.type ?? "Unknown", icon: <IconKey size={13}/>}
-                    return <CardSection border key={provider.id}>
-                        <Flex justify={"space-between"} align={"center"}>
-                            <Flex align={"center"} style={{gap: ".65rem"}}>
-                                {meta.icon}
-                                <Flex style={{gap: ".35rem", flexDirection: "column"}}>
-                                    <Text size={"md"} hierarchy={"primary"}>
-                                        {provider.config?.providerName || provider.id}
-                                    </Text>
-                                    <Text size={"md"} hierarchy={"tertiary"}>{meta.label}</Text>
-                                </Flex>
-                            </Flex>
-                            <Menu>
-                                <MenuTrigger asChild>
-                                    <Button variant={"none"} paddingSize={"xxs"}>
-                                        <IconDotsVertical size={13}/>
-                                    </Button>
-                                </MenuTrigger>
-                                <MenuPortal>
-                                    <MenuContent sideOffset={8} align={"end"}>
-                                        <MenuItem onSelect={() => router.push(`/settings/identity-providers/${encodeURIComponent(provider.id!)}/settings`)}>
-                                            <IconKey size={13}/>
-                                            Configure
-                                        </MenuItem>
-                                        <MenuItem onSelect={() => handleDelete(provider.id!)}>
-                                            <IconTrash size={13}/>
-                                            Remove
-                                        </MenuItem>
-                                    </MenuContent>
-                                </MenuPortal>
-                            </Menu>
+        <DataTable filter={{}}
+                   sort={{}}
+                   onSelect={(provider) => {
+                       if (provider?.id) router.push(`/settings/identity-providers/${encodeURIComponent(provider.id)}/settings`)
+                   }}
+                   emptyComponent={<DataTableColumn>
+                       <Text size={"md"} hierarchy={"tertiary"}>
+                           No identity providers configured. Add one to enable single sign-on.
+                       </Text>
+                   </DataTableColumn>}
+                   data={providers}>
+            {(provider) => {
+                const meta = PROVIDER_TYPES.find(t => t.value === provider.type)
+                    ?? {value: provider.type, label: provider.type ?? "Unknown", icon: <IconKey size={13}/>}
+                return <>
+                    <DataTableColumn pr={2.5}>
+                        <Flex align={"center"} style={{gap: ".65rem"}}>
+                            {meta.icon}
+                            <Text size={"md"} hierarchy={"primary"}>
+                                {provider.type === "SAML" || provider.type === "OIDC"
+                                    ? provider.config?.providerName || provider.id
+                                    : meta.label}
+                            </Text>
                         </Flex>
-                    </CardSection>
-                })}
-            </Card>
-        )}
+                    </DataTableColumn>
+                    <DataTableColumn onClick={(e) => e.stopPropagation()}>
+                        <Menu>
+                            <MenuTrigger asChild>
+                                <Button variant={"none"} p={0.5}>
+                                    <IconDotsVertical size={13}/>
+                                </Button>
+                            </MenuTrigger>
+                            <MenuPortal>
+                                <MenuContent sideOffset={8} align={"end"}>
+                                    <MenuItem onSelect={() => handleDelete(provider.id!)}>
+                                        <IconTrash size={13}/>
+                                        Remove
+                                    </MenuItem>
+                                </MenuContent>
+                            </MenuPortal>
+                        </Menu>
+                    </DataTableColumn>
+                </>
+            }}
+        </DataTable>
     </TabContent>
 }
