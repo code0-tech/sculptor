@@ -2,7 +2,7 @@
 
 import React from "react";
 import {Button, Text, toast, useService, useStore} from "@code0-tech/pictor";
-import {IdentityProvider} from "@code0-tech/sagittarius-graphql-types";
+import {IdentityProviderBasic} from "@code0-tech/sagittarius-graphql-types";
 import {useRouter} from "next/navigation";
 import {ApplicationService} from "@edition/application/services/Application.service";
 import {
@@ -33,12 +33,12 @@ export const IdentityProviderButtonsComponent: React.FC<IdentityProviderButtonsC
     const router = useRouter()
     const [loading, startTransition] = React.useTransition()
 
-    const providers = React.useMemo<IdentityProvider[]>(
-        () => (applicationService.get()?.settings?.identityProviders?.nodes ?? []).filter((node): node is IdentityProvider => !!node),
+    const providers = React.useMemo<IdentityProviderBasic[]>(
+        () => (applicationService.get()?.identityProviders?.nodes ?? []).filter((node): node is IdentityProviderBasic => !!node),
         [applicationStore]
     )
 
-    const visibleProviders = React.useMemo<IdentityProvider[]>(
+    const visibleProviders = React.useMemo<IdentityProviderBasic[]>(
         () => providers.filter(provider => provider.id && !(excludeProviderIds ?? []).includes(provider.id)),
         [providers, excludeProviderIds]
     )
@@ -48,21 +48,21 @@ export const IdentityProviderButtonsComponent: React.FC<IdentityProviderButtonsC
     const providerMeta = React.useCallback((type?: string | null): { label: string, icon: React.ReactNode } => {
         switch (type) {
             case "OIDC":
-                return {label: "OpenID Connect", icon: <IconFingerprint size={13}/>}
+                return {label: "OpenID Connect", icon: <IconFingerprint size={16}/>}
             case "GOOGLE":
-                return {label: "Google", icon: <IconBrandGoogle size={13}/>}
+                return {label: "Google", icon: <IconBrandGoogle size={16}/>}
             case "GITHUB":
-                return {label: "GitHub", icon: <IconBrandGithub size={13}/>}
+                return {label: "GitHub", icon: <IconBrandGithub size={16}/>}
             case "GITLAB":
-                return {label: "GitLab", icon: <IconBrandGitlab size={13}/>}
+                return {label: "GitLab", icon: <IconBrandGitlab size={16}/>}
             case "DISCORD":
-                return {label: "Discord", icon: <IconBrandDiscord size={13}/>}
+                return {label: "Discord", icon: <IconBrandDiscord size={16}/>}
             case "MICROSOFT":
-                return {label: "Microsoft", icon: <IconBrandWindows size={13}/>}
+                return {label: "Microsoft", icon: <IconBrandWindows size={16}/>}
             case "SAML":
-                return {label: "SAML", icon: <IconShieldLock size={13}/>}
+                return {label: "SAML", icon: <IconShieldLock size={16}/>}
             default:
-                return {label: type ?? "Unknown", icon: <IconKey size={13}/>}
+                return {label: type ?? "Unknown", icon: <IconKey size={16}/>}
         }
     }, [])
 
@@ -74,7 +74,7 @@ export const IdentityProviderButtonsComponent: React.FC<IdentityProviderButtonsC
         return url.toString()
     }, [intent, returnTo])
 
-    const startAuth = React.useCallback((provider: IdentityProvider) => {
+    const startAuth = React.useCallback((provider: IdentityProviderBasic) => {
         const providerId = provider.id
         if (!providerId || loading) return
         startTransition(() => {
@@ -93,11 +93,13 @@ export const IdentityProviderButtonsComponent: React.FC<IdentityProviderButtonsC
     return <>
         {visibleProviders.map(provider => {
             const meta = providerMeta(provider.type)
-            return <Button key={provider.id} w={"100%"} mb={0.7} color={"secondary"}
+            return <Button key={provider.id} w={"100%"}
+                           mb={0.7}
+                           color={"tertiary"}
                            disabled={loading}
                            onClick={() => startAuth(provider)}>
                 {meta.icon}
-                <Text size={"md"}>{actionVerb} {meta.label}</Text>
+                <Text>{actionVerb} {meta.label}</Text>
             </Button>
         })}
     </>
