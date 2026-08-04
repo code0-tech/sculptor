@@ -64,7 +64,7 @@ export const ApplicationStatsView: React.FC = () => {
 
     // Saved work = executed nodes across a set of flows, pressed into whole minutes.
     const savedMinutesOf = (flowSet: typeof flows) => Math.floor(flowSet.reduce((sum, flow) =>
-        sum + (flow.nodes?.count ?? 0) * (flow.executionResults?.count ?? 0), 0)
+            sum + (flow.nodes?.count ?? 0) * (flow.executionResults?.count ?? 0), 0)
         * SAVED_SECONDS_PER_NODE_RUN / 60)
 
     const savedMinutes = React.useMemo(() => savedMinutesOf(flows), [flows])

@@ -6,6 +6,7 @@ fragment Flow on Flow {
     signature
     nodes (first: $firstNode, after: $afterNode) {
         __typename
+        count
         nodes {
             __typename
             id

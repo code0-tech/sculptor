@@ -1,0 +1,25 @@
+fragment IdentityProvider on IdentityProvider {
+    __typename
+    id
+    type
+    config {
+        __typename
+        ... on OidcIdentityProviderConfig {
+            providerName
+            clientId
+            clientSecret
+            authorizationUrl
+            tokenUrl
+            userDetailsUrl
+            redirectUri
+            attributeStatements
+        }
+        ... on SamlIdentityProviderConfig {
+            providerName
+            metadataUrl
+            settings
+            responseSettings
+            attributeStatements
+        }
+    }
+}

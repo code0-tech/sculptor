@@ -1,0 +1,26 @@
+#import "@edition/user/services/fragments/User.basic.fragment.graphql"
+mutation identityRegister($providerId: String!, $args: IdentityInput!) {
+    usersIdentityRegister(input: {
+        providerId: $providerId
+        args: $args
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        userSession {
+            updatedAt
+            token
+            active
+            createdAt
+            id
+            user {
+                ...UserBasic
+            }
+        }
+    }
+}

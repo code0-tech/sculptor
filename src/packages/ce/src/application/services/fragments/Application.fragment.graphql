@@ -1,3 +1,5 @@
+#import "@edition/application/services/fragments/IdentityProvider.fragment.graphql"
+
 fragment Application on Application {
     __typename
     metadata {
@@ -8,6 +10,19 @@ fragment Application on Application {
     legalNoticeUrl
     privacyUrl
     termsAndConditionsUrl
+    identityProviders(first: $firstIdentityProvider, after: $afterIdentityProvider) {
+        __typename
+        count
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+        nodes {
+            __typename
+            id
+            type
+        }
+    }
     settings {
         __typename
         termsAndConditionsUrl
@@ -17,6 +32,17 @@ fragment Application on Application {
         organizationCreationRestricted
         userRegistrationEnabled
         runtimeMaxHeartbeatIntervalMinutes
+        identityProviders(first: $firstIdentityProvider, after: $afterIdentityProvider) {
+            __typename
+            count
+            pageInfo {
+                endCursor
+                hasNextPage
+            }
+            nodes {
+                ...IdentityProvider
+            }
+        }
     }
     userAbilities {
         __typename

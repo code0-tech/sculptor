@@ -10,6 +10,7 @@ import {Payload, View} from "@code0-tech/pictor/dist/utils/view";
 import {GraphqlClient} from "@core/util/graphql-client";
 import applicationQuery from "@edition/application/services/queries/Application.query.graphql"
 import applicationUpdateMutation from "@edition/application/services/mutations/Application.update.mutation.graphql"
+import identityProviderLoginUrlQuery from "@edition/application/services/queries/IdentityProviderLoginUrl.query.graphql"
 
 export type Application = SApplication & Payload
 
@@ -50,18 +51,48 @@ export class ApplicationService extends ReactiveArrayService<Application> {
 
         if (result.data && result.data.applicationSettingsUpdate && result.data.applicationSettingsUpdate.applicationSettings) {
             const application = this.get()
+            const errored = (result.data.applicationSettingsUpdate.errors?.length ?? 0) > 0
+            const identityProviders = payload.identityProviders != null && !errored
+                ? {
+                    ...application.settings?.identityProviders,
+                    __typename: "IdentityProviderConnection",
+                    count: payload.identityProviders.length,
+                    nodes: payload.identityProviders.map(input => ({
+                        __typename: "IdentityProvider",
+                        id: input.id,
+                        type: input.type,
+                        config: input.config ? {
+                            __typename: input.type === "SAML"
+                                ? "SamlIdentityProviderConfig"
+                                : "OidcIdentityProviderConfig",
+                            ...input.config
+                        } : null
+                    }))
+                }
+                : application.settings?.identityProviders
+
             this.set(0, new View({
                 ...application,
                 legalNoticeUrl: result.data.applicationSettingsUpdate.applicationSettings.legalNoticeUrl,
                 privacyUrl: result.data.applicationSettingsUpdate.applicationSettings.privacyUrl,
                 termsAndConditionsUrl: result.data.applicationSettingsUpdate.applicationSettings.termsAndConditionsUrl,
                 settings: {
-                    ...result.data.applicationSettingsUpdate.applicationSettings
+                    ...result.data.applicationSettingsUpdate.applicationSettings,
+                    identityProviders
                 }
             } as Application))
 
         }
 
         return result.data?.applicationSettingsUpdate ?? undefined
+    }
+
+    async getIdentityProviderLoginUrl(id: string): Promise<string | undefined> {
+        const result = await this.client.query<Query>({
+            query: identityProviderLoginUrlQuery,
+            variables: {id}
+        })
+
+        return result.data?.application?.identityProviderLoginUrl ?? undefined
     }
 }

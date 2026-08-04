@@ -3,11 +3,12 @@
 import React from "react";
 import {Button, Text} from "@code0-tech/pictor";
 import {TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
-import {IconServer, IconSettings2, IconShieldLock, IconUsers} from "@tabler/icons-react";
+import {IconKey, IconServer, IconSettings2, IconShieldLock, IconUsers} from "@tabler/icons-react";
 import {ApplicationUsersView} from "@edition/application/views/ApplicationUsersView";
 import {ApplicationServersView} from "@edition/application/views/ApplicationServersView";
 import {ApplicationGeneralSettingsView} from "@edition/application/views/ApplicationGeneralSettingsView";
 import {ApplicationRestrictionsView} from "@edition/application/views/ApplicationRestrictionsView";
+import {ApplicationIdentityProvidersView} from "@edition/application/views/ApplicationIdentityProvidersView";
 import {ApplicationLicensesView} from "@edition/application/views/ApplicationLicensesView";
 import {ApplicationLicensesTabTriggerView} from "@edition/application/views/ApplicationLicensesTabTriggerView";
 import {SettingDialog} from "@core/components/SettingDialog";
@@ -49,12 +50,19 @@ export const ApplicationSettingsDialogComponent: React.FC<ApplicationSettingsDia
                                       <Text size={"md"}>Restrictions</Text>
                                   </Button>
                               </TabTrigger>
+                              <TabTrigger value={"identityProviders"} w={"100%"} asChild>
+                                  <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                      <IconKey size={13}/>
+                                      <Text size={"md"}>Identity providers</Text>
+                                  </Button>
+                              </TabTrigger>
                               <ApplicationLicensesTabTriggerView/>
                           </TabList>}>
         <ApplicationUsersView/>
         <ApplicationServersView/>
         <ApplicationGeneralSettingsView/>
         <ApplicationRestrictionsView/>
+        <ApplicationIdentityProvidersView/>
         <ApplicationLicensesView/>
     </SettingDialog>
 }

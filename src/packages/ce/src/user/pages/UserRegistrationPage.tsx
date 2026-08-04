@@ -8,6 +8,7 @@ import {
     Flex,
     PasswordInput,
     passwordValidation,
+    Spacing,
     Text,
     TextInput,
     useForm,
@@ -17,6 +18,7 @@ import Link from "next/link";
 import {UserService} from "@edition/user/services/User.service";
 import {useRouter} from "next/navigation";
 import {setUserSession} from "@edition/user/hooks/User.session.hook";
+import {IdentityProviderButtonsComponent} from "@edition/user/components/IdentityProviderButtonsComponent";
 
 export const UserRegistrationPage: React.FC = () => {
 
@@ -98,6 +100,15 @@ export const UserRegistrationPage: React.FC = () => {
         <Button data-qa-selector={"auth-register-send"} color={"info"} w={"100%"} mb={1.3} onClick={validate}>
             Sign up
         </Button>
+        <div style={{display: "flex", alignItems: "center", gap: "0.75rem"}}>
+            <div style={{flex: 1, borderTop: "1px solid rgba(255,255,255, .1)"}}/>
+            <Text size={"md"} hierarchy={"tertiary"}>
+                or sign up with
+            </Text>
+            <div style={{flex: 1, borderTop: "1px solid rgba(255,255,255, .1)"}}/>
+        </div>
+        <Spacing spacing={"md"}/>
+        <IdentityProviderButtonsComponent intent={"register"}/>
         <Text display={"flex"} hierarchy={"tertiary"} size={"md"}>
             Have an account
             <Link href={`/login`}>
