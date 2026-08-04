@@ -100,9 +100,13 @@ export const UserRegistrationPage: React.FC = () => {
         <Button data-qa-selector={"auth-register-send"} color={"info"} w={"100%"} mb={1.3} onClick={validate}>
             Sign up
         </Button>
-        <Text size={"md"} hierarchy={"tertiary"} display={"block"} style={{textAlign: "center"}}>
-            or sign up with
-        </Text>
+        <div style={{display: "flex", alignItems: "center", gap: "0.75rem"}}>
+            <div style={{flex: 1, borderTop: "1px solid rgba(255,255,255, .1)"}}/>
+            <Text size={"md"} hierarchy={"tertiary"}>
+                or sign up with
+            </Text>
+            <div style={{flex: 1, borderTop: "1px solid rgba(255,255,255, .1)"}}/>
+        </div>
         <Spacing spacing={"md"}/>
         <IdentityProviderButtonsComponent intent={"register"}/>
         <Text display={"flex"} hierarchy={"tertiary"} size={"md"}>

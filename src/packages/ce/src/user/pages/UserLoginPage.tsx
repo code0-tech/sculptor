@@ -198,20 +198,25 @@ export const UserLoginPage: React.FC = () => {
                 </>
             ) : null}
             <EmailInput data-qa-selector={"auth-login-email"} placeholder={"Email"} {...inputs.getInputProps("email")}/>
-            <div style={{marginBottom: "1.3rem"}}/>
+            <Spacing spacing={"xl"}/>
             <PasswordInput data-qa-selector={"auth-login-password"} placeholder={"Password"}
                            {...inputs.getInputProps("password")}/>
-            <div style={{marginBottom: "1.3rem"}}/>
-            <Button disabled={loading} type={"submit"} data-qa-selector={"auth-login-send"} color={"success"} w={"100%"}
-                    mb={1.3}>
+            <Spacing spacing={"xl"}/>
+            <Button disabled={loading} type={"submit"} data-qa-selector={"auth-login-send"} color={"success"} w={"100%"}>
                 {loading ? "Loading..." : "Login"}
             </Button>
         </form>
-        <Text size={"md"} hierarchy={"tertiary"} display={"block"} style={{textAlign: "center"}}>
-            or continue with
-        </Text>
-        <Spacing spacing={"md"}/>
+        <Spacing spacing={"xl"}/>
+        <div style={{display: "flex", alignItems: "center", gap: "0.75rem"}}>
+            <div style={{flex: 1, borderTop: "1px solid rgba(255,255,255, .1)"}}/>
+            <Text size={"md"} hierarchy={"tertiary"}>
+                or continue with
+            </Text>
+            <div style={{flex: 1, borderTop: "1px solid rgba(255,255,255, .1)"}}/>
+        </div>
+        <Spacing spacing={"xl"}/>
         <IdentityProviderButtonsComponent intent={"login"}/>
+        <Spacing spacing={"xl"}/>
         <Link href={`/password?${query.toString()}`}>
             <Text display={"block"} hierarchy={"tertiary"} size={"md"} mb={0.7}>
                 Forgot password?
