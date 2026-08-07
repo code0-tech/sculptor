@@ -1,0 +1,15 @@
+mutation createCraterToken {
+    usersCreateCraterToken(input: {}) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        token {
+            token
+        }
+    }
+}
