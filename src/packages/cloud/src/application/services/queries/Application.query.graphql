@@ -1,0 +1,10 @@
+#import "@ce-internal/application/services/fragments/Application.fragment.graphql"
+
+query Application(
+    $firstIdentityProvider: Int,
+    $afterIdentityProvider: String
+) {
+    application {
+        ...Application
+    }
+}
