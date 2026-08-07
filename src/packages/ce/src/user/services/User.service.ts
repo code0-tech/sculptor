@@ -3,6 +3,8 @@ import {
     Mutation,
     Query,
     User,
+    UsersCreateCraterTokenInput,
+    UsersCreateCraterTokenPayload,
     UsersCreateInput,
     UsersCreatePayload,
     UsersEmailVerificationInput,
@@ -36,6 +38,7 @@ import {
 } from "@code0-tech/sagittarius-graphql-types";
 import {GraphqlClient} from "@core/util/graphql-client";
 import createMutation from "./mutations/User.create.mutation.graphql";
+import createCraterTokenMutation from "./mutations/User.createCraterToken.mutation.graphql";
 import updateMutation from "./mutations/User.update.mutation.graphql";
 import loginMutation from "./mutations/User.login.mutation.graphql";
 import logoutMutation from "./mutations/User.logout.mutation.graphql";
@@ -183,6 +186,15 @@ export class UserService extends ReactiveArrayService<User> {
         }
 
         return result.data?.usersCreate ?? undefined
+    }
+
+    async usersCreateCraterToken(): Promise<UsersCreateCraterTokenPayload | undefined> {
+        const result = await this.client.mutate<Mutation, UsersCreateCraterTokenInput>({
+            mutation: createCraterTokenMutation,
+            variables: {}
+        })
+
+        return result.data?.usersCreateCraterToken ?? undefined
     }
 
     async usersUpdate(payload: UsersUpdateInput): Promise<UsersUpdatePayload | undefined> {
