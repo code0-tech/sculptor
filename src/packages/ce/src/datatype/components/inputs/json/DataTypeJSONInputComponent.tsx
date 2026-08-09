@@ -9,7 +9,7 @@ import {
 } from "@edition/datatype/components/inputs/json/DataTypeJSONInputEditDialogComponent";
 import {DataTypeInputValueComponent} from "@edition/datatype/components/inputs/DataTypeInputValueComponent";
 import {useDebouncedCallback} from "use-debounce";
-import {DataInput, ListInput} from "@code0-tech/triangulum/dist/util/schema.util";
+import {DataInput, ListInput} from "@code0-tech/triangulum";
 
 export interface EditableJSONEntry {
     key: string

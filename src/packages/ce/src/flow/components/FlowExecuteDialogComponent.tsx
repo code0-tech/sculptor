@@ -27,7 +27,7 @@ import {useSchemaAction} from "@edition/flow/components/FlowWorkerProvider";
 import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent";
 import {useFlowExecutionStore} from "@edition/flow/hooks/Flow.execution.hook";
 import {useFlowViewStore} from "@edition/flow/hooks/Flow.view.hook";
-import {Schema} from "@code0-tech/triangulum/dist/util/schema.util";
+import {Schema} from "@code0-tech/triangulum";
 
 export interface FlowExecuteDialogComponentProps {
     flowId: Flow['id']

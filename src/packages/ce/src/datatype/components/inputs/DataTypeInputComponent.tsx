@@ -1,6 +1,6 @@
 import React from "react";
 import {DataTypeTextInputComponent} from "./text/DataTypeTextInputComponent";
-import {NodeSchema} from "@code0-tech/triangulum";
+import {NodeSchema, Schema} from "@code0-tech/triangulum";
 import {
     LiteralValue,
     NodeFunction,
@@ -17,7 +17,6 @@ import {DataTypeGenericInputComponent} from "@edition/datatype/components/inputs
 import {
     DataTypeSubFlowInputComponent
 } from "@edition/datatype/components/inputs/sub-flow/DataTypeSubFlowInputComponent";
-import {Schema} from "@code0-tech/triangulum/dist/util/schema.util";
 
 export interface DataTypeInputComponentProps extends Omit<InputWrapperProps<NodeParameterValue | NodeFunction>, "onChange"> {
     schema: (NodeSchema | Schema)
