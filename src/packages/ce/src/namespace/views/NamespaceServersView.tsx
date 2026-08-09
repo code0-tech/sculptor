@@ -55,8 +55,8 @@ export const NamespaceServersView: React.FC = () => {
 
     const preFilter = React.useCallback((runtime: Runtime) => {
         if (runtime?.namespace?.id !== namespaceId) return false
-        if (filter === "connected") return runtime.status === "CONNECTED"
-        if (filter === "disconnected") return runtime.status !== "CONNECTED"
+        if (filter === "connected") return runtime.status?.status === "RUNNING"
+        if (filter === "disconnected") return runtime.status?.status !== "RUNNING"
         return true
     }, [filter, namespaceId])
 
