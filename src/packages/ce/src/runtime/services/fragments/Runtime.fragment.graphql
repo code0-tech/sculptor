@@ -3,7 +3,13 @@ fragment Runtime on Runtime {
     __typename
     id
     name
-    status
+    status {
+        __typename
+        id
+        status
+        lastHeartbeat
+        uptimes
+    }
     description
     namespace {
         __typename

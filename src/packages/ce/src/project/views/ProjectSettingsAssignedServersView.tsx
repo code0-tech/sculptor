@@ -96,9 +96,9 @@ export const ProjectSettingsAssignedServersView: React.FC = () => {
                                             <Flex align={"center"} justify={"space-between"} w={"100%"}
                                                   style={{gap: "0.7rem"}}>
                                                 <Text hierarchy={"primary"}>{runtime?.name}</Text>
-                                                <Badge color={runtime?.status === "CONNECTED" ? "success" : "error"}
+                                                <Badge color={runtime?.status?.status === "RUNNING" ? "success" : "error"}
                                                        border>
-                                                    <Text style={{color: "inherit"}}>{runtime?.status}</Text>
+                                                    <Text style={{color: "inherit"}}>{runtime?.status?.status}</Text>
                                                 </Badge>
                                             </Flex>
                                         </Flex>

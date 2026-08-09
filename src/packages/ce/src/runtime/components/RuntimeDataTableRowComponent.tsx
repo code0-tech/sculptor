@@ -42,8 +42,8 @@ export const RuntimeDataTableRowComponent: React.FC<ProjectDataTableRowComponent
             </Flex>
         </DataTableColumn>
         <DataTableColumn>
-            <Badge color={runtime?.status === "CONNECTED" ? "success" : "error"} border>
-                <Text style={{color: "inherit"}}>{runtime?.status}</Text>
+            <Badge color={runtime?.status?.status === "RUNNING" ? "success" : "error"} border>
+                <Text style={{color: "inherit"}}>{runtime?.status?.status}</Text>
             </Badge>
         </DataTableColumn>
     </>
