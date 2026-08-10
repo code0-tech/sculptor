@@ -10,7 +10,8 @@
     "dev:cloud": "cross-env EDITION=cloud npm run dev",
     "prebuild": "node edition.mjs",
     "build": "next build",
-    "start": "next start",
+    "postbuild": "cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/",
+    "start": "node .next/standalone/server.js",
     "lint": "eslint"
   },
   "dependencies": {
