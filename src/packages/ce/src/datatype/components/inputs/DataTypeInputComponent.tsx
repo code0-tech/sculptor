@@ -12,6 +12,7 @@ import {DataTypeBooleanInputComponent} from "@edition/datatype/components/inputs
 import {DataTypeSelectInputComponent} from "@edition/datatype/components/inputs/select/DataTypeSelectInputComponent";
 import {InputWrapperProps} from "@code0-tech/pictor/dist/components/form/InputWrapper";
 import {DataTypeNumberInputComponent} from "@edition/datatype/components/inputs/number/DataTypeNumberInputComponent";
+import {DataTypeDateInputComponent} from "@edition/datatype/components/inputs/date/DataTypeDateInputComponent";
 import {DataTypeJSONInputComponent} from "@edition/datatype/components/inputs/json/DataTypeJSONInputComponent";
 import {DataTypeGenericInputComponent} from "@edition/datatype/components/inputs/generic/DataTypeGenericInputComponent";
 import {
@@ -53,6 +54,11 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
                         {...rest}/>
                 case "number":
                     return <DataTypeNumberInputComponent
+                        schema={schema}
+                        suggestions={suggestions}
+                        {...rest}/>
+                case "date":
+                    return <DataTypeDateInputComponent
                         schema={schema}
                         suggestions={suggestions}
                         {...rest}/>

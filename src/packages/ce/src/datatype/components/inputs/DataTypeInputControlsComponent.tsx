@@ -11,6 +11,7 @@ import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/Refer
 import {
     Button,
     ButtonGroup,
+    ButtonProps,
     Flex,
     Menu,
     MenuContent,
@@ -36,6 +37,7 @@ export interface DataTypeInputControlsComponentProps {
     suggestions?: (NodeFunction | SubFlowValue | ReferenceValue | LiteralValue)[]
     onSelect?: (value: NodeFunction | SubFlowValue | ReferenceValue | LiteralValue | null) => void
     showSuggestions?: boolean
+    children?: React.ReactElement<ButtonProps>
 }
 
 interface ReferencePathTreeNode {
@@ -130,7 +132,7 @@ const ReferencePathMenuItems: React.FC<{
 
 export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsComponentProps> = (props) => {
 
-    const {suggestions, showSuggestions = true, onSelect} = props
+    const {suggestions, showSuggestions = true, onSelect, children} = props
 
     const menuEntries = React.useMemo(() => {
         if (!suggestions) return []
@@ -258,6 +260,7 @@ export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsCompo
                 </MenuPortal>
             </Menu>
         ) : <></>}
+        {children ?? <></>}
         <Button paddingSize={"xxs"} tabIndex={-1} onClick={(event) => {
             onSelect?.(null)
             event.stopPropagation()
