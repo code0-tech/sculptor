@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic"
  */
 export function GET() {
 
-    const config: ClientOtelConfig = {
+    const config: ClientOtelConfig & { subscriptionUrl: string | null } = {
         tracesEndpoint: process.env.NEXT_PUBLIC_OTEL_TRACES_ENDPOINT ?? null,
         logsEndpoint: process.env.NEXT_PUBLIC_OTEL_LOGS_ENDPOINT ?? null,
         header: process.env.NEXT_PUBLIC_OTEL_HEADER ?? null,
@@ -20,6 +20,7 @@ export function GET() {
         environment: process.env.NEXT_PUBLIC_OTEL_ENVIRONMENT ?? null,
         version: process.env.NEXT_PUBLIC_SCULPTOR_VERSION ?? "0.0.0",
         edition: process.env.NEXT_PUBLIC_EDITION ?? "edition",
+        subscriptionUrl: process.env.NEXT_PUBLIC_SUBSCRIPTION_URL ?? null,
     }
 
     return NextResponse.json(config, {
