@@ -2,14 +2,11 @@
 
 import React from "react";
 import {
-    Avatar,
     Badge,
     Button,
     ButtonGroup,
-    Card,
     Col,
     Flex,
-    hashToColor,
     Menu,
     MenuContent,
     MenuItem,
@@ -26,9 +23,7 @@ import {
     IconAdjustmentsHorizontal,
     IconArrowsSort,
     IconCheck,
-    IconFolders,
-    IconPlus,
-    IconUsers
+    IconPlus
 } from "@tabler/icons-react";
 import Link from "next/link";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
@@ -37,6 +32,7 @@ import {OrganizationService} from "@edition/organization/services/Organization.s
 import {UserService} from "@edition/user/services/User.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {getNamespaceName} from "@edition/namespace/util/Namespace.name.util";
+import {NamespaceCardComponent} from "@edition/namespace/components/NamespaceCardComponent";
 
 const filterLabels = {
     all: "All",
@@ -159,47 +155,11 @@ export const NamespaceRowView: React.FC = () => {
 
         {/* ── The grid users choose from; create sits in the same grid ── */}
         <Row>
-            {visibleNamespaces.map(namespace => {
-                const number = namespace.id?.match(/Namespace\/(\d+)$/)?.[1]
-                const name = getNamespaceName(namespace, organizationService, userService) ?? ""
-                const isPersonal = namespace.parent?.__typename === "User"
-                const user = namespace.parent?.__typename === "User"
-                    ? userService.getById(namespace.parent.id) : undefined
-                return <Col key={namespace.id} xs={6} mb={1}>
-                    <Link href={`/namespace/${number}`} prefetch style={{display: "contents"}}>
-                        <Card color={"secondary"} clickable h={"100%"}>
-                            <Flex style={{flexDirection: "column", gap: "1.25rem"}}>
-                                {/* identity: avatar (user avatar for personal, identicon for org), name and personal marker */}
-                                <Flex align={"center"} style={{gap: "0.85rem"}}>
-                                    {isPersonal
-                                        ? <Avatar type={"character"} identifier={user?.username ?? ""} size={24}/>
-                                        : <Avatar color={hashToColor(name, 200, 360)}
-                                                  bg={"transparent"} identifier={name} size={24}/>}
-                                    <Flex align={"center"} style={{gap: "0.5rem", minWidth: 0, flex: 1}}>
-                                        <Text size={"md"} hierarchy={"primary"} fw={500}>{name}</Text>
-                                        {isPersonal && <Badge color={"info"}>Personal</Badge>}
-                                    </Flex>
-                                </Flex>
-                                {/* metadata: one calm, labelled line */}
-                                <Flex align={"center"} style={{gap: "1.25rem"}}>
-                                    <Flex align={"center"} style={{gap: "0.4rem"}}>
-                                        <IconFolders size={15}/>
-                                        <Text size={"sm"} hierarchy={"tertiary"}>
-                                            {namespace.projects?.count ?? 0} projects
-                                        </Text>
-                                    </Flex>
-                                    <Flex align={"center"} style={{gap: "0.4rem"}}>
-                                        <IconUsers size={15}/>
-                                        <Text size={"sm"} hierarchy={"tertiary"}>
-                                            {namespace.members?.count ?? 0} members
-                                        </Text>
-                                    </Flex>
-                                </Flex>
-                            </Flex>
-                        </Card>
-                    </Link>
+            {visibleNamespaces.map(namespace => (
+                <Col key={namespace.id} xs={6} mb={1}>
+                    <NamespaceCardComponent namespace={namespace}/>
                 </Col>
-            })}
+            ))}
 
             {/* create-workspace affordance, matching card footprint */}
             <Col xs={6} mb={1} mih={"100px"}>
