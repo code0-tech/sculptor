@@ -1,15 +1,15 @@
 "use client"
 
 import React from "react";
-import {Avatar, Badge, Button, Card, Flex, hashToColor, Text, useService} from "@code0-tech/pictor";
-import {IconArrowRight, IconFolders, IconUsers} from "@tabler/icons-react";
+import {Avatar, Badge, Card, Flex, hashToColor, Text, useService} from "@code0-tech/pictor";
+import {IconFolders, IconUsers} from "@tabler/icons-react";
 import {isFuture, isPast} from "date-fns";
 import Link from "next/link";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
 import {OrganizationService} from "@edition/organization/services/Organization.service";
 import {UserService} from "@edition/user/services/User.service";
 import {getNamespaceName} from "@edition/namespace/util/Namespace.name.util";
-import BorderBeam from "border-beam";
+import {UpgradeButtonComponent} from "@cloud-internal/license/components/UpgradeButtonComponent";
 
 export interface NamespaceCardComponentProps {
     namespace: Namespace
@@ -72,13 +72,7 @@ export const NamespaceCardComponent: React.FC<NamespaceCardComponentProps> = (pr
                 <Text size={"sm"} hierarchy={"secondary"}>
                     Free plan, executions & AI capped
                 </Text>
-                <Link href={"https://codezero.build/subscription"}>
-                    <BorderBeam strength={1} size={"sm"} theme={"dark"} duration={5}>
-                        <Button paddingSize={"xxs"} variant={"none"}>
-                            Upgrade to Pro
-                        </Button>
-                    </BorderBeam>
-                </Link>
+                <UpgradeButtonComponent namespaceId={number} color={"primary"} paddingSize={"xxs"}/>
             </Flex>
         </Card>
     )
