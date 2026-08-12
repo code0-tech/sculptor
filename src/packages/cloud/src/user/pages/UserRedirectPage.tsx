@@ -37,6 +37,7 @@ export const UserRedirectPage: React.FC = () => {
     const params = useSearchParams()
     const callbackUrl = params.get("callbackUrl")
     const selectNamespace = params.get("selectNamespace")
+    const cancelUrl = params.get("cancelUrl")
     const router = useRouter()
     const isValidCallback = isValidRedirect(callbackUrl)
     const organizationService = useService(OrganizationService)
@@ -146,7 +147,8 @@ export const UserRedirectPage: React.FC = () => {
             <Button type={"submit"} onClick={() => {
                 document.cookie = "codezero_callback=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
                 document.cookie = "codezero_selectNamespace=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-                window.location.href = "/"
+                document.cookie = "codezero_cancel=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+                window.location.href = isValidRedirect(cancelUrl) ? cancelUrl! : "/"
             }} data-qa-selector={"auth-login-send"} color={isValidCallback ? "secondary" : "success"} w={"100%"}
                     mb={1.3}>
                 No, go back
@@ -158,6 +160,7 @@ export const UserRedirectPage: React.FC = () => {
                     if (!craterToken) return
                     document.cookie = "codezero_callback=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
                     document.cookie = "codezero_selectNamespace=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+                    document.cookie = "codezero_cancel=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
                     const targetURL = new URL(callbackUrl)
                     targetURL.searchParams.set('token', craterToken)
                     if (selectNamespace && namespaceId) targetURL.searchParams.set('namespace', namespaceId)
