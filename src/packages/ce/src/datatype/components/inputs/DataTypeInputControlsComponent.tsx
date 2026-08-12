@@ -5,7 +5,7 @@ import {
     ReferenceValue,
     SubFlowValue
 } from "@code0-tech/sagittarius-graphql-types";
-import React from "react";
+import React, {ReactElement} from "react";
 import {IconChevronRight, IconVariable, IconX} from "@tabler/icons-react";
 import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
 import {
@@ -260,7 +260,9 @@ export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsCompo
                 </MenuPortal>
             </Menu>
         ) : <></>}
-        {children ?? <></>}
+        {
+            (children ?? null as unknown as ReactElement<any>)
+        }
         <Button paddingSize={"xxs"} tabIndex={-1} onClick={(event) => {
             onSelect?.(null)
             event.stopPropagation()
