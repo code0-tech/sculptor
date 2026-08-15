@@ -17,7 +17,7 @@
   "dependencies": {
     "@apollo/client": "^4.0.9",
     "@code0-tech/pictor": "^0.15.0",
-    "@code0-tech/triangulum": "^0.31.0",
+    "@code0-tech/triangulum": "^0.31.1",
     "@codemirror/lang-javascript": "^6.2.5",
     "@codemirror/lint": "^6.9.5",
     "@icons-pack/react-simple-icons": "^13.13.0",
