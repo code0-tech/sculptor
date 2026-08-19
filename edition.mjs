@@ -9,6 +9,7 @@ const editionImports = {
     cloud: ["./src/packages/cloud/src/*", "./src/packages/ee/src/*", "./src/packages/ce/src/*"],
     ee: ["./src/packages/ee/src/*", "./src/packages/ce/src/*"],
     ce: ["./src/packages/ce/src/*"],
+    playground: ["./src/packages/playground/src/*", "./src/packages/ce/src/*"],
 }
 
 if (!fs.existsSync(target) || !editionImports[edition]) {
