@@ -13,8 +13,12 @@
             display: none !important;
         }
 
-        [data-qa-selector="flow-builder-control-panel-execute"] {
-            display: none !important;
+        .react-flow__panel.bottom.center .button-group > *:nth-child(4) {
+            display: none;
+        }
+
+        .react-flow__panel.bottom.center .button-group > *:nth-child(3)::after {
+            display: none;
         }
     }
 }
