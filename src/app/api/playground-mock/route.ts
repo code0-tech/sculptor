@@ -2,7 +2,7 @@ import {NextResponse} from "next/server"
 import {readFile, readdir} from "node:fs/promises"
 import path from "node:path"
 import {Module, ValidationFlow} from "@code0-tech/tucana/shared"
-import {mapDatatypes, mapFlows, mapFlowtypes, mapFunctions, project} from "@core/util/playground-mock"
+import {mapDatatypes, mapFlows, mapFlowtypes, mapFunctions, mapModules, project} from "@core/util/playground-mock"
 
 export const dynamic = "force-dynamic"
 
@@ -33,6 +33,7 @@ export async function GET() {
         functions: mapFunctions(modules),
         datatypes: mapDatatypes(modules),
         flowtypes: mapFlowtypes(modules),
+        modules: mapModules(modules),
         projects: [project]
     }, {headers: {"Cache-Control": "no-store"}})
 }

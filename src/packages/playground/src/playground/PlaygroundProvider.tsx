@@ -32,6 +32,7 @@ export interface PlaygroundMockData {
     functions: FunctionDefinition[]
     datatypes: DataType[]
     flowtypes: FlowType[]
+    modules: RuntimeModule[]
     projects: NamespaceProject[]
 }
 
@@ -75,7 +76,7 @@ export const PlaygroundProvider: React.FC<{ data: PlaygroundMockData, children: 
     const module = usePersistentReactiveArrayService<RuntimeModule, ModuleService>(
         "playground::modules",
         (store) => new ModuleService(graphqlClient, store),
-        seed([] as RuntimeModule[])
+        seed(data.modules)
     )
     const ai = usePersistentReactiveArrayService<Model, AIService>(
         "playground::ai",

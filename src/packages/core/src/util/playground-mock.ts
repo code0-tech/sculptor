@@ -6,6 +6,8 @@ import {
     FlowTypeSetting_UniquenessScope,
     FunctionDefinition,
     Module,
+    ModuleConfigurationDefinition,
+    ModuleDefinition,
     NodeFunction,
     NodeParameter,
     NodeValue,
@@ -256,6 +258,77 @@ const mapFlow = (flow: ValidationFlow, flowTypeId: Map<string, string>, function
 }
 
 const runtimeModuleId = (modules: Module[], module: Module) => gid("RuntimeModule", modules.indexOf(module) + 1)
+
+const mapModuleDefinition = (definition: ModuleDefinition, id: string) => {
+    const endpoint = definition.value.oneofKind === "endpoint" ? definition.value.endpoint : undefined
+    return {
+        __typename: "RuntimeModuleDefinition",
+        id,
+        createdAt: TIMESTAMP,
+        updatedAt: TIMESTAMP,
+        endpoint: endpoint?.endpoint ?? null,
+        host: endpoint?.host ?? null,
+        port: endpoint ? Number(endpoint.port) : null,
+        protocol: endpoint?.protocol ?? null
+    }
+}
+
+const mapModuleConfiguration = (configuration: ModuleConfigurationDefinition, id: string, runtimeModuleId: string) => ({
+    __typename: "ModuleConfigurationDefinition",
+    id,
+    createdAt: TIMESTAMP,
+    updatedAt: TIMESTAMP,
+    identifier: configuration.identifier,
+    defaultValue: configuration.defaultValue ? literalValue(configuration.defaultValue) : null,
+    type: configuration.type,
+    hidden: configuration.hidden ?? false,
+    optional: configuration.optional ?? false,
+    runtimeModule: {__typename: "RuntimeModule", id: runtimeModuleId},
+    names: translations(configuration.name),
+    descriptions: translations(configuration.description)
+})
+
+const mapModule = (module: Module, id: string, definitionNodes: unknown[], configurationNodes: unknown[]) => ({
+    __typename: "RuntimeModule",
+    id,
+    createdAt: TIMESTAMP,
+    updatedAt: TIMESTAMP,
+    identifier: module.identifier,
+    version: module.version,
+    author: module.author,
+    documentation: module.documentation,
+    icon: module.icon,
+    names: translations(module.name),
+    descriptions: translations(module.description),
+    runtime: {id: RUNTIME_ID},
+    flowTypes: {count: (module.flowTypes ?? []).length},
+    functionDefinitions: {count: (module.functionDefinitions ?? []).length},
+    definitions: {
+        __typename: "RuntimeModuleDefinitionConnection",
+        count: definitionNodes.length,
+        nodes: definitionNodes,
+        pageInfo: {endCursor: null, hasNextPage: false}
+    },
+    configurationDefinitions: {
+        __typename: "ModuleConfigurationDefinitionConnection",
+        count: configurationNodes.length,
+        nodes: configurationNodes,
+        pageInfo: {endCursor: null, hasNextPage: false}
+    }
+})
+
+export const mapModules = (modules: Module[]) => {
+    const definitionEntries = modules.flatMap(module => (module.definitions ?? []).map(definition => ({definition, module})))
+    const definitionNodes = definitionEntries.map(({definition, module}, index) => ({module, node: mapModuleDefinition(definition, gid("RuntimeModuleDefinition", index + 1))}))
+    const configurationEntries = modules.flatMap(module => (module.configurations ?? []).map(configuration => ({configuration, module})))
+    const configurationNodes = configurationEntries.map(({configuration, module}, index) => ({module, node: mapModuleConfiguration(configuration, gid("ModuleConfigurationDefinition", index + 1), runtimeModuleId(modules, module))}))
+    return modules.map(module => mapModule(
+        module,
+        runtimeModuleId(modules, module),
+        definitionNodes.filter(entry => entry.module === module).map(entry => entry.node),
+        configurationNodes.filter(entry => entry.module === module).map(entry => entry.node)
+    ))
+}
 
 export const mapDatatypes = (modules: Module[]) => {
     const dataTypeEntries = modules.flatMap(module => (module.definitionDataTypes ?? []).map(dataType => ({dataType, module})))
