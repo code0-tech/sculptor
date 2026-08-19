@@ -1,0 +1,20 @@
+.playground-canvas {
+    height: 100%;
+    width: 100%;
+
+    &--readonly {
+        .react-flow__panel {
+            display: none !important;
+        }
+    }
+
+    &--edit {
+        .react-flow__panel.top.right {
+            display: none !important;
+        }
+
+        [data-qa-selector="flow-builder-control-panel-execute"] {
+            display: none !important;
+        }
+    }
+}
