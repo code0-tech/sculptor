@@ -1,25 +1,38 @@
 import {NextResponse} from "next/server"
-import {readFile} from "node:fs/promises"
+import {readFile, readdir} from "node:fs/promises"
 import path from "node:path"
+import {Module, ValidationFlow} from "@code0-tech/tucana/shared"
+import {mapDatatypes, mapFlows, mapFlowtypes, mapFunctions, project} from "@core/util/playground-mock"
 
 export const dynamic = "force-dynamic"
 
 export async function GET() {
 
+    const readModules = async (from: string): Promise<Module[]> => {
+        const modulesDir = path.join(from, "modules")
+        const files = await readdir(modulesDir)
+            .then(names => names.filter(name => name.endsWith(".json")).sort())
+            .catch(() => [] as string[])
+        return Promise.all(files.map(async file => JSON.parse(await readFile(path.join(modulesDir, file), "utf-8")) as Module))
+    }
+
+    const readFlows = async (from: string): Promise<ValidationFlow[]> =>
+        readFile(path.join(from, "flows.json"), "utf-8")
+            .then(raw => JSON.parse(raw) as ValidationFlow[])
+            .catch(() => [] as ValidationFlow[])
+
     const dir = process.env.PLAYGROUND_MOCK_DIR
-    const datasets = ["flows", "functions", "datatypes", "flowtypes", "projects"] as const
+    if (!dir) {
+        return new NextResponse(null, {status: 404, headers: {"Cache-Control": "no-store"}})
+    }
 
-    const entries = await Promise.all(datasets.map(async name => {
-        if (!dir) return [name, []] as const
-        try {
-            const raw = await readFile(path.join(dir, `${name}.json`), "utf-8")
-            return [name, JSON.parse(raw)] as const
-        } catch {
-            return [name, []] as const
-        }
-    }))
+    const [modules, flows] = await Promise.all([readModules(dir), readFlows(dir)])
 
-    return NextResponse.json(Object.fromEntries(entries), {
-        headers: {"Cache-Control": "no-store"},
-    })
+    return NextResponse.json({
+        flows: mapFlows(modules, flows),
+        functions: mapFunctions(modules),
+        datatypes: mapDatatypes(modules),
+        flowtypes: mapFlowtypes(modules),
+        projects: [project]
+    }, {headers: {"Cache-Control": "no-store"}})
 }
