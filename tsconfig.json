@@ -41,9 +41,6 @@
       "@cloud-internal/*": [
         "./src/packages/cloud/src/*"
       ],
-      "@playground-internal/*": [
-        "./src/packages/playground/src/*"
-      ],
       "@core/*": [
         "./src/packages/core/src/*"
       ]
