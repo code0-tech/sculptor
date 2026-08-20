@@ -1,3 +1,3 @@
-import {PlaygroundLayout} from "@playground-internal/playground/PlaygroundLayout";
+import {PlaygroundLayout} from "@edition/playground/PlaygroundLayout";
 
 export default PlaygroundLayout
