@@ -3,7 +3,13 @@
     width: 100%;
 
     &--readonly {
-        .react-flow__panel {
+        .react-flow__panel.top.right {
+            display: none !important;
+        }
+        .react-flow__panel.bottom.center {
+            display: none !important;
+        }
+        .react-flow__node-toolbar {
             display: none !important;
         }
     }
