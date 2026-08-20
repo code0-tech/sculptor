@@ -22,6 +22,25 @@ export const PlaygroundFlowView: React.FC<PlaygroundFlowViewProps> = ({flowIndex
     const [mounted, setMounted] = React.useState(false)
     React.useEffect(() => setMounted(true), [])
 
+    React.useEffect(() => {
+        if (!readonly) return
+
+        const blockEditingKeys = (event: KeyboardEvent) => {
+            const target = event.target as HTMLElement | null
+            if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) return
+
+            const key = event.key.toLowerCase()
+            const isEditingKey = key === "backspace" || (event.shiftKey && ["a", "q", "x", "1"].includes(key))
+            if (!isEditingKey) return
+
+            event.stopImmediatePropagation()
+            event.preventDefault()
+        }
+
+        window.addEventListener("keydown", blockEditingKeys, true)
+        return () => window.removeEventListener("keydown", blockEditingKeys, true)
+    }, [readonly])
+
     if (!mounted) return <ResizablePanel id={"playground"}/>
 
     return <ResizablePanel id={"playground"}>
