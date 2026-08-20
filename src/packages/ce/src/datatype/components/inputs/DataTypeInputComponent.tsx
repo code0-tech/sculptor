@@ -13,6 +13,7 @@ import {DataTypeSelectInputComponent} from "@edition/datatype/components/inputs/
 import {InputWrapperProps} from "@code0-tech/pictor/dist/components/form/InputWrapper";
 import {DataTypeNumberInputComponent} from "@edition/datatype/components/inputs/number/DataTypeNumberInputComponent";
 import {DataTypeDateInputComponent} from "@edition/datatype/components/inputs/date/DataTypeDateInputComponent";
+import {DataTypeColorInputComponent} from "@edition/datatype/components/inputs/color/DataTypeColorInputComponent";
 import {DataTypeFileInputComponent} from "@edition/datatype/components/inputs/file/DataTypeFileInputComponent";
 import {DataTypeJSONInputComponent} from "@edition/datatype/components/inputs/json/DataTypeJSONInputComponent";
 import {DataTypeGenericInputComponent} from "@edition/datatype/components/inputs/generic/DataTypeGenericInputComponent";
@@ -60,6 +61,11 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
                         {...rest}/>
                 case "date":
                     return <DataTypeDateInputComponent
+                        schema={schema}
+                        suggestions={suggestions}
+                        {...rest}/>
+                case "color":
+                    return <DataTypeColorInputComponent
                         schema={schema}
                         suggestions={suggestions}
                         {...rest}/>
