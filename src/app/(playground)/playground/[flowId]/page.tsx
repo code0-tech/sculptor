@@ -1,3 +1,3 @@
-import {PlaygroundPage} from "@playground-internal/playground/PlaygroundPage";
+import {PlaygroundPage} from "@edition/playground/PlaygroundPage";
 
 export default PlaygroundPage
