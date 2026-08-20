@@ -1,0 +1,30 @@
+.playground-canvas {
+    height: 100%;
+    width: 100%;
+
+    &--readonly {
+        .react-flow__panel.top.right {
+            display: none !important;
+        }
+        .react-flow__panel.bottom.center {
+            display: none !important;
+        }
+        .react-flow__node-toolbar {
+            display: none !important;
+        }
+    }
+
+    &--edit {
+        .react-flow__panel.top.right {
+            display: none !important;
+        }
+
+        .react-flow__panel.bottom.center .button-group > *:nth-child(4) {
+            display: none;
+        }
+
+        .react-flow__panel.bottom.center .button-group > *:nth-child(3)::after {
+            display: none;
+        }
+    }
+}
