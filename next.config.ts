@@ -5,8 +5,6 @@ const EDITION = process.env.EDITION ?? "ce";
 const SAGITTARIUS_GRAPHQL_URL = process.env.SAGITTARIUS_GRAPHQL_URL ?? 'http://localhost:3010/graphql';
 const SAGITTARIUS_CABLE_URL = process.env.SAGITTARIUS_CABLE_URL ?? 'http://localhost:3010/cable';
 
-const playgroundFrameAncestors = process.env.PLAYGROUND_FRAME_ANCESTORS ?? "'self'";
-
 const csp = (frameAncestors: string) => `
     default-src 'self';
     script-src 'self' 'unsafe-eval' 'unsafe-inline';
@@ -26,15 +24,6 @@ const nextConfig: NextConfig = {
     devIndicators: false,
     async headers() {
         return [
-            {
-                source: '/playground/:path*',
-                headers: [
-                    {
-                        key: 'Content-Security-Policy',
-                        value: csp(playgroundFrameAncestors),
-                    },
-                ],
-            },
             {
                 source: '/((?!playground(?:/|$)).*)',
                 headers: [
