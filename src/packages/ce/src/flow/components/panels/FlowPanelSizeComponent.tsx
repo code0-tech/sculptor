@@ -29,7 +29,9 @@ export const FlowPanelSizeComponent: React.FC = () => {
     }, [reactFlow])
 
     const center = React.useCallback(() => {
-        reactFlow.fitView()
+        reactFlow.fitView({
+            padding: "15%"
+        })
     }, [reactFlow])
 
     return <Panel position="bottom-left">
