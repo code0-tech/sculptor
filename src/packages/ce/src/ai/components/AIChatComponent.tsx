@@ -4,6 +4,8 @@ import {
     ButtonGroup,
     Card,
     EditorInput,
+    EditorInputValue,
+    EditorTokenRule,
     Flex,
     Progress,
     SelectContent,
@@ -28,6 +30,8 @@ import {AiGenerateFlowSubscriptionPayload, Flow, NamespaceProject} from "@code0-
 import {useAIGenerationStore} from "@edition/ai/hooks/AI.generation.hook";
 import {AIGeneratingMessageComponent} from "@edition/ai/components/AIGeneratingMessageComponent";
 import BorderBeam from "border-beam";
+
+const EMPTY_TOKEN_RULES: EditorTokenRule[] = []
 
 export interface AIChatComponentProps {
     projectId: NamespaceProject['id']
@@ -189,7 +193,8 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
                         ) : (
                             <EditorInput
                                 key={prompt}
-                                value={prompt}
+                                initialValue={prompt}
+                                tokenRules={EMPTY_TOKEN_RULES}
                                 onChange={(value) => {
                                     setPromptState(value)
                                 }}
@@ -199,7 +204,9 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
                                         boxShadow: "none"
                                     }
                                 }}
-                                placeholder={"Describe what you want to edit..."}/>
+                                placeholder={"Describe what you want to edit..."}>
+                                <EditorInputValue/>
+                            </EditorInput>
                         )
                     }
                     <Spacing spacing={"xxs"}/>
