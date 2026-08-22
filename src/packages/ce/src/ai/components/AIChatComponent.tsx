@@ -6,7 +6,7 @@ import {
     EditorInput,
     EditorInputValue,
     EditorTokenRule,
-    Flex,
+    Flex, getSize,
     Progress,
     SelectContent,
     SelectItem,
@@ -139,9 +139,9 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
         <Card paddingSize={"xs"} color={"secondary"} w={"var(--radix-popper-anchor-width)"}>
 
             <BorderBeam style={{
-                marginTop: "-0.6rem",
-                marginLeft: "-0.6rem",
-                marginRight: "-0.6rem"
+                marginTop: `calc(-1 * (${getSize("xs")} - 0.1rem))`,
+                marginLeft: `calc(-1 * (${getSize("xs")} - 0.1rem))`,
+                marginRight: `calc(-1 * (${getSize("xs")} - 0.1rem))`
 
             }} strength={1} theme={"dark"} size={aiLoading ? "line" : "md"} duration={aiLoading ? 2 : 5}>
                 <Card color={"primary"} paddingSize={"xxs"} pos={"relative"}>
