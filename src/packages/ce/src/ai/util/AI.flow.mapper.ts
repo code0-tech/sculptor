@@ -56,6 +56,21 @@ const mapValue = (value?: AiGenerationNodeValue | null): NodeParameterValueInput
     }
 }
 
+const mapParameterValue = (value?: AiGenerationNodeValue | null): NodeParameterValueInput => {
+    if (value?.__typename === "AiGenerationLiteralValue" && value.references && value.references.length > 0) {
+        return {
+            literalValue: {
+                value: value.value ?? null,
+                references: value.references.map(ref => ({
+                    signature: ref.signature ?? "",
+                    value: mapValue(ref.value),
+                })),
+            },
+        }
+    }
+    return mapValue(value)
+}
+
 export const ensureUniqueFlowName = (name: string, existingNames: string[]): string => {
     if (!existingNames.includes(name)) return name
     let i = 2
@@ -83,7 +98,7 @@ export const mapAiGenerationFlowToFlowInput = (
         functionDefinitionId: node?.functionDefinition?.id!,
         parameters: (node?.parameters ?? []).map<NodeParameterInput>(p => ({
             cast: p?.cast ?? undefined,
-            value: mapValue(p?.value),
+            value: mapParameterValue(p?.value),
         })),
     }))
 

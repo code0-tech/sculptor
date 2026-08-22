@@ -20,6 +20,7 @@ import {
     NamespacesProjectsFlowsUpdatePayload,
     NodeFunction,
     NodeParameter,
+    NodeParameterValue,
     NodeParameterValueInput,
     Query,
     ReferencePathInput,
@@ -151,62 +152,24 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
                 nextNodeId: node?.nextNodeId!,
                 functionDefinitionId: node?.functionDefinition?.id!,
                 parameters: (node?.parameters?.nodes ?? []).map(parameter => {
-                    let value: NodeParameterValueInput
+                    const parameterValue = parameter?.value
 
-                    switch (parameter?.value?.__typename) {
-                        case "SubFlowValue":
-                            value = {
-                                subFlowValue: {
-                                    ...(
-                                        parameter.value.startingNodeId ? {
-                                            startingNodeId: parameter.value.startingNodeId
-                                        } : parameter?.value?.functionDefinition?.identifier ? {
-                                            functionIdentifier: parameter?.value?.functionDefinition?.identifier,
-                                        } : {}
-                                    ),
-                                    signature: parameter?.value?.signature ?? "",
-                                    settings: parameter?.value?.settings?.map(setting => ({
-                                        defaultValue: setting?.defaultValue,
-                                        hidden: setting?.hidden,
-                                        identifier: setting.identifier!,
-                                        optional: setting?.optional,
-                                    }))
-
-                                }
-                            }
-                            break
-
-                        case "LiteralValue":
-                            value = {literalValue: {value: parameter.value.value!}}
-                            break
-
-                        case "ReferenceValue": {
-                            const v = parameter.value as ReferenceValue
-                            value = {
-                                referenceValue: {
-                                    ...(v.nodeFunctionId ? {nodeFunctionId: v.nodeFunctionId} : {}),
-                                    ...("parameterIndex" in v && "inputIndex" in v ?
-                                        {
-                                            parameterIndex: v.parameterIndex,
-                                            inputIndex: v.inputIndex
-                                        } : {}),
-                                    referencePath: v.referencePath?.map(referencePath => {
-                                        const reference: ReferencePathInput = {
-                                            path: referencePath.path
-                                        }
-                                        return reference
-                                    }) ?? [],
+                    if (parameterValue?.__typename === "LiteralValue" && parameterValue.references && parameterValue.references.length > 0) {
+                        return {
+                            value: {
+                                literalValue: {
+                                    value: parameterValue.value!,
+                                    references: parameterValue.references.map(reference => ({
+                                        signature: reference?.signature ?? "",
+                                        value: this.mapParameterValue(reference?.value),
+                                    })),
                                 },
-                            }
-                            break
+                            },
                         }
-
-                        default:
-                            value = {literalValue: null}
                     }
 
                     return {
-                        value,
+                        value: this.mapParameterValue(parameterValue),
                     }
                 }),
             })),
@@ -214,6 +177,56 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         }
 
         return payload
+    }
+
+    private mapParameterValue(value?: Maybe<NodeParameterValue>): NodeParameterValueInput {
+        switch (value?.__typename) {
+            case "SubFlowValue":
+                return {
+                    subFlowValue: {
+                        ...(
+                            value.startingNodeId ? {
+                                startingNodeId: value.startingNodeId
+                            } : value.functionDefinition?.identifier ? {
+                                functionIdentifier: value.functionDefinition.identifier,
+                            } : {}
+                        ),
+                        signature: value.signature ?? "",
+                        settings: value.settings?.map(setting => ({
+                            defaultValue: setting?.defaultValue,
+                            hidden: setting?.hidden,
+                            identifier: setting.identifier!,
+                            optional: setting?.optional,
+                        }))
+                    }
+                }
+
+            case "LiteralValue":
+                return {literalValue: {value: value.value!}}
+
+            case "ReferenceValue": {
+                const v = value as ReferenceValue
+                return {
+                    referenceValue: {
+                        ...(v.nodeFunctionId ? {nodeFunctionId: v.nodeFunctionId} : {}),
+                        ...("parameterIndex" in v && "inputIndex" in v ?
+                            {
+                                parameterIndex: v.parameterIndex,
+                                inputIndex: v.inputIndex
+                            } : {}),
+                        referencePath: v.referencePath?.map(referencePath => {
+                            const reference: ReferencePathInput = {
+                                path: referencePath.path
+                            }
+                            return reference
+                        }) ?? [],
+                    },
+                }
+            }
+
+            default:
+                return {literalValue: null}
+        }
     }
 
     async deleteNodeById(flowId: FlowView['id'], nodeId: NodeFunction['id']): Promise<void> {
