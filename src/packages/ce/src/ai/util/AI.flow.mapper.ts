@@ -16,7 +16,7 @@ const FALLBACK_FLOW_NAME = "Untitled flow"
 const mapValue = (value?: AiGenerationNodeValue | null): NodeParameterValueInput => {
     switch (value?.__typename) {
         case "AiGenerationLiteralValue":
-            return {literalValue: (value as AiGenerationLiteralValue).value ?? null}
+            return {literalValue: {value: (value as AiGenerationLiteralValue).value ?? null}}
         case "AiGenerationReferenceValue": {
             const v = value as AiGenerationReferenceValue
             return {
