@@ -54,10 +54,8 @@ export const DataTypeSubFlowInputComponent: React.FC<DataTypeSubFlowInputCompone
         <InputDescription>{description}</InputDescription>
         <DataTypeInputValueComponent inside
                                      showSuggestions={false}
-                                     wrapperComponent={{
-                                         onClick: () => {
-                                             setSuggestionDialogOpen(true)
-                                         }
+                                     onClick={() => {
+                                         setSuggestionDialogOpen(true)
                                      }}
                                      initialValue={initialValue}
                                      onChange={(value) => {
