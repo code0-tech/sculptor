@@ -71,9 +71,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                                              formValidation?.setValue?.(value)
                                              onChangeDebounced(value)
                                          }}
-                                         wrapperComponent={{
-                                             onClick: () => handleEntryClick(undefined)
-                                         }}
+                                         onClick={() => handleEntryClick(undefined)}
                                          suggestions={suggestions}
                                          formValidation={formValidation}>
                 <DataTypeJSONInputTreeComponent

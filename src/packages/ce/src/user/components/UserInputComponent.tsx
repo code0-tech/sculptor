@@ -1,27 +1,22 @@
 import React from "react";
-import {IconArrowDown, IconArrowUp, IconCornerDownLeft} from "@tabler/icons-react";
 import {
-    Badge,
     Flex,
-    InputSuggestion,
-    InputSyntaxSegment,
-    MenuItem,
-    MenuLabel,
-    Spacing,
+    TagInput,
+    TagInputMenu,
+    TagInputMenuItem,
+    TagInputProps,
+    TagInputTrigger,
+    TagInputValue,
     Text,
-    TextInput,
-    TextInputProps,
     useService,
     useStore
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import {User} from "@code0-tech/sagittarius-graphql-types";
 
-export interface UserInputComponentProps extends TextInputProps {
+export interface UserInputComponentProps extends TagInputProps {
     filter?: (user: User, index: number) => boolean
 }
-
-export type UserSyntaxSegment = InputSyntaxSegment & { valueData?: User }
 
 export const UserInputComponent: React.FC<UserInputComponentProps> = (props) => {
 
@@ -29,90 +24,27 @@ export const UserInputComponent: React.FC<UserInputComponentProps> = (props) => 
 
     const userService = useService(UserService)
     const userStore = useStore(UserService)
-    const suggestions: InputSuggestion[] = React.useMemo(() => {
-        return userService.values().filter(filter).map(user => ({
-            value: user.username || "",
-            children: <Flex align={"end"} style={{gap: "0.35rem"}}>
-                <Text>{user.username}</Text>
-                <Text size={"xs"} hierarchy={"tertiary"}>{user.email}</Text>
-            </Flex>,
-            insertMode: "insert",
-            valueData: user,
-            groupBy: "Users"
-        }))
-    }, [userStore])
 
-    const transformSyntax = (
-        _?: string | null,
-        appliedParts: (InputSuggestion | any)[] = [],
-    ): UserSyntaxSegment[] => {
+    const users = React.useMemo(
+        () => userService.values().filter(filter),
+        [userStore]
+    )
 
-        let cursor = 0
-
-        return appliedParts.map((part: string | InputSuggestion, index) => {
-            if (typeof part === "object") {
-                const segment = {
-                    type: "block",
-                    // value must stay the raw suggestion value (username) so pictor can
-                    // re-match the segment to its token on re-serialization; the User
-                    // object travels alongside in valueData
-                    value: part.value,
-                    valueData: part.valueData,
-                    start: cursor,
-                    end: cursor + part.value.length,
-                    visualLength: 1,
-                    content: <Badge color={"info"} border>
-                        <Text style={{color: "inherit"}}>
-                            @{part.value}
-                        </Text>
-                    </Badge>,
-                }
-                cursor += part.value.length
-                return segment
-            }
-            const textString = part ?? ""
-            if (!textString.length) return
-
-            if (index == appliedParts.length - 1) {
-                const segment = {
-                    type: "text",
-                    value: textString,
-                    start: cursor,
-                    end: cursor + textString.length,
-                    visualLength: textString.length,
-                    content: textString,
-                }
-                cursor += textString.length
-                return segment
-            }
-            cursor += textString.length
-            return {}
-        }) as UserSyntaxSegment[]
-    }
-
-    return <TextInput placeholder={"Enter users"}
-                      suggestionsEmptyState={<MenuItem><Text>No user found</Text></MenuItem>}
-                      onLastTokenChange={token => {
-                          userService.getByUsername(token)
-                      }}
-                      suggestionsFooter={<MenuLabel>
-                          <Flex style={{gap: ".35rem"}}>
-                              <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                  <Flex>
-                                      <Badge border><IconArrowUp size={12}/></Badge>
-                                      <Badge border><IconArrowDown size={12}/></Badge>
-                                  </Flex>
-                                  move
-                              </Flex>
-                              <Spacing spacing={"xxs"}/>
-                              <Flex align={"center"} style={{gap: ".35rem"}}>
-                                  <Badge border><IconCornerDownLeft size={12}/></Badge>
-                                  insert
-                              </Flex>
-                          </Flex>
-                      </MenuLabel>}
-                      filterSuggestionsByLastToken
-                      enforceUniqueSuggestions
-                      transformSyntax={transformSyntax} {...rest}
-                      suggestions={suggestions}/>
+    return <TagInput allowCustomValues={false} placeholder={"Enter users"} {...rest}>
+        <TagInputMenu>
+            {users.map(user => (
+                <TagInputMenuItem key={user.id} onlyOnce value={user.username || ""} data={user}>
+                    <Flex align={"center"} style={{gap: "0.35rem"}}>
+                        <Text>{user.username}</Text>
+                        <Text size={"xs"} hierarchy={"tertiary"}>{user.email}</Text>
+                    </Flex>
+                </TagInputMenuItem>
+            ))}
+        </TagInputMenu>
+        <TagInputValue onKeyUp={e => {
+            const token = (e.currentTarget.textContent ?? "").split(/\s+/).pop()
+            if (token) userService.getByUsername(token)
+        }}/>
+        <TagInputTrigger/>
+    </TagInput>
 }

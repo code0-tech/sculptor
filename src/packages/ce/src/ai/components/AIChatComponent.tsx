@@ -4,7 +4,9 @@ import {
     ButtonGroup,
     Card,
     EditorInput,
-    Flex,
+    EditorInputValue,
+    EditorTokenRule,
+    Flex, getSize,
     Progress,
     SelectContent,
     SelectItem,
@@ -28,6 +30,8 @@ import {AiGenerateFlowSubscriptionPayload, Flow, NamespaceProject} from "@code0-
 import {useAIGenerationStore} from "@edition/ai/hooks/AI.generation.hook";
 import {AIGeneratingMessageComponent} from "@edition/ai/components/AIGeneratingMessageComponent";
 import BorderBeam from "border-beam";
+
+const EMPTY_TOKEN_RULES: EditorTokenRule[] = []
 
 export interface AIChatComponentProps {
     projectId: NamespaceProject['id']
@@ -135,9 +139,9 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
         <Card paddingSize={"xs"} color={"secondary"} w={"var(--radix-popper-anchor-width)"}>
 
             <BorderBeam style={{
-                marginTop: "-0.6rem",
-                marginLeft: "-0.6rem",
-                marginRight: "-0.6rem"
+                marginTop: `calc(-1 * (${getSize("xs")} - 0.1rem))`,
+                marginLeft: `calc(-1 * (${getSize("xs")} - 0.1rem))`,
+                marginRight: `calc(-1 * (${getSize("xs")} - 0.1rem))`
 
             }} strength={1} theme={"dark"} size={aiLoading ? "line" : "md"} duration={aiLoading ? 2 : 5}>
                 <Card color={"primary"} paddingSize={"xxs"} pos={"relative"}>
@@ -189,7 +193,8 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
                         ) : (
                             <EditorInput
                                 key={prompt}
-                                value={prompt}
+                                initialValue={prompt}
+                                tokenRules={EMPTY_TOKEN_RULES}
                                 onChange={(value) => {
                                     setPromptState(value)
                                 }}
@@ -199,7 +204,9 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
                                         boxShadow: "none"
                                     }
                                 }}
-                                placeholder={"Describe what you want to edit..."}/>
+                                placeholder={"Describe what you want to edit..."}>
+                                <EditorInputValue/>
+                            </EditorInput>
                         )
                     }
                     <Spacing spacing={"xxs"}/>

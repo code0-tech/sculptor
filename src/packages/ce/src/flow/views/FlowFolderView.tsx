@@ -3,7 +3,7 @@
 import React from "react";
 import {
     Button,
-    Flex,
+    Flex, getSize,
     Spacing,
     Text,
     Tooltip,
@@ -72,7 +72,7 @@ export const FlowFolderView: React.FC = () => {
                                    onOpenChange={(open) => setDeleteDialogOpen(open)}
                                    contextData={contextData}
                                    onDelete={deleteFlow}/>
-        <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"}>
+        <Flex style={{gap: getSize("sm")}} align={"center"} justify={"space-between"}>
             <Text pl={0.7} hierarchy={"tertiary"}>
                 Explorer
             </Text>
@@ -137,9 +137,9 @@ export const FlowFolderView: React.FC = () => {
             <IconPlus size={13}/>
             Create workflow
         </Button>
-        <Spacing spacing={"xl"}/>
+        <Spacing spacing={"lg"}/>
         <div style={{borderTop: "1px dashed rgba(255,255,255, .1)"}}/>
-        <Spacing spacing={"xl"}/>
+        <Spacing spacing={"lg"}/>
         <FlowFolderComponent ref={ref} activeFlowId={flowId}
                              onSelect={(flow) => {
                                  const number = flow.id?.match(/Flow\/(\d+)$/)?.[1]

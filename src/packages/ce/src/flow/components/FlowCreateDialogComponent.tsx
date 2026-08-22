@@ -362,7 +362,8 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                     data-qa-selector={"flow-create-name"}
                     description={"You can choose a name here and only use alphanumeric names."}
                     title={"Name of the flow"}
-                    {...inputs.getInputProps("name")}/>
+                    {...inputs.getInputProps("name")}
+                    onChange={() => validate("name")}/>
                 <Spacing spacing={"xl"}/>
                 <Flex justify={"space-between"} align={"center"}>
                     {flowTypeId ? (

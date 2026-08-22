@@ -63,7 +63,8 @@ export const FlowRenameDialogComponent: React.FC<FlowRenameDialogComponentProps>
                     <FlowNameInputComponent
                         description={"You can choose a new name here and only use alphanumeric names."}
                         title={props.contextData.type == "item" ? "Name of the flow" : "Name of the folder"}
-                        {...inputs.getInputProps("path")}/>
+                        {...inputs.getInputProps("path")}
+                        onChange={() => validate("path")}/>
                 </div>
                 <Flex justify={"space-between"} align={"center"}>
                     <DialogClose asChild>
