@@ -1,6 +1,6 @@
 import React from "react";
 import {DataTypeInputComponentProps} from "../DataTypeInputComponent";
-import {EditorInput, InputDescription, InputLabel} from "@code0-tech/pictor";
+import {EditorInput, EditorInputValue, EditorTokenRule, InputDescription, InputLabel} from "@code0-tech/pictor";
 import {useDebouncedCallback} from "use-debounce";
 import {
     LiteralValue,
@@ -13,6 +13,8 @@ import {DataTypeInputControlsComponent} from "@edition/datatype/components/input
 import {DataTypeInputValueComponent} from "@edition/datatype/components/inputs/DataTypeInputValueComponent";
 
 export type DataTypeNumberInputComponentProps = DataTypeInputComponentProps
+
+const EMPTY_TOKEN_RULES: EditorTokenRule[] = []
 
 export const DataTypeNumberInputComponent: React.FC<DataTypeNumberInputComponentProps> = (props) => {
 
@@ -38,7 +40,8 @@ export const DataTypeNumberInputComponent: React.FC<DataTypeNumberInputComponent
             onChangeDebounced(value)
         }} suggestions={suggestions}
                                      formValidation={formValidation}>
-            <EditorInput value={(defaultValue as LiteralValue)?.value?.toString()}
+            <EditorInput initialValue={(defaultValue as LiteralValue)?.value?.toString()}
+                         tokenRules={EMPTY_TOKEN_RULES}
                          onChange={(value) => {
                              if (typeof value === "string") {
                                  formValidation?.setValue?.(value ? {
@@ -59,7 +62,9 @@ export const DataTypeNumberInputComponent: React.FC<DataTypeNumberInputComponent
                                  onChangeDebounced(value)
                              }}/>
                          }
-                         rightType={"action"}/>
+                         rightType={"action"}>
+                <EditorInputValue/>
+            </EditorInput>
         </DataTypeInputValueComponent>
     </>, [formValidation, defaultValue])
 }
