@@ -4,7 +4,7 @@ import {
     AuroraBackground,
     Card,
     Col,
-    Flex,
+    Flex, getSize,
     ScrollArea,
     ScrollAreaScrollbar,
     ScrollAreaThumb,
@@ -119,7 +119,11 @@ export const ProjectOverviewPage: React.FC = () => {
                                         </Text>
                                     </Flex>
                                     <Spacing spacing={"xs"}/>
-                                    <Card color={"primary"} mx={-0.6} mb={-0.6}>
+                                    <Card color={"primary"} style={{
+                                        marginLeft: `calc(-1 * (${getSize("xs")} - 0.1rem))`,
+                                        marginRight: `calc(-1 * (${getSize("xs")} - 0.1rem))`,
+                                        marginBottom: `calc(-1 * (${getSize("xs")} - 0.1rem))`,
+                                    }}>
                                         <Text>
                                             {flowTemplate.prompt}
                                         </Text>
