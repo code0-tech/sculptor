@@ -177,7 +177,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
                             break
 
                         case "LiteralValue":
-                            value = {literalValue: parameter.value.value!}
+                            value = {literalValue: {value: parameter.value.value!}}
                             break
 
                         case "ReferenceValue": {
