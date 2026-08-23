@@ -16,7 +16,7 @@ export interface NodeBadgeComponentProps extends Omit<BadgeType, 'value' | 'chil
 export const NodeBadgeComponent: React.FC<NodeBadgeComponentProps> = (props) => {
 
     const params = useParams()
-    const flowIndex = params.flowId as any as number
+    const flowIndex = Number(params.flowId) || 1
     const flowId: Flow['id'] = `gid://sagittarius/Flow/${flowIndex}`
 
     const {value, definition, ...rest} = props
