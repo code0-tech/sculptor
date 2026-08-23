@@ -10,6 +10,9 @@ import {
 } from "@code0-tech/sagittarius-graphql-types";
 import {DataTypeBooleanInputComponent} from "@edition/datatype/components/inputs/boolean/DataTypeBooleanInputComponent";
 import {DataTypeSelectInputComponent} from "@edition/datatype/components/inputs/select/DataTypeSelectInputComponent";
+import {
+    DataTypeListSelectInputComponent
+} from "@edition/datatype/components/inputs/list-select/DataTypeListSelectInputComponent";
 import {InputWrapperProps} from "@code0-tech/pictor/dist/components/form/InputWrapper";
 import {DataTypeNumberInputComponent} from "@edition/datatype/components/inputs/number/DataTypeNumberInputComponent";
 import {DataTypeDateInputComponent} from "@edition/datatype/components/inputs/date/DataTypeDateInputComponent";
@@ -51,6 +54,11 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
                     />
                 case "select":
                     return <DataTypeSelectInputComponent
+                        schema={schema}
+                        suggestions={suggestions}
+                        {...rest}/>
+                case "list-select":
+                    return <DataTypeListSelectInputComponent
                         schema={schema}
                         suggestions={suggestions}
                         {...rest}/>
