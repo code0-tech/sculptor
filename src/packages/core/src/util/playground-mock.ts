@@ -167,13 +167,40 @@ const mapFlowType = (flowType: FlowType, id: string, runtimeFlowTypeId: string, 
     }
 })
 
-const mapNodeValue = (value?: NodeValue) => {
+const mapNodeValue = (value?: NodeValue, functionId: Map<string, string> = new Map()): Record<string, unknown> | null => {
     const inner = value?.value
-    if (inner?.oneofKind === "literalValue") return literalValue(inner.literalValue.value)
+    if (inner?.oneofKind === "literalValue") return {
+        __typename: "LiteralValue",
+        value: plainValue(inner.literalValue.value),
+        references: inner.literalValue.references.map(reference => ({
+            __typename: "InlineReferenceValue",
+            signature: reference.signature,
+            value: mapNodeValue(reference.value, functionId)
+        }))
+    }
+    if (inner?.oneofKind === "subFlow") {
+        const executionReference = inner.subFlow.executionReference
+        if (executionReference.oneofKind === "startingNodeId") return {
+            __typename: "SubFlowValue",
+            startingNodeId: gid("NodeFunction", executionReference.startingNodeId)
+        }
+        if (executionReference.oneofKind === "function") {
+            const identifier = executionReference.function.functionIdentifier
+            return {
+                __typename: "SubFlowValue",
+                functionDefinition: {
+                    __typename: "FunctionDefinition",
+                    id: functionId.get(identifier) ?? null,
+                    identifier
+                }
+            }
+        }
+        return {__typename: "SubFlowValue"}
+    }
     return null
 }
 
-const mapNodeParameter = (parameter: NodeParameter, functionRuntimeId: string, parameterId: Map<string, string>) => ({
+const mapNodeParameter = (parameter: NodeParameter, functionRuntimeId: string, parameterId: Map<string, string>, functionId: Map<string, string>) => ({
     __typename: "NodeParameter",
     id: gid("NodeParameter", parameter.databaseId),
     createdAt: TIMESTAMP,
@@ -185,11 +212,11 @@ const mapNodeParameter = (parameter: NodeParameter, functionRuntimeId: string, p
         createdAt: TIMESTAMP,
         updatedAt: TIMESTAMP
     },
-    value: mapNodeValue(parameter.value)
+    value: mapNodeValue(parameter.value, functionId)
 })
 
 const mapNodeFunction = (node: NodeFunction, functionId: Map<string, string>, parameterId: Map<string, string>) => {
-    const parameterNodes = node.parameters.map(parameter => mapNodeParameter(parameter, node.runtimeFunctionId, parameterId))
+    const parameterNodes = node.parameters.map(parameter => mapNodeParameter(parameter, node.runtimeFunctionId, parameterId, functionId))
     return {
         __typename: "NodeFunction",
         id: gid("NodeFunction", node.databaseId ?? 0),
