@@ -58,7 +58,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
     const paramIds = new Map<string, string[]>()
 
     for (const n of nodes) {
-        const link = (n.data as any)?.parentNodeId
+        const link = (n.data as any)?.parentNodeId ?? (n.type === "group" ? (n.data as any)?.nodeId : undefined)
         if (link) {
             const arr = paramIds.get(link) ?? []
             arr.push(n.id)
@@ -167,10 +167,6 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         // relatives Layout (Center in globalen Koordinaten)
         const relCenter = new Map<string, Pos>()
 
-        // Unterkante je rechter Spalten-"Band", damit Parameter nicht kollidieren
-        const columnBottom = new Map<number, number>()
-        const colKey = (x: number) => Math.round(x / 10)
-
         const layoutIter = (root: Node, cx: number, cy: number): number => {
             type Frame = {
                 node: Node
@@ -181,9 +177,8 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                 h?: number
                 right?: Node[]
                 rightIndex?: number
-                py?: number
+                rightX?: number
                 rightBottom?: number
-                childKey?: number
                 childPs?: Size
                 lastChildBottom?: number
 
@@ -225,11 +220,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                         f.right = right
                         f.gParams = gParams
 
-                        let total = 0
-                        for (const p of right) total += size(p).h
-                        total += V * Math.max(0, right.length - 1)
-
-                        f.py = f.cy - total / 2
+                        f.rightX = f.cx + f.w! / 2 + H
                         f.rightBottom = f.cy + h / 2
                         f.rightIndex = 0
                         f.phase = 1
@@ -240,22 +231,13 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                         if (f.rightIndex! < f.right!.length) {
                             const p = f.right![f.rightIndex!]
                             const ps = size(p)
-                            const px = f.cx + f.w! / 2 + H + ps.w / 2
-                            let pcy = f.py! + ps.h / 2
+                            const pcx = f.rightX! + ps.w / 2
+                            const pcy = f.cy
 
-                            const key = colKey(px)
-                            const occ = columnBottom.get(key) ?? Number.NEGATIVE_INFINITY
-                            const minTop = occ + V
-                            const desiredTop = pcy - ps.h / 2
-
-                            if (desiredTop < minTop) {
-                                pcy = minTop + ps.h / 2
-                                f.py = pcy - ps.h / 2
-                            }
-
-                            f.childKey = key
+                            f.rightX = f.rightX! + ps.w + H
+                            f.rightBottom = Math.max(f.rightBottom!, pcy + ps.h / 2)
                             f.childPs = ps
-                            stack.push({node: p, cx: px, cy: pcy, phase: 0})
+                            stack.push({node: p, cx: pcx, cy: pcy, phase: 0})
                             f.phase = 10
                         } else {
                             f.bottom = Math.max(f.cy + f.h! / 2, f.rightBottom!)
@@ -266,12 +248,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
 
                     case 10: {
                         const subBottom = f.lastChildBottom!
-                        columnBottom.set(
-                            f.childKey!,
-                            Math.max(columnBottom.get(f.childKey!) ?? Number.NEGATIVE_INFINITY, subBottom)
-                        )
                         f.rightBottom = Math.max(f.rightBottom!, subBottom)
-                        f.py = Math.max(f.py! + f.childPs!.h + V, subBottom + V)
                         f.rightIndex!++
                         f.phase = 1
                         break
@@ -386,7 +363,8 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         // Root-Nodes stapeln
         let yCursor = 0
         for (const r of nodes) {
-            if (!(r.data as any)?.parentNodeId && !r.parentId) {
+            const link = (r.data as any)?.parentNodeId ?? (r.type === "group" ? (r.data as any)?.nodeId : undefined)
+            if (!link && !r.parentId) {
                 const b = layoutIter(r, 0, yCursor + size(r).h / 2)
                 yCursor = b + V
             }

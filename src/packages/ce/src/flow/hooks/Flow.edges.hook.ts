@@ -1,6 +1,6 @@
 import {Edge} from "@xyflow/react";
 import React from "react";
-import type {Flow, Namespace, NamespaceProject, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
+import type {Flow, Namespace, NamespaceProject, NodeFunction, SubFlowValue} from "@code0-tech/sagittarius-graphql-types";
 import {hashToColor, useService, useStore} from "@code0-tech/pictor";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
@@ -95,19 +95,31 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                 const parameterDefinition = functionService.getById(node.functionDefinition?.id!!)?.parameterDefinitions?.nodes?.[index];
                 if (!parameterValue) return
 
-                if (parameterValue && parameterValue.__typename === "SubFlowValue") {
+                const subFlowValues: { subFlow: SubFlowValue, key: string }[] =
+                    parameterValue.__typename === "SubFlowValue"
+                        ? [{subFlow: parameterValue, key: `${param.id}`}]
+                        : parameterValue.__typename === "LiteralValue"
+                            ? (parameterValue.references ?? [])
+                                .filter(reference => reference?.value?.__typename === "SubFlowValue")
+                                .map((reference, referenceIndex) => ({
+                                    subFlow: reference!.value as SubFlowValue,
+                                    key: `${param.id}-${reference?.signature ?? referenceIndex}`
+                                }))
+                            : []
 
-                    if (parameterValue.functionDefinition?.id) {
+                subFlowValues.forEach(({subFlow, key}) => {
+
+                    if (!subFlow.startingNodeId && subFlow.functionDefinition?.id) {
                         edges.push({
-                            id: `${node.id}-${param.id}-next`,
-                            source: `${node.id}-${param.id}`,
+                            id: `${node.id}-${key}-next`,
+                            source: `${node.id}-${key}`,
                             target: node.id!,
                             targetHandle: `param`,
                             deletable: false,
                             selectable: false,
                             animated: true,
                             data: {
-                                color: hashToColor(parameterValue?.startingNodeId || parameterValue.functionDefinition?.id || ""),
+                                color: hashToColor(subFlow?.startingNodeId || subFlow.functionDefinition?.id || ""),
                                 type: 'parameter',
                                 flowId: flowId
                             }
@@ -126,7 +138,7 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                         animated: true,
                         label: parameterDefinition?.names!![0]?.content ?? FALLBACK_FUNCTION_PARAMETER_NAME,
                         data: {
-                            color: hashToColor(parameterValue?.startingNodeId || parameterValue.functionDefinition?.id || ""),
+                            color: hashToColor(subFlow?.startingNodeId || subFlow.functionDefinition?.id || ""),
                             type: 'group',
                             flowId: flowId,
                             parentNodeId: parentNode?.id
@@ -135,16 +147,14 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
 
                     (groupsWithValue.get(node.id!) ?? (groupsWithValue.set(node.id!, []), groupsWithValue.get(node.id!)!)).push(groupId);
 
-                    if (parameterValue.startingNodeId) {
+                    if (subFlow.startingNodeId) {
                         traverse(
-                            flowService.getNodeById(flowId, parameterValue.startingNodeId)!,
+                            flowService.getNodeById(flowId, subFlow.startingNodeId)!,
                             node,
                             true
                         );
                     }
-
-
-                }
+                })
             });
 
             if (node.nextNodeId) {
