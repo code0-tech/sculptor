@@ -13,6 +13,15 @@ import {DataTypeSelectInputComponent} from "@edition/datatype/components/inputs/
 import {
     DataTypeListSelectInputComponent
 } from "@edition/datatype/components/inputs/list-select/DataTypeListSelectInputComponent";
+import {
+    DataTypeListBooleanInputComponent
+} from "@edition/datatype/components/inputs/list-boolean/DataTypeListBooleanInputComponent";
+import {
+    DataTypeListTextInputComponent
+} from "@edition/datatype/components/inputs/list-text/DataTypeListTextInputComponent";
+import {
+    DataTypeListNumberInputComponent
+} from "@edition/datatype/components/inputs/list-number/DataTypeListNumberInputComponent";
 import {InputWrapperProps} from "@code0-tech/pictor/dist/components/form/InputWrapper";
 import {DataTypeNumberInputComponent} from "@edition/datatype/components/inputs/number/DataTypeNumberInputComponent";
 import {DataTypeDateInputComponent} from "@edition/datatype/components/inputs/date/DataTypeDateInputComponent";
@@ -59,6 +68,21 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
                         {...rest}/>
                 case "list-select":
                     return <DataTypeListSelectInputComponent
+                        schema={schema}
+                        suggestions={suggestions}
+                        {...rest}/>
+                case "list-boolean":
+                    return <DataTypeListBooleanInputComponent
+                        schema={schema}
+                        suggestions={suggestions}
+                        {...rest}/>
+                case "list-text":
+                    return <DataTypeListTextInputComponent
+                        schema={schema}
+                        suggestions={suggestions}
+                        {...rest}/>
+                case "list-number":
+                    return <DataTypeListNumberInputComponent
                         schema={schema}
                         suggestions={suggestions}
                         {...rest}/>
