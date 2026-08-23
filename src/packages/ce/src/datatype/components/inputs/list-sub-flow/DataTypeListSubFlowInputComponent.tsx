@@ -138,8 +138,9 @@ export const DataTypeListSubFlowInputComponent: React.FC<DataTypeListSubFlowInpu
                       ]}
                       formValidation={{...formValidation, setValue: undefined}}
                       onChange={changed => {
-                          const remaining = changed.map(tag => String(tag.value))
-                          commit(subFlows.filter(value => remaining.includes(keyOf(value))))
+                          commit(changed
+                              .map(tag => byKey.get(String(tag.value)))
+                              .filter((value): value is SubFlowValue => value !== undefined))
                       }}
                       right={
                           <DataTypeInputControlsComponent suggestions={referenceSuggestions} onSelect={value => {
