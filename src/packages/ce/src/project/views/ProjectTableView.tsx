@@ -152,7 +152,7 @@ export const ProjectTableView: React.FC = () => {
             </ButtonGroup>
         </Flex>
         <Spacing spacing={"xs"}/>
-        <Card color={"secondary"} paddingSize={"sm"}>
+        <Card color={"secondary"} paddingSize={"lg"}>
             <DataTable data={visibleProjects}
                        sort={sortProps}
                        pagination

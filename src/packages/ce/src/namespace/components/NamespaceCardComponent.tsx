@@ -27,7 +27,7 @@ export const NamespaceCardComponent: React.FC<NamespaceCardComponentProps> = (pr
         ? userService.getById(namespace.parent.id) : undefined
 
     return <Link href={`/namespace/${number}`} prefetch style={{display: "contents"}}>
-        <Card color={"secondary"} clickable h={"100%"}>
+        <Card color={"secondary"} paddingSize={"lg"} clickable h={"100%"}>
             <Flex style={{flexDirection: "column", gap: "1.25rem"}}>
                 <Flex align={"center"} style={{gap: "0.85rem"}}>
                     {isPersonal

@@ -80,8 +80,7 @@ export const ProjectOverviewPage: React.FC = () => {
         })
     }, [flowService, flowStore, namespaceId, projectId])
 
-    return <ResizablePanel id={"2"} color={"primary"}
-                           style={{borderRadius: "1rem"}}>
+    return <ResizablePanel id={"2"}>
         <Flex align={"center"} justify={"center"} style={{flexDirection: "column", gap: "1.3rem"}} w={"100%"}
               h={"100%"}>
             <Text hierarchy={"primary"} style={{fontWeight: "bold", textAlign: "center", fontSize: "2rem"}}>

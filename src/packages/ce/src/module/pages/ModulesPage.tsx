@@ -157,14 +157,12 @@ export const ModulesPage: React.FC = () => {
     }, [modules, allModules, project, runtimeStore])
 
     return <div style={{
-        background: "var(--primary)",
         height: "100%",
         width: "100%",
-        borderRadius: "1rem",
     }}>
         <ScrollArea h={"100%"} type={"scroll"}>
             <ScrollAreaViewport>
-                <div style={{maxWidth: "52rem", margin: "0 auto", padding: "4rem 1rem"}}>
+                 <div style={{maxWidth: "52rem", margin: "0 auto", padding: "1rem 1rem"}}>
 
                     {/* ── page header ── */}
                     <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
@@ -250,7 +248,7 @@ export const ModulesPage: React.FC = () => {
                             const moduleNumber = module?.id?.match(/RuntimeModule\/(\d+)$/)?.[1]
 
                             return <Col key={module.id} xs={6} mb={1}>
-                                <Card color={"secondary"} h={"100%"} clickable={configurable}
+                                <Card color={"secondary"} paddingSize={"lg"} h={"100%"} clickable={configurable}
                                       onClick={configurable && moduleNumber
                                           ? () => router.push(`/namespace/${namespaceIndex}/project/${projectIndex}/module/${moduleNumber}`)
                                           : undefined}>
@@ -311,12 +309,11 @@ export const ModulesPage: React.FC = () => {
                         })}
 
                         {/* request-integration affordance, matching card footprint */}
-                        <Col xs={6} mb={1} mih={"100px"}>
+                        <Col xs={12} mb={1} mih={"100px"}>
                             <Link href={"https://github.com/code0-tech/codezero"} target={"_blank"}
                                   style={{display: "contents"}}>
-                                <Button variant={"none"} h={"100%"} w={"100%"} style={{
+                                <Button paddingSize={"lg"} variant={"none"} h={"100%"} w={"100%"} style={{
                                     border: "1px dashed rgba(255,255,255, .15)",
-                                    borderRadius: "0.75rem",
                                 }}>
                                     <Flex align={"center"} justify={"center"} style={{
                                         flexDirection: "column",

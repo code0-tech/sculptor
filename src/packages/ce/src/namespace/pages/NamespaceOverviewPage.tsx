@@ -22,15 +22,13 @@ export const NamespaceOverviewPage: React.FC = () => {
     const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
 
     return <div style={{
-        background: "var(--primary)",
         height: "100%",
         position: "relative",
         boxSizing: "border-box",
-        borderRadius: "1rem"
     }}>
         <ScrollArea h={"100%"} type={"scroll"}>
             <ScrollAreaViewport>
-                <div style={{maxWidth: "52rem", margin: "0 auto", padding: "4rem 1rem"}}>
+                 <div style={{maxWidth: "52rem", margin: "0 auto", padding: "1rem 1rem"}}>
                     <NamespaceStatsView/>
                     <Spacing spacing={"xl"}/>
                     <ApplicationAttentionFlowsComponent namespaceId={namespaceId}/>

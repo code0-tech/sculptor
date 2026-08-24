@@ -76,7 +76,7 @@ export const FlowFolderView: React.FC = () => {
             <Text pl={0.7} hierarchy={"tertiary"}>
                 Explorer
             </Text>
-            <ButtonGroup color={"secondary"} style={{boxShadow: "none"}} p={0}>
+            <ButtonGroup bg={"transparent"} style={{boxShadow: "none"}} p={0}>
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button variant={"none"} paddingSize={"xxs"}
@@ -126,7 +126,7 @@ export const FlowFolderView: React.FC = () => {
             <Button style={{borderRadius: "50rem"}} w={"100%"} paddingSize={"xxs"} color={"tertiary"} variant={"none"}
                     justify={"start"}>
                 <IconApps size={13}/>
-                Integrations
+                <Text>Integrations</Text>
             </Button>
         </Link>
         <Button style={{borderRadius: "50rem"}} w={"100%"} paddingSize={"xxs"} color={"tertiary"} variant={"none"}
@@ -135,7 +135,7 @@ export const FlowFolderView: React.FC = () => {
             setFlowTypeId(undefined)
         }}>
             <IconPlus size={13}/>
-            Create workflow
+            <Text>Create workflow</Text>
         </Button>
         <Spacing spacing={"lg"}/>
         <div style={{borderTop: "1px dashed rgba(255,255,255, .1)"}}/>
