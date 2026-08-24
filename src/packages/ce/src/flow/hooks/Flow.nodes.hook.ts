@@ -78,7 +78,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                 })
             }
 
-            node.parameters?.nodes?.forEach((param) => {
+            node.parameters?.nodes?.forEach((param, parameterIndex) => {
                 const value = param?.value
                 if (!value) return
 
@@ -106,7 +106,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                             extent: parentGroup ? "parent" : undefined,
                             data: {
                                 isParameter: true,
-                                parameterId: param?.id,
+                                parameterIndex: parameterIndex,
                                 referenceSignature: signature,
                                 parentNodeId: nodeId,
                                 index: globalIndex,
