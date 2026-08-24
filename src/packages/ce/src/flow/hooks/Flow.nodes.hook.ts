@@ -82,7 +82,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                 const value = param?.value
                 if (!value) return
 
-                const subFlowValues: { subFlow: SubFlowValue, key: string }[] =
+                const subFlowValues: { subFlow: SubFlowValue, key: string, signature?: string }[] =
                     value.__typename === "SubFlowValue"
                         ? [{subFlow: value, key: `${param?.id}`}]
                         : value.__typename === "LiteralValue"
@@ -90,11 +90,12 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                                 .filter(reference => reference?.value?.__typename === "SubFlowValue")
                                 .map((reference, index) => ({
                                     subFlow: reference!.value as SubFlowValue,
-                                    key: `${param?.id}-${reference?.signature ?? index}`
+                                    key: `${param?.id}-${reference?.signature ?? index}`,
+                                    signature: reference?.signature ?? undefined
                                 }))
                             : []
 
-                subFlowValues.forEach(({subFlow, key}) => {
+                subFlowValues.forEach(({subFlow, key, signature}) => {
                     if (!subFlow.startingNodeId && subFlow.functionDefinition?.id) {
                         nodes.push({
                             id: `${nodeId}-${key}`,
@@ -106,6 +107,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                             data: {
                                 isParameter: true,
                                 parameterId: param?.id,
+                                referenceSignature: signature,
                                 parentNodeId: nodeId,
                                 index: globalIndex,
                                 functionId: subFlow.functionDefinition?.id,
