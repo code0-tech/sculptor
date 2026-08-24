@@ -267,7 +267,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
 
                             f.gSizes = gSizes
                             f.gx = f.cx - rowW / 2
-                            f.gy = f.bottom! + V
+                            f.gy = f.bottom! + 2 * V
                             f.rowBottom = f.bottom
                             f.gIndex = 0
                             f.phase = 3
