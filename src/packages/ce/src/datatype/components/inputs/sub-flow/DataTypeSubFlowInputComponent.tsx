@@ -21,7 +21,7 @@ export const DataTypeSubFlowInputComponent: React.FC<DataTypeSubFlowInputCompone
     const params = useParams()
     const flowService = useService(FlowService)
 
-    const flowIndex = params.flowId as any as number
+    const flowIndex = Number(params.flowId) || 1
     const flowId: Flow['id'] = `gid://sagittarius/Flow/${flowIndex}`
 
     const defaultValue: number = React.useMemo(() => suggestions?.findIndex(suggest => {
