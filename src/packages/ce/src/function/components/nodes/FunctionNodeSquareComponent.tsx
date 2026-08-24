@@ -2,7 +2,7 @@ import {Handle, Node, NodeProps, Position, useStore} from "@xyflow/react";
 import React, {CSSProperties, memo} from "react";
 import "./FunctionNodeComponent.style.scss";
 import {FunctionNodeComponentProps} from "./FunctionNodeComponent";
-import {Card, Flex, Text, useService, useStore as usePictorStore} from "@code0-tech/pictor";
+import {Card, Flex, getSize, Text, useService, useStore as usePictorStore} from "@code0-tech/pictor";
 import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
 import {IconVariable} from "@tabler/icons-react";
 import {FlowService} from "@edition/flow/services/Flow.service";
@@ -135,7 +135,14 @@ export const FunctionNodeSquareComponent: React.FC<FunctionNodeSquareComponentPr
                     <DisplayIcon color={data.color} size={16} style={{width: "16px", height: "16px"}}/>
                 </Flex>
             </Card>
-            <Text size={"xs"}>{definition?.names?.[0]?.content ?? FALLBACK_FUNCTION_NAME}</Text>
+            <Text size={"xs"} style={{
+                position: "absolute",
+                bottom: `calc(-1 * ${getSize("xxs")})`,
+                width: "150%",
+                left: "50%",
+                transform: "translate(-50%, 100%)",
+                textAlign: "center"
+            }}>{definition?.names?.[0]?.content ?? FALLBACK_FUNCTION_NAME}</Text>
         </Flex>
     );
 })

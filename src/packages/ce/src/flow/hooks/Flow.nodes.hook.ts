@@ -1,5 +1,5 @@
 import {Node} from "@xyflow/react";
-import type {Flow, Namespace, NamespaceProject, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
+import type {Flow, Namespace, NamespaceProject, NodeFunction, SubFlowValue} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
 import {hashToColor, useService, useStore} from "@code0-tech/pictor";
 import {FlowService} from "@edition/flow/services/Flow.service";
@@ -78,56 +78,73 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                 })
             }
 
-            node.parameters?.nodes?.forEach((param) => {
+            node.parameters?.nodes?.forEach((param, parameterIndex) => {
                 const value = param?.value
-                if (!value || value.__typename !== "SubFlowValue") return
+                if (!value) return
 
-                if (value.functionDefinition?.id) {
-                    nodes.push({
-                        id: `${nodeId}-${param.id}`,
-                        type: functionDefinition && "design" in functionDefinition ? functionDefinition?.design as string : "square",
-                        position: {x: 0, y: 0},
-                        draggable: false,
-                        parentId: parentGroup,
-                        extent: parentGroup ? "parent" : undefined,
-                        data: {
-                            isParameter: true,
-                            parameterId: param?.id,
-                            parentNodeId: nodeId,
-                            index: globalIndex,
-                            functionId: value.functionDefinition?.id,
-                            flowId: flowId,
-                            color: hashToColor(value?.startingNodeId ?? value?.functionDefinition?.id ?? ""),
-                            schema: []
-                        },
-                    })
-                    return
-                }
+                const subFlowValues: { subFlow: SubFlowValue, key: string, signature?: string }[] =
+                    value.__typename === "SubFlowValue"
+                        ? [{subFlow: value, key: `${param?.id}`}]
+                        : value.__typename === "LiteralValue"
+                            ? (value.references ?? [])
+                                .filter(reference => reference?.value?.__typename === "SubFlowValue")
+                                .map((reference, index) => ({
+                                    subFlow: reference!.value as SubFlowValue,
+                                    key: `${param?.id}-${reference?.signature ?? index}`,
+                                    signature: reference?.signature ?? undefined
+                                }))
+                            : []
 
-                const groupId = `${nodeId}-group-${groupCounter++}`
+                subFlowValues.forEach(({subFlow, key, signature}) => {
+                    if (!subFlow.startingNodeId && subFlow.functionDefinition?.id) {
+                        nodes.push({
+                            id: `${nodeId}-${key}`,
+                            type: functionDefinition && "design" in functionDefinition ? functionDefinition?.design as string : "square",
+                            position: {x: 0, y: 0},
+                            draggable: false,
+                            parentId: parentGroup,
+                            extent: parentGroup ? "parent" : undefined,
+                            data: {
+                                isParameter: true,
+                                parameterIndex: parameterIndex,
+                                referenceSignature: signature,
+                                parentNodeId: nodeId,
+                                index: globalIndex,
+                                functionId: subFlow.functionDefinition?.id,
+                                flowId: flowId,
+                                color: hashToColor(subFlow?.startingNodeId ?? subFlow?.functionDefinition?.id ?? ""),
+                                schema: []
+                            },
+                        })
+                        return
+                    }
 
-                if (!visited.has(groupId)) {
-                    visited.add(groupId)
+                    const groupId = `${nodeId}-group-${groupCounter++}`
 
-                    nodes.push({
-                        id: groupId,
-                        type: "group",
-                        position: {x: 0, y: 0},
-                        draggable: false,
-                        parentId: parentGroup,
-                        extent: parentGroup ? "parent" : undefined,
-                        data: {
-                            isParameter: true,
-                            nodeId: nodeId,
-                            flowId: flowId,
-                            color: hashToColor(value?.startingNodeId ?? ""),
-                            schema: []
-                        },
-                    })
-                }
+                    if (!visited.has(groupId)) {
+                        visited.add(groupId)
 
-                const child = flowService.getNodeById(flowId, value.startingNodeId)
-                if (child) traverse(child, groupId)
+                        nodes.push({
+                            id: groupId,
+                            type: "group",
+                            position: {x: 0, y: 0},
+                            draggable: false,
+                            selectable: false,
+                            parentId: parentGroup,
+                            extent: parentGroup ? "parent" : undefined,
+                            data: {
+                                isParameter: true,
+                                nodeId: nodeId,
+                                flowId: flowId,
+                                color: hashToColor(subFlow?.startingNodeId ?? ""),
+                                schema: []
+                            },
+                        })
+                    }
+
+                    const child = flowService.getNodeById(flowId, subFlow.startingNodeId)
+                    if (child) traverse(child, groupId)
+                })
             })
 
             if (node.nextNodeId) {

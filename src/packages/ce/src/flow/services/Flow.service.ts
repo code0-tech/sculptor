@@ -5,6 +5,7 @@ import {
     FlowSetting,
     FlowType,
     FunctionDefinition,
+    InlineReferenceValue,
     LiteralValue,
     Maybe,
     Mutation,
@@ -107,26 +108,54 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         return this.values(dependencies).find(value => value.id === id);
     }
 
-    protected removeParameterNode(flow: FlowView, node: NodeParameter): void {
-        if (node?.value?.__typename === "SubFlowValue") {
-            const parameterNode = flow?.nodes?.nodes?.find(n => n?.id === (node.value as SubFlowValue)?.startingNodeId)
-            if (parameterNode) {
-                flow!.nodes!.nodes = flow!.nodes!.nodes!.filter(n => n?.id !== (node.value as SubFlowValue)?.startingNodeId)
-                let nextNodeId = parameterNode.nextNodeId
-                while (nextNodeId) {
-                    const nextNode = flow!.nodes!.nodes!.find(n => n?.id === nextNodeId)
-                    if (nextNode) {
-                        flow!.nodes!.nodes = flow!.nodes!.nodes!.filter(n => n?.id !== nextNodeId)
-                        nextNodeId = nextNode.nextNodeId
-                    } else {
-                        nextNodeId = null
-                    }
+    protected removeParameterNode(flow: FlowView, node: NodeParameter, keep?: Set<string>): void {
+        const value = node?.value
+        if (value?.__typename === "SubFlowValue") {
+            this.removeSubFlowNodes(flow, value, keep)
+        } else if (value?.__typename === "LiteralValue") {
+            (value.references ?? []).forEach(reference => {
+                if (reference?.value?.__typename === "SubFlowValue") {
+                    this.removeSubFlowNodes(flow, reference.value as SubFlowValue, keep)
                 }
-                parameterNode.parameters?.nodes?.forEach(p => {
-                    this.removeParameterNode(flow, p!!)
-                })
+            })
+        }
+    }
+
+    private removeSubFlowNodes(flow: FlowView, subFlow: SubFlowValue, keep?: Set<string>): void {
+        if (subFlow?.startingNodeId && keep?.has(subFlow.startingNodeId)) return
+
+        const parameterNode = flow?.nodes?.nodes?.find(n => n?.id === subFlow?.startingNodeId)
+        if (!parameterNode) return
+
+        flow!.nodes!.nodes = flow!.nodes!.nodes!.filter(n => n?.id !== subFlow?.startingNodeId)
+        let nextNodeId = parameterNode.nextNodeId
+        while (nextNodeId) {
+            const nextNode = flow!.nodes!.nodes!.find(n => n?.id === nextNodeId)
+            if (nextNode) {
+                flow!.nodes!.nodes = flow!.nodes!.nodes!.filter(n => n?.id !== nextNodeId)
+                nextNodeId = nextNode.nextNodeId
+            } else {
+                nextNodeId = null
             }
         }
+        parameterNode.parameters?.nodes?.forEach(p => {
+            this.removeParameterNode(flow, p!!, keep)
+        })
+    }
+
+    private collectStartingNodeIds(value?: Maybe<NodeParameterValue>): Set<string> {
+        const ids = new Set<string>()
+        if (!value) return ids
+        if (value.__typename === "SubFlowValue" && value.startingNodeId) {
+            ids.add(value.startingNodeId)
+        } else if (value.__typename === "LiteralValue") {
+            (value.references ?? []).forEach(reference => {
+                if (reference?.value?.__typename === "SubFlowValue" && (reference.value as SubFlowValue).startingNodeId) {
+                    ids.add((reference.value as SubFlowValue).startingNodeId!)
+                }
+            })
+        }
+        return ids
     }
 
     getNodeById(flowId: FlowView['id'], nodeId: NodeFunction['id']): NodeFunction | undefined {
@@ -232,10 +261,39 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
     async deleteNodeById(flowId: FlowView['id'], nodeId: NodeFunction['id']): Promise<void> {
         const flow = this.getById(flowId)
         const node = this.getNodeById(flowId, nodeId)
-        const parentNode = flow?.nodes?.nodes?.find(node => node?.parameters?.nodes?.find(p => p?.value?.__typename === "SubFlowValue" && (p.value as SubFlowValue)?.startingNodeId === nodeId))
         const previousNodes = flow?.nodes?.nodes?.find(n => n?.nextNodeId === nodeId)
         const index = this.values().findIndex(f => f.id === flowId)
         if (!flow || !node) return
+
+        let parentNode: Maybe<NodeFunction> | undefined
+        let parentParameter: Maybe<NodeParameter> | undefined
+        let parentSubFlow: SubFlowValue | undefined
+        let parentLiteral: LiteralValue | undefined
+        let parentReference: InlineReferenceValue | undefined
+
+        for (const candidate of flow.nodes?.nodes ?? []) {
+            for (const parameter of candidate?.parameters?.nodes ?? []) {
+                const value = parameter?.value
+                if (value?.__typename === "SubFlowValue" && value.startingNodeId === nodeId) {
+                    parentNode = candidate
+                    parentParameter = parameter
+                    parentSubFlow = value
+                    break
+                }
+                if (value?.__typename === "LiteralValue") {
+                    const reference = value.references?.find(r => r?.value?.__typename === "SubFlowValue" && (r.value as SubFlowValue).startingNodeId === nodeId)
+                    if (reference) {
+                        parentNode = candidate
+                        parentParameter = parameter
+                        parentLiteral = value
+                        parentReference = reference
+                        parentSubFlow = reference.value as SubFlowValue
+                        break
+                    }
+                }
+            }
+            if (parentNode) break
+        }
 
         flow.nodes!.nodes = flow.nodes!.nodes!.filter(n => n?.id !== nodeId)
         node.parameters?.nodes?.forEach(p => this.removeParameterNode(flow, p!!))
@@ -247,13 +305,44 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
             if (!parentNode) flow.startingNodeId = node.nextNodeId ?? undefined
         }
 
-        if (parentNode) {
-            const parameter = parentNode.parameters?.nodes?.find(p => p?.value?.__typename === "SubFlowValue" && (p.value as SubFlowValue)?.startingNodeId === nodeId)
-            if (parameter && parameter.value?.__typename === "SubFlowValue" && node.nextNodeId) {
-                parameter.value.startingNodeId = node.nextNodeId
-            } else if (parameter) {
-                parameter.value = undefined
+        if (parentSubFlow) {
+            if (node.nextNodeId) {
+                parentSubFlow.startingNodeId = node.nextNodeId
+            } else if (parentLiteral && parentReference) {
+                parentLiteral.references = (parentLiteral.references ?? []).filter(r => r !== parentReference)
+                parentLiteral.value = (parentLiteral.value ?? []).filter((v: unknown) => v !== `\${${parentReference!.signature}}`)
+            } else if (parentParameter) {
+                parentParameter.value = undefined
             }
+        }
+
+        flow.editedAt = new Date().toISOString()
+
+        this.set(index, new View(flow))
+        await this.syncFlow(flowId)
+    }
+
+    async removeParameterMapping(flowId: FlowView['id'], parentNodeId: NodeFunction['id'], parameterIndex: number, referenceSignature?: string): Promise<void> {
+        const flow = this.getById(flowId)
+        const index = this.values().findIndex(f => f.id === flowId)
+        if (!flow) return
+
+        const node = flow.nodes?.nodes?.find(n => n?.id === parentNodeId)
+        const parameter = node?.parameters?.nodes?.[parameterIndex]
+        if (!parameter) return
+
+        const value = parameter.value
+        if (value?.__typename === "LiteralValue" && referenceSignature) {
+            const reference = value.references?.find(r => r?.signature === referenceSignature)
+            if (reference?.value?.__typename === "SubFlowValue") {
+                this.removeSubFlowNodes(flow, reference.value as SubFlowValue)
+            }
+            value.references = (value.references ?? []).filter(r => r?.signature !== referenceSignature)
+            value.value = (value.value ?? []).filter((v: unknown) => v !== `\${${referenceSignature}}`)
+            if ((value.references?.length ?? 0) === 0) parameter.value = undefined
+        } else if (value?.__typename === "SubFlowValue") {
+            this.removeSubFlowNodes(flow, value)
+            parameter.value = undefined
         }
 
         flow.editedAt = new Date().toISOString()
@@ -407,7 +496,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
             node.parameters.nodes[parameterIndex] = (localParameter)
 
         } else if (parameter) {
-            this.removeParameterNode(flow, parameter)
+            this.removeParameterNode(flow, parameter, this.collectStartingNodeIds(value))
             parameter.value = value as LiteralValue | ReferenceValue | SubFlowValue
             flow.editedAt = new Date().toISOString()
         }

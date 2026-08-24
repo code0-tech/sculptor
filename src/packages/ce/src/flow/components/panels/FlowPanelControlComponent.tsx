@@ -35,6 +35,7 @@ import {AIChatComponent} from "@edition/ai/components/AIChatComponent";
 import {mapAiGenerationFlowToFlowInput} from "@edition/ai/util/AI.flow.mapper";
 import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 import {useFlowCompareStore} from "@edition/flow/hooks/Flow.compare.hook";
+import {FunctionNodeComponentProps} from "@edition/function/components/nodes/FunctionNodeComponent";
 import {FlowView} from "@edition/flow/services/Flow.view";
 import {FlowExecuteDialogComponent} from "@edition/flow/components/FlowExecuteDialogComponent";
 
@@ -67,11 +68,16 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
     //callbacks
     const deleteActiveNode = React.useCallback(() => {
         if (!selectedNode) return
+        const data = selectedNode.data as FunctionNodeComponentProps
         // @ts-ignore
         startTransition(async () => {
-            await flowService.deleteNodeById(flowId, selectedNode?.id as NodeFunction['id'])
+            if (data?.isParameter && data?.parentNodeId && data?.parameterIndex != null) {
+                await flowService.removeParameterMapping(flowId, data.parentNodeId, data.parameterIndex, data.referenceSignature)
+            } else {
+                await flowService.deleteNodeById(flowId, selectedNode?.id as NodeFunction['id'])
+            }
         })
-    }, [selectedNode, flowService, flowStore])
+    }, [selectedNode, flowService, flowStore, flowId])
 
     const onAIData = React.useCallback((payload: AiGenerateFlowSubscriptionPayload) => {
         const aiFlow = payload?.flow

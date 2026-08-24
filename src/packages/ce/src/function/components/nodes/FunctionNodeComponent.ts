@@ -10,6 +10,8 @@ export interface FunctionNodeComponentProps extends Record<string, unknown>, Com
     compareType?: 'added' | 'removed' | 'changed'
     color: string
     parentNodeId?: NodeFunction['id']
+    parameterIndex?: number
+    referenceSignature?: string
     isParameter?: boolean
     index?: number
 }
