@@ -322,13 +322,13 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         await this.syncFlow(flowId)
     }
 
-    async removeParameterMapping(flowId: FlowView['id'], parentNodeId: NodeFunction['id'], parameterId: NodeParameter['id'], referenceSignature?: string): Promise<void> {
+    async removeParameterMapping(flowId: FlowView['id'], parentNodeId: NodeFunction['id'], parameterIndex: number, referenceSignature?: string): Promise<void> {
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
         if (!flow) return
 
         const node = flow.nodes?.nodes?.find(n => n?.id === parentNodeId)
-        const parameter = node?.parameters?.nodes?.find(p => p?.id === parameterId)
+        const parameter = node?.parameters?.nodes?.[parameterIndex]
         if (!parameter) return
 
         const value = parameter.value
