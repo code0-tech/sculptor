@@ -1,4 +1,4 @@
-import {Flow, FunctionDefinition, NodeFunction, NodeParameter} from "@code0-tech/sagittarius-graphql-types";
+import {Flow, FunctionDefinition, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {Component} from "@code0-tech/pictor";
 import {NodeSchema} from "@code0-tech/triangulum";
 
@@ -10,7 +10,7 @@ export interface FunctionNodeComponentProps extends Record<string, unknown>, Com
     compareType?: 'added' | 'removed' | 'changed'
     color: string
     parentNodeId?: NodeFunction['id']
-    parameterId?: NodeParameter['id']
+    parameterIndex?: number
     referenceSignature?: string
     isParameter?: boolean
     index?: number
