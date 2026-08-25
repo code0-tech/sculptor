@@ -94,7 +94,7 @@ export const ProjectMenuView: React.FC = () => {
                             Settings
                         </MenuItem>
                     </Link>
-                    <Link href={`/namespace/${namespaceIndex}/project/${projectIndex}/runtime`} prefetch
+                    <Link href={`/namespace/${namespaceIndex}/project/${projectIndex}/settings`} prefetch
                           style={{display: "contents"}}>
                         <MenuItem>
                             <IconSettings color={"transparent"} size={16}/>
