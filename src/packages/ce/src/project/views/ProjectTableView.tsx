@@ -98,7 +98,7 @@ export const ProjectTableView: React.FC = () => {
     return <>
         <Flex align={"center"} justify={"space-between"} style={{gap: "0.5rem"}}>
             <Flex align={"center"} style={{gap: "0.5rem"}}>
-                <Text hierarchy={"tertiary"} size={"md"}>Projects</Text>
+                <Text hierarchy={"secondary"} size={"lg"}>Projects</Text>
                 <Badge color={"secondary"}>{visibleProjects.length}</Badge>
             </Flex>
 
@@ -152,6 +152,10 @@ export const ProjectTableView: React.FC = () => {
             </ButtonGroup>
         </Flex>
         <Spacing spacing={"xs"}/>
+        <Text size={"md"} hierarchy={"tertiary"} maw={"50%"}>
+            Manage the projects in this workspace. You can create new projects or open existing ones.
+        </Text>
+        <Spacing spacing={"md"}/>
         <Card color={"secondary"} paddingSize={"lg"}>
             <DataTable data={visibleProjects}
                        sort={sortProps}
