@@ -118,6 +118,20 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, sidebar,
                         <AuroraBackground/>
 
                     </div>
+
+                    <div style={{
+                        position: "absolute",
+                        top: 0,
+                        right: 0,
+                        width: "100%",
+                        transform: "",
+                        height: "100%",
+                        opacity: "0.25",
+                        filter: "blur(5rem)",
+                    }}>
+                        <AuroraBackground/>
+
+                    </div>
                     <Layout p={1} showLayoutSplitter={false} layoutGap={32} leftContent={<ApplicationNavigationView/>}>
                         <Layout showLayoutSplitter={false} layoutGap={32} leftContent={<div style={{
                             height: "100%",
