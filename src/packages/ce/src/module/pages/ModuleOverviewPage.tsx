@@ -57,7 +57,7 @@ const sortLabels = {
     functions: "Functions",
 } as const
 
-export const ModulesPage: React.FC = () => {
+export const ModuleOverviewPage: React.FC = () => {
 
     const router = useRouter()
     const params = useParams()
@@ -104,18 +104,12 @@ export const ModulesPage: React.FC = () => {
         })
     }, [modules, filter, sort])
 
-    // Every runtime module (across all runtimes) so we can inspect an integration's
-    // required configuration definitions on each runtime, not just the primary one.
+
     const allModules = React.useMemo(
         () => moduleService.values(),
         [moduleStore]
     )
 
-    // For each integration, the runtimes it isn't fully configured on. A required
-    // (non-optional) configuration with an unset value (null/undefined) counts as
-    // unconfigured. Configurations are linked to a runtime, so we check every runtime
-    // assignment of this project. Severity is "error" when the primary runtime is
-    // affected, otherwise "warning" when only secondary runtimes are.
     const integrationSetupStatus = React.useMemo(() => {
         const result = new Map<string, { severity: "error" | "warning", runtimeNames: string[] }>()
         const assignments = project?.runtimeAssignments?.nodes ?? []
@@ -164,22 +158,10 @@ export const ModulesPage: React.FC = () => {
             <ScrollAreaViewport>
                  <div style={{maxWidth: "52rem", margin: "0 auto", padding: "1rem 1rem"}}>
 
-                    {/* ── page header ── */}
-                    <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
-                        <Text size={"xl"} hierarchy={"primary"} fw={500}>
-                            Integrations
-                        </Text>
-                        <Text size={"md"} hierarchy={"tertiary"}>
-                            Connect {project?.name ?? "your project"} to the tools your workflows depend on.
-                        </Text>
-                    </Flex>
-
-                    <Spacing spacing={"xl"}/>
-
                     {/* ── section header: count + filter / sort / request ── */}
                     <Flex align={"center"} justify={"space-between"} style={{gap: "0.7rem"}}>
                         <Flex align={"center"} style={{gap: "0.35rem"}}>
-                            <Text hierarchy={"tertiary"} size={"md"}>Installed</Text>
+                            <Text hierarchy={"secondary"} size={"lg"}>Installed integrations</Text>
                             <Badge color={"secondary"}>{visibleModules.length}</Badge>
                         </Flex>
 
@@ -233,7 +215,11 @@ export const ModulesPage: React.FC = () => {
                         </ButtonGroup>
                     </Flex>
 
-                    <Spacing spacing={"xs"}/>
+                     <Spacing spacing={"xs"}/>
+                     <Text size={"md"} hierarchy={"tertiary"} maw={"50%"}>
+                         Manage the integrations installed in this project. You can configure existing ones or request new ones.
+                     </Text>
+                     <Spacing spacing={"md"}/>
 
                     {/* ── the grid of installed integrations ── */}
                     <Row>
