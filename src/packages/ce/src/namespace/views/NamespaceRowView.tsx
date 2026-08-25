@@ -149,7 +149,7 @@ export const NamespaceRowView: React.FC = () => {
         </Flex>
         <Spacing spacing={"xs"}/>
         <Text size={"md"} hierarchy={"tertiary"} maw={"50%"}>
-            Manage users who have access to your instance. You can invite new users and remove existing ones.
+            Manage your workspaces and the projects within them. You can create new workspaces or open existing ones.
         </Text>
         <Spacing spacing={"md"}/>
 
