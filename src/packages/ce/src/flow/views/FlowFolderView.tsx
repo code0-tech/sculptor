@@ -123,19 +123,17 @@ export const FlowFolderView: React.FC = () => {
         </Flex>
         <Spacing spacing={"xxs"}/>
         <Link href={`/namespace/${namespaceIndex}/project/${projectIndex}/module`} style={{width: "100%"}}>
-            <Button style={{borderRadius: "50rem"}} w={"100%"} paddingSize={"xxs"} color={"tertiary"} variant={"none"}
-                    justify={"start"}>
+            <Button variant={"none"} w={"100%"} justify={"flex-start"} paddingSize={"xxs"}>
                 <IconApps size={13}/>
-                <Text>Integrations</Text>
+                <Text size={"md"} hierarchy={"tertiary"}>Integrations</Text>
             </Button>
         </Link>
-        <Button style={{borderRadius: "50rem"}} w={"100%"} paddingSize={"xxs"} color={"tertiary"} variant={"none"}
-                justify={"start"} onClick={() => {
+        <Button variant={"none"} w={"100%"} justify={"flex-start"} paddingSize={"xxs"} onClick={() => {
             setCreateDialogOpen(true)
             setFlowTypeId(undefined)
         }}>
             <IconPlus size={13}/>
-            <Text>Create workflow</Text>
+            <Text size={"md"} hierarchy={"tertiary"}>Create workflow</Text>
         </Button>
         <Spacing spacing={"lg"}/>
         <div style={{borderTop: "1px dashed rgba(255,255,255, .1)"}}/>
