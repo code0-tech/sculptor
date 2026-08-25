@@ -7,7 +7,7 @@ import {
     Card,
     Col,
     Flex,
-    Progress,
+    ProgressLinear,
     Row,
     Spacing,
     Text
@@ -73,7 +73,7 @@ export const ApplicationLicensesView: React.FC = () => {
                     </Text>
                     <Spacing spacing={"xs"}/>
                     <Card color={"primary"} mx={-1.2} mb={-1.2}>
-                        <Progress value={9} predictionValue={24} max={100}
+                        <ProgressLinear value={9} predictionValue={24} max={100}
                                   color={"linear-gradient(to right, #29BF12 0%, #D90429 100%)"}/>
                         <Spacing spacing={"xs"}/>
                         <Text>
@@ -89,7 +89,7 @@ export const ApplicationLicensesView: React.FC = () => {
                     </Text>
                     <Spacing spacing={"xs"}/>
                     <Card color={"primary"} mx={-1.2} mb={-1.2}>
-                        <Progress value={50} predictionValue={89} max={100} color={"#70ffb2"}/>
+                        <ProgressLinear value={50} predictionValue={89} max={100} color={"#70ffb2"}/>
                         <Spacing spacing={"xs"}/>
                         <Text>
                             You used 50% of your available workflow executions and will used 89% until its reseted.

@@ -1,6 +1,16 @@
 import React from "react";
 import {License, Namespace} from "@code0-tech/sagittarius-graphql-types";
-import {Badge, Button, DataTableColumn, Flex, Progress, Spacing, Text, useService, useStore} from "@code0-tech/pictor";
+import {
+    Badge,
+    Button,
+    DataTableColumn,
+    Flex,
+    ProgressLinear,
+    Spacing,
+    Text,
+    useService,
+    useStore
+} from "@code0-tech/pictor";
 import {formatDistanceToNow, isFuture, isPast} from "date-fns";
 import {IconX} from "@tabler/icons-react";
 import {NamespaceService} from "@cloud-internal/namespace/services/Namespace.service";
@@ -79,7 +89,7 @@ export const NamespaceLicensesDataTableRowComponent: React.FC<LicensesDataTableR
                 Workflow usage (2.250)
             </Text>
             <Spacing spacing={"xs"}/>
-            <Progress maw={"75%"} value={9} predictionValue={24} max={100}
+            <ProgressLinear maw={"75%"} value={9} predictionValue={24} max={100}
                       color={"linear-gradient(to right, #29BF12 0%, #D90429 100%)"}/>
             <Spacing spacing={"xs"}/>
             <Text>
@@ -91,7 +101,7 @@ export const NamespaceLicensesDataTableRowComponent: React.FC<LicensesDataTableR
                 AI usage (250)
             </Text>
             <Spacing spacing={"xs"}/>
-            <Progress maw={"75%"} value={50} predictionValue={89} max={100} color={"#70ffb2"}/>
+            <ProgressLinear maw={"75%"} value={50} predictionValue={89} max={100} color={"#70ffb2"}/>
             <Spacing spacing={"xs"}/>
             <Text>
                 You used 50% of your available workflow executions and will used 89% until its reseted.
