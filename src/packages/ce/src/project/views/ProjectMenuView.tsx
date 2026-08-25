@@ -4,7 +4,7 @@ import React from "react";
 import {
     Avatar,
     Button,
-    Flex,
+    Flex, getSize,
     hashToColor,
     Menu,
     MenuContent,
@@ -69,15 +69,12 @@ export const ProjectMenuView: React.FC = () => {
         <Spacing spacing={"xxs"}/>
         <Menu>
             <MenuTrigger asChild>
-                <Button paddingSize={"xxs"} style={{borderRadius: "50rem"}} w={"100%"}
+                <Button paddingSize={"xxs"} style={{padding: getSize("xs"), borderRadius: "50rem"}} w={"100%"}
                         variant={"none"} justify={"flex-start"}>
                     <Avatar identifier={name} color={hashToColor(name, 0, 180)} size={16}/>
                     <Flex align={"flex-start"} style={{flexDirection: "column", minWidth: 0}}>
                         <Text>
                             {name}
-                        </Text>
-                        <Text hierarchy={"tertiary"}>
-                            Project
                         </Text>
                     </Flex>
                     <Flex align={"center"} justify={"center"} style={{marginLeft: "auto"}}>
