@@ -4,7 +4,7 @@ import React from "react";
 import {
     Avatar,
     Button,
-    Flex,
+    Flex, getSize,
     hashToColor,
     Menu,
     MenuContent,
@@ -89,7 +89,7 @@ export const NamespaceMenuView: React.FC = () => {
 
     return <Menu>
         <MenuTrigger asChild>
-            <Button paddingSize={"xxs"} style={{borderRadius: "50rem"}} w={"100%"}
+            <Button paddingSize={"xxs"} style={{padding: getSize("xs"), borderRadius: "50rem"}} w={"100%"}
                     variant={"none"} justify={"flex-start"}>
                 {isPersonal
                     ? <Avatar type={"character"} identifier={user?.username ?? ""} size={16}/>
@@ -98,9 +98,6 @@ export const NamespaceMenuView: React.FC = () => {
                 <Flex align={"flex-start"} style={{flexDirection: "column", minWidth: 0}}>
                     <Text>
                         {name}
-                    </Text>
-                    <Text hierarchy={"tertiary"}>
-                        {description}
                     </Text>
                 </Flex>
                 <Flex align={"center"} justify={"center"} style={{marginLeft: "auto"}}>
