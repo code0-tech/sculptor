@@ -13,32 +13,37 @@ import {
     Text,
     toast,
     useForm,
-    useService
+    useService, useStore
 } from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import Link from "next/link";
 import {useRouter, useSearchParams} from "next/navigation";
 import {setUserSession} from "@edition/user/hooks/User.session.hook";
 import {MfaInputComponent} from "@edition/user/components/MfaInputComponent";
-import {MfaType} from "@code0-tech/sagittarius-graphql-types";
+import {IdentityProviderBasic, MfaType} from "@code0-tech/sagittarius-graphql-types";
 import {IdentityProviderButtonsComponent} from "@edition/user/components/IdentityProviderButtonsComponent";
+import {ApplicationService} from "@edition/application/services/Application.service";
 
 export const UserLoginPage: React.FC = () => {
 
-    const query = useSearchParams() //can be passwordReset
+    const query = useSearchParams()
     const userService = useService(UserService)
+    const applicationService = useService(ApplicationService)
+    const applicationStore = useStore(ApplicationService)
     const router = useRouter()
-    const [loading, startTransition] = React.useTransition()
 
+    const [loading, startTransition] = React.useTransition()
     const [_, setFailedAttempts] = React.useState(0)
     const [isInTimeout, setIsInTimeout] = React.useState(false)
     const [needsMfa, setNeedsMfa] = React.useState(false)
     const [mfaType, setMfaType] = React.useState<string>("TOTP")
-
-    // Focus the relevant field: the MFA code input while stepping up, otherwise
-    // the email input. autoFocus is unreliable here (React skips it on SSR
-    // hydration), so we imperatively focus the first input in the active view.
     const focusContainerRef = React.useRef<HTMLDivElement>(null)
+
+    const providers = React.useMemo<IdentityProviderBasic[]>(
+        () => (applicationService.get()?.identityProviders?.nodes ?? []).filter((node): node is IdentityProviderBasic => !!node),
+        [applicationStore]
+    )
+
     React.useEffect(() => {
         const focusFirst = () => {
             const input = focusContainerRef.current?.querySelector<HTMLInputElement>(
@@ -46,9 +51,7 @@ export const UserLoginPage: React.FC = () => {
             )
             if (input && document.activeElement !== input) input.focus()
         }
-        // Defer past Radix's roving-focus/collection setup (the OTP field
-        // registers its inputs via layout effects and would otherwise steal
-        // focus back), then retry once in case the first attempt is pre-empted.
+
         let retry = 0
         const raf = requestAnimationFrame(() => {
             focusFirst()
@@ -202,19 +205,26 @@ export const UserLoginPage: React.FC = () => {
             <PasswordInput data-qa-selector={"auth-login-password"} placeholder={"Password"}
                            {...inputs.getInputProps("password")}/>
             <Spacing spacing={"xl"}/>
-            <Button disabled={loading} type={"submit"} data-qa-selector={"auth-login-send"} color={"success"} w={"100%"}>
+            <Button disabled={loading} type={"submit"} data-qa-selector={"auth-login-send"} color={"success"}
+                    w={"100%"}>
                 {loading ? "Loading..." : "Login"}
             </Button>
         </form>
         <Spacing spacing={"xl"}/>
-        <div style={{display: "flex", alignItems: "center", gap: "0.75rem"}}>
-            <div style={{flex: 1, borderTop: "1px solid rgba(255,255,255, .1)"}}/>
-            <Text size={"md"} hierarchy={"tertiary"}>
-                or continue with
-            </Text>
-            <div style={{flex: 1, borderTop: "1px solid rgba(255,255,255, .1)"}}/>
-        </div>
-        <Spacing spacing={"xl"}/>
+        {
+            providers.length > 0 ? (
+                <>
+                    <div style={{display: "flex", alignItems: "center", gap: "0.75rem"}}>
+                        <div style={{flex: 1, borderTop: "1px solid rgba(255,255,255, .1)"}}/>
+                        <Text size={"md"} hierarchy={"tertiary"}>
+                            or continue with
+                        </Text>
+                        <div style={{flex: 1, borderTop: "1px solid rgba(255,255,255, .1)"}}/>
+                    </div>
+                    <Spacing spacing={"xl"}/>
+                </>
+            ) : null
+        }
         <IdentityProviderButtonsComponent intent={"login"}/>
         <Spacing spacing={"xl"}/>
         <Link href={`/password?${query.toString()}`}>

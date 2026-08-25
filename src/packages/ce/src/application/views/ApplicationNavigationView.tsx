@@ -4,7 +4,7 @@ import React, {startTransition} from "react";
 import {
     Avatar,
     Button,
-    Flex,
+    Flex, getSize,
     Icon,
     Menu,
     MenuContent,
@@ -70,7 +70,7 @@ export const ApplicationNavigationView: React.FC = () => {
         <Tooltip>
             <TooltipTrigger asChild>
                 <Link href={"/"} prefetch>
-                    <Button variant={"none"} p={0.5}>
+                    <Button variant={"none"} style={{padding: getSize("xs")}}>
                         <Icon icon={"codezero:codezero"} color={"#fff"} size={16}/>
                     </Button>
                 </Link>
@@ -87,7 +87,7 @@ export const ApplicationNavigationView: React.FC = () => {
             <Tooltip>
                 <TooltipTrigger asChild>
                     <Link href={"/settings"} prefetch>
-                        <Button variant={"none"} p={0.5}>
+                        <Button variant={"none"} style={{padding: getSize("xs")}}>
                             <IconAdjustmentsFilled color={"#fff"} size={16}/>
                         </Button>
                     </Link>
@@ -105,7 +105,7 @@ export const ApplicationNavigationView: React.FC = () => {
             <Tooltip>
                 <TooltipTrigger asChild>
                     <Link href={"/users/@me/settings"} prefetch>
-                        <Button variant={"none"} p={0.5} style={{marginTop: 'auto'}}>
+                        <Button variant={"none"} style={{padding: getSize("xs"), marginTop: 'auto'}}>
                             <IconSettingsFilled color={"#fff"} size={16}/>
                         </Button>
                     </Link>
@@ -120,7 +120,7 @@ export const ApplicationNavigationView: React.FC = () => {
             </Tooltip>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button onClick={userLogout} variant={"none"} p={0.5} style={{marginTop: 'auto'}}>
+                    <Button onClick={userLogout} variant={"none"} style={{padding: getSize("xs"), marginTop: 'auto'}}>
                         <IconArrowAutofitLeftFilled color={"#fff"} size={16}/>
                     </Button>
                 </TooltipTrigger>
@@ -134,7 +134,7 @@ export const ApplicationNavigationView: React.FC = () => {
             </Tooltip>
             <Menu>
                 <MenuTrigger asChild>
-                    <Button variant={"none"} p={0.5} style={{marginTop: 'auto'}}>
+                    <Button variant={"none"} style={{marginTop: 'auto', padding: getSize("xs")}}>
                         <Avatar type={"character"} identifier={currentUser?.username ?? ""} size={16}/>
                     </Button>
                 </MenuTrigger>

@@ -7,7 +7,7 @@ import {
     EditorInputValue,
     EditorTokenRule,
     Flex, getSize,
-    Progress,
+    ProgressLinear,
     SelectContent,
     SelectItem,
     SelectItemText,
@@ -309,7 +309,7 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
                             <Text>
                                 Upgrade your license to increase your AI usage limit
                             </Text>
-                            <Progress w={"100px"} h={"7.5px"} value={0} max={100}
+                            <ProgressLinear w={"100px"} h={"7.5px"} value={0} max={100}
                                       color={"#70ffb2"}/>
                         </Flex>
                     ) : (

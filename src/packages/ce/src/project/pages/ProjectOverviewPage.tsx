@@ -26,6 +26,8 @@ import {
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {mapAiGenerationFlowToFlowInput} from "@edition/ai/util/AI.flow.mapper";
 import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
+import {UserService} from "@edition/user/services/User.service";
+import {useUserSession} from "@edition/user/hooks/User.session.hook";
 
 const flowTemplates = [
     {
@@ -58,6 +60,22 @@ export const ProjectOverviewPage: React.FC = () => {
 
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
+    const userService = useService(UserService)
+    const userStore = useStore(UserService)
+
+    const currentSession = useUserSession()
+
+    const currentUser = React.useMemo(
+        () => userService.getById(currentSession?.user?.id),
+        [userStore, currentSession?.user?.id]
+    )
+
+    const greeting = React.useMemo(() => {
+        const hour = new Date().getHours()
+        if (hour < 12) return "Good morning"
+        if (hour < 18) return "Good afternoon"
+        return "Good evening"
+    }, [])
 
     const onAIData = React.useCallback((payload: AiGenerateFlowSubscriptionPayload) => {
         const aiFlow = payload?.flow
@@ -80,12 +98,11 @@ export const ProjectOverviewPage: React.FC = () => {
         })
     }, [flowService, flowStore, namespaceId, projectId])
 
-    return <ResizablePanel id={"2"} color={"primary"}
-                           style={{borderRadius: "1rem"}}>
+    return <ResizablePanel id={"2"}>
         <Flex align={"center"} justify={"center"} style={{flexDirection: "column", gap: "1.3rem"}} w={"100%"}
               h={"100%"}>
             <Text hierarchy={"primary"} style={{fontWeight: "bold", textAlign: "center", fontSize: "2rem"}}>
-                Good morning, @root <br/>
+                {greeting}, @{currentUser?.username ?? "unknown"} <br/>
                 Let's automate something.
             </Text>
             {/*@ts-ignore*/}

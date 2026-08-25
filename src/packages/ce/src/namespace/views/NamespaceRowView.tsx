@@ -149,7 +149,7 @@ export const NamespaceRowView: React.FC = () => {
         </Flex>
         <Spacing spacing={"xs"}/>
         <Text size={"md"} hierarchy={"tertiary"} maw={"50%"}>
-            Manage users who have access to your instance. You can invite new users and remove existing ones.
+            Manage your workspaces and the projects within them. You can create new workspaces or open existing ones.
         </Text>
         <Spacing spacing={"md"}/>
 
@@ -164,7 +164,7 @@ export const NamespaceRowView: React.FC = () => {
             {/* create-workspace affordance, matching card footprint */}
             <Col xs={6} mb={1} mih={"100px"}>
                 <Link href={"/workspaces/create"} prefetch style={{display: "contents"}}>
-                    <Button variant={"none"} h={"100%"} w={"100%"} style={{
+                    <Button paddingSize={"lg"} variant={"none"} h={"100%"} w={"100%"} style={{
                         border: "1px dashed rgba(255,255,255, .15)",
                     }}>
                         <Flex align={"center"} justify={"center"} style={{

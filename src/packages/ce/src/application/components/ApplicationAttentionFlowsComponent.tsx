@@ -100,7 +100,7 @@ export const ApplicationAttentionFlowsComponent: React.FC<ApplicationAttentionFl
 
     const count = attentionFlows.length
 
-    return <Card color={"secondary"} clickable onClick={() => setOpen(previous => !previous)}>
+    return <Card color={"secondary"} paddingSize={"lg"} clickable onClick={() => setOpen(previous => !previous)}>
         <Flex align={"center"} justify={"space-between"} style={{gap: "0.75rem"}}>
             <Flex align={"center"} style={{gap: "0.75rem", minWidth: 0}}>
                 <IconPointFilled size={16} color={"#FFBE0B"} style={{flexShrink: 0}}/>

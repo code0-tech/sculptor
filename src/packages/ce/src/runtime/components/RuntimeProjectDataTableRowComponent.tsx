@@ -86,7 +86,20 @@ export const RuntimeProjectDataTableRowComponent: React.FC<RuntimeProjectDataTab
                                 {runtime?.name}
                             </Text>
                             {project?.primaryRuntime?.id === runtime?.id ?
-                                <Badge color={"secondary"}>Primary</Badge> : null}
+                                <Badge color={"secondary"}> <Text style={{color: "inherit"}}>
+                                    Primary</Text></Badge> : null}
+                            <Badge color={
+                                runtime?.status?.status === "NOT_READY" ? "secondary" :
+                                    runtime?.status?.status === "RUNNING" ? "success" : "error"
+                            } border>
+                                <Text style={{color: "inherit"}}>
+                                    {
+                                        runtime?.status?.status === "NOT_READY" ? "Not ready" :
+                                            runtime?.status?.status === "RUNNING" ? "Running" :
+                                                runtime?.status?.status === "NOT_RESPONDING" ? "Not responding" : "Stopped"
+                                    }
+                                </Text>
+                            </Badge>
                         </Flex>
                         <Text>
                             {runtime?.description}
@@ -97,32 +110,6 @@ export const RuntimeProjectDataTableRowComponent: React.FC<RuntimeProjectDataTab
                     Updated {formatDistanceToNow(runtime?.updatedAt!)} ago
                 </Text>
             </Flex>
-        </DataTableColumn>
-        <DataTableColumn>
-            <Text>
-                Installed plugins
-            </Text>
-            <Spacing spacing={"xxs"}/>
-            <Flex align={"center"} style={{gap: "0.35rem"}}>
-                {
-                    modules.map(m => m.names?.[0].content).map((name, index) => {
-                        return index <= 5 ? <Badge color={"secondary"}>
-                            {name}
-                        </Badge> : index == 6 ? <Text>...</Text> : null
-                    })
-
-                }
-            </Flex>
-
-        </DataTableColumn>
-        <DataTableColumn>
-            <Text>
-                Status
-            </Text>
-            <Spacing spacing={"xxs"}/>
-            <Badge color={runtime?.status?.status === "RUNNING" ? "success" : "error"} border>
-                <Text style={{color: "inherit"}}>{runtime?.status?.status}</Text>
-            </Badge>
         </DataTableColumn>
         <DataTableColumn>
             {

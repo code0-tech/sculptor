@@ -2,7 +2,7 @@
 
 import React from "react";
 import {useApolloClient} from "@apollo/client/react";
-import {ContextStoreProvider} from "@code0-tech/pictor";
+import {AuroraBackground, ContextStoreProvider} from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import {GraphqlClient} from "@core/util/graphql-client";
 import {useParams, usePathname} from "next/navigation";
@@ -20,12 +20,14 @@ import {RoleView} from "@edition/role/services/Role.view";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 import {
     DataType,
-    Flow, FlowType,
+    Flow,
+    FlowType,
     FunctionDefinition,
     Namespace,
     NamespaceMember,
     NamespaceProject,
-    Runtime, RuntimeModule,
+    Runtime,
+    RuntimeModule,
     User
 } from "@code0-tech/sagittarius-graphql-types";
 import {ApplicationMiddlewareComponent} from "@edition/application/components/ApplicationMiddlewareComponent";
@@ -93,20 +95,56 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, sidebar,
         services={[application, user, organization, member, namespace, runtime, project, role, flow, functions, datatype, flowtype, module, ai]}>
         <ApplicationMiddlewareComponent>
             <MfaProviderComponent>
-            <FullScreen bg={"var(--secondary)"}>
-                <Layout p={1} showLayoutSplitter={false} layoutGap={32} leftContent={<ApplicationNavigationView/>}>
-                    <Layout showLayoutSplitter={false} layoutGap={32} leftContent={<div style={{
+                <FullScreen bg={"var(--primary)"}>
+                    <div style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        transform: "scaleX(-1)",
+                        height: "50%",
+                        opacity: "0.25"
+                    }}>
+                        <div style={{
+                            position: "absolute",
+                            top: "0",
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            background: "radial-gradient(circle at top right,rgba(25, 24, 37, 0) 0%, var(--primary) 35%)",
+                            zIndex: "1",
+                            WebkitBackdropFilter: "blur(5rem)",
+                        }}/>
+                        <AuroraBackground/>
+
+                    </div>
+
+                    <div style={{
+                        position: "absolute",
+                        top: 0,
+                        right: 0,
+                        width: "100%",
+                        transform: "",
                         height: "100%",
-                        boxSizing: "border-box",
-                        maxWidth: "20vw"
-                    }}>{sidebar}</div>}>
-                        <>
-                            {children}
-                            {modal}
-                        </>
+                        opacity: "0.25",
+                        filter: "blur(5rem)",
+                    }}>
+                        <AuroraBackground/>
+
+                    </div>
+                    <Layout p={1} showLayoutSplitter={false} layoutGap={32} leftContent={<ApplicationNavigationView/>}>
+                        <Layout showLayoutSplitter={false} layoutGap={32} leftContent={<div style={{
+                            height: "100%",
+                            boxSizing: "border-box",
+                            maxWidth: "20vw"
+                        }}>{sidebar}</div>}>
+                            <>
+                                {children}
+                                {modal}
+                            </>
+                        </Layout>
                     </Layout>
-                </Layout>
-            </FullScreen>
+                </FullScreen>
             </MfaProviderComponent>
         </ApplicationMiddlewareComponent>
     </ContextStoreProvider>

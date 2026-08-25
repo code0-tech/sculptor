@@ -76,7 +76,7 @@ export const FlowFolderView: React.FC = () => {
             <Text pl={0.7} hierarchy={"tertiary"}>
                 Explorer
             </Text>
-            <ButtonGroup color={"secondary"} style={{boxShadow: "none"}} p={0}>
+            <ButtonGroup bg={"transparent"} style={{boxShadow: "none"}} p={0}>
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button variant={"none"} paddingSize={"xxs"}
@@ -123,19 +123,17 @@ export const FlowFolderView: React.FC = () => {
         </Flex>
         <Spacing spacing={"xxs"}/>
         <Link href={`/namespace/${namespaceIndex}/project/${projectIndex}/module`} style={{width: "100%"}}>
-            <Button style={{borderRadius: "50rem"}} w={"100%"} paddingSize={"xxs"} color={"tertiary"} variant={"none"}
-                    justify={"start"}>
+            <Button variant={"none"} w={"100%"} justify={"flex-start"} paddingSize={"xxs"}>
                 <IconApps size={13}/>
-                Integrations
+                <Text size={"md"} hierarchy={"tertiary"}>Integrations</Text>
             </Button>
         </Link>
-        <Button style={{borderRadius: "50rem"}} w={"100%"} paddingSize={"xxs"} color={"tertiary"} variant={"none"}
-                justify={"start"} onClick={() => {
+        <Button variant={"none"} w={"100%"} justify={"flex-start"} paddingSize={"xxs"} onClick={() => {
             setCreateDialogOpen(true)
             setFlowTypeId(undefined)
         }}>
             <IconPlus size={13}/>
-            Create workflow
+            <Text size={"md"} hierarchy={"tertiary"}>Create workflow</Text>
         </Button>
         <Spacing spacing={"lg"}/>
         <div style={{borderTop: "1px dashed rgba(255,255,255, .1)"}}/>

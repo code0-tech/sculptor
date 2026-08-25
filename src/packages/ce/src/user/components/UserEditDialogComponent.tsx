@@ -22,7 +22,7 @@ import {
 } from "@code0-tech/pictor";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
-import {User, UsersUpdateInput} from "@code0-tech/sagittarius-graphql-types";
+import {IdentityProviderBasic, User, UsersUpdateInput} from "@code0-tech/sagittarius-graphql-types";
 import {UserService} from "@edition/user/services/User.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
@@ -41,6 +41,7 @@ import {useMfa} from "@edition/user/components/MfaProviderComponent";
 import {UserMfaView} from "@edition/user/views/UserMfaView";
 import {UserIdentitiesView} from "@edition/user/views/UserIdentitiesView";
 import {SettingDialog} from "@core/components/SettingDialog";
+import {ApplicationService} from "@edition/application/services/Application.service";
 
 export interface UserEditDialogComponentProps {
     userId?: User['id']
@@ -54,6 +55,8 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
 
     const userService = useService(UserService)
     const userStore = useStore(UserService)
+    const applicationService = useService(ApplicationService)
+    const applicationStore = useStore(ApplicationService)
     const withMfa = useMfa()
     const [, startTransition] = React.useTransition()
 
@@ -61,6 +64,11 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
     const user = React.useMemo(
         () => userService.getById(userId),
         [userStore, userId]
+    )
+
+    const providers = React.useMemo<IdentityProviderBasic[]>(
+        () => (applicationService.get()?.identityProviders?.nodes ?? []).filter((node): node is IdentityProviderBasic => !!node),
+        [applicationStore]
     )
 
     const isSelf = !!user && !!currentSession?.user?.id && user.id === currentSession.user.id
@@ -179,7 +187,7 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                                       </Button>
                                   </TabTrigger>
                               )}
-                              {isSelf && (
+                              {isSelf && providers.length > 0 && (
                                   <TabTrigger value={"connections"} w={"100%"} asChild>
                                       <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
                                           <IconLink size={13}/>
@@ -312,7 +320,7 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                            {...inputs.getInputProps("repeatPassword")}/>
         </TabContent>
         {isSelf ? <UserMfaView/> : <></>}
-        {isSelf ? <UserIdentitiesView/> : <></>}
+        {isSelf && providers.length > 0 ? <UserIdentitiesView/> : <></>}
         <TabContent value={"sessions"}
                     style={{
                         overflow: "hidden",

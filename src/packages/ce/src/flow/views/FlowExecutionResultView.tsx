@@ -115,7 +115,9 @@ export const FlowExecutionResultView: React.FC = () => {
     const flowTypeStore = useStore(FlowTypeService)
     const projectService = useService(ProjectService)
     const projectStore = useStore(ProjectService)
+
     const [activeTab, setActiveTab] = React.useState<string>()
+    const previousPendingRef = React.useRef<string[]>([])
 
     const namespaceIndex = params.namespaceId as any as number
     const projectIndex = params.projectId as any as number
@@ -161,14 +163,12 @@ export const FlowExecutionResultView: React.FC = () => {
     )
 
     const executions = useFlowExecutionStore(s => s.executions)
+
     const pendingExecutions = React.useMemo(
         () => executions.filter(execution => execution.flowId === flowId),
         [executions, flowId]
     )
 
-    // When a manual execution is triggered elsewhere (the definition panel) its pending
-    // entry appears here; focus its loading tab so the user sees the spinner immediately.
-    const previousPendingRef = React.useRef<string[]>([])
     React.useEffect(() => {
         const currentIds = pendingExecutions.map(execution => execution.executionIdentifier)
         const newlyAdded = currentIds.find(id => !previousPendingRef.current.includes(id))
@@ -176,8 +176,6 @@ export const FlowExecutionResultView: React.FC = () => {
         previousPendingRef.current = currentIds
     }, [pendingExecutions])
 
-    // Once the pending execution resolves its loading tab disappears; fall back to the
-    // newest result so the freshly arrived execution result becomes visible.
     React.useEffect(() => {
         if (!activeTab) return
         const stillPending = pendingExecutions.some(execution => execution.executionIdentifier === activeTab)
@@ -312,7 +310,7 @@ export const FlowExecutionResultView: React.FC = () => {
                         <Flex align={"center"} style={{gap: "0.35rem"}}>
                             <IconPlayerPlayFilled size={13} color={hashToColor(id ?? "")}/>
                             <Text size={"sm"}>
-                                #{id?.match(/ExecutionResult\/(\d+)$/)?.[1]}
+                                #{id?.match(/\/ExecutionResult\/(\d+)(?:\/|$)/)?.[1]}
                             </Text>
                             <Text size={"sm"} hierarchy={"tertiary"}>
                                 {formatDistanceToNow(execution?.createdAt ?? "")}
