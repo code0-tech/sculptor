@@ -187,7 +187,7 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                                       </Button>
                                   </TabTrigger>
                               )}
-                              {isSelf && providers.length > 0 (
+                              {isSelf && providers.length > 0 && (
                                   <TabTrigger value={"connections"} w={"100%"} asChild>
                                       <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
                                           <IconLink size={13}/>
