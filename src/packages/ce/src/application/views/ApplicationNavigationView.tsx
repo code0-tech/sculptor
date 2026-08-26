@@ -4,7 +4,8 @@ import React, {startTransition} from "react";
 import {
     Avatar,
     Button,
-    Flex, getSize,
+    Flex,
+    getSize,
     Icon,
     Menu,
     MenuContent,
@@ -26,7 +27,6 @@ import {
     IconApps,
     IconArrowAutofitLeft,
     IconArrowAutofitLeftFilled,
-    IconHomeFilled,
     IconSettingsFilled,
     IconUser
 } from "@tabler/icons-react";
@@ -34,6 +34,7 @@ import Link from "next/link";
 import {UserService} from "@edition/user/services/User.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {useRouter} from "next/navigation";
+import {ApplicationUsageView} from "@edition/application/views/ApplicationUsageView";
 
 export const ApplicationNavigationView: React.FC = () => {
 
@@ -101,6 +102,7 @@ export const ApplicationNavigationView: React.FC = () => {
                 </TooltipPortal>
             </Tooltip>
         )}
+        <ApplicationUsageView/>
         <Flex style={{marginTop: "auto", boxSizing: "border-box", flexDirection: 'column', gap: "0.7rem"}}>
             <Tooltip>
                 <TooltipTrigger asChild>
