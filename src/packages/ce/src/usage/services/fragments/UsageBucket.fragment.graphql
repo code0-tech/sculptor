@@ -1,0 +1,7 @@
+fragment UsageBucket on UsageBucket {
+    __typename
+    periodStart
+    periodEnd
+    usage
+    value
+}
