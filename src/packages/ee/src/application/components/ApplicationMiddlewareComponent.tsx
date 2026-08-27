@@ -19,7 +19,7 @@ export const ApplicationMiddlewareComponent: React.FC<ApplicationMiddlewareProps
     const applicationService = useService(ApplicationService)
     const applicationStore = useStore(ApplicationService)
     const userService = useService(UserService)
-    const userStore = useService(UserService)
+    const userStore = useStore(UserService)
 
     if (currentSession === null) {
         router.push("/login")
