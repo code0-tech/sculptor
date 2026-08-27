@@ -16,6 +16,11 @@ export interface UsageLimits {
     ai: number | undefined
 }
 
+export interface UsageRange {
+    afterDate: string
+    beforeDate: string
+}
+
 export interface UsageEntry extends Payload {
     id: string
     level: UsageLevel
@@ -34,19 +39,15 @@ export class UsageService extends ReactiveArrayService<UsageEntry> {
         this.client = client
     }
 
-    getApplicationUsage(): UsageEntry | undefined {
+    getApplicationUsage(range: UsageRange): UsageEntry | undefined {
         const cached = this.values().find(entry => entry && entry.id === "application")
         if (cached) return cached
-
-        const before = new Date()
-        const after = new Date()
-        after.setDate(after.getDate() - 30)
 
         this.client.query<Query>({
             query: applicationUsageQuery,
             variables: {
-                afterDate: after.toISOString().slice(0, 10),
-                beforeDate: before.toISOString().slice(0, 10),
+                afterDate: range.afterDate,
+                beforeDate: range.beforeDate,
                 aggregation: "MONTH"
             }
         }).then(result => {
@@ -65,20 +66,16 @@ export class UsageService extends ReactiveArrayService<UsageEntry> {
         return undefined
     }
 
-    getNamespaceUsage(namespaceId: string): UsageEntry | undefined {
+    getNamespaceUsage(namespaceId: string, range: UsageRange): UsageEntry | undefined {
         const cached = this.values().find(entry => entry && entry.id === namespaceId)
         if (cached) return cached
-
-        const before = new Date()
-        const after = new Date()
-        after.setDate(after.getDate() - 30)
 
         this.client.query<Query>({
             query: namespaceUsageQuery,
             variables: {
                 namespaceId,
-                afterDate: after.toISOString().slice(0, 10),
-                beforeDate: before.toISOString().slice(0, 10),
+                afterDate: range.afterDate,
+                beforeDate: range.beforeDate,
                 aggregation: "MONTH"
             }
         }).then(result => {
@@ -97,21 +94,17 @@ export class UsageService extends ReactiveArrayService<UsageEntry> {
         return undefined
     }
 
-    getProjectUsage(namespaceId: string, projectId: string): UsageEntry | undefined {
+    getProjectUsage(namespaceId: string, projectId: string, range: UsageRange): UsageEntry | undefined {
         const cached = this.values().find(entry => entry && entry.id === projectId)
         if (cached) return cached
-
-        const before = new Date()
-        const after = new Date()
-        after.setDate(after.getDate() - 30)
 
         this.client.query<Query>({
             query: projectUsageQuery,
             variables: {
                 namespaceId,
                 projectId,
-                afterDate: after.toISOString().slice(0, 10),
-                beforeDate: before.toISOString().slice(0, 10),
+                afterDate: range.afterDate,
+                beforeDate: range.beforeDate,
                 aggregation: "MONTH"
             }
         }).then(result => {
@@ -130,13 +123,9 @@ export class UsageService extends ReactiveArrayService<UsageEntry> {
         return undefined
     }
 
-    getFlowUsage(namespaceId: string, projectId: string, flowId: string): UsageEntry | undefined {
+    getFlowUsage(namespaceId: string, projectId: string, flowId: string, range: UsageRange): UsageEntry | undefined {
         const cached = this.values().find(entry => entry && entry.id === flowId)
         if (cached) return cached
-
-        const before = new Date()
-        const after = new Date()
-        after.setDate(after.getDate() - 30)
 
         this.client.query<Query>({
             query: flowUsageQuery,
@@ -144,8 +133,8 @@ export class UsageService extends ReactiveArrayService<UsageEntry> {
                 namespaceId,
                 projectId,
                 flowId,
-                afterDate: after.toISOString().slice(0, 10),
-                beforeDate: before.toISOString().slice(0, 10),
+                afterDate: range.afterDate,
+                beforeDate: range.beforeDate,
                 aggregation: "MONTH"
             }
         }).then(result => {

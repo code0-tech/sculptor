@@ -25,13 +25,17 @@ export const ApplicationUsageView: React.FC = () => {
         [namespaceStore, namespaceIndex]
     )
 
-    const hasActiveLicense = namespace?.licenses?.nodes?.some(license =>
+    const activeLicense = namespace?.licenses?.nodes?.find(license =>
         !!license?.startDate && !!license?.endDate && isPast(license.startDate) && isFuture(license.endDate)
-    ) ?? false
+    )
 
-    const limits = !namespaceIndex || hasActiveLicense
+    const limits = !namespaceIndex || activeLicense
         ? {workflow: undefined, ai: undefined}
         : {workflow: FREE_WORKFLOW_LIMIT, ai: FREE_AI_LIMIT}
 
-    return <UsageIndicatorComponent licenseLevel={"namespace"} limits={limits}/>
+    return <UsageIndicatorComponent
+        licenseLevel={"namespace"}
+        licenseStartDate={activeLicense?.startDate ?? undefined}
+        limits={limits}
+    />
 }

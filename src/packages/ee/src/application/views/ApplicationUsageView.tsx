@@ -19,6 +19,7 @@ export const ApplicationUsageView: React.FC = () => {
 
     return <UsageIndicatorComponent
         licenseLevel={"application"}
+        licenseStartDate={hasActiveLicense ? (license?.startDate ?? undefined) : undefined}
         limits={hasActiveLicense ? {workflow: undefined, ai: undefined} : {workflow: 0, ai: 0}}
     />
 }

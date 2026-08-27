@@ -91,7 +91,7 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, sidebar,
         module[1].values({namespaceId, projectId, runtimeId})
     }, [runtimeId, namespaceId, projectId, currentSession, flow, functions, datatype, flowtype])
 
-    const isAddLicensePage = pathname === '/licenses/add';
+    const isAddLicensePage = pathname === '/licenses/add'
 
     return <ContextStoreProvider
         services={[application, user, organization, member, namespace, runtime, project, role, flow, functions, datatype, flowtype, module, ai, usage]}>
@@ -134,12 +134,14 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, sidebar,
                         <AuroraBackground/>
 
                     </div>
-                    <Layout p={1} showLayoutSplitter={false} layoutGap={32} leftContent={<ApplicationNavigationView/>}>
-                        <Layout showLayoutSplitter={false} layoutGap={32} leftContent={<div style={{
-                            height: "100%",
-                            boxSizing: "border-box",
-                            maxWidth: "20vw"
-                        }}>{sidebar}</div>}>
+                    <Layout p={1} showLayoutSplitter={false} layoutGap={32}
+                            leftContent={<ApplicationNavigationView/>}>
+                        <Layout showLayoutSplitter={false} layoutGap={32}
+                                leftContent={!isAddLicensePage ? <div style={{
+                                    height: "100%",
+                                    boxSizing: "border-box",
+                                    maxWidth: "20vw"
+                                }}>{sidebar}</div> : undefined}>
                             <>
                                 {children}
                                 {modal}

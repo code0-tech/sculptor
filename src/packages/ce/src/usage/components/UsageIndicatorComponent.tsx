@@ -16,6 +16,7 @@ import {
     useStore
 } from "@code0-tech/pictor";
 import {useParams} from "next/navigation";
+import {addMonths, differenceInMonths, endOfMonth, format, parseISO, startOfMonth} from "date-fns";
 import {UserService} from "@edition/user/services/User.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {LicenseLevel, UsageLevel, UsageLimits, UsageService} from "@edition/usage/services/Usage.service";
@@ -29,12 +30,13 @@ const numberFormat = new Intl.NumberFormat()
 
 export interface UsageIndicatorComponentProps {
     licenseLevel?: LicenseLevel
+    licenseStartDate?: string
     limits?: UsageLimits
 }
 
 export const UsageIndicatorComponent: React.FC<UsageIndicatorComponentProps> = (props) => {
 
-    const {licenseLevel, limits = {workflow: undefined, ai: undefined}} = props
+    const {licenseLevel, licenseStartDate, limits = {workflow: undefined, ai: undefined}} = props
 
     const userService = useService(UserService)
     const userStore = useStore(UserService)
@@ -62,19 +64,27 @@ export const UsageIndicatorComponent: React.FC<UsageIndicatorComponentProps> = (
 
     const overallAccessible = overallLevel === "application" ? !!currentUser?.admin : !!namespaceIndex
 
+    const now = new Date()
+    const licenseStart = licenseStartDate ? parseISO(licenseStartDate) : undefined
+    const monthsElapsed = licenseStart ? differenceInMonths(now, licenseStart) : 0
+    const periodStart = licenseStart ? addMonths(licenseStart, monthsElapsed) : startOfMonth(now)
+    const periodEnd = licenseStart ? addMonths(licenseStart, monthsElapsed + 1) : addMonths(periodStart, 1)
+    const afterDate = format(periodStart, "yyyy-MM-dd")
+    const beforeDate = format(periodEnd, "yyyy-MM-dd")
+
     const overallUsage = React.useMemo(() => {
         if (!overallAccessible) return undefined
         return overallLevel === "namespace"
-            ? usageService.getNamespaceUsage(namespaceId)
-            : usageService.getApplicationUsage()
-    }, [usageStore, overallLevel, overallAccessible, namespaceId])
+            ? usageService.getNamespaceUsage(namespaceId, {afterDate, beforeDate})
+            : usageService.getApplicationUsage({afterDate, beforeDate})
+    }, [usageStore, overallLevel, overallAccessible, namespaceId, afterDate, beforeDate])
 
     const contextUsage = React.useMemo(() => {
         if (RANK[contextLevel] <= RANK[overallLevel]) return undefined
-        if (contextLevel === "flow") return usageService.getFlowUsage(namespaceId, projectId, flowId)
-        if (contextLevel === "project") return usageService.getProjectUsage(namespaceId, projectId)
-        return usageService.getNamespaceUsage(namespaceId)
-    }, [usageStore, contextLevel, overallLevel, namespaceId, projectId, flowId])
+        if (contextLevel === "flow") return usageService.getFlowUsage(namespaceId, projectId, flowId, {afterDate, beforeDate})
+        if (contextLevel === "project") return usageService.getProjectUsage(namespaceId, projectId, {afterDate, beforeDate})
+        return usageService.getNamespaceUsage(namespaceId, {afterDate, beforeDate})
+    }, [usageStore, contextLevel, overallLevel, namespaceId, projectId, flowId, afterDate, beforeDate])
 
     if (!overallAccessible) return null
 
