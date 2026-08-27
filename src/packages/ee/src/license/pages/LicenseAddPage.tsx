@@ -15,7 +15,7 @@ import {
     FileInputItemPreview,
     FileInputItemSizeText,
     FileInputTrigger,
-    Flex,
+    Flex, getSize,
     hashToColor,
     Spacing,
     Text,
@@ -33,10 +33,13 @@ export const LicenseAddPage: React.FC = () => {
     const applicationService = useService(ApplicationService)
     const router = useRouter()
 
-    const [inputs, validate, values] = useForm<{ file: FileUploadFileChangeDetails | undefined }>({
-        initialValues: {
-            file: undefined
-        },
+    const initialValues = React.useMemo(() => ({
+        file: undefined
+    }), [])
+
+    const [inputs, validate] = useForm<{ file: FileUploadFileChangeDetails | undefined }>({
+        initialValues,
+        useInitialValidation: false,
         validate: {
             file: (value) => {
                 if (!value || value.acceptedFiles.length <= 0) return "Please upload a license file"
@@ -59,10 +62,6 @@ export const LicenseAddPage: React.FC = () => {
         }
     })
 
-    React.useEffect(() => {
-        validate("file")
-    }, [values])
-
     return <>
         <Text size={"lg"} hierarchy={"primary"}>
             Add a license
@@ -73,14 +72,12 @@ export const LicenseAddPage: React.FC = () => {
         </Text>
         <Spacing spacing={"xl"}/>
         {/*@ts-ignore*/}
-        <FileInput title={"License"}
-                   description={"Build high-class workflows, endpoints and software without coding"}
-                   accept={".czlc"}
+        <FileInput accept={".czlc"}
                    pos={"relative"}
                    {...inputs.getInputProps("file")}
                    maxFiles={1}>
             <FileInputDropzone asChild>
-                <Card color={"tertiary"} style={{boxShadow: "none", border: "1px dashed rgba(191, 191, 191, 0.1)"}}>
+                <Card color={"primary"} style={{boxShadow: "none", border: "1px dashed rgba(191, 191, 191, 0.1)"}}>
                     <Flex align={"center"} justify={"center"}
                           style={{textAlign: "center", flexDirection: "column", gap: "1rem"}}>
                         <Text size={"md"} hierarchy={"primary"} display={"flex"} align={"center"}
@@ -99,11 +96,11 @@ export const LicenseAddPage: React.FC = () => {
                     </Flex>
                 </Card>
             </FileInputDropzone>
-            <FileInputItemGroup display={"flex"} mt={1} style={{flexDirection: "column", gap: "0.35rem"}}>
+            <FileInputItemGroup>
                 <FileInputContext>
                     {({acceptedFiles}) => acceptedFiles?.map((file) => (
                         <FileInputItem file={file} key={file.name} asChild>
-                            <Card paddingSize={"xxs"}>
+                            <Card color={"secondary"} style={{marginTop: getSize("xs")}} paddingSize={"xxs"}>
                                 <Flex align={"center"} justify={"space-between"}>
                                     <Flex align={"center"} style={{gap: "0.7rem"}}>
                                         {
