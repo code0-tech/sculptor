@@ -33,21 +33,24 @@ import {
 import Link from "next/link";
 import {UserService} from "@edition/user/services/User.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
-import {useRouter} from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
 import {ApplicationUsageView} from "@edition/application/views/ApplicationUsageView";
 
 export const ApplicationNavigationView: React.FC = () => {
 
-
+    const pathname = usePathname()
+    const router = useRouter()
     const userService = useService(UserService)
     const userStore = useStore(UserService)
-
-    const router = useRouter()
     const currentSession = useUserSession()
+
+    const isAddLicensePage = pathname === '/licenses/add';
+
     const currentUser = React.useMemo(
         () => userService.getById(currentSession?.user?.id),
         [userStore, currentSession]
     )
+
     const userNamespaceIndex = React.useMemo(
         () => currentUser?.namespace?.id?.match(/Namespace\/(\d+)$/)?.[1],
         [currentUser]
@@ -84,7 +87,7 @@ export const ApplicationNavigationView: React.FC = () => {
                 </TooltipContent>
             </TooltipPortal>
         </Tooltip>
-        {currentUser?.admin && (
+        {currentUser?.admin && !isAddLicensePage && (
             <Tooltip>
                 <TooltipTrigger asChild>
                     <Link href={"/settings"} prefetch>
@@ -102,9 +105,9 @@ export const ApplicationNavigationView: React.FC = () => {
                 </TooltipPortal>
             </Tooltip>
         )}
-        <ApplicationUsageView/>
+        {!isAddLicensePage && <ApplicationUsageView/>}
         <Flex style={{marginTop: "auto", boxSizing: "border-box", flexDirection: 'column', gap: "0.7rem"}}>
-            <Tooltip>
+            {!isAddLicensePage && <Tooltip>
                 <TooltipTrigger asChild>
                     <Link href={"/users/@me/settings"} prefetch>
                         <Button variant={"none"} style={{padding: getSize("xs"), marginTop: 'auto'}}>
@@ -119,7 +122,7 @@ export const ApplicationNavigationView: React.FC = () => {
                         </Text>
                     </TooltipContent>
                 </TooltipPortal>
-            </Tooltip>
+            </Tooltip>}
             <Tooltip>
                 <TooltipTrigger asChild>
                     <Button onClick={userLogout} variant={"none"} style={{padding: getSize("xs"), marginTop: 'auto'}}>
@@ -145,28 +148,30 @@ export const ApplicationNavigationView: React.FC = () => {
                         <MenuLabel>
                             User menu
                         </MenuLabel>
-                        <Link href={`/users/@me`}>
-                            <MenuItem>
-                                <IconUser size={16}/>Profile
-                            </MenuItem>
-                        </Link>
-                        <Link href={`/users/@me/settings`}>
-                            <MenuItem>
-                                <IconUser color={"transparent"} size={16}/>Settings
-                            </MenuItem>
-                        </Link>
-                        <MenuSeparator/>
-                        <Link href={"/"}>
-                            <MenuItem>
-                                <IconApps size={16}/>Workspaces
-                            </MenuItem>
-                        </Link>
-                        <Link href={`/namespace/${userNamespaceIndex}`}>
-                            <MenuItem>
-                                <IconApps color={"transparent"} size={16}/>Personal Workspace
-                            </MenuItem>
-                        </Link>
-                        <MenuSeparator/>
+                        {!isAddLicensePage && <>
+                            <Link href={`/users/@me`}>
+                                <MenuItem>
+                                    <IconUser size={16}/>Profile
+                                </MenuItem>
+                            </Link>
+                            <Link href={`/users/@me/settings`}>
+                                <MenuItem>
+                                    <IconUser color={"transparent"} size={16}/>Settings
+                                </MenuItem>
+                            </Link>
+                            <MenuSeparator/>
+                            <Link href={"/"}>
+                                <MenuItem>
+                                    <IconApps size={16}/>Workspaces
+                                </MenuItem>
+                            </Link>
+                            <Link href={`/namespace/${userNamespaceIndex}`}>
+                                <MenuItem>
+                                    <IconApps color={"transparent"} size={16}/>Personal Workspace
+                                </MenuItem>
+                            </Link>
+                            <MenuSeparator/>
+                        </>}
                         <MenuItem onSelect={userLogout}>
                             <IconArrowAutofitLeft size={16}/>Logout
                         </MenuItem>
