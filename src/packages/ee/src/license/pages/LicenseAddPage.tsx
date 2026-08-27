@@ -22,9 +22,10 @@ import {
     useForm,
     useService
 } from "@code0-tech/pictor";
-import {IconFileInfoFilled, IconX} from "@tabler/icons-react";
+import {IconCloudUpload, IconFileInfoFilled, IconX} from "@tabler/icons-react";
 import {FileUploadFileChangeDetails} from "@ark-ui/react";
 import {ApplicationService} from "@ee-internal/application/services/Application.service";
+import Link from "next/link";
 import {useRouter} from "next/navigation";
 import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
@@ -68,7 +69,7 @@ export const LicenseAddPage: React.FC = () => {
         </Text>
         <Spacing spacing={"xs"}/>
         <Text size={"md"} hierarchy={"tertiary"}>
-            Build high-class workflows, endpoints and software without coding
+            Upload your license file to unlock the Enterprise Edition features.
         </Text>
         <Spacing spacing={"xl"}/>
         {/*@ts-ignore*/}
@@ -77,9 +78,18 @@ export const LicenseAddPage: React.FC = () => {
                    {...inputs.getInputProps("file")}
                    maxFiles={1}>
             <FileInputDropzone asChild>
-                <Card color={"primary"} style={{boxShadow: "none", border: "1px dashed rgba(191, 191, 191, 0.1)"}}>
+                <Card color={"primary"} style={{boxShadow: "none", border: "1px dashed rgba(191, 191, 191, 0.25)"}}>
                     <Flex align={"center"} justify={"center"}
-                          style={{textAlign: "center", flexDirection: "column", gap: "1rem"}}>
+                          style={{textAlign: "center", flexDirection: "column", gap: "1rem", padding: "1rem 0"}}>
+                        <Flex align={"center"} justify={"center"}
+                              style={{
+                                  width: "3rem",
+                                  height: "3rem",
+                                  borderRadius: "50%",
+                                  background: "rgba(191, 191, 191, 0.08)"
+                              }}>
+                            <IconCloudUpload size={24} color={"rgba(191, 191, 191, 0.75)"}/>
+                        </Flex>
                         <Text size={"md"} hierarchy={"primary"} display={"flex"} align={"center"}
                               style={{gap: "0.35rem"}}>
                             Drag license file or
@@ -90,7 +100,7 @@ export const LicenseAddPage: React.FC = () => {
                             </FileInputTrigger>
                             to upload
                         </Text>
-                        <Text>
+                        <Text size={"sm"} hierarchy={"tertiary"}>
                             Only .czlc files are accepted.
                         </Text>
                     </Flex>
@@ -110,7 +120,7 @@ export const LicenseAddPage: React.FC = () => {
                                                 </FileInputItemPreview>
                                             )
                                         }
-                                        <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
+                                        <Flex style={{flexDirection: "column"}}>
                                             <Text>
                                                 <FileInputItemName/>
                                             </Text>
@@ -120,7 +130,7 @@ export const LicenseAddPage: React.FC = () => {
                                         </Flex>
                                     </Flex>
                                     <FileInputItemDeleteTrigger asChild>
-                                        <Button variant={"none"}>
+                                        <Button style={{padding: getSize("xs")}} variant={"none"}>
                                             <IconX size={16}/>
                                         </Button>
                                     </FileInputItemDeleteTrigger>
@@ -136,5 +146,22 @@ export const LicenseAddPage: React.FC = () => {
         <Button color={"success"} w={"100%"} onClick={() => validate()}>
             Add license
         </Button>
+        <Spacing spacing={"xl"}/>
+        <Text display={"flex"} hierarchy={"tertiary"} size={"md"} mb={0.7}>
+            Already bought a license?
+            <Link href={"https://cloud.codezero.app"} target={"_blank"}>
+                <Text ml={0.35} hierarchy={"primary"} display={"flex"} size={"md"}>
+                    Download it here
+                </Text>
+            </Link>
+        </Text>
+        <Text display={"flex"} hierarchy={"tertiary"} size={"md"}>
+            Don't have a license yet?
+            <Link href={"https://codezero.build/subscription"} target={"_blank"}>
+                <Text ml={0.35} hierarchy={"primary"} display={"flex"} size={"md"}>
+                    Buy a license
+                </Text>
+            </Link>
+        </Text>
     </>
 }
