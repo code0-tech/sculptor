@@ -19,12 +19,7 @@ export const ApplicationMiddlewareComponent: React.FC<ApplicationMiddlewareProps
     const applicationService = useService(ApplicationService)
     const applicationStore = useStore(ApplicationService)
     const userService = useService(UserService)
-    const userStore = useService(UserService)
-
-    if (currentSession === null) {
-        router.push("/login")
-        return null
-    }
+    const userStore = useStore(UserService)
 
     const user = React.useMemo(
         () => userService.getById(currentSession?.user?.id),
@@ -35,6 +30,11 @@ export const ApplicationMiddlewareComponent: React.FC<ApplicationMiddlewareProps
         () => applicationService.get(),
         [applicationStore]
     )
+
+    if (currentSession === null) {
+        router.push("/login")
+        return null
+    }
 
     if ((user?.admin ?? false) && application && ((application.licenses?.count ?? 0) <= 0) && pathname != "/licenses/add") {
         router.push("/licenses/add")

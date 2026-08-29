@@ -98,28 +98,37 @@ export const ProjectSettingsGeneralView: React.FC = () => {
         <Spacing spacing={"md"}/>
         <Card color={"secondary"}>
             <CardSection border>
-                <Flex justify={"space-between"} align={"center"}>
-                    <Text size={"md"} hierarchy={"primary"}>Name</Text>
-                    <TextInput miw={"200px"} {...inputs.getInputProps("name")}/>
-                </Flex>
+                <Text size={"md"} hierarchy={"primary"}>Name</Text>
+                <Spacing spacing={"xxs"}/>
+                <Text size={"sm"} hierarchy={"tertiary"}>
+                    The display name for this project. It is shown across the platform wherever this project
+                    appears.
+                </Text>
+                <Spacing spacing={"xs"}/>
+                <TextInput clearable
+                           {...inputs.getInputProps("name")}/>
             </CardSection>
             <CardSection border>
-                <Flex justify={"space-between"} align={"center"}>
-                    <Text size={"md"} hierarchy={"primary"}>Description</Text>
-                    <TextInput miw={"200px"} {...inputs.getInputProps("description")}/>
-                </Flex>
+                <Text size={"md"} hierarchy={"primary"}>Description</Text>
+                <Spacing spacing={"xxs"}/>
+                <Text size={"sm"} hierarchy={"tertiary"}>
+                    A short summary of what this project is about. It helps others understand the project’s
+                    purpose at a glance.
+                </Text>
+                <Spacing spacing={"xs"}/>
+                <TextInput clearable
+                           {...inputs.getInputProps("description")}/>
             </CardSection>
             <CardSection border>
-                <Flex justify={"space-between"} align={"center"}>
-                    <Flex style={{gap: ".35rem", flexDirection: "column"}}>
-                        <Text size={"md"} hierarchy={"primary"}>Slug</Text>
-                        <Text size={"md"} hierarchy={"tertiary"}>
-                            Think of this as your project’s unique nickname in a web address. It helps distinguish this
-                            project from others when using URL-based connections (like REST flows).
-                        </Text>
-                    </Flex>
-                    <TextInput miw={"200px"} {...inputs.getInputProps("slug")}/>
-                </Flex>
+                <Text size={"md"} hierarchy={"primary"}>Slug</Text>
+                <Spacing spacing={"xxs"}/>
+                <Text size={"sm"} hierarchy={"tertiary"}>
+                    Think of this as your project’s unique nickname in a web address. It helps distinguish this
+                    project from others when using URL-based connections (like REST flows).
+                </Text>
+                <Spacing spacing={"xs"}/>
+                <TextInput clearable
+                           {...inputs.getInputProps("slug")}/>
             </CardSection>
         </Card>
     </TabContent>

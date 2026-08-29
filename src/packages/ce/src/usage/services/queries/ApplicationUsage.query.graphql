@@ -1,0 +1,17 @@
+#import "@edition/usage/services/fragments/UsageBucket.fragment.graphql"
+
+query ApplicationUsage(
+    $afterDate: ISO8601Date!,
+    $beforeDate: ISO8601Date!,
+    $aggregation: UsageAggregation
+) {
+    application {
+        __typename
+        aiUsage(afterDate: $afterDate, beforeDate: $beforeDate, aggregation: $aggregation) {
+            ...UsageBucket
+        }
+        runtimeUsage(afterDate: $afterDate, beforeDate: $beforeDate, aggregation: $aggregation) {
+            ...UsageBucket
+        }
+    }
+}

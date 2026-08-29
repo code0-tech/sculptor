@@ -4,6 +4,7 @@ import {
     Button,
     Card,
     Flex,
+    getSize,
     NumberInput,
     Spacing,
     Text,
@@ -39,9 +40,6 @@ export const ApplicationGeneralSettingsView: React.FC = () => {
         [application]
     )
 
-    // The +/- buttons of NumberInput write to the input element directly without
-    // triggering a React change event, so the useForm value goes stale. Read the
-    // value from the element itself on submit instead.
     const runtimeHeartbeatInputRef = React.useRef<HTMLInputElement>(null)
 
     const [inputs, validate] = useForm({
@@ -77,82 +75,91 @@ export const ApplicationGeneralSettingsView: React.FC = () => {
         </Text>
         <Spacing spacing={"md"}/>
         <Text size={"md"} hierarchy={"secondary"}>Versions</Text>
-        <Spacing spacing={"xs"}/>
+        <Spacing spacing={"lg"}/>
         <Card color={"secondary"}>
             <CardSection border>
-                <Flex justify={"space-between"} align={"center"}>
-                    <Flex style={{gap: ".35rem", flexDirection: "column"}}>
+                <Flex justify={"space-between"} align={"center"} style={{gap: getSize("md")}}>
+                    <Flex style={{gap: getSize("xxxs"), flexDirection: "column"}}>
                         <Text size={"md"} hierarchy={"primary"}>Sculptor version</Text>
                         <Text size={"md"} hierarchy={"tertiary"}>Version of this application</Text>
                     </Flex>
-                    <Badge color={"info"}>{process.env.NEXT_PUBLIC_SCULPTOR_VERSION}</Badge>
+                    <Badge color={"info"}>
+                        <Text c={"inherit"}>{process.env.NEXT_PUBLIC_SCULPTOR_VERSION ?? "Unknown version"}</Text>
+                    </Badge>
                 </Flex>
             </CardSection>
 
             <CardSection border>
-                <Flex justify={"space-between"} align={"center"}>
-                    <Flex style={{gap: ".35rem", flexDirection: "column"}}>
+                <Flex justify={"space-between"} align={"center"} style={{gap: getSize("md")}}>
+                    <Flex style={{gap: getSize("xxxs"), flexDirection: "column"}}>
                         <Text size={"md"} hierarchy={"primary"}>Pictor version</Text>
                         <Text size={"md"} hierarchy={"tertiary"}>Version of the UI component
                             library</Text>
                     </Flex>
-                    <Badge
-                        color={"info"}>{process.env.NEXT_PUBLIC_PICTOR_VERSION}</Badge>
+                    <Badge color={"info"}>
+                        <Text c={"inherit"}>{process.env.NEXT_PUBLIC_PICTOR_VERSION ?? "Unknown version"}</Text>
+                    </Badge>
                 </Flex>
             </CardSection>
             <CardSection border>
-                <Flex justify={"space-between"} align={"center"}>
-                    <Flex style={{gap: ".35rem", flexDirection: "column"}}>
+                <Flex justify={"space-between"} align={"center"} style={{gap: getSize("md")}}>
+                    <Flex style={{gap: getSize("xxxs"), flexDirection: "column"}}>
                         <Text size={"md"} hierarchy={"primary"}>Sagittarius version</Text>
                         <Text size={"md"} hierarchy={"tertiary"}>Version of the backend</Text>
                     </Flex>
-                    <Badge color={"info"}>{application?.metadata?.version}</Badge>
+                    <Badge color={"info"} style={{wordBreak: "break-all"}} maw={"50%"}>
+                        <Text c={"inherit"}>{application?.metadata?.version ?? "Unknown version"}</Text>
+                    </Badge>
                 </Flex>
             </CardSection>
         </Card>
         <Spacing spacing={"lg"}/>
-        <Text size={"md"} hierarchy={"secondary"}>Legal URLs</Text>
-        <Spacing spacing={"xs"}/>
+        <Text size={"md"} hierarchy={"secondary"}>URLs</Text>
+        <Spacing spacing={"lg"}/>
         <Card color={"secondary"}>
             <CardSection border>
-                <Flex justify={"space-between"} align={"center"}>
-                    <Flex style={{gap: ".35rem", flexDirection: "column"}}>
-                        <Text size={"md"} hierarchy={"primary"}>Legal notice url</Text>
-                    </Flex>
-                    <TextInput {...inputs.getInputProps("legalNoticeUrl")}/>
-                </Flex>
+                <Text size={"md"} hierarchy={"primary"}>Legal notice url</Text>
+                <Spacing spacing={"xxs"}/>
+                <Text size={"sm"} hierarchy={"tertiary"}>General configuration for your Sculptor application, including version information, legal links and runtime behaviour.</Text>
+                <Spacing spacing={"xs"}/>
+                <TextInput clearable
+                           placeholder={"https://codezero.build/legal"}
+                           {...inputs.getInputProps("legalNoticeUrl")}/>
             </CardSection>
             <CardSection border>
-                <Flex justify={"space-between"} align={"center"}>
-                    <Flex style={{gap: ".35rem", flexDirection: "column"}}>
-                        <Text size={"md"} hierarchy={"primary"}>Privacy information url</Text>
-                    </Flex>
-                    <TextInput {...inputs.getInputProps("privacyUrl")}/>
-                </Flex>
+                <Text size={"md"} hierarchy={"primary"}>Privacy information url</Text>
+                <Spacing spacing={"xxs"}/>
+                <Text size={"sm"} hierarchy={"tertiary"}>General configuration for your Sculptor application, including version information, legal links and runtime behaviour.</Text>
+                <Spacing spacing={"xs"}/>
+
+                <TextInput clearable
+                           placeholder={"https://codezero.build/privacy"}
+                           {...inputs.getInputProps("privacyUrl")}/>
             </CardSection>
             <CardSection border>
-                <Flex justify={"space-between"} align={"center"}>
-                    <Flex style={{gap: ".35rem", flexDirection: "column"}}>
-                        <Text size={"md"} hierarchy={"primary"}>Terms and conditions url</Text>
-                    </Flex>
-                    <TextInput {...inputs.getInputProps("termsAndConditionsUrl")}/>
-                </Flex>
+                <Text size={"md"} hierarchy={"primary"}>Terms and conditions url</Text>
+                <Spacing spacing={"xxs"}/>
+                <Text size={"sm"} hierarchy={"tertiary"}>General configuration for your Sculptor application, including version information, legal links and runtime behaviour.</Text>
+                <Spacing spacing={"xs"}/>
+
+                <TextInput clearable
+                           placeholder={"https://codezero.build/terms"}
+                           {...inputs.getInputProps("termsAndConditionsUrl")}/>
             </CardSection>
         </Card>
         <Spacing spacing={"lg"}/>
         <Text size={"md"} hierarchy={"secondary"}>Runtimes</Text>
-        <Spacing spacing={"xs"}/>
+        <Spacing spacing={"lg"}/>
         <Card color={"secondary"}>
             <CardSection border>
-                <Flex justify={"space-between"} align={"center"}>
-                    <Flex style={{gap: ".35rem", flexDirection: "column"}}>
-                        <Text size={"md"} hierarchy={"primary"}>Max heartbeat interval</Text>
-                        <Text size={"md"} hierarchy={"tertiary"}>The maximum amount of minutes a runtime is
-                            shown as connected after the last heartbeat.</Text>
-                    </Flex>
-                    <NumberInput ref={runtimeHeartbeatInputRef}
-                                 {...inputs.getInputProps("runtimeMaxHeartbeatIntervalMinutes")}/>
-                </Flex>
+                <Text size={"md"} hierarchy={"primary"}>Max heartbeat interval</Text>
+                <Spacing spacing={"xxs"}/>
+                <Text size={"sm"} hierarchy={"tertiary"}>The maximum amount of minutes a runtime is shown as connected after the last heartbeat.</Text>
+                <Spacing spacing={"xs"}/>
+
+                <NumberInput
+                    ref={runtimeHeartbeatInputRef}
+                    {...inputs.getInputProps("runtimeMaxHeartbeatIntervalMinutes")}/>
             </CardSection>
         </Card>
     </TabContent>

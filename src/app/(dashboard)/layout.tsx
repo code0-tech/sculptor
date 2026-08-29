@@ -40,6 +40,7 @@ import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {ModuleService} from "@edition/module/services/Module.service";
 import {AIService, Model} from "@edition/ai/services/AI.service";
+import {UsageEntry, UsageService} from "@edition/usage/services/Usage.service";
 
 interface ApplicationLayoutProps {
     children: React.ReactNode
@@ -76,6 +77,7 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, sidebar,
     const flowtype = usePersistentReactiveArrayService<FlowType, FlowTypeService>(`dashboard::flowtypes::${currentSession?.id}`, (store) => new FlowTypeService(graphqlClient, store))
     const module = usePersistentReactiveArrayService<RuntimeModule, ModuleService>(`dashboard::modules::${currentSession?.id}`, (store) => new ModuleService(graphqlClient, store))
     const ai = usePersistentReactiveArrayService<Model, AIService>(`dashboard::ai::${currentSession?.id}`, (store) => new AIService(graphqlClient, store))
+    const usage = usePersistentReactiveArrayService<UsageEntry, UsageService>(`dashboard::usage::${currentSession?.id}`, (store) => new UsageService(graphqlClient, store))
 
     const runtimeId = React.useMemo(() => project[1].getById(projectId, {namespaceId})?.primaryRuntime?.id, [projectId, project[0], namespaceId])
 
@@ -89,10 +91,10 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, sidebar,
         module[1].values({namespaceId, projectId, runtimeId})
     }, [runtimeId, namespaceId, projectId, currentSession, flow, functions, datatype, flowtype])
 
-    const isAddLicensePage = pathname === '/licenses/add';
+    const isAddLicensePage = pathname === '/licenses/add'
 
     return <ContextStoreProvider
-        services={[application, user, organization, member, namespace, runtime, project, role, flow, functions, datatype, flowtype, module, ai]}>
+        services={[application, user, organization, member, namespace, runtime, project, role, flow, functions, datatype, flowtype, module, ai, usage]}>
         <ApplicationMiddlewareComponent>
             <MfaProviderComponent>
                 <FullScreen bg={"var(--primary)"}>
@@ -132,12 +134,14 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, sidebar,
                         <AuroraBackground/>
 
                     </div>
-                    <Layout p={1} showLayoutSplitter={false} layoutGap={32} leftContent={<ApplicationNavigationView/>}>
-                        <Layout showLayoutSplitter={false} layoutGap={32} leftContent={<div style={{
-                            height: "100%",
-                            boxSizing: "border-box",
-                            maxWidth: "20vw"
-                        }}>{sidebar}</div>}>
+                    <Layout p={1} showLayoutSplitter={false} layoutGap={32}
+                            leftContent={<ApplicationNavigationView/>}>
+                        <Layout showLayoutSplitter={false} layoutGap={32}
+                                leftContent={!isAddLicensePage ? <div style={{
+                                    height: "100%",
+                                    boxSizing: "border-box",
+                                    maxWidth: "20vw"
+                                }}>{sidebar}</div> : undefined}>
                             <>
                                 {children}
                                 {modal}

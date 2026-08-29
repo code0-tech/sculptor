@@ -1,0 +1,24 @@
+#import "@edition/usage/services/fragments/UsageBucket.fragment.graphql"
+
+query ProjectUsage(
+    $namespaceId: NamespaceID!,
+    $projectId: NamespaceProjectID!,
+    $afterDate: ISO8601Date!,
+    $beforeDate: ISO8601Date!,
+    $aggregation: UsageAggregation
+) {
+    namespace(id: $namespaceId) {
+        __typename
+        id
+        project(id: $projectId) {
+            __typename
+            id
+            aiUsage(afterDate: $afterDate, beforeDate: $beforeDate, aggregation: $aggregation) {
+                ...UsageBucket
+            }
+            runtimeUsage(afterDate: $afterDate, beforeDate: $beforeDate, aggregation: $aggregation) {
+                ...UsageBucket
+            }
+        }
+    }
+}
