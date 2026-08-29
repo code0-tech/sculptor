@@ -25,7 +25,6 @@ import {useEdges} from "@edition/flow/hooks/Flow.edges.hook";
 import {FlowPanelSizeComponent} from "@edition/flow/components/panels/FlowPanelSizeComponent";
 import {FlowPanelLayoutComponent} from "@edition/flow/components/panels/FlowPanelLayoutComponent";
 import {FlowPanelControlComponent} from "@edition/flow/components/panels/FlowPanelControlComponent";
-import {FlowPanelUpdateComponent} from "@edition/flow/components/panels/FlowPanelUpdateComponent";
 import {FunctionNodeSquareComponent} from "@edition/function/components/nodes/FunctionNodeSquareComponent";
 
 /**
@@ -761,7 +760,6 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
                     <FlowPanelSizeComponent/>
                     <FlowPanelLayoutComponent/>
                     <FlowPanelControlComponent namespaceId={namespaceId} projectId={projectId} flowId={flowId}/>
-                    <FlowPanelUpdateComponent flowId={flowId}/>
                 </>
             ) : null}
         </ReactFlow>
