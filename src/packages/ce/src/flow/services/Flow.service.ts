@@ -629,12 +629,12 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
                     }
                 }).then(res => {
                     const lflow = res.data?.namespace?.project?.flow! as FlowView
-                    lflow.updatedAt = Date.now().toString()
+                    lflow.updatedAt = new Date().toISOString()
                     lflow.editedAt = undefined
                     this.set(flowIndex, new View(lflow!))
                 })
             } else {
-                flow.updatedAt = Date.now().toString()
+                flow.updatedAt = new Date().toISOString()
                 flow.editedAt = undefined
                 this.set(flowIndex, new View(flow))
             }
