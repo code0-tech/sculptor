@@ -1,8 +1,10 @@
 import {EditableJSONEntry} from "./DataTypeJSONInputComponent"
 import React from "react"
 import {IconChevronDown, IconChevronUp} from "@tabler/icons-react"
-import {LiteralValue} from "@code0-tech/sagittarius-graphql-types"
+import {InlineReferenceValue, LiteralValue} from "@code0-tech/sagittarius-graphql-types"
 import {Badge, Flex, hashToColor, Text} from "@code0-tech/pictor";
+import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
+import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeComponent";
 
 export interface DataTypeJSONInputTreeComponentProps {
     object: LiteralValue
@@ -15,7 +17,11 @@ export interface DataTypeJSONInputTreeComponentProps {
     activePath?: string[] | null
     onDoubleClick?: (path: string[], isCollapsed: boolean) => void
     parentColor?: string
+    rootDepth?: number
+    references?: InlineReferenceValue[]
 }
+
+const CLICK_DELAY = 250
 
 export const DataTypeJSONInputTreeComponent: React.FC<DataTypeJSONInputTreeComponentProps> = (props) => {
     const {
@@ -29,13 +35,24 @@ export const DataTypeJSONInputTreeComponent: React.FC<DataTypeJSONInputTreeCompo
         activePath = null,
         onDoubleClick,
         parentColor,
+        rootDepth = 1,
+        references,
     } = props
 
-    const value = isRoot ? object?.value : object
-    if (typeof value !== "object" || value === null) return null
-
     const clickTimeout = React.useRef<NodeJS.Timeout | null>(null)
-    const CLICK_DELAY = 250 // ms
+
+    const value: unknown = isRoot ? object?.value : object
+    const entries = typeof value === "object" && value !== null ? Object.entries(value as Record<string, unknown>) : null
+    const rootCollapsed = collapsedState?.["root"] || false
+    const rootCollapsable = !!entries && entries.length > 0
+    const rootActive = Array.isArray(activePath) && activePath.length === 0 && parentKey === undefined
+
+    React.useEffect(() => {
+        const pathKey = (isRoot ? ["root"] : path).join(".")
+        if (path.length > rootDepth && collapsedState?.[pathKey] === undefined) {
+            setCollapsedState?.(path.length === 0 ? ["root"] : path, true)
+        }
+    }, [path, isRoot, collapsedState, setCollapsedState])
 
     const handleClick = (entry: EditableJSONEntry) => {
         if (clickTimeout.current) clearTimeout(clickTimeout.current)
@@ -50,117 +67,100 @@ export const DataTypeJSONInputTreeComponent: React.FC<DataTypeJSONInputTreeCompo
             clearTimeout(clickTimeout.current)
             clickTimeout.current = null
         }
-        if (onDoubleClick) {
-            onDoubleClick(currentPath, isCollapsed)
-        } else {
-            setCollapsedState?.(currentPath, !isCollapsed)
-        }
+        if (onDoubleClick) onDoubleClick(currentPath, isCollapsed)
+        else setCollapsedState?.(currentPath, !isCollapsed)
     }
 
-    React.useEffect(() => {
-        const currentPath = path ?? []
-        const pathKey = (isRoot ? ["root"] : currentPath).join(".")
-        if (currentPath.length > 1 && collapsedState?.[pathKey] === undefined) {
-            setCollapsedState?.(currentPath.length === 0 ? ["root"] : currentPath, true)
-        }
-    }, [path, isRoot, collapsedState, setCollapsedState])
+    if (!entries) return null
 
-    const renderRoot = () => {
-        const currentPath = [...path]
-        const pathKey = "root"
+    const children = entries.map(([key, val]) => {
+        const currentPath = [...path, key]
+        const pathKey = currentPath.join(".")
         const isCollapsed = collapsedState?.[pathKey] || false
-        const isCollapsable = typeof value === "object" && value !== null && (Array.isArray(value) ? value.length > 0 : Object.keys(value).length > 0)
-        const isActive = Array.isArray(activePath) && activePath.length === 0 && parentKey === undefined
-        const icon = isCollapsable ? (isCollapsed ? <IconChevronUp size={13}/> : <IconChevronDown size={13}/>) : null
+        const isActive = !!activePath && activePath.length > 0 && pathKey === activePath.join(".")
+        const isCollapsable = typeof val === "object" && val !== null && Object.keys(val).length > 0
+        const color = isCollapsable ? hashToColor(pathKey) : (parentColor ?? hashToColor("root"))
+        const signature = typeof val === "string" ? val.match(/^\$\{(.+)}$/)?.[1] : undefined
+        const reference = signature ? references?.find(entry => entry.signature === signature)?.value : undefined
+
         return (
+            <li key={pathKey} className="json-tree__item">
+                <div
+                    onClick={e => {
+                        e.stopPropagation()
+                        handleClick({key, value: val as LiteralValue, path: currentPath})
+                    }}
+                    onDoubleClick={e => {
+                        e.stopPropagation()
+                        handleDoubleClick(currentPath, isCollapsed)
+                    }}
+                >
+                    <Flex align="center" style={{gap: ".35rem", textWrap: "nowrap"}} className="rule"
+                          aria-selected={isActive || undefined}>
+                        {isCollapsable && (isCollapsed ? <IconChevronUp size={13}/> : <IconChevronDown size={13}/>)}
+                        <Badge border color={color} style={{verticalAlign: "middle"}}>
+                            <Text size="xs" style={{color: "inherit"}}>{key}</Text>
+                        </Badge>
+                        {isCollapsable ? (
+                            <Text hierarchy="tertiary">{Array.isArray(val) ? "is a list of" : "is a nested object"}</Text>
+                        ) : (
+                            <>
+                                <Text hierarchy="tertiary">has value</Text>
+                                {reference?.__typename === "ReferenceValue" ? <ReferenceBadgeComponent value={reference}/>
+                                    : reference?.__typename === "SubFlowValue" ? <NodeBadgeComponent value={reference}/>
+                                        : (
+                                            <Badge border color={"primary"} style={{verticalAlign: "middle"}}>
+                                                <Text size="xs" style={{color: "inherit"}}>{String(val)}</Text>
+                                            </Badge>
+                                        )}
+                            </>
+                        )}
+                    </Flex>
+                    {isCollapsable && !isCollapsed && (
+                        <DataTypeJSONInputTreeComponent
+                            object={val as LiteralValue}
+                            parentKey={key}
+                            isRoot={false}
+                            onEntryClick={onEntryClick}
+                            collapsedState={collapsedState}
+                            setCollapsedState={setCollapsedState}
+                            path={currentPath}
+                            activePath={activePath}
+                            parentColor={color}
+                            rootDepth={rootDepth}
+                            references={references}
+                        />
+                    )}
+                </div>
+            </li>
+        )
+    })
+
+    if (!isRoot) {
+        if (children.length === 0) return null
+        return <ul className="json-tree">{children}</ul>
+    }
+
+    return (
+        <ul className="json-tree">
             <div
                 onClick={e => {
                     e.stopPropagation()
-                    handleClick({key: pathKey, value: object, path: currentPath})
+                    handleClick({key: "root", value: object, path: [...path]})
                 }}
                 onDoubleClick={e => {
                     e.stopPropagation()
-                    handleDoubleClick(currentPath, isCollapsed)
+                    handleDoubleClick([...path], rootCollapsed)
                 }}
-                aria-selected={isActive || undefined}
+                aria-selected={rootActive || undefined}
             >
-                <Flex align="center" style={{gap: ".35rem", textWrap: "nowrap"}} aria-selected={isActive || undefined}
+                <Flex align="center" style={{gap: ".35rem", textWrap: "nowrap"}} aria-selected={rootActive || undefined}
                       className="rule">
-                    {icon}
+                    {rootCollapsable && (rootCollapsed ? <IconChevronUp size={13}/> : <IconChevronDown size={13}/>)}
                     <Text hierarchy="tertiary">{Array.isArray(value) ? "is a list of" : "is a nested object"}</Text>
                 </Flex>
-                {!isCollapsed && (renderNodes?.length ?? 0) > 0 && <ul className="json-tree">{renderNodes}</ul>}
+                {!rootCollapsed && children.length > 0 && <ul className="json-tree">{children}</ul>}
             </div>
-        )
-    }
-
-    const renderNodes = Array.isArray(value) || (value && typeof value === 'object')
-        ? Object.entries(value as Record<string, unknown>).map(([key, val]) => {
-            const currentPath = [...path, key]
-            const pathKey = currentPath.join(".")
-            const isCollapsed = collapsedState?.[pathKey] || false
-            const isActive = activePath && activePath.length > 0 && currentPath.join(".") === activePath.join(".")
-            const parentColorValue = parentColor ?? hashToColor("root")
-            const isCollapsable = typeof (val as any) === "object" && (val as any) !== null && (Array.isArray((val as any)) ? (val as any).length > 0 : Object.keys((val as any) ?? {}).length > 0)
-            const collapsableColor = isCollapsable ? hashToColor(pathKey) : parentColorValue
-            const icon = isCollapsable ? (isCollapsed ? <IconChevronUp size={13}/> : <IconChevronDown size={13}/>) : null
-            const label = isCollapsable ? (
-                <Flex align="center" style={{gap: ".35rem", textWrap: "nowrap"}} className="rule"
-                      aria-selected={isActive || undefined}>
-                    {icon}
-                    <Badge border color={collapsableColor} style={{verticalAlign: "middle"}}>
-                        <Text size="xs" style={{color: "inherit"}}>{key}</Text>
-                    </Badge>
-                    <Text hierarchy="tertiary">{Array.isArray((val as any)) ? "is a list of" : "is a nested object"}</Text>
-                </Flex>
-            ) : (
-                <Flex align="center" style={{gap: ".35rem", textWrap: "nowrap"}} className="rule"
-                      aria-selected={isActive || undefined}>
-                    <Badge border color={parentColorValue} style={{verticalAlign: "middle"}}>
-                        <Text size="xs" style={{color: "inherit"}}>{key}</Text>
-                    </Badge>
-                    <Text hierarchy="tertiary">has value</Text>
-                    <Badge border color={"primary"} style={{verticalAlign: "middle"}}>
-                        <Text size="xs" style={{color: "inherit"}}>{String((val as any))}</Text>
-                    </Badge>
-                </Flex>
-            )
-            const childTree = isCollapsable && !isCollapsed ? (
-                <DataTypeJSONInputTreeComponent
-                    object={val as LiteralValue}
-                    parentKey={key}
-                    isRoot={false}
-                    onEntryClick={onEntryClick}
-                    collapsedState={collapsedState}
-                    setCollapsedState={setCollapsedState}
-                    path={currentPath}
-                    activePath={activePath}
-                    parentColor={collapsableColor}
-                />
-            ) : null
-            return (
-                <li key={pathKey} className="json-tree__item">
-                    <div
-                        onClick={e => {
-                            e.stopPropagation()
-                            handleClick({key, value: val as LiteralValue, path: currentPath})
-                        }}
-                        onDoubleClick={e => {
-                            e.stopPropagation()
-                            handleDoubleClick(currentPath, isCollapsed)
-                        }}
-                    >
-                        {label}
-                        {childTree}
-                    </div>
-                </li>
-            )
-        })
-        : null
-
-    const rootNode = renderRoot()
-    const nodes = rootNode && isRoot ? [rootNode] : renderNodes
-    const validNodes = (nodes ?? []).filter(Boolean)
-    if (validNodes.length <= 0) return null
-    return <ul className="json-tree">{validNodes}</ul>
+        </ul>
+    )
 }
