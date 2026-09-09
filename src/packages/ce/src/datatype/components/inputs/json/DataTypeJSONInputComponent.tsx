@@ -21,7 +21,7 @@ export type DataTypeJSONInputComponentProps = DataTypeInputComponentProps
 
 export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProps> = (props) => {
 
-    const {schema, title, description, suggestions, formValidation, initialValue, onChange} = props
+    const {schema, title, description, suggestions, formValidation, initialValue, onChange, flowId, nodeId, parameterIndex} = props
 
     const [editDialogOpen, setEditDialogOpen] = React.useState(false)
     const [editEntry, setEditEntry] = React.useState<EditableJSONEntry | undefined>(undefined)
@@ -57,6 +57,9 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                     entry={editEntry}
                     value={value as LiteralValue}
                     schema={"schema" in schema ? schema.schema as Schema : schema as Schema}
+                    flowId={flowId}
+                    nodeId={nodeId}
+                    parameterIndex={parameterIndex}
                     onOpenChange={open => setEditDialogOpen(open)}
                     onObjectClose={(value) => {
                         formValidation?.setValue?.(value)
