@@ -92,7 +92,7 @@ export const UsageIndicatorComponent: React.FC<UsageIndicatorComponentProps> = (
 
     const sections = [
         {title: "Workflow usage", overall: overallUsage?.runtimeCount ?? 0, context: contextUsage?.runtimeCount ?? 0, limit: limits.workflow},
-        {title: "AI usage", overall: overallUsage?.aiCount ?? 0, context: contextUsage?.aiCount ?? 0, limit: limits.ai}
+        {title: "AI usage", overall: overallUsage?.aiValue ?? 0, context: contextUsage?.aiValue ?? 0, limit: limits.ai}
     ].map(section => {
 
         const bounded = section.limit != null && section.limit > 0
