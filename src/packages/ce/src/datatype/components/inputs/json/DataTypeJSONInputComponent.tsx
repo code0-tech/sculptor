@@ -9,7 +9,7 @@ import {
 } from "@edition/datatype/components/inputs/json/DataTypeJSONInputEditDialogComponent";
 import {DataTypeInputValueComponent} from "@edition/datatype/components/inputs/DataTypeInputValueComponent";
 import {useDebouncedCallback} from "use-debounce";
-import {DataInput, ListInput} from "@code0-tech/triangulum";
+import {DataInput, ListInput, Schema} from "@code0-tech/triangulum";
 
 export interface EditableJSONEntry {
     key: string
@@ -56,6 +56,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                     open={editDialogOpen}
                     entry={editEntry}
                     value={value as LiteralValue}
+                    schema={"schema" in schema ? schema.schema as Schema : schema as Schema}
                     onOpenChange={open => setEditDialogOpen(open)}
                     onObjectClose={(value) => {
                         formValidation?.setValue?.(value)
@@ -76,6 +77,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                                          formValidation={formValidation}>
                 <DataTypeJSONInputTreeComponent
                     object={value as LiteralValue}
+                    references={(value as LiteralValue).references ?? undefined}
                     onEntryClick={handleEntryClick}
                     collapsedState={collapsedState}
                     setCollapsedState={setCollapsedState}
