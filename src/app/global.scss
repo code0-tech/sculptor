@@ -32,3 +32,7 @@ a {
 [data-sonner-toaster][data-y-position=top] {
   top: 1rem;
 }
+
+.button-group__first, .button-group__item {
+  flex: 1 1 auto;
+}
