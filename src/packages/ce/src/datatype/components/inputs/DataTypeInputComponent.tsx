@@ -48,13 +48,24 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
 
     const {schema, ...rest} = props
 
-    const suggestions = "schema" in (schema ?? {}) ? (schema as NodeSchema)?.schema?.suggestions as (NodeFunction | ReferenceValue | LiteralValue)[] : []
+    const suggestions = ("schema" in (schema ?? {}) ? (schema as NodeSchema)?.schema?.suggestions : (schema as Schema)?.suggestions) as (NodeFunction | ReferenceValue | LiteralValue)[]
     const inputName = "schema" in (schema ?? {}) ? (schema as NodeSchema)?.schema?.input : (schema as Schema)?.input
 
     return React.useMemo(
         () => {
             if ("schema" in (schema ?? {}) && (((schema as NodeSchema).blockedBy?.length ?? 0) > 0) && (rest.formValidation?.valid ?? false)) {
                 return null
+            }
+
+            const isInlineReference = rest.initialValue?.__typename === "ReferenceValue"
+                || (rest.initialValue?.__typename === "SubFlowValue" && inputName !== "sub-flow" && inputName !== "list-sub-flow")
+
+            if (isInlineReference) {
+                return <DataTypeTextInputComponent
+                    suggestions={suggestions}
+                    schema={schema}
+                    {...rest}
+                />
             }
 
             switch (inputName) {
