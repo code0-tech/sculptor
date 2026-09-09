@@ -2,6 +2,7 @@ import React from "react";
 import {DataTypeTextInputComponent} from "./text/DataTypeTextInputComponent";
 import {NodeSchema, Schema} from "@code0-tech/triangulum";
 import {
+    Flow,
     LiteralValue,
     NodeFunction,
     NodeParameterValue,
@@ -42,6 +43,9 @@ export interface DataTypeInputComponentProps extends Omit<InputWrapperProps<Node
     onChange?: (value: ReferenceValue | SubFlowValue | LiteralValue | NodeFunction | null) => void
     suggestions?: (NodeFunction | SubFlowValue | ReferenceValue | LiteralValue)[]
     onClear?: (event: React.MouseEvent<HTMLButtonElement>) => void
+    flowId?: Flow['id']
+    nodeId?: NodeFunction['id']
+    parameterIndex?: number
 }
 
 export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (props) => {
@@ -150,6 +154,6 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
                     />
             }
         },
-        [rest.initialValue, inputName, suggestions?.length ?? 0, rest.formValidation?.valid ?? true, rest.formValidation?.notValidMessage ?? ""]
+        [rest.initialValue, inputName, suggestions?.length ?? 0, rest.formValidation?.valid ?? true, rest.formValidation?.notValidMessage ?? "", rest.flowId, rest.nodeId, rest.parameterIndex]
     )
 }
