@@ -13,7 +13,7 @@ export async function GET() {
         const files = await readdir(modulesDir)
             .then(names => names.filter(name => name.endsWith(".json")).sort())
             .catch(() => [] as string[])
-        return Promise.all(files.map(async file => JSON.parse(await readFile(path.join(modulesDir, file), "utf-8")) as Module))
+        return Promise.all(files.map(async file => Module.fromJson(JSON.parse(await readFile(path.join(modulesDir, file), "utf-8")))))
     }
 
     const readFlows = async (from: string): Promise<ValidationFlow[]> =>
