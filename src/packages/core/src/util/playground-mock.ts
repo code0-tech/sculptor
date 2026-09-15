@@ -130,7 +130,7 @@ const mapFlowTypeSetting = (setting: FlowTypeSetting, id: string) => ({
     unique: setting.unique === FlowTypeSetting_UniquenessScope.PROJECT,
     optional: setting.optional ?? false,
     hidden: setting.hidden ?? false,
-    defaultValue: setting.defaultValue ? literalValue(setting.defaultValue) : null,
+    defaultValue: setting.defaultValue ? plainValue(setting.defaultValue) : null,
     createdAt: TIMESTAMP,
     updatedAt: TIMESTAMP,
     names: translations(setting.name),
