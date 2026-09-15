@@ -113,8 +113,8 @@ export const DataTypeListSubFlowInputComponent: React.FC<DataTypeListSubFlowInpu
                                        if (value?.__typename !== "SubFlowValue") return
                                        commit([...subFlows, value])
                                    }}/>
-        <InputLabel>{title}</InputLabel>
-        <InputDescription>{description}</InputDescription>
+        {title && <InputLabel>{title}</InputLabel>}
+        {description && <InputDescription>{description}</InputDescription>}
         <DataTypeInputValueComponent initialValue={initialValue}
                                      onChange={value => {
                                          formValidation?.setValue?.(value)

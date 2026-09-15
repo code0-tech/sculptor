@@ -82,8 +82,8 @@ export const DataTypeTypeInputComponent: React.FC<DataTypeJSONInputComponentProp
                 onTypeChange={v => setType(v ?? null)}
             />
             <div>
-                <InputLabel>{title}</InputLabel>
-                <InputDescription>{description}</InputDescription>
+                {title && <InputLabel>{title}</InputLabel>}
+                {description && <InputDescription>{description}</InputDescription>}
             </div>
             <Card color="secondary" paddingSize="xs">
                 <Flex style={{gap: ".7rem"}} align="center" justify="space-between">

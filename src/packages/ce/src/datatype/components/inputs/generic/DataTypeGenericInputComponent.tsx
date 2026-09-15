@@ -16,8 +16,8 @@ export const DataTypeGenericInputComponent: React.FC<DataTypeGenericInputCompone
     }, 200)
 
     return <>
-        <InputLabel>{title}</InputLabel>
-        <InputDescription>{description}</InputDescription>
+        {title && <InputLabel>{title}</InputLabel>}
+        {description && <InputDescription>{description}</InputDescription>}
         <ButtonGroup w={"100%"} color={"secondary"}>
             <Button w={"100%"} style={{flex: "1 1 auto"}} color={"tertiary"} onClick={() => {
                 formValidation?.setValue?.({

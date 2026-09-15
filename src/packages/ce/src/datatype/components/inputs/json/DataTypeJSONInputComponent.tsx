@@ -67,8 +67,8 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                     }}
                 />
             )}
-            <InputLabel>{title}</InputLabel>
-            <InputDescription>{description}</InputDescription>
+            {title && <InputLabel>{title}</InputLabel>}
+            {description && <InputDescription>{description}</InputDescription>}
             <DataTypeInputValueComponent inside
                                          initialValue={value}
                                          onChange={(value) => {
