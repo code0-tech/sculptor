@@ -16,10 +16,10 @@ export const DataTypeGenericInputComponent: React.FC<DataTypeGenericInputCompone
     }, 200)
 
     return <>
-        <InputLabel>{title}</InputLabel>
-        <InputDescription>{description}</InputDescription>
-        <ButtonGroup color={"secondary"}>
-            <Button color={"tertiary"} onClick={() => {
+        {title && <InputLabel>{title}</InputLabel>}
+        {description && <InputDescription>{description}</InputDescription>}
+        <ButtonGroup w={"100%"} color={"secondary"}>
+            <Button w={"100%"} style={{flex: "1 1 auto"}} color={"tertiary"} onClick={() => {
                 formValidation?.setValue?.({
                     __typename: "LiteralValue", value: 0
                 })
@@ -29,7 +29,7 @@ export const DataTypeGenericInputComponent: React.FC<DataTypeGenericInputCompone
             }}>
                 Number Value
             </Button>
-            <Button color={"tertiary"} onClick={() => {
+            <Button w={"100%"} color={"tertiary"} onClick={() => {
                 formValidation?.setValue?.({
                     __typename: "LiteralValue", value: false
                 })
@@ -39,7 +39,7 @@ export const DataTypeGenericInputComponent: React.FC<DataTypeGenericInputCompone
             }}>
                 Boolean Value
             </Button>
-            <Button color={"tertiary"} onClick={() => {
+            <Button w={"100%"} color={"tertiary"} onClick={() => {
                 formValidation?.setValue?.({
                     __typename: "LiteralValue", value: ""
                 })
@@ -49,7 +49,7 @@ export const DataTypeGenericInputComponent: React.FC<DataTypeGenericInputCompone
             }}>
                 Text Value
             </Button>
-            <Button color={"tertiary"} onClick={() => {
+            <Button w={"100%"} color={"tertiary"} onClick={() => {
                 formValidation?.setValue?.({
                     __typename: "LiteralValue", value: []
                 })
@@ -59,7 +59,7 @@ export const DataTypeGenericInputComponent: React.FC<DataTypeGenericInputCompone
             }}>
                 List Value
             </Button>
-            <Button color={"tertiary"} onClick={() => {
+            <Button w={"100%"} color={"tertiary"} onClick={() => {
                 formValidation?.setValue?.({
                     __typename: "LiteralValue", value: {}
                 })

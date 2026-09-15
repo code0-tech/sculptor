@@ -141,6 +141,8 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
                                             schema={(flowNode?.data?.schema as NodeSchema[])?.[index]}
                                             description={description}
                                             clearable
+                                            flowId={flowId}
+                                            parameterIndex={index}
                                             onChange={() => {
                                                 changedSettings.current.add(settingDefinition.id!)
                                                 validate()

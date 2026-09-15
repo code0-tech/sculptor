@@ -2,6 +2,10 @@
     height: 100%;
     width: 100%;
 
+    .react-flow__panel.top.center {
+        display: none !important;
+    }
+
     &--readonly {
         .react-flow__panel.top.right {
             display: none !important;

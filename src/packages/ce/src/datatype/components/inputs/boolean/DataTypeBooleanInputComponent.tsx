@@ -29,8 +29,8 @@ export const DataTypeBooleanInputComponent: React.FC<DataTypeBooleanInputCompone
     }, 200)
 
     return React.useMemo(() => <>
-        <InputLabel>{title}</InputLabel>
-        <InputDescription>{description}</InputDescription>
+        {title && <InputLabel>{title}</InputLabel>}
+        {description && <InputDescription>{description}</InputDescription>}
         <DataTypeInputValueComponent inside initialValue={initialValue} onChange={value => {
             formValidation?.setValue?.(value)
             onChangeDebounced(value)

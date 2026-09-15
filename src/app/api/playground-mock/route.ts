@@ -8,12 +8,15 @@ export const dynamic = "force-dynamic"
 
 export async function GET() {
 
+    const parseModule = (raw: string): Module =>
+        (Module as unknown as { fromJson(json: unknown): Module }).fromJson(JSON.parse(raw))
+
     const readModules = async (from: string): Promise<Module[]> => {
         const modulesDir = path.join(from, "modules")
         const files = await readdir(modulesDir)
             .then(names => names.filter(name => name.endsWith(".json")).sort())
             .catch(() => [] as string[])
-        return Promise.all(files.map(async file => JSON.parse(await readFile(path.join(modulesDir, file), "utf-8")) as Module))
+        return Promise.all(files.map(async file => parseModule(await readFile(path.join(modulesDir, file), "utf-8"))))
     }
 
     const readFlows = async (from: string): Promise<ValidationFlow[]> =>

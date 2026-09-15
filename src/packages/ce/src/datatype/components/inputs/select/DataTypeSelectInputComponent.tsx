@@ -38,8 +38,8 @@ export const DataTypeSelectInputComponent: React.FC<DataTypeSelectInputComponent
     }, 200)
 
     return React.useMemo(() => <>
-        <InputLabel>{title}</InputLabel>
-        <InputDescription>{description}</InputDescription>
+        {title && <InputLabel>{title}</InputLabel>}
+        {description && <InputDescription>{description}</InputDescription>}
         <SelectInput value={defaultValue >= 0 ? defaultValue?.toString() : undefined}
                      formValidation={{...formValidation, setValue: undefined}}
                      maw={"100%"}

@@ -2,6 +2,7 @@ import React from "react";
 import {DataTypeTextInputComponent} from "./text/DataTypeTextInputComponent";
 import {NodeSchema, Schema} from "@code0-tech/triangulum";
 import {
+    Flow,
     LiteralValue,
     NodeFunction,
     NodeParameterValue,
@@ -42,19 +43,33 @@ export interface DataTypeInputComponentProps extends Omit<InputWrapperProps<Node
     onChange?: (value: ReferenceValue | SubFlowValue | LiteralValue | NodeFunction | null) => void
     suggestions?: (NodeFunction | SubFlowValue | ReferenceValue | LiteralValue)[]
     onClear?: (event: React.MouseEvent<HTMLButtonElement>) => void
+    flowId?: Flow['id']
+    nodeId?: NodeFunction['id']
+    parameterIndex?: number
 }
 
 export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (props) => {
 
     const {schema, ...rest} = props
 
-    const suggestions = "schema" in (schema ?? {}) ? (schema as NodeSchema)?.schema?.suggestions as (NodeFunction | ReferenceValue | LiteralValue)[] : []
+    const suggestions = ("schema" in (schema ?? {}) ? (schema as NodeSchema)?.schema?.suggestions : (schema as Schema)?.suggestions) as (NodeFunction | ReferenceValue | LiteralValue)[]
     const inputName = "schema" in (schema ?? {}) ? (schema as NodeSchema)?.schema?.input : (schema as Schema)?.input
 
     return React.useMemo(
         () => {
             if ("schema" in (schema ?? {}) && (((schema as NodeSchema).blockedBy?.length ?? 0) > 0) && (rest.formValidation?.valid ?? false)) {
                 return null
+            }
+
+            const isInlineReference = rest.initialValue?.__typename === "ReferenceValue"
+                || (rest.initialValue?.__typename === "SubFlowValue" && inputName !== "sub-flow" && inputName !== "list-sub-flow")
+
+            if (isInlineReference) {
+                return <DataTypeTextInputComponent
+                    suggestions={suggestions}
+                    schema={schema}
+                    {...rest}
+                />
             }
 
             switch (inputName) {
@@ -139,6 +154,6 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
                     />
             }
         },
-        [rest.initialValue, inputName, suggestions?.length ?? 0, rest.formValidation?.valid ?? true, rest.formValidation?.notValidMessage ?? ""]
+        [rest.initialValue, inputName, suggestions?.length ?? 0, rest.formValidation?.valid ?? true, rest.formValidation?.notValidMessage ?? "", rest.flowId, rest.nodeId, rest.parameterIndex]
     )
 }

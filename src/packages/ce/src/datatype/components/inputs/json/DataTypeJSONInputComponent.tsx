@@ -9,7 +9,7 @@ import {
 } from "@edition/datatype/components/inputs/json/DataTypeJSONInputEditDialogComponent";
 import {DataTypeInputValueComponent} from "@edition/datatype/components/inputs/DataTypeInputValueComponent";
 import {useDebouncedCallback} from "use-debounce";
-import {DataInput, ListInput} from "@code0-tech/triangulum";
+import {DataInput, ListInput, Schema} from "@code0-tech/triangulum";
 
 export interface EditableJSONEntry {
     key: string
@@ -21,7 +21,7 @@ export type DataTypeJSONInputComponentProps = DataTypeInputComponentProps
 
 export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProps> = (props) => {
 
-    const {schema, title, description, suggestions, formValidation, initialValue, onChange} = props
+    const {schema, title, description, suggestions, formValidation, initialValue, onChange, flowId, nodeId, parameterIndex} = props
 
     const [editDialogOpen, setEditDialogOpen] = React.useState(false)
     const [editEntry, setEditEntry] = React.useState<EditableJSONEntry | undefined>(undefined)
@@ -56,6 +56,10 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                     open={editDialogOpen}
                     entry={editEntry}
                     value={value as LiteralValue}
+                    schema={"schema" in schema ? schema.schema as Schema : schema as Schema}
+                    flowId={flowId}
+                    nodeId={nodeId}
+                    parameterIndex={parameterIndex}
                     onOpenChange={open => setEditDialogOpen(open)}
                     onObjectClose={(value) => {
                         formValidation?.setValue?.(value)
@@ -63,8 +67,8 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                     }}
                 />
             )}
-            <InputLabel>{title}</InputLabel>
-            <InputDescription>{description}</InputDescription>
+            {title && <InputLabel>{title}</InputLabel>}
+            {description && <InputDescription>{description}</InputDescription>}
             <DataTypeInputValueComponent inside
                                          initialValue={value}
                                          onChange={(value) => {
@@ -76,6 +80,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                                          formValidation={formValidation}>
                 <DataTypeJSONInputTreeComponent
                     object={value as LiteralValue}
+                    references={(value as LiteralValue).references ?? undefined}
                     onEntryClick={handleEntryClick}
                     collapsedState={collapsedState}
                     setCollapsedState={setCollapsedState}

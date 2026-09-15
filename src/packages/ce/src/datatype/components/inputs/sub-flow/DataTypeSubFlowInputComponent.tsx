@@ -50,8 +50,8 @@ export const DataTypeSubFlowInputComponent: React.FC<DataTypeSubFlowInputCompone
                                        onChangeDebounced(value as SubFlowValue)
                                    }}
                                    onOpenChange={setSuggestionDialogOpen}/>
-        <InputLabel>{title}</InputLabel>
-        <InputDescription>{description}</InputDescription>
+        {title && <InputLabel>{title}</InputLabel>}
+        {description && <InputDescription>{description}</InputDescription>}
         <DataTypeInputValueComponent inside
                                      showSuggestions={false}
                                      onClick={() => {

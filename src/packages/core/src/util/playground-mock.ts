@@ -130,7 +130,7 @@ const mapFlowTypeSetting = (setting: FlowTypeSetting, id: string) => ({
     unique: setting.unique === FlowTypeSetting_UniquenessScope.PROJECT,
     optional: setting.optional ?? false,
     hidden: setting.hidden ?? false,
-    defaultValue: setting.defaultValue ? literalValue(setting.defaultValue) : null,
+    defaultValue: setting.defaultValue ? plainValue(setting.defaultValue) : null,
     createdAt: TIMESTAMP,
     updatedAt: TIMESTAMP,
     names: translations(setting.name),
@@ -177,6 +177,27 @@ const mapNodeValue = (value?: NodeValue, functionId: Map<string, string> = new M
             signature: reference.signature,
             value: mapNodeValue(reference.value, functionId)
         }))
+    }
+    if (inner?.oneofKind === "referenceValue") {
+        const target = inner.referenceValue.target
+        const referencePath = inner.referenceValue.paths.map(path => ({
+            __typename: "ReferencePath",
+            path: path.path ?? null,
+            arrayIndex: path.arrayIndex != null ? Number(path.arrayIndex) : null
+        }))
+        if (target.oneofKind === "nodeId") return {
+            __typename: "ReferenceValue",
+            nodeFunctionId: gid("NodeFunction", target.nodeId),
+            referencePath
+        }
+        if (target.oneofKind === "inputType") return {
+            __typename: "ReferenceValue",
+            nodeFunctionId: gid("NodeFunction", target.inputType.nodeId),
+            parameterIndex: Number(target.inputType.parameterIndex),
+            inputIndex: Number(target.inputType.inputIndex),
+            referencePath
+        }
+        return {__typename: "ReferenceValue", referencePath}
     }
     if (inner?.oneofKind === "subFlow") {
         const executionReference = inner.subFlow.executionReference

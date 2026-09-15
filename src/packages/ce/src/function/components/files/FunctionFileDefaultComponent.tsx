@@ -144,6 +144,9 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                                             schema={schema}
                                             description={description}
                                             clearable
+                                            flowId={flowId}
+                                            nodeId={node.id!}
+                                            parameterIndex={index}
                                             onChange={() => {
                                                 changedParameter.current.add(parameterDefinition.id!)
                                                 validate()

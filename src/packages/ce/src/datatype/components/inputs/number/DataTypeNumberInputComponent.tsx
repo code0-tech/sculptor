@@ -33,8 +33,8 @@ export const DataTypeNumberInputComponent: React.FC<DataTypeNumberInputComponent
     }, 400)
 
     return React.useMemo(() => <>
-        <InputLabel>{title}</InputLabel>
-        <InputDescription>{description}</InputDescription>
+        {title && <InputLabel>{title}</InputLabel>}
+        {description && <InputDescription>{description}</InputDescription>}
         <DataTypeInputValueComponent initialValue={initialValue} onChange={value => {
             formValidation?.setValue?.(value)
             onChangeDebounced(value)
