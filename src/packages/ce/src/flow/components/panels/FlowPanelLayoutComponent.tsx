@@ -50,6 +50,17 @@ export const FlowPanelLayoutComponent: React.FC = () => {
     )
     const lastSave = React.useMemo(() => formatDistanceToNow(new Date(flow?.updatedAt ?? Date.now()), {addSuffix: true}), [flow, flowStore])
 
+    React.useEffect(() => {
+        if (!edited) return
+
+        const onBeforeUnload = (event: BeforeUnloadEvent) => {
+            event.preventDefault()
+        }
+
+        window.addEventListener("beforeunload", onBeforeUnload)
+        return () => window.removeEventListener("beforeunload", onBeforeUnload)
+    }, [edited])
+
     const flowUpdate = () => {
         const flowInput = flowService.getPayloadById(flowId)
         if (!flowInput) return
@@ -67,13 +78,22 @@ export const FlowPanelLayoutComponent: React.FC = () => {
                 <TooltipTrigger asChild>
                     {
                         edited ? (
-                            <Button onClick={flowUpdate} disabled={loading} paddingSize={"xxs"}>
-                                {loading ? "Saving..." : <IconCloudUpload size={13}/>}
+                            <Button onClick={flowUpdate}
+                                    disabled={loading}
+                                    paddingSize={"xxs"}
+                                    variant={"filled"}
+                                    color={"warning"}>
+                                <Flex align={"center"} style={{gap: getSize("xxs")}}>
+                                    <IconCloudUpload size={13}/>
+                                    <Text>{loading ? "Saving..." : "Unsaved – Save now"}</Text>
+                                </Flex>
                             </Button>
                         ) : (
-                            <Badge color={edited ? "secondary" : "success"} border>
-                                {edited ? <IconCloudUpload size={13}/> : <IconCloudCheck size={13}/>}
-                                {edited ? "Unsaved" : "Synced"}
+                            <Badge color={"success"} border>
+                                <Flex align={"center"} style={{gap: getSize("xxs")}}>
+                                    <IconCloudCheck size={13}/>
+                                    <Text>Synced</Text>
+                                </Flex>
                             </Badge>
                         )
                     }
