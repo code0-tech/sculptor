@@ -73,7 +73,7 @@ export const FlowPanelLayoutComponent: React.FC = () => {
 
     return <Panel position={"top-center"}>
         <Flex align={"center"} style={{gap: getSize("xxs")}}>
-            <Text>{flow?.name}</Text>
+            <Text style={{textWrap: "nowrap"}}>{flow?.name}</Text>
             <Tooltip>
                 <TooltipTrigger asChild>
                     {
@@ -81,18 +81,17 @@ export const FlowPanelLayoutComponent: React.FC = () => {
                             <Button onClick={flowUpdate}
                                     disabled={loading}
                                     paddingSize={"xxs"}
-                                    variant={"filled"}
                                     color={"warning"}>
-                                <Flex align={"center"} style={{gap: getSize("xxs")}}>
+                                <Flex align={"center"} style={{textWrap: "nowrap", gap: getSize("xxs")}}>
                                     <IconCloudUpload size={13}/>
-                                    <Text>{loading ? "Saving..." : "Unsaved – Save now"}</Text>
+                                    <Text>{loading ? "Saving..." : "Unsaved. Save now"}</Text>
                                 </Flex>
                             </Button>
                         ) : (
                             <Badge color={"success"} border>
-                                <Flex align={"center"} style={{gap: getSize("xxs")}}>
+                                <Flex align={"center"} style={{textWrap: "nowrap", gap: getSize("xxs")}}>
                                     <IconCloudCheck size={13}/>
-                                    <Text>Synced</Text>
+                                    <Text c={"inherit"}>Synced</Text>
                                 </Flex>
                             </Badge>
                         )
