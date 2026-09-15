@@ -30,10 +30,7 @@ export const useFunctionSuggestions = () => {
                     value: p?.defaultValue !== undefined && p?.defaultValue !== null ? {
                         __typename: "LiteralValue",
                         value: p.defaultValue.value
-                    } : {
-                        __typename: "LiteralValue",
-                        value: null
-                    }
+                    } : null
                 }))
             }
         })),
