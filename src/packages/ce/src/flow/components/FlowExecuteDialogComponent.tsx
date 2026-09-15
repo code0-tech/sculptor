@@ -166,11 +166,18 @@ export const FlowExecuteDialogComponent: React.FC<FlowExecuteDialogComponentProp
         copyToClipboard(endpoint)
     }
 
-    const onExecute = React.useCallback(() => {
+    const onExecute = React.useCallback(async () => {
         const runtimeId = project?.primaryRuntime?.id
         if (!runtimeId || executing) return
 
         setExecuting(true)
+
+        const edited = !!flow?.editedAt && new Date(flow.updatedAt ?? Date.now()).getTime() != new Date(flow.editedAt).getTime()
+        if (edited) {
+            const flowInput = flowService.getPayloadById(flowId)
+            if (flowInput) await flowService.flowUpdate({flowInput, flowId: flowId!})
+        }
+
         flowService.triggerExecution({
             flowId: flowId!,
             runtimeId,
@@ -190,7 +197,7 @@ export const FlowExecuteDialogComponent: React.FC<FlowExecuteDialogComponentProp
             onOpenChange?.(false)
             openTab("execution")
         }).catch(() => setExecuting(false))
-    }, [project?.primaryRuntime?.id, executing, flowService, flowId, values.input, addExecution, namespaceId, projectId, openTab, onOpenChange])
+    }, [project?.primaryRuntime?.id, executing, flow?.editedAt, flow?.updatedAt, flowService, flowId, values.input, addExecution, namespaceId, projectId, openTab, onOpenChange])
 
     return <Dialog open={open} onOpenChange={(open) => onOpenChange?.(open)}>
         <DialogPortal>
