@@ -1,4 +1,5 @@
 import {
+    Flow,
     LiteralValue,
     NodeFunction,
     ReferencePath,
@@ -7,7 +8,9 @@ import {
 } from "@code0-tech/sagittarius-graphql-types";
 import React, {ReactElement} from "react";
 import {IconChevronRight, IconVariable, IconX} from "@tabler/icons-react";
+import {useParams} from "next/navigation";
 import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
+import {useFlowReferenceHoverStore} from "@edition/flow/hooks/Flow.reference.hover.hook";
 import {
     Button,
     ButtonGroup,
@@ -134,6 +137,11 @@ export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsCompo
 
     const {suggestions, showSuggestions = true, onSelect, children} = props
 
+    const params = useParams()
+    const flowIndex = params.flowId as any as number
+    const flowId: Flow['id'] = `gid://sagittarius/Flow/${flowIndex}`
+    const setHoveredNodeId = useFlowReferenceHoverStore(state => state.setHoveredNodeId)
+
     const menuEntries = React.useMemo(() => {
         if (!suggestions) return []
 
@@ -185,7 +193,9 @@ export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsCompo
 
     return <ButtonGroup color={"primary"}>
         {showSuggestions ? (
-            <Menu>
+            <Menu onOpenChange={(open) => {
+                if (!open) setHoveredNodeId(null)
+            }}>
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <MenuTrigger asChild disabled={menuEntries.length <= 0}>
@@ -209,7 +219,8 @@ export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsCompo
                         <MenuScrollArea>
                             {menuEntries.map((entry, index) => {
                                 if (entry.kind === "value" && entry.value.__typename === "LiteralValue") {
-                                    return <MenuItem key={index} onSelect={() => onSelect?.(entry.value)}>
+                                    return <MenuItem key={index} onMouseEnter={() => setHoveredNodeId(null)}
+                                                     onSelect={() => onSelect?.(entry.value)}>
                                         <Flex style={{gap: "0.35rem"}} align={"center"}>
                                             {entry.value.value.toString()}
                                         </Flex>
@@ -217,30 +228,39 @@ export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsCompo
                                 }
 
                                 if (entry.kind === "value" && entry.value.__typename === "SubFlowValue") {
-                                    return <MenuItem key={index} onSelect={() => onSelect?.(entry.value)}>
+                                    return <MenuItem key={index} onMouseEnter={() => setHoveredNodeId(null)}
+                                                     onSelect={() => onSelect?.(entry.value)}>
                                         <NodeBadgeComponent value={entry.value}/>
                                     </MenuItem>
                                 }
 
                                 if (entry.kind === "reference-group") {
                                     const group = entry.group
+                                    const nodeFunctionId = group.root.nodeFunctionId as string | null | undefined
+                                    const targetNodeId = (!nodeFunctionId || nodeFunctionId === "undefined"
+                                        ? flowId
+                                        : nodeFunctionId) as string
 
                                     if (group.suggestions.length === 1) {
                                         return <MenuItem key={entry.key}
+                                                         onMouseEnter={() => setHoveredNodeId(targetNodeId)}
+                                                         onMouseLeave={() => setHoveredNodeId(null)}
                                                          onSelect={() => onSelect?.(group.suggestions[0])}>
                                             <ReferenceBadgeComponent value={group.suggestions[0]}/>
                                         </MenuItem>
                                     }
 
                                     return <MenuSub key={entry.key}>
-                                        <MenuSubTrigger>
+                                        <MenuSubTrigger onMouseEnter={() => setHoveredNodeId(targetNodeId)}
+                                                        onMouseLeave={() => setHoveredNodeId(null)}>
                                             <Flex align={"center"} justify={"space-between"} style={{gap: "0.7rem"}}
                                                   w={"100%"}>
                                                 <ReferenceBadgeComponent value={group.root}/>
                                                 <IconChevronRight size={12}/>
                                             </Flex>
                                         </MenuSubTrigger>
-                                        <MenuSubContent>
+                                        <MenuSubContent onMouseEnter={() => setHoveredNodeId(targetNodeId)}
+                                                        onMouseLeave={() => setHoveredNodeId(null)}>
                                             <MenuScrollArea>
                                                 {group.value ? (
                                                     <MenuItem onSelect={() => onSelect?.(group.value!)}>

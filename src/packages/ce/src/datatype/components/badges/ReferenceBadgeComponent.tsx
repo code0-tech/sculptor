@@ -4,6 +4,8 @@ import {NodeBadgeComponent} from "./NodeBadgeComponent";
 import {IconVariable} from "@tabler/icons-react";
 import {Badge, BadgeType, Flex, Text} from "@code0-tech/pictor";
 import {useParams} from "next/navigation";
+import {useReferencedNodeIds} from "@edition/flow/hooks/Flow.references.hook";
+import {useFlowReferenceHoverStore} from "@edition/flow/hooks/Flow.reference.hover.hook";
 
 export interface ReferenceBadgeComponentProps extends Omit<BadgeType, 'value' | 'children'> {
     value: ReferenceValue
@@ -17,11 +19,19 @@ export const ReferenceBadgeComponent: React.FC<ReferenceBadgeComponentProps> = (
     const flowId: Flow['id'] = `gid://sagittarius/Flow/${flowIndex}`
 
     const {value, definition, ...rest} = props
+
+    const nodeFunctionId = value.nodeFunctionId as string | null | undefined
+    const isTriggerReference = !nodeFunctionId || nodeFunctionId === "undefined"
+    const targetNodeId = (isTriggerReference ? flowId : nodeFunctionId) as string
+    const referencedNodeIds = useReferencedNodeIds(flowId)
+    const hoveredNodeId = useFlowReferenceHoverStore(state => state.hoveredNodeId)
+    const colored = referencedNodeIds.has(targetNodeId) || hoveredNodeId === targetNodeId
+
     const content = React.useMemo(() => {
         if (flowId) {
             return <Flex align={"center"} display={"inline-flex"}>
-                <NodeBadgeComponent definition={definition} value={{
-                    startingNodeId: value.nodeFunctionId,
+                <NodeBadgeComponent definition={definition} colored={colored} value={{
+                    startingNodeId: isTriggerReference ? undefined : value.nodeFunctionId,
                     __typename: "SubFlowValue"
                 }}/>
                 {"inputTypeIdentifier" in value && value.inputTypeIdentifier ? "." + value.inputTypeIdentifier : ""}
@@ -29,7 +39,7 @@ export const ReferenceBadgeComponent: React.FC<ReferenceBadgeComponentProps> = (
             </Flex>
         }
         return `undefined`
-    }, [value])
+    }, [value, definition, colored])
 
     return <Badge style={{verticalAlign: "middle"}}
                   color={"warning"}
