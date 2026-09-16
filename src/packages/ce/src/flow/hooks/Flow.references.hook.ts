@@ -16,17 +16,20 @@ export const useReferencedNodeIds = (flowId: Flow["id"]): Set<string> => {
     return React.useMemo(() => {
         const ids = new Set<string>()
 
+        const targetNodeId = (nodeFunctionId?: string | null) =>
+            !nodeFunctionId || nodeFunctionId === "undefined" ? flowId as string : nodeFunctionId
+
         flow?.nodes?.nodes?.forEach(node => {
             node?.parameters?.nodes?.forEach(parameter => {
                 const value = parameter?.value
                 if (!value) return
 
                 if (value.__typename === "ReferenceValue") {
-                    ids.add((value.nodeFunctionId || flowId) as string)
+                    ids.add(targetNodeId(value.nodeFunctionId))
                 } else if (value.__typename === "LiteralValue") {
                     (value.references ?? []).forEach(reference => {
                         if (reference?.value?.__typename === "ReferenceValue") {
-                            ids.add((reference.value.nodeFunctionId || flowId) as string)
+                            ids.add(targetNodeId(reference.value.nodeFunctionId))
                         }
                     })
                 }
@@ -34,5 +37,5 @@ export const useReferencedNodeIds = (flowId: Flow["id"]): Set<string> => {
         })
 
         return ids
-    }, [flow, flowId])
+    }, [flow, flow?.editedAt, flowStore, flowId])
 }

@@ -20,7 +20,9 @@ export const ReferenceBadgeComponent: React.FC<ReferenceBadgeComponentProps> = (
 
     const {value, definition, ...rest} = props
 
-    const targetNodeId = value.nodeFunctionId || flowId
+    const nodeFunctionId = value.nodeFunctionId as string | null | undefined
+    const isTriggerReference = !nodeFunctionId || nodeFunctionId === "undefined"
+    const targetNodeId = (isTriggerReference ? flowId : nodeFunctionId) as string
     const referencedNodeIds = useReferencedNodeIds(flowId)
     const hoveredNodeId = useFlowReferenceHoverStore(state => state.hoveredNodeId)
     const colored = referencedNodeIds.has(targetNodeId) || hoveredNodeId === targetNodeId
@@ -29,7 +31,7 @@ export const ReferenceBadgeComponent: React.FC<ReferenceBadgeComponentProps> = (
         if (flowId) {
             return <Flex align={"center"} display={"inline-flex"}>
                 <NodeBadgeComponent definition={definition} colored={colored} value={{
-                    startingNodeId: value.nodeFunctionId,
+                    startingNodeId: isTriggerReference ? undefined : value.nodeFunctionId,
                     __typename: "SubFlowValue"
                 }}/>
                 {"inputTypeIdentifier" in value && value.inputTypeIdentifier ? "." + value.inputTypeIdentifier : ""}

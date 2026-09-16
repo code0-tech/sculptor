@@ -182,7 +182,7 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
                     transform: "rotate(45deg)",
                     aspectRatio: "50/50",
                     ...(isReferenced === true || hoveredNodeId === id ? {
-                        boxShadow: `0 0 5rem 0 rgba(112, 255, 178, 0.25)`,
+                        boxShadow: `0 0 5rem 0 ${withAlpha(data.color, 0.25)}`,
                     } : {}),
                 }}>
 
@@ -261,3 +261,45 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
 
 
 })
+
+type RGBA = {
+    r: number
+    g: number
+    b: number
+    a: number
+}
+
+const clamp01 = (v: number) => Math.min(Math.max(v, 0), 1)
+
+const parseCssColorToRgba = (color: string): RGBA => {
+    if (typeof document === "undefined") {
+        return {r: 0, g: 0, b: 0, a: 1}
+    }
+
+    const el = document.createElement("span")
+    el.style.color = color
+    document.body.appendChild(el)
+
+    const computed = getComputedStyle(el).color
+    document.body.removeChild(el)
+
+    const match = computed.match(
+        /rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/
+    )
+
+    if (!match) {
+        return {r: 0, g: 0, b: 0, a: 1}
+    }
+
+    return {
+        r: Math.round(Number(match[1])),
+        g: Math.round(Number(match[2])),
+        b: Math.round(Number(match[3])),
+        a: match[4] !== undefined ? Number(match[4]) : 1,
+    }
+}
+
+const withAlpha = (color: string, alpha: number) => {
+    const c = parseCssColorToRgba(color)
+    return `rgba(${c.r}, ${c.g}, ${c.b}, ${clamp01(alpha)})`
+}

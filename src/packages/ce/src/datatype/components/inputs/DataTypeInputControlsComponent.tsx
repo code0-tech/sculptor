@@ -236,7 +236,10 @@ export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsCompo
 
                                 if (entry.kind === "reference-group") {
                                     const group = entry.group
-                                    const targetNodeId = group.root.nodeFunctionId || flowId
+                                    const nodeFunctionId = group.root.nodeFunctionId as string | null | undefined
+                                    const targetNodeId = (!nodeFunctionId || nodeFunctionId === "undefined"
+                                        ? flowId
+                                        : nodeFunctionId) as string
 
                                     if (group.suggestions.length === 1) {
                                         return <MenuItem key={entry.key}

@@ -56,7 +56,7 @@ export const NodeBadgeComponent: React.FC<NodeBadgeComponentProps> = (props) => 
     const DisplayIcon = icon(lDefinition?.displayIcon as IconString)
 
     return <Badge style={{verticalAlign: "middle", textWrap: "nowrap"}}
-                  color={colored ? (isTrigger ? "info" : hashToColor(value.startingNodeId || value.functionDefinition?.id || "")) : "rgba(255,255,255,0.75)"}
+                  color={colored ? (isTrigger ? hashToColor(flowId) : hashToColor(value.startingNodeId || value.functionDefinition?.id || "")) : "rgba(255,255,255,0.75)"}
                   border
                   {...rest}>
         <DisplayIcon size={12}/>
