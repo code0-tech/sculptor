@@ -11,6 +11,7 @@ import {FALLBACK_FLOW_TYPE_NAME, FALLBACK_FUNCTION_NAME} from "@core/util/fallba
 export interface NodeBadgeComponentProps extends Omit<BadgeType, 'value' | 'children'> {
     value: SubFlowValue
     definition?: FunctionDefinition | FlowType
+    colored?: boolean
 }
 
 export const NodeBadgeComponent: React.FC<NodeBadgeComponentProps> = (props) => {
@@ -19,7 +20,7 @@ export const NodeBadgeComponent: React.FC<NodeBadgeComponentProps> = (props) => 
     const flowIndex = Number(params.flowId) || 1
     const flowId: Flow['id'] = `gid://sagittarius/Flow/${flowIndex}`
 
-    const {value, definition, ...rest} = props
+    const {value, definition, colored = true, ...rest} = props
 
     const functionService = definition || useService(FunctionService)
     const functionStore = definition || useStore(FunctionService)
@@ -55,7 +56,7 @@ export const NodeBadgeComponent: React.FC<NodeBadgeComponentProps> = (props) => 
     const DisplayIcon = icon(lDefinition?.displayIcon as IconString)
 
     return <Badge style={{verticalAlign: "middle", textWrap: "nowrap"}}
-                  color={isTrigger ? "info" : hashToColor(value.startingNodeId || value.functionDefinition?.id || "")}
+                  color={colored ? (isTrigger ? "info" : hashToColor(value.startingNodeId || value.functionDefinition?.id || "")) : "rgba(255,255,255,0.75)"}
                   border
                   {...rest}>
         <DisplayIcon size={12}/>
