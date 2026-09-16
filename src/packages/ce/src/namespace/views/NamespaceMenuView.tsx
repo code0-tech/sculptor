@@ -116,19 +116,19 @@ export const NamespaceMenuView: React.FC = () => {
                         Settings
                     </MenuItem>
                 </Link>
-                <Link href={`/namespace/${namespaceIndex}/settings`} prefetch style={{display: "contents"}}>
+                <Link href={`/namespace/${namespaceIndex}/settings?tab=members`} prefetch style={{display: "contents"}}>
                     <MenuItem>
                         <IconSettings color={"transparent"} size={16}/>
                         Members
                     </MenuItem>
                 </Link>
-                <Link href={`/namespace/${namespaceIndex}/settings`} prefetch style={{display: "contents"}}>
+                <Link href={`/namespace/${namespaceIndex}/settings?tab=roles`} prefetch style={{display: "contents"}}>
                     <MenuItem>
                         <IconSettings color={"transparent"} size={16}/>
                         Roles
                     </MenuItem>
                 </Link>
-                <Link href={`/namespace/${namespaceIndex}/settings`} prefetch style={{display: "contents"}}>
+                <Link href={`/namespace/${namespaceIndex}/settings?tab=servers`} prefetch style={{display: "contents"}}>
                     <MenuItem>
                         <IconSettings color={"transparent"} size={16}/>
                         Servers
