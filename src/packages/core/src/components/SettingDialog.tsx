@@ -15,19 +15,33 @@ import {
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 import {IconArrowLeft} from "@tabler/icons-react";
 import {Tab} from "@code0-tech/pictor/dist/components/tab/Tab";
+import {usePathname, useRouter, useSearchParams} from "next/navigation";
 
 export interface SettingDialogProps {
     open?: boolean
     onOpenChange?: (open: boolean) => void
     title?: string
     description?: string
+    defaultValue?: string
     trigger?: React.ReactElement[] | React.ReactElement
     children?: React.ReactElement[] | React.ReactElement
 }
 
 export const SettingDialog: React.FC<SettingDialogProps> = (props) => {
 
-    const {open, onOpenChange, title, description, trigger, children} = props
+    const {open, onOpenChange, title, description, defaultValue = "general", trigger, children} = props
+
+    const router = useRouter()
+    const pathname = usePathname()
+    const searchParams = useSearchParams()
+
+    const activeTab = searchParams.get("tab") || defaultValue
+
+    const onTabChange = (value: string) => {
+        const next = new URLSearchParams(searchParams)
+        next.set("tab", value)
+        router.replace(`${pathname}?${next.toString()}`, {scroll: false})
+    }
 
     return <Dialog open={open} onOpenChange={(open) => onOpenChange?.(open)}>
         <DialogPortal>
@@ -36,7 +50,7 @@ export const SettingDialog: React.FC<SettingDialogProps> = (props) => {
                            w={"75%"} h={"75%"}
                            autoFocus
                            showCloseButton={false}>
-                <Tab orientation={"vertical"} defaultValue={"general"} w={"100%"} h={"100%"}>
+                <Tab orientation={"vertical"} value={activeTab} onValueChange={onTabChange} w={"100%"} h={"100%"}>
                     <Layout layoutGap={0} showLayoutSplitter={false} leftContent={
                         <div style={{
                             padding: "2.6rem",
