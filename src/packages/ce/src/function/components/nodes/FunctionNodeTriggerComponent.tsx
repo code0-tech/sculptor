@@ -24,6 +24,8 @@ import {LiteralBadgeComponent} from "@edition/datatype/components/badges/Literal
 import {useParams} from "next/navigation";
 import {ProjectService} from "@edition/project/services/Project.service";
 import {ModuleService} from "@edition/module/services/Module.service";
+import {useReferencedNodeIds} from "@edition/flow/hooks/Flow.references.hook";
+import {useFlowReferenceHoverStore} from "@edition/flow/hooks/Flow.reference.hover.hook";
 
 
 export type FunctionNodeTriggerComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
@@ -88,6 +90,11 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
     })
 
     const DisplayIcon = icon(flowType?.displayIcon as IconString)
+
+    const referencedNodeIds = useReferencedNodeIds(data.flowId)
+    const hoveredNodeId = useFlowReferenceHoverStore(state => state.hoveredNodeId)
+    const iconColor = referencedNodeIds.has(id) || hoveredNodeId === id ? data.color : "rgba(255,255,255,0.75)"
+
     const validation = useFlowValidation(data.flowId)
 
     const triggerValidations = React.useMemo(
@@ -174,7 +181,7 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
                 style={{
                     transform: "rotate(45deg)",
                     aspectRatio: "50/50",
-                    ...(isReferenced === true ? {
+                    ...(isReferenced === true || hoveredNodeId === id ? {
                         boxShadow: `0 0 5rem 0 rgba(112, 255, 178, 0.25)`,
                     } : {}),
                 }}>
@@ -220,11 +227,11 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
                 }}>
 
                     <Flex align={"center"} style={{flexDirection: "column", gap: "0.35rem", ...triggerValidationStyle}}>
-                        <DisplayIcon color={data.color} size={16} style={{width: "16px", height: "16px"}}/>
+                        <DisplayIcon color={iconColor} size={16} style={{width: "16px", height: "16px"}}/>
                     </Flex>
 
                     {
-                        isReferenced === true ? (
+                        isReferenced === true || hoveredNodeId === id ? (
                             <div className={"d-flow-node__isReferenced"} style={{
                                 position: "absolute",
                                 top: "50%",
@@ -232,7 +239,7 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
                                 transform: "translate(-100%, -50%)",
                                 display: "flex"
                             }}>
-                                <IconVariable className={"d-flow-node__isReferenced-icon"} color={"#70ffb2"} size={13}/>
+                                <IconVariable className={"d-flow-node__isReferenced-icon"} color={data.color} size={13}/>
                             </div>
                         ) : null
                     }

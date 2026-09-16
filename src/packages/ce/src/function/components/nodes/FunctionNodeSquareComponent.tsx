@@ -12,6 +12,8 @@ import {underlineBySeverity} from "@core/util/inspection";
 import {icon, IconString} from "@core/util/icons";
 import {FALLBACK_FUNCTION_NAME} from "@core/util/fallback-translations";
 import {useSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
+import {useReferencedNodeIds} from "@edition/flow/hooks/Flow.references.hook";
+import {useFlowReferenceHoverStore} from "@edition/flow/hooks/Flow.reference.hover.hook";
 
 export type FunctionNodeSquareComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
 
@@ -36,6 +38,10 @@ export const FunctionNodeSquareComponent: React.FC<FunctionNodeSquareComponentPr
     )
 
     const DisplayIcon = icon(definition?.displayIcon as IconString)
+
+    const referencedNodeIds = useReferencedNodeIds(data.flowId)
+    const hoveredNodeId = useFlowReferenceHoverStore(state => state.hoveredNodeId)
+    const iconColor = referencedNodeIds.has(id) || hoveredNodeId === id ? data.color : "rgba(255,255,255,0.75)"
 
     const validation = useFlowValidation(data.flowId)
 
@@ -95,7 +101,7 @@ export const FunctionNodeSquareComponent: React.FC<FunctionNodeSquareComponentPr
                 className={`d-flow-node ${selectedNode?.id == id ? "d-flow-node--active" : ""} ${isReferenced === false ? "d-flow-node--notReferenced" : ""}`}
                 color={"primary"} style={{
                     aspectRatio: "50/50",
-                ...(isReferenced === true ? {boxShadow: `0 0 5rem 0 ${withAlpha(data.color, 0.25)}`} : {}),
+                ...(isReferenced === true || hoveredNodeId === id ? {boxShadow: `0 0 5rem 0 ${withAlpha(data.color, 0.25)}`} : {}),
             }}>
 
                 <Handle
@@ -117,7 +123,7 @@ export const FunctionNodeSquareComponent: React.FC<FunctionNodeSquareComponentPr
                 />
 
                 {
-                    isReferenced === true ? (
+                    isReferenced === true || hoveredNodeId === id ? (
                         <div className={"d-flow-node__isReferenced"} style={{
                             position: "absolute",
                             top: "50%",
@@ -132,7 +138,7 @@ export const FunctionNodeSquareComponent: React.FC<FunctionNodeSquareComponentPr
 
 
                 <Flex align={"center"} style={{flexDirection: "column", gap: "0.35rem", ...nodeValidationStyle}}>
-                    <DisplayIcon color={data.color} size={16} style={{width: "16px", height: "16px"}}/>
+                    <DisplayIcon color={iconColor} size={16} style={{width: "16px", height: "16px"}}/>
                 </Flex>
             </Card>
             <Text size={"xs"} style={{

@@ -15,6 +15,8 @@ import {underlineBySeverity} from "@core/util/inspection";
 import {icon, IconString} from "@core/util/icons";
 import {FALLBACK_FUNCTION_DISPLAY_MESSAGE, FALLBACK_FUNCTION_NAME} from "@core/util/fallback-translations";
 import {useSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
+import {useReferencedNodeIds} from "@edition/flow/hooks/Flow.references.hook";
+import {useFlowReferenceHoverStore} from "@edition/flow/hooks/Flow.reference.hover.hook";
 
 export type FunctionNodeDefaultComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
 
@@ -39,6 +41,10 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
     )
 
     const DisplayIcon = icon(definition?.displayIcon as IconString)
+
+    const referencedNodeIds = useReferencedNodeIds(data.flowId)
+    const hoveredNodeId = useFlowReferenceHoverStore(state => state.hoveredNodeId)
+    const iconColor = referencedNodeIds.has(id) || hoveredNodeId === id ? data.color : "rgba(255,255,255,0.75)"
 
     const validation = useFlowValidation(data.flowId)
 
@@ -142,9 +148,9 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
             py={"0.35"}
             outline={firstItem.id === id}
             borderColor={selected ? "info" : undefined}
-            className={`d-flow-node ${selected ? "d-flow-node--active" : ""} ${isReferenced === false ? "d-flow-node--notReferenced" : ""}`}
+            className={`d-flow-node ${selected ? "d-flow-node--active" : ""} ${(isReferenced === false && !hoveredNodeId) || (hoveredNodeId && hoveredNodeId !== id) ? "d-flow-node--notReferenced" : ""}`}
             color={"primary"} style={{
-            ...(isReferenced === true ? {boxShadow: `0 0 5rem 0 ${withAlpha(data.color, 0.25)}`} : {}),
+            ...(isReferenced === true || hoveredNodeId === id ? {boxShadow: `0 0 5rem 0 ${withAlpha(data.color, 0.25)}`} : {}),
         }}>
 
             <NodeToolbar align={"center"} offset={8} position={Position.Top}>
@@ -224,7 +230,7 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
             />
 
             {
-                isReferenced === true ? (
+                isReferenced === true || hoveredNodeId === id ? (
                     <div className={"d-flow-node__isReferenced"} style={{
                         position: "absolute",
                         top: "50%",
@@ -239,7 +245,7 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
 
 
             <Flex align={"center"} style={{gap: "0.7rem", ...nodeValidationStyle}}>
-                <DisplayIcon color={data.color} size={16}/>
+                <DisplayIcon color={iconColor} size={16}/>
                 <Text
                     size={"md"}>{node ? displayMessage : definition?.names?.[0].content ?? FALLBACK_FUNCTION_NAME}</Text>
             </Flex>
