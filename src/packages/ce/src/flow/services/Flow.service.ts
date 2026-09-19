@@ -185,6 +185,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
 
                     if (parameterValue?.__typename === "LiteralValue" && parameterValue.references && parameterValue.references.length > 0) {
                         return {
+                            ...(parameter?.cast ? {cast: parameter.cast} : {}),
                             value: {
                                 literalValue: {
                                     value: parameterValue.value!,
@@ -198,6 +199,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
                     }
 
                     return {
+                        ...(parameter?.cast ? {cast: parameter.cast} : {}),
                         value: this.mapParameterValue(parameterValue),
                     }
                 }),
@@ -453,7 +455,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         await this.syncFlow(flowId)
     }
 
-    async setParameterValue(flowId: FlowView['id'], nodeId: NodeFunction['id'], parameterIndex: number, value?: LiteralValue | ReferenceValue | SubFlowValue, functionDefinition?: FunctionDefinition): Promise<void> {
+    async setParameterValue(flowId: FlowView['id'], nodeId: NodeFunction['id'], parameterIndex: number, value?: LiteralValue | ReferenceValue | SubFlowValue, functionDefinition?: FunctionDefinition, cast?: string | null): Promise<void> {
 
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
@@ -492,12 +494,14 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
             }
 
             localParameter.value = value as LiteralValue | ReferenceValue | SubFlowValue
+            if (cast !== undefined) localParameter.cast = cast
             flow.editedAt = new Date().toISOString()
             node.parameters.nodes[parameterIndex] = (localParameter)
 
         } else if (parameter) {
             this.removeParameterNode(flow, parameter, this.collectStartingNodeIds(value))
             parameter.value = value as LiteralValue | ReferenceValue | SubFlowValue
+            if (cast !== undefined) parameter.cast = cast
             flow.editedAt = new Date().toISOString()
         }
 
