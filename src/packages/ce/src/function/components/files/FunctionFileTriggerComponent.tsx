@@ -31,6 +31,7 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
     const flowService = useService(FlowService)
     const validation = useFlowValidation(flowId)
     const changedSettings = React.useRef<Set<string>>(new Set())
+    const castBySetting = React.useRef<Map<string, string | null>>(new Map())
 
     const instance = React.useMemo(
         () => flowService.getById(flowId, {namespaceId, projectId}),
@@ -85,7 +86,8 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
                 if (typeof index !== "number") return
 
                 const value = values[flowTypeSetting!.id!]
-                await flowService.setSettingValue(flowId, index, value?.value, definition!)
+                const cast = castBySetting.current.has(flowTypeSetting!.id!) ? castBySetting.current.get(flowTypeSetting!.id!) : undefined
+                await flowService.setSettingValue(flowId, index, value?.value, definition!, cast)
 
                 changedSettings.current.delete(flowTypeSetting!.id!)
             }
@@ -133,6 +135,7 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
             const renderSetting = (settingDefinition: NonNullable<typeof indexedSettings[number]['settingDefinition']>, index: number) => {
                 const title = settingDefinition.names?.[0]?.content ?? FALLBACK_FLOW_TYPE_SETTING_NAME
                 const description = settingDefinition?.descriptions?.[0]?.content ?? FALLBACK_FLOW_TYPE_SETTING_DESCRIPTION
+                const cast = instance?.settings?.nodes?.[index]?.cast ?? null
 
                 return <div key={settingDefinition.id}>
                     {/*@ts-ignore*/}
@@ -143,7 +146,13 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
                                             clearable
                                             flowId={flowId}
                                             parameterIndex={index}
+                                            cast={cast}
                                             onChange={() => {
+                                                changedSettings.current.add(settingDefinition.id!)
+                                                validate()
+                                            }}
+                                            onCastChange={cast => {
+                                                castBySetting.current.set(settingDefinition.id!, cast)
                                                 changedSettings.current.add(settingDefinition.id!)
                                                 validate()
                                             }}
