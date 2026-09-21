@@ -17,7 +17,7 @@
   "dependencies": {
     "@apollo/client": "^4.0.9",
     "@code0-tech/pictor": "^0.18.1",
-    "@code0-tech/triangulum": "^0.34.0",
+    "@code0-tech/triangulum": "^0.35.0",
     "@code0-tech/tucana": "^0.0.82",
     "@codemirror/lang-javascript": "^6.2.5",
     "@codemirror/lint": "^6.9.5",
