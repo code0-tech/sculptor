@@ -21,6 +21,7 @@ fragment Flow on Flow {
                     id
                     updatedAt
                     createdAt
+                    cast
                     parameterDefinition {
                         __typename
                         id
@@ -144,6 +145,7 @@ fragment Flow on Flow {
             updatedAt
             flowSettingIdentifier
             value
+            cast
         }
         pageInfo {
             endCursor
