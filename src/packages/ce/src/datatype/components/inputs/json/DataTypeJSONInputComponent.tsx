@@ -79,6 +79,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                                          suggestions={suggestions}
                                          formValidation={formValidation}>
                 <DataTypeJSONInputTreeComponent
+                    readonly
                     object={value as LiteralValue}
                     references={(value as LiteralValue).references ?? undefined}
                     onEntryClick={handleEntryClick}

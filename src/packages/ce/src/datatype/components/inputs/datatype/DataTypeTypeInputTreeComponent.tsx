@@ -69,7 +69,7 @@ export const DataTypeTypeInputTreeComponent: React.FC<DataTypeTypeInputTreeCompo
 
     const content = (
         <>
-            <Flex align="center" style={{gap: ".35rem", textWrap: "nowrap"}} className="rule">
+            <Flex align="center" style={{gap: ".35rem", textWrap: "nowrap"}} className="rule rule--static">
                 {label && (
                     <Badge border color={color} style={{verticalAlign: "middle"}}>
                         <Text size="xs" style={{color: "inherit"}}>{label}</Text>

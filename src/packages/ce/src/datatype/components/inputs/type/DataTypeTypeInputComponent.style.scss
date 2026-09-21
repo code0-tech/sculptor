@@ -53,11 +53,14 @@
 
   & {
     @include helpers.borderRadius();
-    @include box.boxHover(variables.$tertiary);
-    @include box.boxActive(variables.$secondary);
     @include helpers.fontStyle();
     box-shadow: none;
     background: transparent;
+  }
+
+  &:not(.rule--static) {
+    @include box.boxHover(variables.$tertiary);
+    @include box.boxActive(variables.$secondary);
     cursor: pointer;
   }
 }
