@@ -30,6 +30,7 @@ import {DataTypeColorInputComponent} from "@edition/datatype/components/inputs/c
 import {DataTypeFileInputComponent} from "@edition/datatype/components/inputs/file/DataTypeFileInputComponent";
 import {DataTypeJSONInputComponent} from "@edition/datatype/components/inputs/json/DataTypeJSONInputComponent";
 import {DataTypeGenericInputComponent} from "@edition/datatype/components/inputs/generic/DataTypeGenericInputComponent";
+import {DataTypeTypeInputComponent} from "@edition/datatype/components/inputs/datatype/DataTypeTypeInputComponent";
 import {
     DataTypeSubFlowInputComponent
 } from "@edition/datatype/components/inputs/sub-flow/DataTypeSubFlowInputComponent";
@@ -46,6 +47,8 @@ export interface DataTypeInputComponentProps extends Omit<InputWrapperProps<Node
     flowId?: Flow['id']
     nodeId?: NodeFunction['id']
     parameterIndex?: number
+    cast?: string | null
+    onCastChange?: (cast: string | null) => void
 }
 
 export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (props) => {
@@ -131,6 +134,11 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
                         schema={schema}
                         suggestions={suggestions}
                         {...rest}/>
+                case "type":
+                    return <DataTypeTypeInputComponent
+                        schema={schema}
+                        suggestions={suggestions}
+                        {...rest}/>
                 case "generic":
                     return <DataTypeGenericInputComponent
                         schema={schema}
@@ -154,6 +162,6 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
                     />
             }
         },
-        [rest.initialValue, inputName, suggestions?.length ?? 0, rest.formValidation?.valid ?? true, rest.formValidation?.notValidMessage ?? "", rest.flowId, rest.nodeId, rest.parameterIndex]
+        [rest.initialValue, inputName, suggestions?.length ?? 0, rest.formValidation?.valid ?? true, rest.formValidation?.notValidMessage ?? "", rest.flowId, rest.nodeId, rest.parameterIndex, rest.cast]
     )
 }
