@@ -67,6 +67,7 @@ export interface NodeGanttItem extends GanttItem {
     data?: {
         displayMessage: string
         color: string
+        duration: number
         payload?: Maybe<NodeFunction> | Maybe<FunctionDefinition> | Maybe<Flow>
         input?: ExecutionParameterResult[] | object
         success?: object
@@ -187,67 +188,78 @@ export const FlowExecutionResultView: React.FC = () => {
 
     const ganttItems = React.useMemo<Map<ExecutionResult['id'], NodeGanttItem[]>>(
         () => {
-            return new Map<ExecutionResult["id"], NodeGanttItem[]>(flowExecutionResults.map(result => [result?.id, [
-                {
-                    id: result?.id as string,
-                    type: "trigger",
-                    start: 0,
-                    end: (result?.finishedAt ?? 0) - (result?.startedAt ?? 0),
-                    data: {
-                        displayMessage: flowTypes.find(fT => fT.id === flow?.type?.id)?.names?.[0].content ?? FALLBACK_FLOW_TYPE_NAME,
-                        color: hashToColor(result?.flow?.name ?? ""),
-                        payload: {
-                            ...flow,
-                            type: flowTypes.find(fT => fT.id === flow?.type?.id)
-                        },
-                        success: result?.success,
-                        input: result?.input,
-                        error: result?.error,
-                    }
-                },
-                ...(result?.nodeResults?.nodes?.map?.(nodeResult => {
+            return new Map<ExecutionResult["id"], NodeGanttItem[]>(flowExecutionResults.map((result): [ExecutionResult["id"], NodeGanttItem[]] => {
 
-                    if (nodeResult?.functionDefinition) {
-                        const funktion = functions.find(f => f.id === nodeResult?.functionDefinition?.id)
+                const duration = (result?.finishedAt ?? 0) - (result?.startedAt ?? 0)
+
+                return [result?.id, [
+                    {
+                        id: result?.id as string,
+                        type: "trigger",
+                        start: 0,
+                        end: Math.max(duration, 1),
+                        data: {
+                            displayMessage: flowTypes.find(fT => fT.id === flow?.type?.id)?.names?.[0].content ?? FALLBACK_FLOW_TYPE_NAME,
+                            color: hashToColor(result?.flow?.name ?? ""),
+                            duration: duration,
+                            payload: {
+                                ...flow,
+                                type: flowTypes.find(fT => fT.id === flow?.type?.id)
+                            },
+                            success: result?.success,
+                            input: result?.input,
+                            error: result?.error,
+                        }
+                    },
+                    ...(result?.nodeResults?.nodes?.map?.(nodeResult => {
+
+                        const nodeStart = (nodeResult?.startedAt ?? 0) - (result?.startedAt ?? 0)
+                        const nodeDuration = (nodeResult?.finishedAt ?? 0) - (nodeResult?.startedAt ?? 0)
+
+                        if (nodeResult?.functionDefinition) {
+                            const funktion = functions.find(f => f.id === nodeResult?.functionDefinition?.id)
+
+                            return {
+                                id: nodeResult?.id as string,
+                                type: "function",
+                                start: nodeStart,
+                                end: nodeStart + Math.max(nodeDuration, 1),
+                                data: {
+                                    displayMessage: funktion?.names?.[0].content ?? FALLBACK_FUNCTION_NAME,
+                                    color: hashToColor(funktion?.identifier ?? ""),
+                                    duration: nodeDuration,
+                                    payload: funktion,
+                                    success: nodeResult?.success,
+                                    input: nodeResult?.parameterResults ?? [],
+                                    error: nodeResult?.error,
+                                }
+                            }
+                        }
+
+                        const node = flow?.nodes?.nodes?.find(n => n?.id === nodeResult?.nodeFunction?.id)
+                        const funktion = functions.find(f => f.id === nodeResult?.nodeFunction?.functionDefinition?.id)
 
                         return {
                             id: nodeResult?.id as string,
-                            type: "function",
-                            start: (nodeResult?.startedAt ?? 0) - (result?.startedAt ?? 0),
-                            end: (nodeResult?.finishedAt ?? 0) - (result?.startedAt ?? 0),
+                            type: "node",
+                            start: nodeStart,
+                            end: nodeStart + Math.max(nodeDuration, 1),
                             data: {
                                 displayMessage: funktion?.names?.[0].content ?? FALLBACK_FUNCTION_NAME,
-                                color: hashToColor(funktion?.identifier ?? ""),
-                                payload: funktion,
+                                color: hashToColor(nodeResult?.nodeFunction?.id ?? ""),
+                                duration: nodeDuration,
+                                payload: {
+                                    ...node,
+                                    functionDefinition: funktion
+                                },
                                 success: nodeResult?.success,
                                 input: nodeResult?.parameterResults ?? [],
                                 error: nodeResult?.error,
                             }
                         }
-                    }
-
-                    const node = flow?.nodes?.nodes?.find(n => n?.id === nodeResult?.nodeFunction?.id)
-                    const funktion = functions.find(f => f.id === nodeResult?.nodeFunction?.functionDefinition?.id)
-
-                    return {
-                        id: nodeResult?.id as string,
-                        type: "node",
-                        start: (nodeResult?.startedAt ?? 0) - (result?.startedAt ?? 0),
-                        end: (nodeResult?.finishedAt ?? 0) - (result?.startedAt ?? 0),
-                        data: {
-                            displayMessage: funktion?.names?.[0].content ?? FALLBACK_FUNCTION_NAME,
-                            color: hashToColor(nodeResult?.nodeFunction?.id ?? ""),
-                            payload: {
-                                ...node,
-                                functionDefinition: funktion
-                            },
-                            success: nodeResult?.success,
-                            input: nodeResult?.parameterResults ?? [],
-                            error: nodeResult?.error,
-                        }
-                    }
-                }) ?? [])
-            ]]))
+                    }) ?? [])
+                ]]
+            }))
         },
         [flowExecutionResults, flowTypes, flow, functions]
     )
@@ -416,7 +428,7 @@ export const FlowExecutionResultView: React.FC = () => {
                                                                     </Text>
                                                                 </Flex>
                                                                 <Text size={"xs"} hierarchy={"tertiary"}>
-                                                                    {getRelativeValue(item.end - item.start)}
+                                                                    {getRelativeValue(item.data?.duration ?? item.end - item.start)}
                                                                 </Text>
                                                             </Flex>
                                                         </Card>
@@ -447,7 +459,7 @@ export const FlowExecutionResultView: React.FC = () => {
                                                                             </Text>
                                                                         </Flex>
                                                                         <Text size={"sm"} hierarchy={"tertiary"}>
-                                                                            {getRelativeValue(item.end - item.start)}
+                                                                            {getRelativeValue(item.data?.duration ?? item.end - item.start)}
                                                                         </Text>
                                                                     </Flex>
                                                                     <Spacing spacing={"xs"}/>
