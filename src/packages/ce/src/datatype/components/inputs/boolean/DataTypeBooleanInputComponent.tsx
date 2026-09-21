@@ -44,10 +44,12 @@ export const DataTypeBooleanInputComponent: React.FC<DataTypeBooleanInputCompone
                               value={(initialValue as LiteralValue)?.value?.toString() ?? ""}
                               onValueChange={value => {
                                   if (typeof value === "string") {
-                                      const boolValue: LiteralValue | null = value && ["true", "false"].includes(value) ? {
+                                      if (!["true", "false"].includes(value)) return
+
+                                      const boolValue: LiteralValue = {
                                           __typename: "LiteralValue",
                                           value: value === "true"
-                                      } : null
+                                      }
 
                                       formValidation?.setValue?.(boolValue)
                                       onChangeDebounced(boolValue)
