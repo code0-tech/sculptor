@@ -121,9 +121,14 @@ export const FlowExecuteDialogComponent: React.FC<FlowExecuteDialogComponentProp
     )
 
     // The manual execution input is derived from the trigger's return schema (the shape of
-    // the data the trigger hands to the flow). Resolve it whenever the dialog opens.
+    // the data the trigger hands to the flow). Resolve it whenever the dialog opens, and
+    // drop it on close so a reopen never renders the schema of the previous open.
     React.useEffect(() => {
-        if (!open || !flow) return
+        if (!open) {
+            setTriggerSchema(undefined)
+            return
+        }
+        if (!flow) return
         if (dataTypes.length <= 0 || functions.length <= 0) return
 
         let cancelled = false
