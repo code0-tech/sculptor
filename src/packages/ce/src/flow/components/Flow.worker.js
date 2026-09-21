@@ -1,5 +1,6 @@
 import {getFlowValidation, getSignatureSchema, getTypeFromValue, getValueFromType} from "@code0-tech/triangulum";
 import {InspectionSeverity} from "../../../../core/src/util/inspection";
+import {getJsonSchemaFromType} from "../../../../core/src/util/json-schema";
 
 const errorResult = (
     nodeId,
@@ -44,6 +45,9 @@ addEventListener("message", (event) => {
                 break;
             case 'value_extraction':
                 result = getValueFromType(payload.type, payload.dataTypes);
+                break;
+            case 'json_schema':
+                result = getJsonSchemaFromType(payload.type, payload.dataTypes);
                 break;
             case 'type_variant':
                 result = 0;
