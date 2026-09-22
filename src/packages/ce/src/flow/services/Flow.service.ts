@@ -172,6 +172,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
             type: flow?.type?.id!,
             settings: flow?.settings?.nodes?.map(setting => {
                 return {
+                    ...(setting?.cast ? {cast: setting.cast} : {}),
                     value: setting?.value ?? null,
                 }
             }) ?? [],
@@ -185,6 +186,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
 
                     if (parameterValue?.__typename === "LiteralValue" && parameterValue.references && parameterValue.references.length > 0) {
                         return {
+                            ...(parameter?.cast ? {cast: parameter.cast} : {}),
                             value: {
                                 literalValue: {
                                     value: parameterValue.value!,
@@ -198,6 +200,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
                     }
 
                     return {
+                        ...(parameter?.cast ? {cast: parameter.cast} : {}),
                         value: this.mapParameterValue(parameterValue),
                     }
                 }),
@@ -405,7 +408,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         await this.syncFlow(flowId)
     }
 
-    async setSettingValue(flowId: FlowView['id'], parameterIndex: number, value: FlowSetting['value'], flowType: FlowType): Promise<void> {
+    async setSettingValue(flowId: FlowView['id'], parameterIndex: number, value: FlowSetting['value'], flowType: FlowType, cast?: string | null): Promise<void> {
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
         if (!flow) return
@@ -441,11 +444,13 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
             }
 
             localParameter.value = value as FlowSetting['value']
+            if (cast !== undefined) localParameter.cast = cast
             flow.editedAt = new Date().toISOString()
             flow.settings.nodes[parameterIndex] = (localParameter)
 
         } else if (setting) {
             setting.value = value as FlowSetting['value']
+            if (cast !== undefined) setting.cast = cast
             flow.editedAt = new Date().toISOString()
         }
 
@@ -453,7 +458,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         await this.syncFlow(flowId)
     }
 
-    async setParameterValue(flowId: FlowView['id'], nodeId: NodeFunction['id'], parameterIndex: number, value?: LiteralValue | ReferenceValue | SubFlowValue, functionDefinition?: FunctionDefinition): Promise<void> {
+    async setParameterValue(flowId: FlowView['id'], nodeId: NodeFunction['id'], parameterIndex: number, value?: LiteralValue | ReferenceValue | SubFlowValue, functionDefinition?: FunctionDefinition, cast?: string | null): Promise<void> {
 
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
@@ -492,12 +497,14 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
             }
 
             localParameter.value = value as LiteralValue | ReferenceValue | SubFlowValue
+            if (cast !== undefined) localParameter.cast = cast
             flow.editedAt = new Date().toISOString()
             node.parameters.nodes[parameterIndex] = (localParameter)
 
         } else if (parameter) {
             this.removeParameterNode(flow, parameter, this.collectStartingNodeIds(value))
             parameter.value = value as LiteralValue | ReferenceValue | SubFlowValue
+            if (cast !== undefined) parameter.cast = cast
             flow.editedAt = new Date().toISOString()
         }
 

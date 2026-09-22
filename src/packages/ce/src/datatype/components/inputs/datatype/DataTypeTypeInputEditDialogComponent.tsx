@@ -1,5 +1,6 @@
-import React, {useEffect, useMemo, useState} from "react"
+import React from "react"
 import {
+    Alert,
     Button,
     Dialog,
     DialogClose,
@@ -7,518 +8,199 @@ import {
     DialogOverlay,
     DialogPortal,
     Flex,
+    getSize,
+    ScrollArea,
+    ScrollAreaScrollbar,
+    ScrollAreaThumb,
+    ScrollAreaViewport,
     SegmentedControl,
     SegmentedControlItem,
     Text,
     useService,
     useStore
-} from "@code0-tech/pictor";
-import {IconX} from "@tabler/icons-react";
-import {Editor} from "@code0-tech/pictor/dist/components/editor/Editor";
-import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
+} from "@code0-tech/pictor"
+import {Editor} from "@code0-tech/pictor/dist/components/editor/Editor"
+import {IconX} from "@tabler/icons-react"
+import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout"
+import {LiteralValue} from "@code0-tech/sagittarius-graphql-types"
+import {useValueExtractionAction} from "@edition/flow/components/FlowWorkerProvider"
+import {DatatypeService} from "@edition/datatype/services/Datatype.service"
+import {ModuleService} from "@edition/module/services/Module.service"
 import {
-    ResizableHandle,
-    ResizablePanel,
-    ResizablePanelGroup
-} from "@code0-tech/pictor/dist/components/resizable/Resizable";
-import {DatatypeService} from "@edition/datatype/services/Datatype.service";
-import {LiteralValue} from "@code0-tech/sagittarius-graphql-types";
-import {useTypeExtractionAction, useValueExtractionAction} from "@edition/flow/components/FlowWorkerProvider";
-import {DataTypeTypeEditorInput} from "@edition/datatype/components/inputs/datatype/DataTypeTypeEditorInput";
-import {DataTypeJSONInputTreeComponent} from "@edition/datatype/components/inputs/json/DataTypeJSONInputTreeComponent";
+    collectTypeErrors,
+    getNodeAtPath,
+    inferTypeFromValue,
+    parseTypeToNode,
+    serializeType,
+    TypeNode
+} from "@edition/datatype/components/inputs/datatype/DataTypeType.node.util"
+import {
+    DataTypeTypeBuilderFormComponent
+} from "@edition/datatype/components/inputs/datatype/DataTypeTypeBuilderFormComponent"
+import {
+    DataTypeTypeBuilderBreadcrumbComponent
+} from "@edition/datatype/components/inputs/datatype/DataTypeTypeBuilderBreadcrumbComponent"
 
-export interface DataTypeJSONInputEditDialogComponentProps {
+export interface DataTypeTypeInputEditDialogComponentProps {
     open: boolean
     value: string | null
     onOpenChange?: (open: boolean) => void
-    onTypeChange?: (type: string | null) => void
+    onTypeClose?: (type: string | null) => void
 }
 
+export const DataTypeTypeInputEditDialogComponent: React.FC<DataTypeTypeInputEditDialogComponentProps> = (props) => {
 
-function humanToTs(input: string): string {
-    if (!input) return ""
+    const {open, value, onOpenChange, onTypeClose} = props
 
-    const findClosingBracket = (s: string, start: number) => {
-        let level = 1;
-        for (let i = start + 1; i < s.length; i++) {
-            if (s[i] === "(") level++;
-            else if (s[i] === ")") level--;
-            if (level === 0) return i;
-        }
-        return -1;
-    };
-
-    const getIndent = (line: string) => {
-        const match = line.match(/^(\s*)/);
-        return match ? match[0].length : 0;
-    };
-
-    const transform = (str: string): string => {
-        if (!str || !str.trim()) return "";
-        let result = str.trim();
-
-        // Handle leading/trailing parentheses for the whole block
-        if (result.startsWith("(") && result.endsWith(")")) {
-            const innerMatch = findClosingBracket(result, 0);
-            if (innerMatch === result.length - 1) {
-                return `(${transform(result.substring(1, result.length - 1))})`;
-            }
-        }
-
-        // 1. Handle Generics: NAME of (...) or NAME of TYPE
-        let genericChanged = true;
-        while (genericChanged) {
-            genericChanged = false;
-            const ofMatch = result.match(/(\b(?!is\b|contains\b|and\b|or\b)\w+\b)\s+of\s+/i);
-            if (ofMatch && ofMatch.index !== undefined) {
-                const start = ofMatch.index;
-                const name = ofMatch[1];
-                const afterOf = result.substring(start + ofMatch[0].length);
-
-                if (afterOf.startsWith("(")) {
-                    const end = findClosingBracket(afterOf, 0);
-                    if (end !== -1) {
-                        const inner = transform(afterOf.substring(1, end));
-                        result = result.substring(0, start) + `${name}<${inner}>` + afterOf.substring(end + 1);
-                        genericChanged = true;
-                        continue;
-                    }
-                }
-                const wordMatch = afterOf.match(/^(\w+)/);
-                if (wordMatch) {
-                    const word = wordMatch[1];
-                    result = result.substring(0, start) + `${name}<${word}>` + afterOf.substring(start + ofMatch[0].length + word.length);
-                    genericChanged = true;
-                }
-            }
-        }
-
-        let processed = "";
-        let remaining = result;
-        while (remaining.length > 0) {
-            remaining = remaining.trim();
-            if (!remaining) break;
-
-            // Check for stand-alone operators first: or is, or contains, and is, and contains
-            const opSpecialMatch = remaining.match(/^(and|or)\s+(is|contains)\b/i);
-            if (opSpecialMatch) {
-                const op = opSpecialMatch[1].toLowerCase() === "and" ? "&" : "|";
-                const keyword = opSpecialMatch[2].toLowerCase();
-                let after = remaining.substring(opSpecialMatch[0].length).trim();
-                let val = "";
-                if (after.startsWith("(")) {
-                    const end = findClosingBracket(after, 0);
-                    if (end !== -1) {
-                        val = transform(after.substring(1, end));
-                        processed += ` ${op} ${keyword === "contains" ? `{ ${val} }` : (val.includes("&") || val.includes("|") ? `(${val})` : val)}`;
-                        remaining = after.substring(end + 1);
-                    } else {
-                        val = transform(after.substring(1));
-                        processed += ` ${op} ${keyword === "contains" ? `{ ${val} }` : val}`;
-                        remaining = "";
-                    }
-                } else {
-                    let k = 0;
-                    let bLevel = 0;
-                    for (; k < after.length; k++) {
-                        if (after[k] === "(" || after[k] === "<" || after[k] === "{") bLevel++;
-                        else if (after[k] === ")" || after[k] === ">" || after[k] === "}") bLevel--;
-                        else if (bLevel === 0) {
-                            if (/^\s+(and|or)\b/i.test(after.substring(k))) break;
-                            if (/^\s+(\b(?!is\b|contains\b|and\b|or\b)\w+\b)\s+(is|contains)\b/i.test(after.substring(k))) break;
-                        }
-                    }
-                    val = transform(after.substring(0, k).trim());
-                    processed += ` ${op} ${keyword === "contains" ? `{ ${val} }` : val}`;
-                    remaining = after.substring(k);
-                }
-            }
-
-            // Property: key contains / key is (exclude keywords from being keys)
-            const propMatch = remaining.match(/^(\b(?!is\b|contains\b|and\b|or\b)\w+\b)\s+(contains|is)\b/i);
-            if (propMatch) {
-                const key = propMatch[1];
-                const keyword = propMatch[2].toLowerCase();
-                let after = remaining.substring(propMatch[0].length).trim();
-                let val = "";
-                if (after.startsWith("(")) {
-                    const end = findClosingBracket(after, 0);
-                    if (end !== -1) {
-                        val = transform(after.substring(1, end));
-                        if (processed.length > 0 && !/[{&|]\s*$/.test(processed.trim())) processed += ", ";
-                        processed += keyword === "contains" ? `${key}: { ${val} }` : `${key}: ${val.includes("&") || val.includes("|") ? `(${val})` : val}`;
-                        remaining = after.substring(end + 1);
-                    } else {
-                        val = transform(after.substring(1));
-                        if (processed.length > 0 && !/[{&|]\s*$/.test(processed.trim())) processed += ", ";
-                        processed += keyword === "contains" ? `${key}: { ${val} }` : `${key}: ${val}`;
-                        remaining = "";
-                    }
-                } else {
-                    let k = 0;
-                    let bLevel = 0;
-                    for (; k < after.length; k++) {
-                        if (after[k] === "(" || after[k] === "<" || after[k] === "{") bLevel++;
-                        else if (after[k] === ")" || after[k] === ">" || after[k] === "}") bLevel--;
-                        else if (bLevel === 0) {
-                            if (/^\s+(and|or)\b/i.test(after.substring(k))) break;
-                            if (/^\s+(\b(?!is\b|contains\b|and\b|or\b)\w+\b)\s+(is|contains)\b/i.test(after.substring(k))) break;
-                        }
-                    }
-                    val = transform(after.substring(0, k).trim());
-                    if (processed.length > 0 && !/[{&|]\s*$/.test(processed.trim())) processed += ", ";
-                    processed += keyword === "contains" ? `${key}: { ${val} }` : `${key}: ${val}`;
-                    remaining = after.substring(k);
-                }
-            }
-
-            // Fallback for types or remaining keywords
-            const word = remaining.match(/^([a-zA-Z0-9_<>]+)/);
-            if (word) {
-                processed += word[1];
-                remaining = remaining.substring(word[1].length);
-                continue;
-            }
-            if (remaining[0] === "(" || remaining[0] === ")") {
-                processed += remaining[0];
-                remaining = remaining.substring(1);
-                continue;
-            }
-            processed += remaining[0];
-            remaining = remaining.substring(1);
-        }
-        return processed;
-    };
-
-    const parseLines = (lines: string[]): string => {
-        let result = "";
-        let i = 0;
-
-        while (i < lines.length) {
-            let line = lines[i].trim();
-            if (!line) {
-                i++;
-                continue;
-            }
-            const currentIndent = getIndent(lines[i]);
-
-            const propMatch = line.match(/^(\w+)\s+(contains|is)\b(.*)$/i);
-            if (propMatch) {
-                const key = propMatch[1];
-                const keyword = propMatch[2].toLowerCase();
-                let rest = propMatch[3].trim();
-                let value = "";
-
-                if (rest.startsWith("(")) {
-                    let combined = rest;
-                    let j = i;
-                    while (j < lines.length) {
-                        const openIdx = combined.indexOf("(");
-                        const closingIdx = findClosingBracket(combined, openIdx);
-                        if (closingIdx !== -1) {
-                            value = transform(combined.substring(openIdx + 1, closingIdx));
-                            i = j;
-                            break;
-                        }
-                        j++;
-                        if (j < lines.length) combined += " " + lines[j].trim();
-                    }
-                } else {
-                    let subLines: string[] = [];
-                    let j = i + 1;
-                    while (j < lines.length) {
-                        if (lines[j].trim() === "") {
-                            j++;
-                            continue;
-                        }
-                        if (getIndent(lines[j]) > currentIndent) {
-                            subLines.push(lines[j]);
-                            j++;
-                        } else break;
-                    }
-                    if (subLines.length > 0) {
-                        value = parseLines(subLines);
-                        if (rest) {
-                            const restTransformed = transform(rest);
-                            value = restTransformed + (value.trim().startsWith("&") || value.trim().startsWith("|") ? "" : " & ") + value;
-                        }
-                        i = j - 1;
-                    } else {
-                        value = transform(rest);
-                    }
-                }
-
-                if (result.length > 0 && !/[{&|]\s*$/.test(result.trim())) result += ", ";
-                result += keyword === "contains" ? `${key}: { ${value} }` : `${key}: ${value}`;
-            } else {
-                const transformed = transform(line);
-                if (result.length > 0 && !/[{&|]\s*$/.test(result.trim()) && !/^\s*[&|]/.test(transformed)) result += ", ";
-                result += transformed;
-            }
-            i++;
-        }
-        return result;
-    };
-
-    const lines = input.split("\n");
-    let final = parseLines(lines).replace(/\s+/g, " ").trim();
-    if (final.includes(":") && !final.startsWith("{")) final = `{ ${final} }`;
-
-    return final.replace(/\( /g, "(").replace(/ \)/g, ")")
-        .replace(/: \s*:/g, ":").replace(/\{\s*:/g, "{")
-        .replace(/&/g, " & ").replace(/\|/g, " | ")
-        .replace(/,/g, ", ").replace(/\s+/g, " ").trim();
-}
-
-function tsToHuman(ts: string): string {
-    if (!ts) return ""
-
-    const transform = (str: string, level: number = 0): string => {
-        str = str.trim()
-        const nextIndent = "  ".repeat(level + 1)
-
-        // Handle Parentheses: ( ... )
-        if (str.startsWith("(") && str.endsWith(")")) {
-            const inner = str.slice(1, -1).trim();
-            const transformedInner = transform(inner, level);
-            return `(${transformedInner})`;
-        }
-
-        // Handle Objects: { key: value, ... } -> key is/contains ... and ...
-        if (str.startsWith("{") && str.endsWith("}")) {
-            const inner = str.slice(1, -1).trim()
-            const pairs: string[] = []
-            let bLevel = 0
-            let lastIndex = 0
-            for (let i = 0; i < inner.length; i++) {
-                if (inner[i] === "{" || inner[i] === "(" || inner[i] === "<") bLevel++
-                else if (inner[i] === "}" || inner[i] === ")" || inner[i] === ">") bLevel--
-                else if (inner[i] === "," && bLevel === 0) {
-                    pairs.push(inner.substring(lastIndex, i).trim())
-                    lastIndex = i + 1
-                }
-            }
-            pairs.push(inner.substring(lastIndex).trim())
-
-            const transformedPairs = pairs.filter(p => p.length > 0).map(pair => {
-                const colonIndex = pair.indexOf(":")
-                if (colonIndex === -1) return transform(pair, level + 1)
-                const key = pair.substring(0, colonIndex).trim()
-                const value = pair.substring(colonIndex + 1).trim()
-
-                if (value.startsWith("{")) {
-                    return `\n${nextIndent}${key} contains ${transform(value, level + 1)}`
-                } else {
-                    const transformedVal = transform(value, level + 1)
-                    return `\n${nextIndent}${key} is ${transformedVal}`
-                }
-            })
-
-            return transformedPairs.join("")
-        }
-
-        // Handle Unions: A | B -> A or is B / A or contains B
-        const unionParts = []
-        let lastIdx = 0
-        let bLevel = 0
-        for (let i = 0; i < str.length; i++) {
-            if (str[i] === "{" || str[i] === "<" || str[i] === "(") bLevel++
-            else if (str[i] === "}" || str[i] === ">" || str[i] === ")") bLevel--
-            else if (str[i] === "|" && bLevel === 0) {
-                unionParts.push(str.substring(lastIdx, i).trim())
-                lastIdx = i + 1
-            }
-        }
-        unionParts.push(str.substring(lastIdx).trim())
-        if (unionParts.length > 1) {
-            return unionParts.map((s, idx) => {
-                const t = transform(s, level)
-                const prefix = idx === 0 ? "" : (s.trim().startsWith("{") ? " or contains " : " or is ")
-                const content = (t.includes("\n") || (t.includes(" ") && !t.startsWith("("))) && !t.startsWith("\n") ? `(${t.trim()})` : t
-                return `${prefix}${content}`
-            }).join("")
-        }
-
-        // Handle Intersections: A & B -> A and is B / A and contains B
-        const intersectParts = []
-        lastIdx = 0
-        bLevel = 0
-        for (let i = 0; i < str.length; i++) {
-            if (str[i] === "{" || str[i] === "<" || str[i] === "(") bLevel++
-            else if (str[i] === "}" || str[i] === ">" || str[i] === ")") bLevel--
-            else if (str[i] === "&" && bLevel === 0) {
-                intersectParts.push(str.substring(lastIdx, i).trim())
-                lastIdx = i + 1
-            }
-        }
-        intersectParts.push(str.substring(lastIdx).trim())
-        if (intersectParts.length > 1) {
-            return intersectParts.map((s, idx) => {
-                const t = transform(s, level)
-                const prefix = idx === 0 ? "" : (s.trim().startsWith("{") ? " and contains " : " and is ")
-                const content = (t.includes("\n") || (t.includes(" ") && !t.startsWith("("))) && !t.startsWith("\n") ? `(${t.trim()})` : t
-                return `${prefix}${content}`
-            }).join("")
-        }
-
-        // Handle Generics: NAME<TYPE> -> NAME of (TYPE)
-        const genericMatch = str.match(/^(\w+)<(.+)>$/)
-        if (genericMatch) {
-            const name = genericMatch[1]
-            const inner = genericMatch[2]
-            const transformedInner = transform(inner, level)
-            const needsParen = transformedInner.includes("\n") || (transformedInner.includes(" ") && !transformedInner.startsWith("("));
-            return `${name} of ${needsParen ? `(${transformedInner.trim()})` : transformedInner}`
-        }
-
-        return str
-    }
-
-    return transform(ts).trim()
-}
-
-export const DataTypeTypeInputEditDialogComponent: React.FC<DataTypeJSONInputEditDialogComponentProps> = (props) => {
-    const {
-        open,
-        value,
-        onTypeChange,
-        onOpenChange
-    } = props
-
-    const [editOpen, setEditOpen] = useState(open)
     const dataTypeService = useService(DatatypeService)
     const dataTypeStore = useStore(DatatypeService)
+    const moduleService = useService(ModuleService)
+    const moduleStore = useStore(ModuleService)
     const valueFromTypeAction = useValueExtractionAction()
-    const typeFromValueAction = useTypeExtractionAction()
-    const [humanValue, setHumanValue] = useState("")
-    const [tsValue, setTsValue] = useState(value ?? "")
-    const [literalValue, setLiteralValue] = useState<LiteralValue>()
-    const [editVariant, setEditVariant] = useState<"manual" | "value">("value")
 
-    const dataTypes = useMemo(
-        () => dataTypeService.values(),
-        [dataTypeStore]
+    const [root, setRoot] = React.useState<TypeNode>(() => parseTypeToNode(value))
+    const [activePath, setActivePath] = React.useState<number[]>([])
+    const [showErrors, setShowErrors] = React.useState<boolean>(false)
+    const [mode, setMode] = React.useState<string>("manual")
+    const [json, setJson] = React.useState<unknown>(null)
+
+    const errors = React.useMemo(() => collectTypeErrors(root), [root])
+
+    const dataTypes = React.useMemo(() => dataTypeService.values(), [dataTypeStore])
+    const modules = React.useMemo(() => moduleService.values(), [moduleStore])
+
+    const dataTypeOptions = React.useMemo(
+        () => dataTypes.map(dataType => {
+            const module = modules.find(candidate => candidate.id === dataType.runtimeModule?.id)
+            return {
+                identifier: dataType.identifier!,
+                generics: dataType.genericKeys?.length ?? 0,
+                label: dataType.name?.[0]?.content || dataType.identifier!,
+                displayMessage: dataType.displayMessages?.[0]?.content ?? undefined,
+                genericKeys: dataType.genericKeys ?? [],
+                moduleId: dataType.runtimeModule?.id ?? undefined,
+                moduleName: module?.names?.[0]?.content ?? undefined,
+                moduleIcon: module?.icon ?? undefined
+            }
+        }),
+        [dataTypes, modules]
     )
 
-    // Sync from props ONLY when opening the dialog
-    useEffect(() => {
-        setEditOpen(open)
+    React.useEffect(() => {
         if (open) {
-            const initialTs = value ?? ""
-            setTsValue(initialTs)
-            setHumanValue(tsToHuman(initialTs))
-            // Generate initial literal/JSON for the tree/editor
-            valueFromTypeAction.execute({
-                type: initialTs,
-                dataTypes: dataTypes
-            }).then(val => {
-                setLiteralValue(val as any)
-            })
+            const parsed = parseTypeToNode(value)
+            setRoot(parsed)
+            setActivePath([])
+            setShowErrors(false)
+            setMode("manual")
+            setJson(null)
         }
     }, [open])
 
-    // Handler 1: Schema Editor changes
-    const handleSchemaChange = React.useCallback((human: string) => {
-        const ts = humanToTs(human)
+    React.useEffect(() => {
+        if (errors.length === 0) setShowErrors(false)
+    }, [errors.length])
 
-        if (ts !== tsValue) {
-            setTsValue(ts)
-            onTypeChange?.(ts)
+    React.useEffect(() => {
+        if (activePath.length > 0 && !getNodeAtPath(root, activePath)) setActivePath([])
+    }, [root, activePath])
 
-            // Sync Tree & JSON Editor (async)
-            valueFromTypeAction.execute({
-                type: ts,
-                dataTypes: dataTypes
-            }).then(val => {
-                setLiteralValue(val as any)
-            })
+    const handleModeChange = (next: string) => {
+        if (!next) return
+        if (next !== "json") return setMode(next)
+
+        const type = serializeType(root)
+        if (!type) {
+            setJson(null)
+            setMode(next)
+            return
         }
-    }, [])
-
-    // Handler 2: JSON Input changes
-    const handleJsonChange = (json: object) => {
-        const newLiteral = {__typename: "LiteralValue", value: json} as LiteralValue
-        setLiteralValue(newLiteral)
-
-        typeFromValueAction.execute({
-            value: newLiteral,
-            dataTypes: dataTypes
-        }).then(type => {
-            setTsValue(type as string)
-            onTypeChange?.(type as string)
-            setHumanValue(tsToHuman(type as string))
+        valueFromTypeAction.execute({type, dataTypes}).then(extracted => {
+            setJson((extracted as LiteralValue | undefined)?.value ?? null)
+            setMode(next)
         })
     }
 
-    // Use keys to force-refresh editors when switching tabs or when external sync happens
-    // We use humanValue for the Schema editor to ensure it's stable while typing but refreshes from JSON
-    const typeEditorInput = React.useMemo(() => {
-        return <DataTypeTypeEditorInput
-            value={humanValue}
-            showValidation={false}
-            showTooltips={false}
-            onChange={handleSchemaChange}/>
-    }, [humanValue, handleSchemaChange])
-
-    const jsonInput = React.useMemo(() => {
-        return <Editor
-            key={String(literalValue)}
-            showValidation={true}
-            language={"json"}
-            initialValue={literalValue?.value}
-            onChange={handleJsonChange}
-            showTooltips={false}/>
-    }, [open, literalValue, handleJsonChange])
+    const handleOpenChange = (next: boolean) => {
+        if (!next && errors.length > 0) {
+            setShowErrors(true)
+            return
+        }
+        onOpenChange?.(next)
+        if (!next) onTypeClose?.(serializeType(root) || null)
+    }
 
     return (
-        <Dialog open={editOpen} onOpenChange={(open) => onOpenChange?.(open)}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogPortal>
                 <DialogOverlay/>
-                <DialogContent aria-describedby="DFlowInputObjectEditDialog" onPointerDownOutside={e => {
-                    const target = e.target as HTMLElement
-                    if (target.closest("[data-slot=resizable-handle]") || target.closest("[data-slot=resizable-panel]")) {
-                        e.preventDefault()
-                    }
-                }} w={"75%"} h={"75%"} style={{padding: "2px"}}>
+                <DialogContent aria-describedby="DFlowTypeBuilderDialog" w={"75%"} h={"75%"} style={{padding: "2px"}}>
                     <Layout layoutGap={0} showLayoutSplitter={false}
                             topContent={
-                                <Flex style={{gap: ".7rem"}} p={0.7} justify={"space-between"} align={"center"}>
-                                    <Text>{"Edit Type"}</Text>
-                                    <DialogClose asChild>
-                                        <Button variant={"filled"} color={"tertiary"} paddingSize={"xxs"}>
-                                            <IconX size={13}/>
-                                        </Button>
-                                    </DialogClose>
+                                <Flex style={{flexDirection: "column", gap: ".5rem"}} p={0.7}>
+                                    <Flex style={{gap: ".7rem"}} justify={"space-between"} align={"center"}>
+                                        {mode === "manual" ? (
+                                            <DataTypeTypeBuilderBreadcrumbComponent root={root}
+                                                                                    activePath={activePath}
+                                                                                    dataTypeOptions={dataTypeOptions}
+                                                                                    onActivePathChange={setActivePath}/>
+                                        ) : <div/>}
+                                        <Flex align={"center"} style={{gap: getSize("xs")}}>
+                                            <SegmentedControl type={"single"}
+                                                              color={"primary"}
+                                                              value={mode}
+                                                              onValueChange={handleModeChange}>
+                                                <SegmentedControlItem value={"manual"}>
+                                                    <Text>Manual</Text>
+                                                </SegmentedControlItem>
+                                                <SegmentedControlItem value={"json"}>
+                                                    <Text>JSON</Text>
+                                                </SegmentedControlItem>
+                                            </SegmentedControl>
+                                            <DialogClose asChild>
+                                                <Button variant={"none"} color={"tertiary"} style={{padding: getSize("xs")}}>
+                                                    <IconX size={13}/>
+                                                </Button>
+                                            </DialogClose>
+                                        </Flex>
+                                    </Flex>
+                                    {showErrors && errors.length > 0 && (
+                                        <Alert color={"error"}>
+                                            <Text size={"sm"}>
+                                                {[...new Set(errors.map(error => error.message))].join(" ")} Fix this before closing, or your changes will be lost.
+                                            </Text>
+                                        </Alert>
+                                    )}
                                 </Flex>
                             }>
-                        <ResizablePanelGroup style={{borderRadius: "1rem"}}>
-                            <ResizablePanel color="primary">
-                                <DataTypeJSONInputTreeComponent object={literalValue ?? {}}
-                                                                onEntryClick={() => {
-                                                                }}
-                                                                collapsedState={{}}
-                                                                setCollapsedState={() => {
-                                                                }}/>
-                            </ResizablePanel>
-                            <ResizableHandle/>
-                            <ResizablePanel color="primary">
-                                {editVariant === "manual" ? typeEditorInput : jsonInput}
-                                <SegmentedControl type={"single"}
-                                                  pos={"absolute"}
-                                                  bottom={"1rem"}
-                                                  left={"50%"}
-                                                  value={editVariant}
-                                                  onValueChange={v => v && setEditVariant(v as any)}
-                                                  style={{transform: "translateX(-50%)", zIndex: 99}}>
-                                    {/*<SegmentedControlItem value={"manual"}>
-                                        Schema
-                                    </SegmentedControlItem>*/}
-                                    <SegmentedControlItem value={"value"}>
-                                        From Value
-                                    </SegmentedControlItem>
-                                </SegmentedControl>
-                            </ResizablePanel>
-                        </ResizablePanelGroup>
+                        <div style={{background: "#070514", borderRadius: "1rem", height: "100%"}}>
+                            {mode === "manual" ? (
+                                <ScrollArea h="100%" w="100%" type="scroll">
+                                    <ScrollAreaViewport>
+                                        <div style={{maxWidth: "42rem", margin: "0 auto", padding: "3rem 1rem"}}>
+                                            <DataTypeTypeBuilderFormComponent root={root}
+                                                                              activePath={activePath}
+                                                                              dataTypeOptions={dataTypeOptions}
+                                                                              showErrors={showErrors}
+                                                                              onRootChange={setRoot}
+                                                                              onActivePathChange={setActivePath}/>
+                                        </div>
+                                    </ScrollAreaViewport>
+                                    <ScrollAreaScrollbar orientation="vertical">
+                                        <ScrollAreaThumb/>
+                                    </ScrollAreaScrollbar>
+                                </ScrollArea>
+                            ) : (
+                                <Editor language={"json"}
+                                        initialValue={json}
+                                        showTooltips={false}
+                                        basicSetup={{autocompletion: false}}
+                                        onChange={next => {
+                                            setActivePath([])
+                                            setRoot(inferTypeFromValue(next))
+                                        }}/>
+                            )}
+                        </div>
                     </Layout>
                 </DialogContent>
             </DialogPortal>

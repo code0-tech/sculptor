@@ -233,6 +233,7 @@ const mapNodeParameter = (parameter: NodeParameter, functionRuntimeId: string, p
         createdAt: TIMESTAMP,
         updatedAt: TIMESTAMP
     },
+    cast: parameter.cast ?? null,
     value: mapNodeValue(parameter.value, functionId)
 })
 
@@ -263,6 +264,7 @@ const mapFlowSetting = (setting: FlowSetting) => ({
     id: gid("FlowSetting", setting.databaseId ?? 0),
     flowSettingIdentifier: setting.flowSettingId,
     value: plainValue(setting.value),
+    cast: setting.cast ?? null,
     createdAt: TIMESTAMP,
     updatedAt: TIMESTAMP
 })

@@ -19,6 +19,7 @@ export interface DataTypeJSONInputTreeComponentProps {
     parentColor?: string
     rootDepth?: number
     references?: InlineReferenceValue[]
+    readonly?: boolean
 }
 
 const CLICK_DELAY = 250
@@ -37,6 +38,7 @@ export const DataTypeJSONInputTreeComponent: React.FC<DataTypeJSONInputTreeCompo
         parentColor,
         rootDepth = 1,
         references,
+        readonly = false,
     } = props
 
     const clickTimeout = React.useRef<NodeJS.Timeout | null>(null)
@@ -86,16 +88,17 @@ export const DataTypeJSONInputTreeComponent: React.FC<DataTypeJSONInputTreeCompo
         return (
             <li key={pathKey} className="json-tree__item">
                 <div
-                    onClick={e => {
+                    onClick={readonly ? undefined : e => {
                         e.stopPropagation()
                         handleClick({key, value: val as LiteralValue, path: currentPath})
                     }}
-                    onDoubleClick={e => {
+                    onDoubleClick={readonly ? undefined : e => {
                         e.stopPropagation()
                         handleDoubleClick(currentPath, isCollapsed)
                     }}
                 >
-                    <Flex align="center" style={{gap: ".35rem", textWrap: "nowrap"}} className="rule"
+                    <Flex align="center" style={{gap: ".35rem", textWrap: "nowrap"}}
+                          className={readonly ? "rule rule--static" : "rule"}
                           aria-selected={isActive || undefined}>
                         {isCollapsable && (isCollapsed ? <IconChevronUp size={13}/> : <IconChevronDown size={13}/>)}
                         <Badge border color={color} style={{verticalAlign: "middle"}}>
@@ -129,6 +132,7 @@ export const DataTypeJSONInputTreeComponent: React.FC<DataTypeJSONInputTreeCompo
                             parentColor={color}
                             rootDepth={rootDepth}
                             references={references}
+                            readonly={readonly}
                         />
                     )}
                 </div>
@@ -144,18 +148,18 @@ export const DataTypeJSONInputTreeComponent: React.FC<DataTypeJSONInputTreeCompo
     return (
         <ul className="json-tree">
             <div
-                onClick={e => {
+                onClick={readonly ? undefined : e => {
                     e.stopPropagation()
                     handleClick({key: "root", value: object, path: [...path]})
                 }}
-                onDoubleClick={e => {
+                onDoubleClick={readonly ? undefined : e => {
                     e.stopPropagation()
                     handleDoubleClick([...path], rootCollapsed)
                 }}
                 aria-selected={rootActive || undefined}
             >
                 <Flex align="center" style={{gap: ".35rem", textWrap: "nowrap"}} aria-selected={rootActive || undefined}
-                      className="rule">
+                      className={readonly ? "rule rule--static" : "rule"}>
                     {rootCollapsable && (rootCollapsed ? <IconChevronUp size={13}/> : <IconChevronDown size={13}/>)}
                     <Text hierarchy="tertiary">{Array.isArray(value) ? "is a list of" : "is a nested object"}</Text>
                 </Flex>

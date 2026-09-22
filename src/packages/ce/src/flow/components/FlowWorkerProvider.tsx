@@ -1,6 +1,7 @@
 import React from "react"
 import {DataType, Flow, FunctionDefinition, LiteralValue, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {SignatureSchema} from "@code0-tech/triangulum";
+import type {JsonSchema} from "@core/util/json-schema";
 
 interface Deferred {
     resolve: (value: any) => void
@@ -17,6 +18,7 @@ type FlowWorkerActions =
     | "value_extraction"
     | "type_variant"
     | "schema"
+    | "json_schema"
 
 interface FlowWorkerValidationPayload {
     flow: Flow
@@ -54,6 +56,11 @@ interface FlowWorkerValueExtractionPayload {
     dataTypes: DataType[]
 }
 
+interface FlowWorkerJsonSchemaPayload {
+    type: string
+    dataTypes: DataType[]
+}
+
 interface FlowWorkerTypeVariantPayload {
     type: string
     dataTypes: DataType[]
@@ -78,6 +85,7 @@ type FlowWorkerPayload =
     | FlowWorkerNodeSuggestionsPayload
     | FlowWorkerNodeTypeExtractionPayload
     | FlowWorkerValueExtractionPayload
+    | FlowWorkerJsonSchemaPayload
     | FlowWorkerTypeVariantPayload
 
 interface WorkerContextType {
@@ -195,6 +203,9 @@ export const useTypeExtractionAction = () =>
 
 export const useValueExtractionAction = () =>
     useWorkerAction<any[], FlowWorkerValueExtractionPayload>("value_extraction");
+
+export const useJsonSchemaAction = () =>
+    useWorkerAction<JsonSchema, FlowWorkerJsonSchemaPayload>("json_schema");
 
 export const useSchemaAction = () =>
     useWorkerAction<SignatureSchema, FlowWorkerSchemaPayload>("schema");

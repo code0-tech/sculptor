@@ -38,6 +38,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
     const functionStore = useStore(FunctionService)
     const validation = useFlowValidation(flowId)
     const changedParameter = React.useRef<Set<string>>(new Set())
+    const castByParameter = React.useRef<Map<string, string | null>>(new Map())
 
     const node = React.useMemo(
         () => flowService.getNodeById(flowId, nodeId)!,
@@ -88,7 +89,8 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
             if (typeof parameterIndex !== "number") return
 
             const value = values[parameterDefinition!.id!]
-            flowService.setParameterValue(flowId, node.id!!, parameterIndex, (value ?? undefined) as SubFlowValue | ReferenceValue | LiteralValue | undefined, definition);
+            const cast = castByParameter.current.has(parameterDefinition!.id!) ? castByParameter.current.get(parameterDefinition!.id!) : undefined
+            flowService.setParameterValue(flowId, node.id!!, parameterIndex, (value ?? undefined) as SubFlowValue | ReferenceValue | LiteralValue | undefined, definition, cast);
 
             changedParameter.current.delete(parameterDefinition?.id!)
         }
@@ -137,6 +139,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                 const description = parameterDefinition?.descriptions?.[0]?.content ?? FALLBACK_FUNCTION_PARAMETER_DESCRIPTION
 
                 const schema = (flowNode?.data?.schema as NodeSchema[])?.[index]
+                const cast = node.parameters?.nodes?.[index]?.cast ?? null
 
                 return <div key={parameterDefinition.id}>
                     <DataTypeInputComponent data-qa-selector={"flow-builder-parameter"}
@@ -147,7 +150,13 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                                             flowId={flowId}
                                             nodeId={node.id!}
                                             parameterIndex={index}
+                                            cast={cast}
                                             onChange={() => {
+                                                changedParameter.current.add(parameterDefinition.id!)
+                                                validate()
+                                            }}
+                                            onCastChange={cast => {
+                                                castByParameter.current.set(parameterDefinition.id!, cast)
                                                 changedParameter.current.add(parameterDefinition.id!)
                                                 validate()
                                             }}

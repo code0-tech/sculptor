@@ -26,10 +26,6 @@ import {
     MenuItem,
     MenuPortal,
     MenuTrigger,
-    ScrollArea,
-    ScrollAreaScrollbar,
-    ScrollAreaThumb,
-    ScrollAreaViewport,
     Spacing,
     Text,
     Tooltip,
@@ -67,41 +63,12 @@ export interface NodeGanttItem extends GanttItem {
     data?: {
         displayMessage: string
         color: string
+        duration: number
         payload?: Maybe<NodeFunction> | Maybe<FunctionDefinition> | Maybe<Flow>
         input?: ExecutionParameterResult[] | object
         success?: object
         error?: Maybe<ExecutionError>
     }
-}
-
-const ExecutionTooltipScrollArea: React.FC<React.PropsWithChildren> = ({children}) => {
-    const contentRef = React.useRef<HTMLDivElement>(null)
-    const [height, setHeight] = React.useState<number>()
-
-    React.useLayoutEffect(() => {
-        const el = contentRef.current
-        if (!el) return
-        const observer = new ResizeObserver((entries) => {
-            const entry = entries[0]
-            if (entry) setHeight(entry.contentRect.height)
-        })
-        observer.observe(el)
-        return () => observer.disconnect()
-    }, [])
-
-    return (
-        <ScrollArea h={height !== undefined ? `${height}px` : undefined}
-                    mah={"var(--radix-popper-available-height)"}>
-            <ScrollAreaViewport>
-                <div ref={contentRef}>
-                    {children}
-                </div>
-            </ScrollAreaViewport>
-            <ScrollAreaScrollbar orientation={"vertical"}>
-                <ScrollAreaThumb/>
-            </ScrollAreaScrollbar>
-        </ScrollArea>
-    )
 }
 
 export const FlowExecutionResultView: React.FC = () => {
@@ -117,6 +84,8 @@ export const FlowExecutionResultView: React.FC = () => {
     const projectStore = useStore(ProjectService)
 
     const [activeTab, setActiveTab] = React.useState<string>()
+    const [openGanttItemId, setOpenGanttItemId] = React.useState<string>()
+    const [hoveredGanttItemId, setHoveredGanttItemId] = React.useState<string>()
     const previousPendingRef = React.useRef<string[]>([])
 
     const namespaceIndex = params.namespaceId as any as number
@@ -187,67 +156,78 @@ export const FlowExecutionResultView: React.FC = () => {
 
     const ganttItems = React.useMemo<Map<ExecutionResult['id'], NodeGanttItem[]>>(
         () => {
-            return new Map<ExecutionResult["id"], NodeGanttItem[]>(flowExecutionResults.map(result => [result?.id, [
-                {
-                    id: result?.id as string,
-                    type: "trigger",
-                    start: 0,
-                    end: (result?.finishedAt ?? 0) - (result?.startedAt ?? 0),
-                    data: {
-                        displayMessage: flowTypes.find(fT => fT.id === flow?.type?.id)?.names?.[0].content ?? FALLBACK_FLOW_TYPE_NAME,
-                        color: hashToColor(result?.flow?.name ?? ""),
-                        payload: {
-                            ...flow,
-                            type: flowTypes.find(fT => fT.id === flow?.type?.id)
-                        },
-                        success: result?.success,
-                        input: result?.input,
-                        error: result?.error,
-                    }
-                },
-                ...(result?.nodeResults?.nodes?.map?.(nodeResult => {
+            return new Map<ExecutionResult["id"], NodeGanttItem[]>(flowExecutionResults.map((result): [ExecutionResult["id"], NodeGanttItem[]] => {
 
-                    if (nodeResult?.functionDefinition) {
-                        const funktion = functions.find(f => f.id === nodeResult?.functionDefinition?.id)
+                const duration = (result?.finishedAt ?? 0) - (result?.startedAt ?? 0)
+
+                return [result?.id, [
+                    {
+                        id: result?.id as string,
+                        type: "trigger",
+                        start: 0,
+                        end: Math.max(duration, 1),
+                        data: {
+                            displayMessage: flowTypes.find(fT => fT.id === flow?.type?.id)?.names?.[0].content ?? FALLBACK_FLOW_TYPE_NAME,
+                            color: hashToColor(result?.flow?.name ?? ""),
+                            duration: duration,
+                            payload: {
+                                ...flow,
+                                type: flowTypes.find(fT => fT.id === flow?.type?.id)
+                            },
+                            success: result?.success,
+                            input: result?.input,
+                            error: result?.error,
+                        }
+                    },
+                    ...(result?.nodeResults?.nodes?.map?.(nodeResult => {
+
+                        const nodeStart = (nodeResult?.startedAt ?? 0) - (result?.startedAt ?? 0)
+                        const nodeDuration = (nodeResult?.finishedAt ?? 0) - (nodeResult?.startedAt ?? 0)
+
+                        if (nodeResult?.functionDefinition) {
+                            const funktion = functions.find(f => f.id === nodeResult?.functionDefinition?.id)
+
+                            return {
+                                id: nodeResult?.id as string,
+                                type: "function",
+                                start: nodeStart,
+                                end: nodeStart + Math.max(nodeDuration, 1),
+                                data: {
+                                    displayMessage: funktion?.names?.[0].content ?? FALLBACK_FUNCTION_NAME,
+                                    color: hashToColor(funktion?.identifier ?? ""),
+                                    duration: nodeDuration,
+                                    payload: funktion,
+                                    success: nodeResult?.success,
+                                    input: nodeResult?.parameterResults ?? [],
+                                    error: nodeResult?.error,
+                                }
+                            }
+                        }
+
+                        const node = flow?.nodes?.nodes?.find(n => n?.id === nodeResult?.nodeFunction?.id)
+                        const funktion = functions.find(f => f.id === nodeResult?.nodeFunction?.functionDefinition?.id)
 
                         return {
                             id: nodeResult?.id as string,
-                            type: "function",
-                            start: (nodeResult?.startedAt ?? 0) - (result?.startedAt ?? 0),
-                            end: (nodeResult?.finishedAt ?? 0) - (result?.startedAt ?? 0),
+                            type: "node",
+                            start: nodeStart,
+                            end: nodeStart + Math.max(nodeDuration, 1),
                             data: {
                                 displayMessage: funktion?.names?.[0].content ?? FALLBACK_FUNCTION_NAME,
-                                color: hashToColor(funktion?.identifier ?? ""),
-                                payload: funktion,
+                                color: hashToColor(nodeResult?.nodeFunction?.id ?? ""),
+                                duration: nodeDuration,
+                                payload: {
+                                    ...node,
+                                    functionDefinition: funktion
+                                },
                                 success: nodeResult?.success,
                                 input: nodeResult?.parameterResults ?? [],
                                 error: nodeResult?.error,
                             }
                         }
-                    }
-
-                    const node = flow?.nodes?.nodes?.find(n => n?.id === nodeResult?.nodeFunction?.id)
-                    const funktion = functions.find(f => f.id === nodeResult?.nodeFunction?.functionDefinition?.id)
-
-                    return {
-                        id: nodeResult?.id as string,
-                        type: "node",
-                        start: (nodeResult?.startedAt ?? 0) - (result?.startedAt ?? 0),
-                        end: (nodeResult?.finishedAt ?? 0) - (result?.startedAt ?? 0),
-                        data: {
-                            displayMessage: funktion?.names?.[0].content ?? FALLBACK_FUNCTION_NAME,
-                            color: hashToColor(nodeResult?.nodeFunction?.id ?? ""),
-                            payload: {
-                                ...node,
-                                functionDefinition: funktion
-                            },
-                            success: nodeResult?.success,
-                            input: nodeResult?.parameterResults ?? [],
-                            error: nodeResult?.error,
-                        }
-                    }
-                }) ?? [])
-            ]]))
+                    }) ?? [])
+                ]]
+            }))
         },
         [flowExecutionResults, flowTypes, flow, functions]
     )
@@ -382,56 +362,32 @@ export const FlowExecutionResultView: React.FC = () => {
                                                 item.type === "node" ? item?.data?.payload?.functionDefinition?.displayIcon : item.type === "function" ? item?.data?.payload?.displayIcon : item?.data?.payload?.type?.displayIcon,
                                             )
 
-                                            return <Tooltip key={item.id} delayDuration={0}>
-                                                <TooltipTrigger asChild>
-                                                    <Flex align={"center"} justify={"start"} w={"100%"} h={"100%"}
-                                                          style={{cursor: "pointer"}}>
-                                                        <Card color={item.data.error ? "error" : "primary"}
-                                                              className={`d-flow-node`}
-                                                              paddingSize={"xs"}
-                                                              py={"0.35"}
-                                                              w={"100%"}>
-                                                            <Flex align={"center"} w={"100%"} pos={"relative"}
-                                                                  justify={"space-between"}
-                                                                  style={{
-                                                                      gap: "0.35rem",
-                                                                      textWrap: "nowrap",
-                                                                      overflow: "hidden"
-                                                                  }}>
-                                                                <Flex align={"center"} maw={"75%"} pos={"relative"}
-                                                                      justify={"start"}
-                                                                      style={{gap: "0.7rem"}}>
-                                                                    <DisplayIcon size={16}
-                                                                                 style={{
-                                                                                     minWidth: "16px",
-                                                                                     minHeight: "16px",
-                                                                                 }}
-                                                                                 color={hashToColor(item?.data?.payload?.id ?? "")}/>
-                                                                    <Text size={"md"}
+                                            return <Menu key={item.id}
+                                                        modal={false}
+                                                        open={openGanttItemId === item.id}
+                                                        onOpenChange={(open) => setOpenGanttItemId(open ? item.id : undefined)}>
+                                                <Tooltip delayDuration={0}
+                                                         open={hoveredGanttItemId === item.id && openGanttItemId !== item.id}
+                                                         onOpenChange={(open) => setHoveredGanttItemId(open ? item.id : undefined)}>
+                                                    <TooltipTrigger asChild>
+                                                        <MenuTrigger asChild>
+                                                            <Flex align={"center"} justify={"start"} w={"100%"} h={"100%"}
+                                                                  style={{cursor: "pointer"}}>
+                                                                <Card color={item.data.error ? "error" : "primary"}
+                                                                      className={`d-flow-node`}
+                                                                      paddingSize={"xs"}
+                                                                      py={"0.35"}
+                                                                      w={"100%"}>
+                                                                    <Flex align={"center"} w={"100%"} pos={"relative"}
+                                                                          justify={"space-between"}
                                                                           style={{
-                                                                              overflow: "hidden",
-                                                                              position: "relative"
+                                                                              gap: "0.35rem",
+                                                                              textWrap: "nowrap",
+                                                                              overflow: "hidden"
                                                                           }}>
-                                                                        {item.data.displayMessage}
-                                                                    </Text>
-                                                                </Flex>
-                                                                <Text size={"xs"} hierarchy={"tertiary"}>
-                                                                    {getRelativeValue(item.end - item.start)}
-                                                                </Text>
-                                                            </Flex>
-                                                        </Card>
-                                                    </Flex>
-                                                </TooltipTrigger>
-                                                <TooltipPortal>
-                                                    <TooltipContent sideOffset={8} align={"start"}
-                                                                    maw={"300px"}
-                                                                    mah={"var(--radix-popper-available-height)"}>
-                                                        <ExecutionTooltipScrollArea>
-                                                                <div>
-
-                                                                    <Flex align={"center"} justify={"space-between"}
-                                                                          style={{gap: "0.7rem"}}>
-                                                                        <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                                                        <Flex align={"center"} maw={"75%"} pos={"relative"}
+                                                                              justify={"start"}
+                                                                              style={{gap: "0.7rem"}}>
                                                                             <DisplayIcon size={16}
                                                                                          style={{
                                                                                              minWidth: "16px",
@@ -443,60 +399,95 @@ export const FlowExecutionResultView: React.FC = () => {
                                                                                       overflow: "hidden",
                                                                                       position: "relative"
                                                                                   }}>
-                                                                                {item?.data?.displayMessage}
+                                                                                {item.data.displayMessage}
                                                                             </Text>
                                                                         </Flex>
-                                                                        <Text size={"sm"} hierarchy={"tertiary"}>
-                                                                            {getRelativeValue(item.end - item.start)}
+                                                                        <Text size={"xs"} hierarchy={"tertiary"}>
+                                                                            {getRelativeValue(item.data?.duration ?? item.end - item.start)}
                                                                         </Text>
                                                                     </Flex>
-                                                                    <Spacing spacing={"xs"}/>
+                                                                </Card>
+                                                            </Flex>
+                                                        </MenuTrigger>
+                                                    </TooltipTrigger>
+                                                    <TooltipPortal>
+                                                        <TooltipContent side={"right"} align={"center"} sideOffset={8}>
+                                                            <Text size={"sm"}>
+                                                                Click to open
+                                                            </Text>
+                                                        </TooltipContent>
+                                                    </TooltipPortal>
+                                                </Tooltip>
+                                                <MenuPortal>
+                                                    <MenuContent sideOffset={0} align={"start"}
+                                                                 maw={"300px"}
+                                                                 mah={"var(--radix-popper-available-height)"}>
+                                                        <Flex align={"center"} justify={"space-between"}
+                                                              style={{gap: "0.7rem"}}>
+                                                            <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                                                <DisplayIcon size={16}
+                                                                             style={{
+                                                                                 minWidth: "16px",
+                                                                                 minHeight: "16px",
+                                                                             }}
+                                                                             color={hashToColor(item?.data?.payload?.id ?? "")}/>
+                                                                <Text size={"md"}
+                                                                      style={{
+                                                                          overflow: "hidden",
+                                                                          position: "relative"
+                                                                      }}>
+                                                                    {item?.data?.displayMessage}
+                                                                </Text>
+                                                            </Flex>
+                                                            <Text size={"sm"} hierarchy={"tertiary"}>
+                                                                {getRelativeValue(item.data?.duration ?? item.end - item.start)}
+                                                            </Text>
+                                                        </Flex>
+                                                        <Spacing spacing={"xs"}/>
 
-                                                                    <>
-                                                                        <Text size={"md"}>
-                                                                            {item.type === "node" || item.type === "function" ? "Parameters" : "Input"}
-                                                                        </Text>
-                                                                        {item.type === "node" || item.type === "function" ? item.data.input?.map((input: ExecutionParameterResult, index: number) => {
+                                                        <>
+                                                            <Text size={"md"}>
+                                                                {item.type === "node" || item.type === "function" ? "Parameters" : "Input"}
+                                                            </Text>
+                                                            {item.type === "node" || item.type === "function" ? item.data.input?.map((input: ExecutionParameterResult, index: number) => {
 
-                                                                            //TODO: for item.type === function this is wrong
-                                                                            const parameter: ParameterDefinition = item?.data?.payload?.functionDefinition?.parameterDefinitions?.nodes?.[index]
+                                                                //TODO: for item.type === function this is wrong
+                                                                const parameter: ParameterDefinition = item?.data?.payload?.functionDefinition?.parameterDefinitions?.nodes?.[index]
 
-                                                                            return <div key={input.id}>
-                                                                                <Text size={"sm"}
-                                                                                      hierarchy={"tertiary"}>
-                                                                                    {parameter?.names?.[0]?.content}
-                                                                                </Text>
-                                                                                <JsonView collapsed  value={input.value ?? {}}/>
-                                                                            </div>
-
-                                                                        }) : item.type === "trigger" ? (
-                                                                            <JsonView collapsed  value={item.data.input ?? {}}/>
-                                                                        ) : null}
-                                                                    </>
-
-                                                                    <Spacing spacing={"xs"}/>
-                                                                    {
-                                                                        item.data.error ? (
-                                                                            <>
-                                                                                <Text size={"md"}>
-                                                                                    Error
-                                                                                </Text>
-                                                                                <JsonView collapsed  value={item.data.error ?? {}}/>
-                                                                            </>
-                                                                            ) : (
-                                                                            <div>
-                                                                                <Text size={"md"}>
-                                                                                    Result
-                                                                                </Text>
-                                                                                <JsonView collapsed  value={item.data.success ?? {}}/>
-                                                                            </div>
-                                                                        )
-                                                                    }
+                                                                return <div key={input.id}>
+                                                                    <Text size={"sm"}
+                                                                          hierarchy={"tertiary"}>
+                                                                        {parameter?.names?.[0]?.content}
+                                                                    </Text>
+                                                                    <JsonView collapsed  value={input.value ?? {}}/>
                                                                 </div>
-                                                        </ExecutionTooltipScrollArea>
-                                                    </TooltipContent>
-                                                </TooltipPortal>
-                                            </Tooltip>
+
+                                                            }) : item.type === "trigger" ? (
+                                                                <JsonView collapsed  value={item.data.input ?? {}}/>
+                                                            ) : null}
+                                                        </>
+
+                                                        <Spacing spacing={"xs"}/>
+                                                        {
+                                                            item.data.error ? (
+                                                                <>
+                                                                    <Text size={"md"}>
+                                                                        Error
+                                                                    </Text>
+                                                                    <JsonView collapsed  value={item.data.error ?? {}}/>
+                                                                </>
+                                                                ) : (
+                                                                <div>
+                                                                    <Text size={"md"}>
+                                                                        Result
+                                                                    </Text>
+                                                                    <JsonView collapsed  value={item.data.success ?? {}}/>
+                                                                </div>
+                                                            )
+                                                        }
+                                                    </MenuContent>
+                                                </MenuPortal>
+                                            </Menu>
                                         }
                                     }}
                                 </Gantt>

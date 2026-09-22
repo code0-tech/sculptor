@@ -1,113 +1,105 @@
-import React, {useMemo} from "react"
-import {IconEdit, IconX} from "@tabler/icons-react"
+import React from "react"
 import "../type/DataTypeTypeInputComponent.style.scss"
-import {Flow, LiteralValue} from "@code0-tech/sagittarius-graphql-types";
-import {
-    Button,
-    Card,
-    Flex,
-    InputDescription,
-    InputLabel,
-    InputMessage,
-    InputProps,
-    Text,
-    useService,
-    useStore
-} from "@code0-tech/pictor";
-import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
+import {LiteralValue} from "@code0-tech/sagittarius-graphql-types";
+import {InputDescription, InputLabel, Spacing, useService, useStore} from "@code0-tech/pictor";
 import {
     DataTypeTypeInputEditDialogComponent
 } from "@edition/datatype/components/inputs/datatype/DataTypeTypeInputEditDialogComponent";
-import {DataTypeJSONInputTreeComponent} from "@edition/datatype/components/inputs/json/DataTypeJSONInputTreeComponent";
-import {useValueExtractionAction} from "@edition/flow/components/FlowWorkerProvider";
+import {DataTypeInputValueComponent} from "@edition/datatype/components/inputs/DataTypeInputValueComponent";
+import {useJsonSchemaAction} from "@edition/flow/components/FlowWorkerProvider";
 import {DatatypeService} from "@edition/datatype/services/Datatype.service";
+import {DataTypeInputComponentProps} from "@edition/datatype/components/inputs/DataTypeInputComponent";
+import {parseTypeToNode} from "@edition/datatype/components/inputs/datatype/DataTypeType.node.util";
+import {
+    DataTypeTypeInputTreeComponent
+} from "@edition/datatype/components/inputs/datatype/DataTypeTypeInputTreeComponent";
 
-
-export interface DataTypeJSONInputComponentProps extends Omit<InputProps<any | null>, "wrapperComponent" | "type"> {
-    flowId: Flow['id']
-    clearable?: boolean
-    onClear?: (event: React.MouseEvent<HTMLButtonElement>) => void
+export interface DataTypeTypeInputComponentProps extends DataTypeInputComponentProps {
 }
 
-export const DataTypeTypeInputComponent: React.FC<DataTypeJSONInputComponentProps> = (props) => {
+export const DataTypeTypeInputComponent: React.FC<DataTypeTypeInputComponentProps> = (props) => {
 
-
-    const {initialValue, title, description, formValidation, onChange} = props
+    const {title, description, formValidation, suggestions, initialValue, cast, onChange, onCastChange} = props
 
     const dataTypeService = useService(DatatypeService)
     const dataTypeStore = useStore(DatatypeService)
-    const valueFromTypeAction = useValueExtractionAction()
+    const jsonSchemaAction = useJsonSchemaAction()
 
-    const [type, setType] = React.useState<string | null>(initialValue)
-    const [literalValue, setLiteralValue] = React.useState<LiteralValue>()
+    const [type, setType] = React.useState<string | null>(cast ?? null)
     const [editDialogOpen, setEditDialogOpen] = React.useState(false)
+    const emittedCast = React.useRef<string | null>(cast ?? null)
 
-    const dataTypes = useMemo(
+    const dataTypes = React.useMemo(
         () => dataTypeService.values(),
         [dataTypeStore]
     )
 
-    const handleClear = React.useCallback(
-        () => setType(""),
-        []
+    const dataTypeOptions = React.useMemo(
+        () => dataTypes.map(dataType => ({
+            identifier: dataType.identifier!,
+            generics: dataType.genericKeys?.length ?? 0,
+            label: dataType.name?.[0]?.content || dataType.identifier!,
+            displayMessage: dataType.displayMessages?.[0]?.content ?? undefined,
+            genericKeys: dataType.genericKeys ?? []
+        })),
+        [dataTypes]
     )
 
+    const root = React.useMemo(() => parseTypeToNode(type), [type])
+
     React.useEffect(() => {
-        formValidation?.setValue?.(type)
-        const timeout = setTimeout(() => {
-            // @ts-ignore
-            onChange?.()
-        }, 200)
-
-        if (type) {
-            valueFromTypeAction.execute({
-                type: type,
-                dataTypes: dataTypes
-            }).then(val => {
-                setLiteralValue(val as LiteralValue)
-            })
+        if ((cast ?? null) !== emittedCast.current) {
+            emittedCast.current = cast ?? null
+            setType(cast ?? null)
         }
+    }, [cast])
 
-        return () => clearTimeout(timeout);
+    const handleClear = React.useCallback(() => {
+        emittedCast.current = null
+        setType(null)
+        formValidation?.setValue?.(null)
+        onChange?.(null)
+        onCastChange?.(null)
+    }, [])
 
-    }, [type])
+    const handleTypeChange = React.useCallback(async (next: string | null) => {
+        setType(next)
+        if (!next) return handleClear()
+
+        emittedCast.current = next
+        onCastChange?.(next)
+        const schema = await jsonSchemaAction.execute({type: next, dataTypes})
+        if (emittedCast.current !== next) return
+
+        const literal = {__typename: "LiteralValue", value: schema ?? {}} as LiteralValue
+        formValidation?.setValue?.(literal)
+        onChange?.(literal)
+    }, [dataTypes])
 
     return (
         <>
             <DataTypeTypeInputEditDialogComponent
                 key={`edit-dialog-${editDialogOpen}`}
                 open={editDialogOpen}
-                value={initialValue}
+                value={type}
                 onOpenChange={open => setEditDialogOpen(open)}
-                onTypeChange={v => setType(v ?? null)}
+                onTypeClose={v => handleTypeChange(v ?? null)}
             />
-            <div>
-                {title && <InputLabel>{title}</InputLabel>}
-                {description && <InputDescription>{description}</InputDescription>}
-            </div>
-            <Card color="secondary" paddingSize="xs">
-                <Flex style={{gap: ".7rem"}} align="center" justify="space-between">
-                    <Flex style={{gap: ".35rem"}} align="center">
-                        <Text>{"Object"}</Text>
-                    </Flex>
-                    <ButtonGroup color={"primary"}>
-                        <Button paddingSize="xxs" variant="filled" color="secondary"
-                                onClick={() => setEditDialogOpen(true)}>
-                            <IconEdit size={13}/>
-                        </Button>
-                        <Button paddingSize="xxs" variant="filled" color="secondary"
-                                onClick={handleClear}>
-                            <IconX size={13}/>
-                        </Button>
-                    </ButtonGroup>
-                </Flex>
-                <Card paddingSize="xs" mt={0.7} mb={-0.55} mx={-0.55}>
-                    <DataTypeJSONInputTreeComponent object={literalValue ?? {}}/>
-                </Card>
-            </Card>
-            {!formValidation?.valid && formValidation?.notValidMessage && (
-                <InputMessage>{formValidation.notValidMessage}</InputMessage>
-            )}
+            {title && <InputLabel>{title}</InputLabel>}
+            {description && <InputDescription>{description}</InputDescription>}
+            <DataTypeInputValueComponent inside
+                                         initialValue={initialValue}
+                                         onChange={(value) => {
+                                             if (!value) return handleClear()
+                                             formValidation?.setValue?.(value)
+                                             onChange?.(value)
+                                         }}
+                                         onClick={() => setEditDialogOpen(true)}
+                                         suggestions={suggestions}
+                                         formValidation={formValidation}>
+                <DataTypeTypeInputTreeComponent node={root} dataTypeOptions={dataTypeOptions}/>
+                <Spacing spacing={"xxs"}/>
+            </DataTypeInputValueComponent>
         </>
     )
 }
