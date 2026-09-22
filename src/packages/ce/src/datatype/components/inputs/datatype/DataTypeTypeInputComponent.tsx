@@ -83,7 +83,7 @@ export const DataTypeTypeInputComponent: React.FC<DataTypeTypeInputComponentProp
                 open={editDialogOpen}
                 value={type}
                 onOpenChange={open => setEditDialogOpen(open)}
-                onTypeChange={v => handleTypeChange(v ?? null)}
+                onTypeClose={v => handleTypeChange(v ?? null)}
             />
             {title && <InputLabel>{title}</InputLabel>}
             {description && <InputDescription>{description}</InputDescription>}

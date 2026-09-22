@@ -45,12 +45,12 @@ export interface DataTypeTypeInputEditDialogComponentProps {
     open: boolean
     value: string | null
     onOpenChange?: (open: boolean) => void
-    onTypeChange?: (type: string | null) => void
+    onTypeClose?: (type: string | null) => void
 }
 
 export const DataTypeTypeInputEditDialogComponent: React.FC<DataTypeTypeInputEditDialogComponentProps> = (props) => {
 
-    const {open, value, onOpenChange, onTypeChange} = props
+    const {open, value, onOpenChange, onTypeClose} = props
 
     const dataTypeService = useService(DatatypeService)
     const dataTypeStore = useStore(DatatypeService)
@@ -105,11 +105,6 @@ export const DataTypeTypeInputEditDialogComponent: React.FC<DataTypeTypeInputEdi
         if (activePath.length > 0 && !getNodeAtPath(root, activePath)) setActivePath([])
     }, [root, activePath])
 
-    const handleRootChange = (next: TypeNode) => {
-        setRoot(next)
-        onTypeChange?.(serializeType(next) || null)
-    }
-
     const handleModeChange = (next: string) => {
         if (!next) return
         if (next !== "json") return setMode(next)
@@ -132,6 +127,7 @@ export const DataTypeTypeInputEditDialogComponent: React.FC<DataTypeTypeInputEdi
             return
         }
         onOpenChange?.(next)
+        if (!next) onTypeClose?.(serializeType(root) || null)
     }
 
     return (
@@ -186,7 +182,7 @@ export const DataTypeTypeInputEditDialogComponent: React.FC<DataTypeTypeInputEdi
                                                                               activePath={activePath}
                                                                               dataTypeOptions={dataTypeOptions}
                                                                               showErrors={showErrors}
-                                                                              onRootChange={handleRootChange}
+                                                                              onRootChange={setRoot}
                                                                               onActivePathChange={setActivePath}/>
                                         </div>
                                     </ScrollAreaViewport>
@@ -201,7 +197,7 @@ export const DataTypeTypeInputEditDialogComponent: React.FC<DataTypeTypeInputEdi
                                         basicSetup={{autocompletion: false}}
                                         onChange={next => {
                                             setActivePath([])
-                                            handleRootChange(inferTypeFromValue(next))
+                                            setRoot(inferTypeFromValue(next))
                                         }}/>
                             )}
                         </div>
