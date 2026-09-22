@@ -26,10 +26,6 @@ import {
     MenuItem,
     MenuPortal,
     MenuTrigger,
-    ScrollArea,
-    ScrollAreaScrollbar,
-    ScrollAreaThumb,
-    ScrollAreaViewport,
     Spacing,
     Text,
     Tooltip,
@@ -73,36 +69,6 @@ export interface NodeGanttItem extends GanttItem {
         success?: object
         error?: Maybe<ExecutionError>
     }
-}
-
-const ExecutionTooltipScrollArea: React.FC<React.PropsWithChildren> = ({children}) => {
-    const contentRef = React.useRef<HTMLDivElement>(null)
-    const [height, setHeight] = React.useState<number>()
-
-    React.useLayoutEffect(() => {
-        const el = contentRef.current
-        if (!el) return
-        const observer = new ResizeObserver((entries) => {
-            const entry = entries[0]
-            if (entry) setHeight(entry.contentRect.height)
-        })
-        observer.observe(el)
-        return () => observer.disconnect()
-    }, [])
-
-    return (
-        <ScrollArea h={height !== undefined ? `${height}px` : undefined}
-                    mah={"var(--radix-popper-available-height)"}>
-            <ScrollAreaViewport>
-                <div ref={contentRef}>
-                    {children}
-                </div>
-            </ScrollAreaViewport>
-            <ScrollAreaScrollbar orientation={"vertical"}>
-                <ScrollAreaThumb/>
-            </ScrollAreaScrollbar>
-        </ScrollArea>
-    )
 }
 
 export const FlowExecutionResultView: React.FC = () => {
@@ -453,77 +419,72 @@ export const FlowExecutionResultView: React.FC = () => {
                                                     </TooltipPortal>
                                                 </Tooltip>
                                                 <MenuPortal>
-                                                    <MenuContent sideOffset={8} align={"start"}
+                                                    <MenuContent sideOffset={0} align={"start"}
                                                                  maw={"300px"}
                                                                  mah={"var(--radix-popper-available-height)"}>
-                                                            <ExecutionTooltipScrollArea>
-                                                                    <div>
+                                                        <Flex align={"center"} justify={"space-between"}
+                                                              style={{gap: "0.7rem"}}>
+                                                            <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                                                <DisplayIcon size={16}
+                                                                             style={{
+                                                                                 minWidth: "16px",
+                                                                                 minHeight: "16px",
+                                                                             }}
+                                                                             color={hashToColor(item?.data?.payload?.id ?? "")}/>
+                                                                <Text size={"md"}
+                                                                      style={{
+                                                                          overflow: "hidden",
+                                                                          position: "relative"
+                                                                      }}>
+                                                                    {item?.data?.displayMessage}
+                                                                </Text>
+                                                            </Flex>
+                                                            <Text size={"sm"} hierarchy={"tertiary"}>
+                                                                {getRelativeValue(item.data?.duration ?? item.end - item.start)}
+                                                            </Text>
+                                                        </Flex>
+                                                        <Spacing spacing={"xs"}/>
 
-                                                                        <Flex align={"center"} justify={"space-between"}
-                                                                              style={{gap: "0.7rem"}}>
-                                                                            <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                                                                <DisplayIcon size={16}
-                                                                                             style={{
-                                                                                                 minWidth: "16px",
-                                                                                                 minHeight: "16px",
-                                                                                             }}
-                                                                                             color={hashToColor(item?.data?.payload?.id ?? "")}/>
-                                                                                <Text size={"md"}
-                                                                                      style={{
-                                                                                          overflow: "hidden",
-                                                                                          position: "relative"
-                                                                                      }}>
-                                                                                    {item?.data?.displayMessage}
-                                                                                </Text>
-                                                                            </Flex>
-                                                                            <Text size={"sm"} hierarchy={"tertiary"}>
-                                                                                {getRelativeValue(item.data?.duration ?? item.end - item.start)}
-                                                                            </Text>
-                                                                        </Flex>
-                                                                        <Spacing spacing={"xs"}/>
+                                                        <>
+                                                            <Text size={"md"}>
+                                                                {item.type === "node" || item.type === "function" ? "Parameters" : "Input"}
+                                                            </Text>
+                                                            {item.type === "node" || item.type === "function" ? item.data.input?.map((input: ExecutionParameterResult, index: number) => {
 
-                                                                        <>
-                                                                            <Text size={"md"}>
-                                                                                {item.type === "node" || item.type === "function" ? "Parameters" : "Input"}
-                                                                            </Text>
-                                                                            {item.type === "node" || item.type === "function" ? item.data.input?.map((input: ExecutionParameterResult, index: number) => {
+                                                                //TODO: for item.type === function this is wrong
+                                                                const parameter: ParameterDefinition = item?.data?.payload?.functionDefinition?.parameterDefinitions?.nodes?.[index]
 
-                                                                                //TODO: for item.type === function this is wrong
-                                                                                const parameter: ParameterDefinition = item?.data?.payload?.functionDefinition?.parameterDefinitions?.nodes?.[index]
+                                                                return <div key={input.id}>
+                                                                    <Text size={"sm"}
+                                                                          hierarchy={"tertiary"}>
+                                                                        {parameter?.names?.[0]?.content}
+                                                                    </Text>
+                                                                    <JsonView collapsed  value={input.value ?? {}}/>
+                                                                </div>
 
-                                                                                return <div key={input.id}>
-                                                                                    <Text size={"sm"}
-                                                                                          hierarchy={"tertiary"}>
-                                                                                        {parameter?.names?.[0]?.content}
-                                                                                    </Text>
-                                                                                    <JsonView collapsed  value={input.value ?? {}}/>
-                                                                                </div>
+                                                            }) : item.type === "trigger" ? (
+                                                                <JsonView collapsed  value={item.data.input ?? {}}/>
+                                                            ) : null}
+                                                        </>
 
-                                                                            }) : item.type === "trigger" ? (
-                                                                                <JsonView collapsed  value={item.data.input ?? {}}/>
-                                                                            ) : null}
-                                                                        </>
-
-                                                                        <Spacing spacing={"xs"}/>
-                                                                        {
-                                                                            item.data.error ? (
-                                                                                <>
-                                                                                    <Text size={"md"}>
-                                                                                        Error
-                                                                                    </Text>
-                                                                                    <JsonView collapsed  value={item.data.error ?? {}}/>
-                                                                                </>
-                                                                                ) : (
-                                                                                <div>
-                                                                                    <Text size={"md"}>
-                                                                                        Result
-                                                                                    </Text>
-                                                                                    <JsonView collapsed  value={item.data.success ?? {}}/>
-                                                                                </div>
-                                                                            )
-                                                                        }
-                                                                    </div>
-                                                            </ExecutionTooltipScrollArea>
+                                                        <Spacing spacing={"xs"}/>
+                                                        {
+                                                            item.data.error ? (
+                                                                <>
+                                                                    <Text size={"md"}>
+                                                                        Error
+                                                                    </Text>
+                                                                    <JsonView collapsed  value={item.data.error ?? {}}/>
+                                                                </>
+                                                                ) : (
+                                                                <div>
+                                                                    <Text size={"md"}>
+                                                                        Result
+                                                                    </Text>
+                                                                    <JsonView collapsed  value={item.data.success ?? {}}/>
+                                                                </div>
+                                                            )
+                                                        }
                                                     </MenuContent>
                                                 </MenuPortal>
                                             </Menu>
