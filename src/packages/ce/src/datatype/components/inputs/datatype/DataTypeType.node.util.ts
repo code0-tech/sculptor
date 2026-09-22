@@ -262,3 +262,45 @@ export const collectTypeErrors = (root: TypeNode): TypeError[] => {
     walk(root, [])
     return errors
 }
+
+export const hasStructure = (node: TypeNode): boolean =>
+    node.kind === "object"
+        ? true
+        : node.kind === "union" || node.kind === "intersection"
+            ? (node.members ?? []).some(hasStructure)
+            : (node.args ?? []).some(hasStructure)
+
+export const describeType = (node: TypeNode, options: DataTypeOption[]): string => {
+    if (node.kind === "object") {
+        const count = (node.fields ?? []).length
+        return count === 0 ? "empty form" : `form with ${count} ${count === 1 ? "field" : "fields"}`
+    }
+    if (node.kind === "union" || node.kind === "intersection") {
+        const parts = (node.members ?? []).map(member => describeType(member, options)).filter(part => part.length > 0)
+        if (parts.length === 0) return node.kind === "union" ? "one of a few choices" : "a combination"
+        return parts.join(node.kind === "union" ? " or " : " and ")
+    }
+    if (node.kind === "literal") return (node.identifier ?? "").trim() ? `exactly “${node.identifier}”` : "an exact value"
+    if (!(node.identifier ?? "").trim()) return "not chosen yet"
+
+    const option = options.find(candidate => candidate.identifier === node.identifier)
+    const label = option?.label ?? node.identifier!
+    const args = (node.args ?? []).map(arg => describeType(arg, options))
+
+    if (option?.displayMessage) {
+        let unresolved = false
+        const filled = option.displayMessage.replace(/\$\{([^}]+)}/g, (_, variable: string) => {
+            const index = option.genericKeys.findIndex(key => key.split(/\s+extends\s+/)[0].trim() === variable.trim())
+            if (index < 0) {
+                unresolved = true
+                return ""
+            }
+            return args[index] ?? "…"
+        })
+        if (!unresolved) {
+            const message = filled.replace(/^(a|an|the)\s+/i, "").trim()
+            return message.charAt(0).toUpperCase() + message.slice(1)
+        }
+    }
+    return args.length > 0 ? `${label} of ${args.join(" and ")}` : label
+}
