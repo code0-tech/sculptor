@@ -8,7 +8,7 @@ export function middleware(request: NextRequest) {
     const callbackUrl = searchParams.get('callbackUrl')
     const selectNamespace = searchParams.get('selectNamespace')
     const cancelUrl = searchParams.get('cancelUrl')
-    const authPaths = ["/email", "/login", "/password", "/redirect", "/register", "/callback"]
+    const authPaths = ["/email", "/login", "/password", "/redirect", "/register", "/callback", "/complete-profile"]
     const isAuthPath = authPaths.some(path => pathname.startsWith(path))
     const isRedirectPath = pathname.startsWith("/redirect")
 
