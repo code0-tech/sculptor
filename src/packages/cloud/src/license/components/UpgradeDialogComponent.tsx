@@ -11,22 +11,25 @@ import {
     Flex,
     Row,
     Spacing,
-    Text
+    Text,
+    useService,
+    useStore
 } from "@code0-tech/pictor";
 import {IconAdjustmentsHorizontal, IconArrowRight, IconBolt, IconHeadset, IconSparkles} from "@tabler/icons-react";
 import BorderBeam from "border-beam";
+import {useSearchParams} from "next/navigation";
+import {Namespace} from "@code0-tech/sagittarius-graphql-types";
+import {NamespaceService} from "@cloud-internal/namespace/services/Namespace.service";
+import {OrganizationService} from "@edition/organization/services/Organization.service";
+import {UserService} from "@edition/user/services/User.service";
+import {getNamespaceName} from "@edition/namespace/util/Namespace.name.util";
 import {UpgradeButtonComponent} from "@cloud-internal/license/components/UpgradeButtonComponent";
-
-export interface UpgradeDialogComponentProps {
-    open?: boolean
-    onOpenChange?: (open: boolean) => void
-}
 
 const benefits = [
     {
         icon: IconBolt,
         title: "Up to 10k executions",
-        text: "Run your flows without hitting the free-tier cap.",
+        text: "Run your flows without hitting the execution cap of this workspace.",
     },
     {
         icon: IconSparkles,
@@ -45,9 +48,33 @@ const benefits = [
     },
 ]
 
+export interface UpgradeDialogComponentProps {
+    open?: boolean
+    onOpenChange?: (open: boolean) => void
+}
+
 export const UpgradeDialogComponent: React.FC<UpgradeDialogComponentProps> = ({open, onOpenChange}) => {
 
-    return <Dialog open={open} onOpenChange={(open) => onOpenChange?.(open)}>
+    const searchParams = useSearchParams()
+    const namespaceService = useService(NamespaceService)
+    const namespaceStore = useStore(NamespaceService)
+    const organizationService = useService(OrganizationService)
+    const userService = useService(UserService)
+
+    const namespaceIndex = searchParams.get("namespace") as any as number
+    const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
+
+    const namespace = React.useMemo(
+        () => namespaceIndex ? namespaceService.getById(namespaceId) : undefined,
+        [namespaceStore, namespaceIndex, namespaceId]
+    )
+
+    const name = namespace ? getNamespaceName(namespace, organizationService, userService) : undefined
+    const subject = namespace?.parent?.__typename === "Organization"
+        ? (name ? `the ${name} workspace` : "your workspace")
+        : name ?? "your workspace"
+
+    return <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogPortal>
             <DialogOverlay/>
             <DialogContent w={"480px"}>
@@ -74,7 +101,9 @@ export const UpgradeDialogComponent: React.FC<UpgradeDialogComponentProps> = ({o
                         </BorderBeam>
                     </Flex>
                     <Spacing spacing={"xl"}/>
-                    <Text size={"xl"} hierarchy={"primary"}>Upgrade your workspace</Text>
+                    <Text size={"xl"} hierarchy={"primary"}>
+                        {`Upgrade ${subject}`}
+                    </Text>
                     <Spacing spacing={"xs"}/>
                     <Text size={"sm"} hierarchy={"tertiary"}>
                         Unlock higher limits for executions and AI usage.
@@ -86,8 +115,8 @@ export const UpgradeDialogComponent: React.FC<UpgradeDialogComponentProps> = ({o
                 <Row>
                     {benefits.map(benefit => {
                         const Icon = benefit.icon
-                        return <Col xs={6} mb={1.3}>
-                            <Flex key={benefit.title} style={{gap: "0.7rem"}}>
+                        return <Col key={benefit.title} xs={6} mb={1.3}>
+                            <Flex style={{gap: "0.7rem"}}>
                                 <Icon size={16} style={{minWidth: "16px", minHeight: "16px"}}/>
                                 <Flex style={{flexDirection: "column", gap: "0.35rem", minWidth: 0}}>
                                     <Text size={"md"} hierarchy={"primary"} fw={500}>{benefit.title}</Text>
