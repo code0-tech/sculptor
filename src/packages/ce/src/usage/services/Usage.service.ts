@@ -1,5 +1,5 @@
 import {ReactiveArrayService, ReactiveArrayStore} from "@code0-tech/pictor";
-import {Query} from "@code0-tech/sagittarius-graphql-types";
+import {License, Query} from "@code0-tech/sagittarius-graphql-types";
 import {Payload, View} from "@code0-tech/pictor/dist/utils/view";
 import {GraphqlClient} from "@core/util/graphql-client";
 import applicationUsageQuery from "@edition/usage/services/queries/ApplicationUsage.query.graphql";
@@ -14,6 +14,14 @@ export type LicenseLevel = "application" | "namespace"
 export interface UsageLimits {
     workflow: number | undefined
     ai: number | undefined
+}
+
+export interface UsageLicense {
+    license?: License | null
+    licenseLevel: LicenseLevel
+    licenseStartDate?: string
+    limits: UsageLimits
+    accessible: boolean
 }
 
 export interface UsageRange {
