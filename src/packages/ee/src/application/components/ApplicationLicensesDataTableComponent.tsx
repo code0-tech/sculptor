@@ -1,24 +1,13 @@
 "use client"
 
 import React from "react";
-import {
-    AuroraBackground,
-    Button,
-    ButtonGroup,
-    DataTable,
-    DataTableColumn,
-    Flex,
-    Spacing,
-    Text,
-    useService,
-    useStore
-} from "@code0-tech/pictor";
+import {DataTable, DataTableColumn, Text, useService, useStore} from "@code0-tech/pictor";
 import {DataTableFilterProps, DataTableSortProps} from "@code0-tech/pictor/dist/components/data-table/DataTable";
+import Link from "next/link";
 import {License} from "@code0-tech/sagittarius-graphql-types";
 import {
     ApplicationLicensesDataTableRowComponent
 } from "@ee-internal/application/components/ApplicationLicensesDataTableRowComponent";
-import Link from "next/link";
 import {ApplicationService} from "@edition/application/services/Application.service";
 
 export interface LicensesDataTableComponentProps {
@@ -43,33 +32,11 @@ export const ApplicationLicensesDataTableComponent: React.FC<LicensesDataTableCo
     return <DataTable filter={{}}
                       sort={{}}
                       emptyComponent={<DataTableColumn>
-                          <Flex align={"center"} justify={"center"}
-                                style={{textAlign: "center", flexDirection: "column"}}>
-                              <Text size={"lg"} hierarchy={"primary"}>
-                                  No license connected yet
-                              </Text>
-                              <Spacing spacing={"xl"}/>
+                          <Link href={"/licenses/add"} style={{display: "block"}}>
                               <Text>
-                                  To use the cloud features, you need to have at least one license connected to
-                                  your <br/>
-                                  namespace.
+                                  No license connected yet. Add one to unlock the enterprise features.
                               </Text>
-                              <Spacing spacing={"xl"}/>
-                              <ButtonGroup>
-                                  <Link href={"https://codezero.build/subscription"}>
-                                      <Button color={"secondary"} variant={"none"}>
-                                          Link bought license
-                                      </Button>
-                                  </Link>
-                                  <Link href={"https://codezero.build/subscription"}>
-                                      <Button color={"secondary"} variant={"none"}>
-                                          <AuroraBackground/>
-                                          Buy new license
-                                      </Button>
-                                  </Link>
-                              </ButtonGroup>
-                          </Flex>
-
+                          </Link>
                       </DataTableColumn>}
                       onSelect={(item) => item && onSelect?.(item)}
                       data={licenses?.filter(preFilter)}>

@@ -1,3 +1,5 @@
+"use client"
+
 import React from "react";
 import {
     AuroraBackground,
@@ -5,108 +7,96 @@ import {
     Button,
     ButtonGroup,
     Card,
-    Col,
     Flex,
-    ProgressLinear,
-    Row,
     Spacing,
-    Text
+    Text,
+    useService,
+    useStore
 } from "@code0-tech/pictor";
 import Link from "next/link";
+import {IconPlus, IconShoppingCart} from "@tabler/icons-react";
 import {ApplicationLicensesDataTableComponent} from "@ee-internal/application/components/ApplicationLicensesDataTableComponent";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
+import {ApplicationService} from "@edition/application/services/Application.service";
+import {UsageService} from "@edition/usage/services/Usage.service";
+import {useUsageLicense} from "@edition/usage/hooks/Usage.license.hook";
+import {getLicensePeriod} from "@core/util/license";
+import {LicenseSummarySectionComponent} from "@ee-internal/license/components/LicenseSummarySectionComponent";
+import {LicenseUsageSectionComponent} from "@ee-internal/license/components/LicenseUsageSectionComponent";
 
 export const ApplicationLicensesView: React.FC = () => {
+
+    const applicationService = useService(ApplicationService)
+    const applicationStore = useStore(ApplicationService)
+    const usageService = useService(UsageService)
+    const usageStore = useStore(UsageService)
+
+    const licenseCount = React.useMemo(
+        () => applicationService.get()?.licenses?.nodes?.length ?? 0,
+        [applicationStore]
+    )
+
+    const {license, licenseStartDate, limits} = useUsageLicense()
+
+    const {afterDate, beforeDate} = getLicensePeriod(licenseStartDate)
+
+    const usage = React.useMemo(
+        () => usageService.getApplicationUsage({afterDate, beforeDate}),
+        [usageStore, afterDate, beforeDate]
+    )
+
     return <TabContent value={"license"}>
-        <Flex align={"center"} justify={"space-between"}>
-            <Flex style={{gap: "0.35rem", flexDirection: "column"}}>
-                <Text size={"xl"} hierarchy={"primary"}>
-                    Licenses
-                </Text>
-                <Text size={"sm"} hierarchy={"tertiary"}>
-                    Manage members that belong to this namespace. You can add new members and manage their permissions.
-                </Text>
+        <Flex justify={"space-between"} align={"center"}>
+            <Flex align={"center"} style={{gap: "0.5rem"}}>
+                <Text size={"lg"} hierarchy={"primary"} display={"block"}>Licenses</Text>
+                <Badge color={"secondary"}>{licenseCount}</Badge>
             </Flex>
             <ButtonGroup>
                 <Link href={"/licenses/add"}>
-                    <Button color={"secondary"} variant={"none"}>
-                        Add new license
+                    <Button variant={"none"} paddingSize={"xxs"}>
+                        <IconPlus size={13}/>
                     </Button>
                 </Link>
                 <Link href={"https://codezero.build/subscription"}>
-                    <Button color={"secondary"} variant={"none"}>
+                    <Button variant={"none"} paddingSize={"xxs"}>
                         <AuroraBackground/>
-                        Buy new license
+                        <IconShoppingCart size={13}/>
                     </Button>
                 </Link>
             </ButtonGroup>
         </Flex>
-        <Spacing spacing={"xl"}/>
-        <Row>
-            <Col xs={4}>
-                <Card color={"secondary"} h={"100%"}>
-                    <Flex align={"center"} justify={"space-between"} style={{gap: "0.35rem"}}>
-                        <Text hierarchy={"primary"}>
-                            Enterprise Edition license
-                        </Text>
-                        <Badge color={"success"}>
-                            <Text style={{color: "inherit"}}>
-                                Active
-                            </Text>
-                        </Badge>
-                    </Flex>
-                    <Spacing spacing={"xs"}/>
-                    <Card color={"primary"} mx={-1.2} mb={-1.2}>
-                        <Text>
-                            Active since
-                            about 2 months ago
-                            and active until
-                            in 10 months
-                        </Text>
-                    </Card>
-                </Card>
-            </Col>
-            <Col xs={4}>
-                <Card color={"secondary"} h={"100%"}>
-                    <Text hierarchy={"primary"}>
-                        Workflow usage (2.250)
-                    </Text>
-                    <Spacing spacing={"xs"}/>
-                    <Card color={"primary"} mx={-1.2} mb={-1.2}>
-                        <ProgressLinear value={9} predictionValue={24} max={100}
-                                  color={"linear-gradient(to right, #29BF12 0%, #D90429 100%)"}/>
-                        <Spacing spacing={"xs"}/>
-                        <Text>
-                            You used 9% of your available workflow executions and will used 24% until its reseted.
-                        </Text>
-                    </Card>
-                </Card>
-            </Col>
-            <Col xs={4}>
-                <Card color={"secondary"} h={"100%"}>
-                    <Text hierarchy={"primary"}>
-                        AI usage (250)
-                    </Text>
-                    <Spacing spacing={"xs"}/>
-                    <Card color={"primary"} mx={-1.2} mb={-1.2}>
-                        <ProgressLinear value={50} predictionValue={89} max={100} color={"#70ffb2"}/>
-                        <Spacing spacing={"xs"}/>
-                        <Text>
-                            You used 50% of your available workflow executions and will used 89% until its reseted.
-                        </Text>
-                    </Card>
-                </Card>
-            </Col>
-        </Row>
-        <Spacing spacing={"xl"}/>
+        <Spacing spacing={"xs"}/>
+        <Text size={"md"} hierarchy={"tertiary"}>
+            Manage the licenses of this instance. Your active license decides which features and which workflow and AI
+            entitlements are unlocked.
+        </Text>
+        <Spacing spacing={"md"}/>
+        <Text size={"md"} hierarchy={"secondary"}>Current plan</Text>
+        <Spacing spacing={"lg"}/>
         <Card color={"secondary"}>
-            <Text hierarchy={"primary"}>
-                All used or future licenses
-            </Text>
-            <Spacing spacing={"xs"}/>
-            <Card color={"primary"} mx={-1.2} mb={-1.2}>
-                <ApplicationLicensesDataTableComponent/>
-            </Card>
+            <LicenseSummarySectionComponent license={license}
+                                            fallbackName={"Enterprise Edition license"}
+                                            action={<Link href={"/licenses/add"}>
+                                                <Button color={"tertiary"} paddingSize={"xxs"}>
+                                                    Connect a license
+                                                </Button>
+                                            </Link>}/>
+            <LicenseUsageSectionComponent title={"Workflow usage"}
+                                          unit={"workflow executions"}
+                                          used={usage?.runtimeCount ?? 0}
+                                          limit={limits.workflow}
+                                          afterDate={afterDate}
+                                          beforeDate={beforeDate}/>
+            <LicenseUsageSectionComponent title={"AI usage"}
+                                          unit={"AI tokens"}
+                                          used={usage?.aiValue ?? 0}
+                                          limit={limits.ai}
+                                          afterDate={afterDate}
+                                          beforeDate={beforeDate}/>
         </Card>
+        <Spacing spacing={"lg"}/>
+        <Text size={"md"} hierarchy={"secondary"}>All used or future licenses</Text>
+        <Spacing spacing={"lg"}/>
+        <ApplicationLicensesDataTableComponent/>
     </TabContent>
 }

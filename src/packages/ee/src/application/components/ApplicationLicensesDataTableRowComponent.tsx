@@ -1,20 +1,13 @@
 import React from "react";
 import {License} from "@code0-tech/sagittarius-graphql-types";
-import {
-    Badge,
-    Button,
-    DataTableColumn,
-    Flex,
-    ProgressLinear,
-    Spacing,
-    Text,
-    useService,
-    useStore
-} from "@code0-tech/pictor";
+import {Badge, Button, DataTableColumn, Flex, Text, useService, useStore} from "@code0-tech/pictor";
 import {ApplicationService} from "@ee-internal/application/services/Application.service";
-import {formatDistanceToNow, isFuture, isPast} from "date-fns";
+import {formatDistanceToNow} from "date-fns";
 import {IconX} from "@tabler/icons-react";
 import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
+import {getLicenseName, isLicenseActive} from "@core/util/license";
+import {LicenseRestrictionsComponent} from "@ee-internal/license/components/LicenseRestrictionsComponent";
+import {LicenseBillingComponent} from "@ee-internal/license/components/LicenseBillingComponent";
 
 export interface LicensesDataTableRowComponentProps {
     licenseId: License['id']
@@ -47,9 +40,9 @@ export const ApplicationLicensesDataTableRowComponent: React.FC<LicensesDataTabl
             <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
                 <Flex align={"center"} style={{gap: "0.35rem"}}>
                     <Text size={"xl"} hierarchy={"primary"}>
-                        Enterprise Edition license
+                        {getLicenseName(license, "Enterprise Edition license")}
                     </Text>
-                    {isPast(license.startDate!) && isFuture(license.endDate!) ? (
+                    {isLicenseActive(license) ? (
                         <Badge color={"success"}>
                             <Text style={{color: "inherit"}}>
                                 Active
@@ -68,7 +61,7 @@ export const ApplicationLicensesDataTableRowComponent: React.FC<LicensesDataTabl
                         Active since
                         <Badge color={"secondary"}>
                             <Text>
-                                {formatDistanceToNow(license.startDate!, {addSuffix: true})}
+                                {license?.startDate ? formatDistanceToNow(license.startDate, {addSuffix: true}) : "unknown"}
                             </Text>
                         </Badge>
                     </Text>
@@ -76,7 +69,7 @@ export const ApplicationLicensesDataTableRowComponent: React.FC<LicensesDataTabl
                         and active until
                         <Badge color={"secondary"}>
                             <Text>
-                                {formatDistanceToNow(license.endDate!, {addSuffix: true})}
+                                {license?.endDate ? formatDistanceToNow(license.endDate, {addSuffix: true}) : "further notice"}
                             </Text>
                         </Badge>
                     </Text>
@@ -84,35 +77,10 @@ export const ApplicationLicensesDataTableRowComponent: React.FC<LicensesDataTabl
             </Flex>
         </DataTableColumn>
         <DataTableColumn pr={2.5}>
-            <Text>
-                Workflow usage (2.250)
-            </Text>
-            <Spacing spacing={"xs"}/>
-            <ProgressLinear maw={"75%"} value={9} predictionValue={24} max={100}
-                      color={"linear-gradient(to right, #29BF12 0%, #D90429 100%)"}/>
-            <Spacing spacing={"xs"}/>
-            <Text>
-                You used 9% of your available workflow executions and will used 24% until its reseted.
-            </Text>
+            <LicenseRestrictionsComponent license={license}/>
         </DataTableColumn>
         <DataTableColumn pr={2.5}>
-            <Text>
-                AI usage (250)
-            </Text>
-            <Spacing spacing={"xs"}/>
-            <ProgressLinear maw={"75%"} value={50} predictionValue={89} max={100} color={"#70ffb2"}/>
-            <Spacing spacing={"xs"}/>
-            <Text>
-                You used 50% of your available workflow executions and will used 89% until its reseted.
-            </Text>
-        </DataTableColumn>
-        <DataTableColumn>
-            <Text size={"xl"} hierarchy={"primary"} display={"flex"} align={"center"} style={{gap: "0.35rem"}}>
-                350€
-                <Text size={"md"} hierarchy={"tertiary"}>
-                    /month
-                </Text>
-            </Text>
+            <LicenseBillingComponent license={license}/>
         </DataTableColumn>
         <DataTableColumn>
             <Button color={"error"} variant={"none"} onClick={licenseRemove}>
