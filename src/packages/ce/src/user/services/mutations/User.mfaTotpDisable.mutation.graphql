@@ -1,0 +1,18 @@
+#import "@edition/user/services/fragments/User.basic.fragment.graphql"
+mutation mfaTotpDisable($mfa: MfaInput!) {
+    usersMfaTotpDisable(input: {
+        mfa: $mfa
+    }) {
+        errors {
+            ...on Error {
+                errorCode,
+                details {
+                    __typename
+                }
+            }
+        }
+        user {
+            ...UserBasic
+        }
+    }
+}
