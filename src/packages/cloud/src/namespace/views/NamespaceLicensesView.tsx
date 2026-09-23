@@ -21,8 +21,8 @@ import Link from "next/link";
 import {IconPlus, IconShoppingCart} from "@tabler/icons-react";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {
-    NamespaceLicensesDataTableComponent
-} from "@cloud-internal/namespace/components/NamespaceLicensesDataTableComponent";
+    NamespaceLicensesListComponent
+} from "@cloud-internal/namespace/components/NamespaceLicensesListComponent";
 import {useParams} from "next/navigation";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
 import {NamespaceService} from "@edition/namespace/services/Namespace.service";
@@ -131,6 +131,6 @@ export const NamespaceLicensesView: React.FC = () => {
         <Spacing spacing={"lg"}/>
         <Text size={"md"} hierarchy={"secondary"}>All used or future licenses</Text>
         <Spacing spacing={"lg"}/>
-        <NamespaceLicensesDataTableComponent namespaceId={namespaceId}/>
+        <NamespaceLicensesListComponent namespaceId={namespaceId}/>
     </TabContent>
 }

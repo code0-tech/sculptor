@@ -19,7 +19,7 @@ import {
 } from "@code0-tech/pictor";
 import Link from "next/link";
 import {IconPlus, IconShoppingCart} from "@tabler/icons-react";
-import {ApplicationLicensesDataTableComponent} from "@ee-internal/application/components/ApplicationLicensesDataTableComponent";
+import {ApplicationLicensesListComponent} from "@ee-internal/application/components/ApplicationLicensesListComponent";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {ApplicationService} from "@edition/application/services/Application.service";
 import {UsageService} from "@edition/usage/services/Usage.service";
@@ -123,6 +123,6 @@ export const ApplicationLicensesView: React.FC = () => {
         <Spacing spacing={"lg"}/>
         <Text size={"md"} hierarchy={"secondary"}>All used or future licenses</Text>
         <Spacing spacing={"lg"}/>
-        <ApplicationLicensesDataTableComponent/>
+        <ApplicationLicensesListComponent/>
     </TabContent>
 }
