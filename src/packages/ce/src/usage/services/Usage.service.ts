@@ -20,6 +20,7 @@ export interface UsageLicense {
     license?: License | null
     licenseLevel: LicenseLevel
     licenseStartDate?: string
+    resolved: boolean
     limits: UsageLimits
     accessible: boolean
 }
@@ -47,8 +48,13 @@ export class UsageService extends ReactiveArrayService<UsageEntry> {
         this.client = client
     }
 
+    protected key(id: string, range: UsageRange): string {
+        return `${id}@${range.afterDate}:${range.beforeDate}`
+    }
+
     getApplicationUsage(range: UsageRange): UsageEntry | undefined {
-        const cached = this.values().find(entry => entry && entry.id === "application")
+        const id = this.key("application", range)
+        const cached = this.values().find(entry => entry && entry.id === id)
         if (cached) return cached
 
         this.client.query<Query>({
@@ -60,9 +66,9 @@ export class UsageService extends ReactiveArrayService<UsageEntry> {
             }
         }).then(result => {
             const application = result.data?.application
-            if (!application || this.values().find(entry => entry && entry.id === "application")) return
+            if (!application || this.values().find(entry => entry && entry.id === id)) return
             this.add(new View({
-                id: "application",
+                id,
                 level: "application",
                 aiCount: (application.aiUsage ?? []).reduce((total, bucket) => total + (bucket?.usage ?? 0), 0),
                 aiValue: (application.aiUsage ?? []).reduce((total, bucket) => total + (bucket?.value ?? 0), 0),
@@ -75,7 +81,8 @@ export class UsageService extends ReactiveArrayService<UsageEntry> {
     }
 
     getNamespaceUsage(namespaceId: string, range: UsageRange): UsageEntry | undefined {
-        const cached = this.values().find(entry => entry && entry.id === namespaceId)
+        const id = this.key(namespaceId, range)
+        const cached = this.values().find(entry => entry && entry.id === id)
         if (cached) return cached
 
         this.client.query<Query>({
@@ -88,9 +95,9 @@ export class UsageService extends ReactiveArrayService<UsageEntry> {
             }
         }).then(result => {
             const namespace = result.data?.namespace
-            if (!namespace || this.values().find(entry => entry && entry.id === namespaceId)) return
+            if (!namespace || this.values().find(entry => entry && entry.id === id)) return
             this.add(new View({
-                id: namespaceId,
+                id,
                 level: "namespace",
                 aiCount: (namespace.aiUsage ?? []).reduce((total, bucket) => total + (bucket?.usage ?? 0), 0),
                 aiValue: (namespace.aiUsage ?? []).reduce((total, bucket) => total + (bucket?.value ?? 0), 0),
@@ -103,7 +110,8 @@ export class UsageService extends ReactiveArrayService<UsageEntry> {
     }
 
     getProjectUsage(namespaceId: string, projectId: string, range: UsageRange): UsageEntry | undefined {
-        const cached = this.values().find(entry => entry && entry.id === projectId)
+        const id = this.key(projectId, range)
+        const cached = this.values().find(entry => entry && entry.id === id)
         if (cached) return cached
 
         this.client.query<Query>({
@@ -117,9 +125,9 @@ export class UsageService extends ReactiveArrayService<UsageEntry> {
             }
         }).then(result => {
             const project = result.data?.namespace?.project
-            if (!project || this.values().find(entry => entry && entry.id === projectId)) return
+            if (!project || this.values().find(entry => entry && entry.id === id)) return
             this.add(new View({
-                id: projectId,
+                id,
                 level: "project",
                 aiCount: (project.aiUsage ?? []).reduce((total, bucket) => total + (bucket?.usage ?? 0), 0),
                 aiValue: (project.aiUsage ?? []).reduce((total, bucket) => total + (bucket?.value ?? 0), 0),
@@ -132,7 +140,8 @@ export class UsageService extends ReactiveArrayService<UsageEntry> {
     }
 
     getFlowUsage(namespaceId: string, projectId: string, flowId: string, range: UsageRange): UsageEntry | undefined {
-        const cached = this.values().find(entry => entry && entry.id === flowId)
+        const id = this.key(flowId, range)
+        const cached = this.values().find(entry => entry && entry.id === id)
         if (cached) return cached
 
         this.client.query<Query>({
@@ -147,9 +156,9 @@ export class UsageService extends ReactiveArrayService<UsageEntry> {
             }
         }).then(result => {
             const flow = result.data?.namespace?.project?.flow
-            if (!flow || this.values().find(entry => entry && entry.id === flowId)) return
+            if (!flow || this.values().find(entry => entry && entry.id === id)) return
             this.add(new View({
-                id: flowId,
+                id,
                 level: "flow",
                 aiCount: (flow.aiUsage ?? []).reduce((total, bucket) => total + (bucket?.usage ?? 0), 0),
                 aiValue: (flow.aiUsage ?? []).reduce((total, bucket) => total + (bucket?.value ?? 0), 0),
