@@ -62,7 +62,7 @@ export const useUsageOverview = (): UsageOverview => {
         accessible,
         limits,
         namespaceIndex,
-        contextLabel: contextLevel === "flow" ? "Flow" : contextLevel === "project" ? "Project" : "Namespace",
+        contextLabel: contextLevel === "flow" ? "Flow" : contextLevel === "project" ? "Project" : "Workspace",
         overallUsage,
         contextUsage
     }
