@@ -57,7 +57,7 @@ export const UsageIndicatorComponent: React.FC<UsageIndicatorComponentProps> = (
 
     return <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
         <TooltipTrigger asChild>
-            <Button variant={"none"} paddingSize={paddingSize}>
+            <Button variant={"none"} style={{padding: getSize("xs")}}>
                 <Flex w={"16px"} h={"16px"} align={"center"} justify={"center"}>
                     {sections.map((section, index) => (
                         <ProgressCircle key={section.title}
