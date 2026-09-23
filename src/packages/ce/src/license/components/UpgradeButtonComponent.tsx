@@ -4,9 +4,9 @@ import React from "react";
 import {Button} from "@code0-tech/pictor";
 
 export interface UpgradeButtonComponentProps {
+    reference: string
     namespaceId?: string | number
     fullWidth?: boolean
-    paddingSize?: React.ComponentProps<typeof Button>["paddingSize"]
     color?: React.ComponentProps<typeof Button>["color"]
 }
 
