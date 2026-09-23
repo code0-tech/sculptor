@@ -15,12 +15,13 @@ import {
 export interface LicenseSummarySectionComponentProps {
     license?: License | null
     fallbackName: string
+    warning?: string
     action: React.ReactNode
 }
 
 export const LicenseSummarySectionComponent: React.FC<LicenseSummarySectionComponentProps> = (props) => {
 
-    const {license, fallbackName, action} = props
+    const {license, fallbackName, warning, action} = props
 
     const active = isLicenseActive(license)
     const paymentPeriod = license?.options?.paymentPeriod
@@ -51,6 +52,7 @@ export const LicenseSummarySectionComponent: React.FC<LicenseSummarySectionCompo
                         {(licenseCustomerTypeNames[customerType] ?? customerType).toLowerCase()}
                     </Text> customer.
                     </> : null}
+                    {warning ? ` ${warning}` : null}
                 </Text>
             </Flex>
             {active ? <Badge color={"success"}>

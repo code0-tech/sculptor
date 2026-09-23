@@ -28,7 +28,8 @@ import {Namespace} from "@code0-tech/sagittarius-graphql-types";
 import {NamespaceService} from "@edition/namespace/services/Namespace.service";
 import {UsageService} from "@edition/usage/services/Usage.service";
 import {useUsageLicense} from "@edition/usage/hooks/Usage.license.hook";
-import {getLicensePeriod} from "@core/util/license";
+import {getLicensePeriod, isLicenseActive} from "@core/util/license";
+import {getUsageRiskDescription, getUsagesAtRisk} from "@core/util/usage";
 import {UpgradeButtonComponent} from "@cloud-internal/license/components/UpgradeButtonComponent";
 import {LicenseSummarySectionComponent} from "@ee-internal/license/components/LicenseSummarySectionComponent";
 import {LicenseUsageSectionComponent} from "@ee-internal/license/components/LicenseUsageSectionComponent";
@@ -59,6 +60,15 @@ export const NamespaceLicensesView: React.FC = () => {
         () => resolved ? usageService.getNamespaceUsage(namespaceId, {afterDate, beforeDate}) : undefined,
         [usageStore, resolved, namespaceId, afterDate, beforeDate]
     )
+
+    const licensed = isLicenseActive(license)
+
+    const usages = [
+        {title: "Workflow executions", used: usage?.runtimeCount ?? 0, limit: limits.workflow},
+        {title: "AI tokens", used: usage?.aiValue ?? 0, limit: limits.ai}
+    ]
+
+    const atRisk = getUsagesAtRisk(usages, afterDate, beforeDate)
 
     return <TabContent value={"licenses"}>
         <Flex justify={"space-between"} align={"center"}>
@@ -113,27 +123,15 @@ export const NamespaceLicensesView: React.FC = () => {
         <Card color={"secondary"}>
             <LicenseSummarySectionComponent license={license}
                                             fallbackName={"Free plan"}
+                                            warning={licensed ? undefined : getUsageRiskDescription(atRisk, afterDate, beforeDate)}
                                             action={<UpgradeButtonComponent namespaceId={namespaceIndex}
                                                                             color={"tertiary"}
                                                                             paddingSize={"xxs"}/>}/>
-            <LicenseLimitsSectionComponent afterDate={afterDate}
-                                           beforeDate={beforeDate}
-                                           usages={[
-                                               {
-                                                   title: "Workflow executions",
-                                                   used: usage?.runtimeCount ?? 0,
-                                                   limit: limits.workflow
-                                               },
-                                               {
-                                                   title: "AI tokens",
-                                                   used: usage?.aiValue ?? 0,
-                                                   limit: limits.ai
-                                               }
-                                           ]}
-                                           action={<UpgradeButtonComponent namespaceId={namespaceIndex}
-                                                                           paddingSize={"xxs"}>
-                                               Increase limits
-                                           </UpgradeButtonComponent>}/>
+            {licensed ? <LicenseLimitsSectionComponent afterDate={afterDate}
+                                                       beforeDate={beforeDate}
+                                                       usages={usages}
+                                                       action={<UpgradeButtonComponent namespaceId={namespaceIndex}
+                                                                                       paddingSize={"xxs"}/>}/> : null}
             <LicenseUsageSectionComponent title={"Workflow usage"}
                                           unit={"workflow executions"}
                                           used={usage?.runtimeCount ?? 0}

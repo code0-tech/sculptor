@@ -62,3 +62,39 @@ export const isUsageAtRisk = (used: number, limit: number | null | undefined, af
         getUsageColor(used, limit) !== USAGE_NEUTRAL_COLOR
         || getUsageProjectedFill(used, limit, afterDate, beforeDate) >= 100
     )
+
+export interface UsageLimitEntry {
+    title: string
+    used: number
+    limit?: number | null
+}
+
+/**
+ * The entries that have entered the warning zone or run out before the period
+ * resets, in the order they were given.
+ */
+export const getUsagesAtRisk = (usages: UsageLimitEntry[], afterDate: string, beforeDate: string): UsageLimitEntry[] =>
+    usages.filter(usage => isUsageAtRisk(usage.used, usage.limit, afterDate, beforeDate))
+
+/**
+ * Headline for the entries at risk: a single metric is named, several are
+ * summarised as the limits as a whole.
+ */
+export const getUsageRiskTitle = (atRisk: UsageLimitEntry[]): string =>
+    atRisk.length > 1 ? "Your limits are running out" : `Your ${atRisk[0]?.title.toLowerCase()} are running out`
+
+/**
+ * Sentence naming what runs out and how soon. Undefined while nothing is at
+ * risk, so callers can leave their copy untouched.
+ */
+export const getUsageRiskDescription = (atRisk: UsageLimitEntry[], afterDate: string, beforeDate: string): string | undefined => {
+
+    if (atRisk.length <= 0) return undefined
+
+    const names = atRisk.map(usage => usage.title.toLowerCase()).join(" and ")
+    const exceeding = atRisk.some(usage => getUsageProjectedFill(usage.used, usage.limit, afterDate, beforeDate) >= 100)
+
+    return exceeding
+        ? `Your ${names} will be used up before this period resets.`
+        : `Your ${names} are close to their limit for this period.`
+}

@@ -2,6 +2,7 @@
 
 import React from "react";
 import {
+    Button,
     Card,
     Col,
     Dialog,
@@ -23,7 +24,6 @@ import {NamespaceService} from "@cloud-internal/namespace/services/Namespace.ser
 import {OrganizationService} from "@edition/organization/services/Organization.service";
 import {UserService} from "@edition/user/services/User.service";
 import {getNamespaceName} from "@edition/namespace/util/Namespace.name.util";
-import {UpgradeButtonComponent} from "@cloud-internal/license/components/UpgradeButtonComponent";
 
 const benefits = [
     {
@@ -60,6 +60,7 @@ export const UpgradeDialogComponent: React.FC<UpgradeDialogComponentProps> = ({o
     const namespaceStore = useStore(NamespaceService)
     const organizationService = useService(OrganizationService)
     const userService = useService(UserService)
+    const [pending, startTransition] = React.useTransition()
 
     const namespaceIndex = searchParams.get("namespace") as any as number
     const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
@@ -68,6 +69,26 @@ export const UpgradeDialogComponent: React.FC<UpgradeDialogComponentProps> = ({o
         () => namespaceIndex ? namespaceService.getById(namespaceId) : undefined,
         [namespaceStore, namespaceIndex, namespaceId]
     )
+
+    const openSubscription = () => {
+        const target = window.open("about:blank", "_blank")
+        startTransition(async () => {
+            const [config, tokenPayload] = await Promise.all([
+                fetch("/api/config").then(response => response.json()),
+                userService.usersCreateCraterToken()
+            ])
+            const subscriptionUrl = config?.subscriptionUrl as string | null | undefined
+            const token = tokenPayload?.token?.token
+            if (!subscriptionUrl || !token) {
+                target?.close()
+                return
+            }
+            const url = new URL(subscriptionUrl)
+            if (namespaceIndex) url.searchParams.set("namespace", namespaceIndex.toString())
+            url.searchParams.set("token", token)
+            if (target) target.location.href = url.toString()
+        })
+    }
 
     const name = namespace ? getNamespaceName(namespace, organizationService, userService) : undefined
     const subject = namespace?.parent?.__typename === "Organization"
@@ -141,10 +162,13 @@ export const UpgradeDialogComponent: React.FC<UpgradeDialogComponentProps> = ({o
                     </Flex>
                 </Flex>
                 <Spacing spacing={"xs"}/>
-                <UpgradeButtonComponent beamSize={"line"} fullWidth>
-                    Choose your plan
-                    <IconArrowRight size={16}/>
-                </UpgradeButtonComponent>
+                <BorderBeam strength={1} size={"line"} theme={"dark"} duration={5} style={{display: "block"}}>
+                    <Button color={"tertiary"} paddingSize={"xxs"} disabled={pending}
+                            onClick={openSubscription} justify={"center"} w={"100%"}>
+                        Choose your plan
+                        <IconArrowRight size={16}/>
+                    </Button>
+                </BorderBeam>
             </DialogContent>
         </DialogPortal>
     </Dialog>

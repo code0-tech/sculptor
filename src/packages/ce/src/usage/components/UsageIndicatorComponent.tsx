@@ -126,9 +126,7 @@ export const UsageIndicatorComponent: React.FC<UsageIndicatorComponentProps> = (
                     {sections.some(section => section.color !== USAGE_NEUTRAL_COLOR) ? (
                         <UpgradeButtonComponent namespaceId={namespaceIndex}
                                                 fullWidth
-                                                paddingSize={"xxs"}>
-                            Increase limit
-                        </UpgradeButtonComponent>
+                                                paddingSize={"xxs"}/>
                     ) : null}
                 </Flex>
             </TooltipContent>

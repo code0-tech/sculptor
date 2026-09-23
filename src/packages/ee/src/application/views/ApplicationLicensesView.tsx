@@ -24,7 +24,9 @@ import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {ApplicationService} from "@edition/application/services/Application.service";
 import {UsageService} from "@edition/usage/services/Usage.service";
 import {useUsageLicense} from "@edition/usage/hooks/Usage.license.hook";
-import {getLicensePeriod} from "@core/util/license";
+import {getLicensePeriod, isLicenseActive} from "@core/util/license";
+import {getUsageRiskDescription, getUsagesAtRisk} from "@core/util/usage";
+import {UpgradeButtonComponent} from "@edition/license/components/UpgradeButtonComponent";
 import {LicenseSummarySectionComponent} from "@ee-internal/license/components/LicenseSummarySectionComponent";
 import {LicenseUsageSectionComponent} from "@ee-internal/license/components/LicenseUsageSectionComponent";
 import {LicenseLimitsSectionComponent} from "@ee-internal/license/components/LicenseLimitsSectionComponent";
@@ -49,6 +51,15 @@ export const ApplicationLicensesView: React.FC = () => {
         () => resolved ? usageService.getApplicationUsage({afterDate, beforeDate}) : undefined,
         [usageStore, resolved, afterDate, beforeDate]
     )
+
+    const licensed = isLicenseActive(license)
+
+    const usages = [
+        {title: "Workflow executions", used: usage?.runtimeCount ?? 0, limit: limits.workflow},
+        {title: "AI tokens", used: usage?.aiValue ?? 0, limit: limits.ai}
+    ]
+
+    const atRisk = getUsagesAtRisk(usages, afterDate, beforeDate)
 
     return <TabContent value={"license"}>
         <Flex justify={"space-between"} align={"center"}>
@@ -103,30 +114,16 @@ export const ApplicationLicensesView: React.FC = () => {
         <Card color={"secondary"}>
             <LicenseSummarySectionComponent license={license}
                                             fallbackName={"Enterprise Edition license"}
+                                            warning={licensed ? undefined : getUsageRiskDescription(atRisk, afterDate, beforeDate)}
                                             action={<Link href={"/licenses/add"}>
                                                 <Button color={"tertiary"} paddingSize={"xxs"}>
                                                     Connect a license
                                                 </Button>
                                             </Link>}/>
-            <LicenseLimitsSectionComponent afterDate={afterDate}
-                                           beforeDate={beforeDate}
-                                           usages={[
-                                               {
-                                                   title: "Workflow executions",
-                                                   used: usage?.runtimeCount ?? 0,
-                                                   limit: limits.workflow
-                                               },
-                                               {
-                                                   title: "AI tokens",
-                                                   used: usage?.aiValue ?? 0,
-                                                   limit: limits.ai
-                                               }
-                                           ]}
-                                           action={<Link target={"_blank"} href={"https://codezero.build/subscription"}>
-                                               <Button color={"warning"} paddingSize={"xxs"}>
-                                                   Increase limits
-                                               </Button>
-                                           </Link>}/>
+            {licensed ? <LicenseLimitsSectionComponent afterDate={afterDate}
+                                                       beforeDate={beforeDate}
+                                                       usages={usages}
+                                                       action={<UpgradeButtonComponent paddingSize={"xxs"}/>}/> : null}
             <LicenseUsageSectionComponent title={"Workflow usage"}
                                           unit={"workflow executions"}
                                           used={usage?.runtimeCount ?? 0}
