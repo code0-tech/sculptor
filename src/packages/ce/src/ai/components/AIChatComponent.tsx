@@ -7,7 +7,6 @@ import {
     EditorInputValue,
     EditorTokenRule,
     Flex, getSize,
-    ProgressLinear,
     SelectContent,
     SelectItem,
     SelectItemText,
@@ -28,6 +27,7 @@ import {AIService} from "@edition/ai/services/AI.service";
 import {motion} from "framer-motion";
 import {AiGenerateFlowSubscriptionPayload, Flow, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {useAIGenerationStore} from "@edition/ai/hooks/AI.generation.hook";
+import {AIUsageComponent} from "@edition/ai/components/AIUsageComponent";
 import {AIGeneratingMessageComponent} from "@edition/ai/components/AIGeneratingMessageComponent";
 import BorderBeam from "border-beam";
 
@@ -305,13 +305,7 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
                 <Spacing spacing={"xs"}/>
                 {
                     models.length > 0 ? (
-                        <Flex align={"center"} justify={"space-between"} p={0.35} style={{gap: "0.35rem"}}>
-                            <Text>
-                                Upgrade your license to increase your AI usage limit
-                            </Text>
-                            <ProgressLinear w={"100px"} h={"7.5px"} value={0} max={100}
-                                      color={"#70ffb2"}/>
-                        </Flex>
+                        <AIUsageComponent/>
                     ) : (
                         <Flex align={"center"} justify={"center"} p={0.35}>
                             <Text>
