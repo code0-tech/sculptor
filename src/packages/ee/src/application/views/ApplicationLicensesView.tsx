@@ -123,7 +123,7 @@ export const ApplicationLicensesView: React.FC = () => {
             {licensed ? <LicenseLimitsSectionComponent afterDate={afterDate}
                                                        beforeDate={beforeDate}
                                                        usages={usages}
-                                                       action={<UpgradeButtonComponent paddingSize={"xxs"}/>}/> : null}
+                                                       action={<UpgradeButtonComponent reference={"app_settings_limits_alert"}/>}/> : null}
             <LicenseUsageSectionComponent title={"Workflow usage"}
                                           unit={"workflow executions"}
                                           used={usage?.runtimeCount ?? 0}
