@@ -23,6 +23,8 @@ import {
     UsersLogoutPayload,
     UsersMfaBackupCodesRotateInput,
     UsersMfaBackupCodesRotatePayload,
+    UsersMfaTotpDisableInput,
+    UsersMfaTotpDisablePayload,
     UsersMfaTotpGenerateSecretInput,
     UsersMfaTotpGenerateSecretPayload,
     UsersMfaTotpValidateSecretInput,
@@ -50,6 +52,7 @@ import identityUnlinkMutation from "./mutations/User.identityUnlink.mutation.gra
 import emailVerificationMutation from "./mutations/User.emailVerification.mutation.graphql";
 import passwordResetMutation from "./mutations/User.passwordReset.mutation.graphql"
 import passwordResetRequestMutation from "./mutations/User.passwordResetRequest.mutation.graphql"
+import mfaTotpDisableMutation from "./mutations/User.mfaTotpDisable.mutation.graphql"
 import mfaTotpGenerateSecretMutation from "./mutations/User.mfaTotpGenerateSecret.mutation.graphql"
 import mfaTotpValidateSecretMutation from "./mutations/User.mfaTotpValidateSecret.mutation.graphql"
 import mfaBackupCodesRotateMutation from "./mutations/User.mfaBackupCodesRotate.mutation.graphql"
@@ -61,7 +64,7 @@ import {View} from "@code0-tech/pictor/dist/utils/view";
 
 export class UserService extends ReactiveArrayService<User> {
 
-    private readonly client: GraphqlClient
+    protected readonly client: GraphqlClient
     private i = 0;
 
     constructor(client: GraphqlClient, store: ReactiveArrayStore<View<User>>) {
@@ -368,6 +371,22 @@ export class UserService extends ReactiveArrayService<User> {
         const data = result.data?.usersMfaBackupCodesRotate ?? undefined
         // The acting user's remaining backup code count changed — refresh it in the store.
         if (data?.codes && (data.errors?.length ?? 0) <= 0) {
+            await this.refetchCurrentUser()
+        }
+
+        return data
+    }
+
+    async usersMfaTotpDisable(payload: UsersMfaTotpDisableInput): Promise<UsersMfaTotpDisablePayload | undefined> {
+        const result = await this.client.mutate<Mutation, UsersMfaTotpDisableInput>({
+            mutation: mfaTotpDisableMutation,
+            variables: {
+                ...payload
+            }
+        })
+
+        const data = result.data?.usersMfaTotpDisable ?? undefined
+        if (data?.user && (data.errors?.length ?? 0) <= 0) {
             await this.refetchCurrentUser()
         }
 
