@@ -29,7 +29,7 @@ export const LicenseUsageSectionComponent: React.FC<LicenseUsageSectionComponent
     const exhausted = limit != null && limit <= 0
 
     const usedPercent = getUsageFill(used, limit)
-    const projectedPercent = bounded ? Math.min(100, Math.round((used / elapsed / limit!) * 100)) : usedPercent
+    const projectedPercent = bounded ? Math.round((used / elapsed / limit!) * 100) : usedPercent
 
     return <CardSection border>
         <Flex justify={"space-between"} align={"center"} style={{gap: getSize("md")}}>
@@ -62,7 +62,7 @@ export const LicenseUsageSectionComponent: React.FC<LicenseUsageSectionComponent
             <Flex align={"center"} style={{gap: getSize("xs"), flexShrink: 0}}>
                 <ProgressLinear w={"100px"} h={"7.5px"} max={100}
                                 value={usedPercent}
-                                predictionValue={projectedPercent}
+                                predictionValue={Math.min(100, projectedPercent)}
                                 color={getUsageColor(used, limit)}/>
                 <Text size={"md"} hierarchy={"primary"}>
                     {bounded ? `${usedPercent}%` : exhausted ? "none included" : "unlimited"}
