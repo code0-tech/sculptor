@@ -23,7 +23,7 @@ export const NamespaceUpgradeView: React.FC = () => {
         [namespaceStore, namespaceId]
     )
 
-    const hasActiveLicense = namespace?.licenses?.nodes?.some(license => isLicenseActive(license)) ?? false
+    const hasActiveLicense = isLicenseActive(namespace?.currentLicense)
     const upgradeVisible = useUpgradeVisibility()
 
     if (hasActiveLicense || !upgradeVisible) return null

@@ -18,7 +18,7 @@ import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import Link from "next/link";
 import {License} from "@code0-tech/sagittarius-graphql-types";
 import {IconPencil, IconTrash} from "@tabler/icons-react";
-import {getLicenseName, isLicenseActive} from "@core/util/license";
+import {getLicenseName} from "@core/util/license";
 import {LicenseDetailsComponent} from "@ee-internal/license/components/LicenseDetailsComponent";
 import {
     LicenseEntitlementsSectionComponent
@@ -27,12 +27,13 @@ import {
 export interface LicenseCardComponentProps {
     license?: License | null
     fallbackName: string
+    active: boolean
     onRemove: () => void
 }
 
 export const LicenseCardComponent: React.FC<LicenseCardComponentProps> = (props) => {
 
-    const {license, fallbackName, onRemove} = props
+    const {license, fallbackName, active, onRemove} = props
 
     return <Card color={"secondary"} variant={"outlined"}
                  style={{border: "1px solid rgba(191, 191, 191, 0.1)", boxShadow: "none"}}>
@@ -43,7 +44,7 @@ export const LicenseCardComponent: React.FC<LicenseCardComponentProps> = (props)
                         <Text size={"md"} hierarchy={"primary"}>
                             {getLicenseName(license, fallbackName)}
                         </Text>
-                        {isLicenseActive(license) ? <Badge color={"success"}>
+                        {active ? <Badge color={"success"}>
                             <Text c={"inherit"}>
                                 Active
                             </Text>

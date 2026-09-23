@@ -6,6 +6,7 @@ import {License} from "@code0-tech/sagittarius-graphql-types";
 import {ApplicationService} from "@ee-internal/application/services/Application.service";
 import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 import {LicenseCardComponent} from "@ee-internal/license/components/LicenseCardComponent";
+import {isLicenseActive} from "@core/util/license";
 
 export interface ApplicationLicensesListItemComponentProps {
     licenseId: License['id']
@@ -23,6 +24,11 @@ export const ApplicationLicensesListItemComponent: React.FC<ApplicationLicensesL
         [applicationStore, licenseId]
     )
 
+    const active = React.useMemo(
+        () => isLicenseActive(license) && applicationService.get()?.currentLicense?.id === licenseId,
+        [applicationStore, license, licenseId]
+    )
+
     const licenseRemove = React.useCallback(() => {
         applicationService.applicationLicenseRemove({
             licenseId: licenseId!
@@ -34,6 +40,7 @@ export const ApplicationLicensesListItemComponent: React.FC<ApplicationLicensesL
     }, [licenseId])
 
     return <LicenseCardComponent license={license}
-                                fallbackName={"Enterprise Edition license"}
-                                onRemove={licenseRemove}/>
+                                 fallbackName={"Enterprise Edition license"}
+                                 active={active}
+                                 onRemove={licenseRemove}/>
 }

@@ -6,6 +6,7 @@ import {License, Namespace} from "@code0-tech/sagittarius-graphql-types";
 import {NamespaceService} from "@cloud-internal/namespace/services/Namespace.service";
 import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 import {LicenseCardComponent} from "@ee-internal/license/components/LicenseCardComponent";
+import {isLicenseActive} from "@core/util/license";
 
 export interface NamespaceLicensesListItemComponentProps {
     namespaceId: Namespace['id']
@@ -24,6 +25,11 @@ export const NamespaceLicensesListItemComponent: React.FC<NamespaceLicensesListI
         [namespaceStore, namespaceId, licenseId]
     )
 
+    const active = React.useMemo(
+        () => isLicenseActive(license) && namespaceService.getById(namespaceId)?.currentLicense?.id === licenseId,
+        [namespaceStore, namespaceId, license, licenseId]
+    )
+
     const licenseRemove = React.useCallback(() => {
         namespaceService.namespaceLicenseRemove({
             licenseId: licenseId!
@@ -34,5 +40,8 @@ export const NamespaceLicensesListItemComponent: React.FC<NamespaceLicensesListI
         })
     }, [licenseId])
 
-    return <LicenseCardComponent license={license} fallbackName={"Cloud license"} onRemove={licenseRemove}/>
+    return <LicenseCardComponent license={license}
+                                 fallbackName={"Cloud license"}
+                                 active={active}
+                                 onRemove={licenseRemove}/>
 }

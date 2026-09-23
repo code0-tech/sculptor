@@ -15,6 +15,9 @@ fragment Namespace on Namespace {
     projects {
         count
     }
+    currentLicense {
+        ...NamespaceLicense
+    }
     licenses (first: $firstLicense, after: $afterLicense) {
         __typename
         count

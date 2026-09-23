@@ -25,17 +25,18 @@ export const useUsageLicense = (): UsageLicense => {
         [namespaceStore, namespaceIndex, namespaceId]
     )
 
-    const license = namespace?.licenses?.nodes?.find(license => isLicenseActive(license))
+    const license = namespace?.currentLicense
+    const active = isLicenseActive(license)
 
     return {
         license,
         licenseLevel: "namespace",
         resolved: !namespaceIndex || !!namespace,
-        licenseStartDate: license?.startDate ?? undefined,
-        limits: license
+        licenseStartDate: active ? (license?.startDate ?? undefined) : undefined,
+        limits: active
             ? {
-                workflow: license.restrictions?.workflowExecutions ?? undefined,
-                ai: license.restrictions?.aiTokens ?? undefined
+                workflow: license?.restrictions?.workflowExecutions ?? undefined,
+                ai: license?.restrictions?.aiTokens ?? undefined
             }
             : !namespaceIndex
                 ? {workflow: undefined, ai: undefined}

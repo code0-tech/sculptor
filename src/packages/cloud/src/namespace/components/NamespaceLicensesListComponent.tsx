@@ -23,7 +23,17 @@ export const NamespaceLicensesListComponent: React.FC<NamespaceLicensesListCompo
     const namespaceStore = useStore(NamespaceService)
 
     const licenses = React.useMemo(
-        () => (namespaceService.getById(namespaceId)?.licenses?.nodes as License[] ?? []).filter(preFilter),
+        () => {
+            const currentLicenseId = namespaceService.getById(namespaceId)?.currentLicense?.id
+            return (namespaceService.getById(namespaceId)?.licenses?.nodes as License[] ?? [])
+                .filter(preFilter)
+                .sort((first, second) => {
+                    if (first?.id === second?.id) return 0
+                    if (first?.id === currentLicenseId) return -1
+                    if (second?.id === currentLicenseId) return 1
+                    return new Date(second?.startDate ?? 0).getTime() - new Date(first?.startDate ?? 0).getTime()
+                })
+        },
         [namespaceStore, namespaceId, preFilter]
     )
 

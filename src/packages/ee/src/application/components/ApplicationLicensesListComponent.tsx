@@ -22,7 +22,17 @@ export const ApplicationLicensesListComponent: React.FC<ApplicationLicensesListC
     const applicationStore = useStore(ApplicationService)
 
     const licenses = React.useMemo(
-        () => (applicationService.get()?.licenses?.nodes as License[] ?? []).filter(preFilter),
+        () => {
+            const currentLicenseId = applicationService.get()?.currentLicense?.id
+            return (applicationService.get()?.licenses?.nodes as License[] ?? [])
+                .filter(preFilter)
+                .sort((first, second) => {
+                    if (first?.id === second?.id) return 0
+                    if (first?.id === currentLicenseId) return -1
+                    if (second?.id === currentLicenseId) return 1
+                    return new Date(second?.startDate ?? 0).getTime() - new Date(first?.startDate ?? 0).getTime()
+                })
+        },
         [applicationStore, preFilter]
     )
 
