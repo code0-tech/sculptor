@@ -19,6 +19,7 @@ export const useUsageLicense = (): UsageLicense => {
 
     return {
         licenseLevel: "application",
+        resolved: true,
         limits: {workflow: undefined, ai: undefined},
         accessible: !!currentUser?.admin
     }

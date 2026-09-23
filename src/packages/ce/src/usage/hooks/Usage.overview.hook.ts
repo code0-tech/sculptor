@@ -24,7 +24,7 @@ export const useUsageOverview = (): UsageOverview => {
     const usageStore = useStore(UsageService)
     const params = useParams()
 
-    const {licenseLevel, licenseStartDate, limits, accessible} = useUsageLicense()
+    const {licenseLevel, licenseStartDate, limits, accessible, resolved} = useUsageLicense()
 
     const namespaceIndex = params.namespaceId as any as number
     const projectIndex = params.projectId as any as number
@@ -39,14 +39,14 @@ export const useUsageOverview = (): UsageOverview => {
     const {afterDate, beforeDate} = getLicensePeriod(licenseStartDate)
 
     const overallUsage = React.useMemo(() => {
-        if (!accessible) return undefined
+        if (!accessible || !resolved) return undefined
         return overallLevel === "namespace"
             ? usageService.getNamespaceUsage(namespaceId, {afterDate, beforeDate})
             : usageService.getApplicationUsage({afterDate, beforeDate})
-    }, [usageStore, overallLevel, accessible, namespaceId, afterDate, beforeDate])
+    }, [usageStore, overallLevel, accessible, resolved, namespaceId, afterDate, beforeDate])
 
     const contextUsage = React.useMemo(() => {
-        if (!accessible || RANK[contextLevel] <= RANK[overallLevel]) return undefined
+        if (!accessible || !resolved || RANK[contextLevel] <= RANK[overallLevel]) return undefined
         if (contextLevel === "flow") return usageService.getFlowUsage(namespaceId, projectId, flowId, {
             afterDate,
             beforeDate
@@ -56,7 +56,7 @@ export const useUsageOverview = (): UsageOverview => {
             beforeDate
         })
         return usageService.getNamespaceUsage(namespaceId, {afterDate, beforeDate})
-    }, [usageStore, accessible, contextLevel, overallLevel, namespaceId, projectId, flowId, afterDate, beforeDate])
+    }, [usageStore, accessible, resolved, contextLevel, overallLevel, namespaceId, projectId, flowId, afterDate, beforeDate])
 
     return {
         accessible,
