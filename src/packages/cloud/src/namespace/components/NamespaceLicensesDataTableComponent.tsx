@@ -1,22 +1,10 @@
 "use client"
 
 import React from "react";
-import {
-    AuroraBackground,
-    Button,
-    ButtonGroup,
-    DataTable,
-    DataTableColumn,
-    Flex,
-    Spacing,
-    Text,
-    useService,
-    useStore
-} from "@code0-tech/pictor";
+import {DataTable, DataTableColumn, Text, useService, useStore} from "@code0-tech/pictor";
 import {DataTableFilterProps, DataTableSortProps} from "@code0-tech/pictor/dist/components/data-table/DataTable";
-import {License, Namespace} from "@code0-tech/sagittarius-graphql-types";
 import Link from "next/link";
-import {ApplicationService} from "@edition/application/services/Application.service";
+import {License, Namespace} from "@code0-tech/sagittarius-graphql-types";
 import {NamespaceService} from "@edition/namespace/services/Namespace.service";
 import {
     NamespaceLicensesDataTableRowComponent
@@ -45,33 +33,12 @@ export const NamespaceLicensesDataTableComponent: React.FC<LicensesDataTableComp
     return <DataTable filter={{}}
                       sort={{}}
                       emptyComponent={<DataTableColumn>
-                          <Flex align={"center"} justify={"center"}
-                                style={{textAlign: "center", flexDirection: "column"}}>
-                              <Text size={"lg"} hierarchy={"primary"}>
-                                  No license connected yet
-                              </Text>
-                              <Spacing spacing={"xl"}/>
+                          <Link href={`/upgrade?namespace=${namespaceId?.match(/Namespace\/(\d+)$/)?.[1]}`}
+                                style={{display: "block"}}>
                               <Text>
-                                  To use the cloud features, you need to have at least one license connected to
-                                  your <br/>
-                                  namespace.
+                                  No license connected yet. Upgrade your plan to unlock the cloud features.
                               </Text>
-                              <Spacing spacing={"xl"}/>
-                              <ButtonGroup>
-                                  <Link href={"https://codezero.build/subscription"}>
-                                      <Button color={"secondary"} variant={"none"}>
-                                          Link bought license
-                                      </Button>
-                                  </Link>
-                                  <Link href={"https://codezero.build/subscription"}>
-                                      <Button color={"secondary"} variant={"none"}>
-                                          <AuroraBackground/>
-                                          Buy new license
-                                      </Button>
-                                  </Link>
-                              </ButtonGroup>
-                          </Flex>
-
+                          </Link>
                       </DataTableColumn>}
                       onSelect={(item) => item && onSelect?.(item)}
                       data={licenses?.filter(preFilter)}>

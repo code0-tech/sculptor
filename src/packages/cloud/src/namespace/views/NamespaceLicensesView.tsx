@@ -1,3 +1,5 @@
+"use client"
+
 import React from "react";
 import {
     AuroraBackground,
@@ -5,118 +7,104 @@ import {
     Button,
     ButtonGroup,
     Card,
-    Col,
     Flex,
-    ProgressLinear,
-    Row,
     Spacing,
-    Text
+    Text,
+    useService,
+    useStore
 } from "@code0-tech/pictor";
 import Link from "next/link";
+import {IconPlus, IconShoppingCart} from "@tabler/icons-react";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {
     NamespaceLicensesDataTableComponent
 } from "@cloud-internal/namespace/components/NamespaceLicensesDataTableComponent";
 import {useParams} from "next/navigation";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
+import {NamespaceService} from "@edition/namespace/services/Namespace.service";
+import {UsageService} from "@edition/usage/services/Usage.service";
+import {useUsageLicense} from "@edition/usage/hooks/Usage.license.hook";
+import {getLicensePeriod} from "@core/util/license";
+import {UpgradeButtonComponent} from "@cloud-internal/license/components/UpgradeButtonComponent";
+import {LicenseSummarySectionComponent} from "@ee-internal/license/components/LicenseSummarySectionComponent";
+import {LicenseUsageSectionComponent} from "@ee-internal/license/components/LicenseUsageSectionComponent";
 
 export const NamespaceLicensesView: React.FC = () => {
 
     const params = useParams()
 
+    const namespaceService = useService(NamespaceService)
+    const namespaceStore = useStore(NamespaceService)
+    const usageService = useService(UsageService)
+    const usageStore = useStore(UsageService)
+
     const namespaceIndex = params.namespaceId as any as number
     const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
 
+    const licenseCount = React.useMemo(
+        () => namespaceService.getById(namespaceId)?.licenses?.nodes?.length ?? 0,
+        [namespaceStore, namespaceId]
+    )
+
+    const {license, licenseStartDate, limits} = useUsageLicense()
+
+    const {afterDate, beforeDate} = getLicensePeriod(licenseStartDate)
+
+    const usage = React.useMemo(
+        () => usageService.getNamespaceUsage(namespaceId, {afterDate, beforeDate}),
+        [usageStore, namespaceId, afterDate, beforeDate]
+    )
+
     return <TabContent value={"licenses"}>
-        <Flex align={"center"} justify={"space-between"}>
-            <Flex style={{gap: "0.35rem", flexDirection: "column"}}>
-                <Text size={"xl"} hierarchy={"primary"}>
-                    Licenses
-                </Text>
-                <Text size={"sm"} hierarchy={"tertiary"}>
-                    Manage members that belong to this namespace. You can add new members and manage their permissions.
-                </Text>
+        <Flex justify={"space-between"} align={"center"}>
+            <Flex align={"center"} style={{gap: "0.5rem"}}>
+                <Text size={"lg"} hierarchy={"primary"} display={"block"}>Licenses</Text>
+                <Badge color={"secondary"}>{licenseCount}</Badge>
             </Flex>
             <ButtonGroup>
                 <Link href={"/licenses/add"}>
-                    <Button color={"secondary"} variant={"none"}>
-                        Add new license
+                    <Button variant={"none"} paddingSize={"xxs"}>
+                        <IconPlus size={13}/>
                     </Button>
                 </Link>
                 <Link href={"https://codezero.build/subscription"}>
-                    <Button color={"secondary"} variant={"none"}>
+                    <Button variant={"none"} paddingSize={"xxs"}>
                         <AuroraBackground/>
-                        Buy new license
+                        <IconShoppingCart size={13}/>
                     </Button>
                 </Link>
             </ButtonGroup>
         </Flex>
-        <Spacing spacing={"xl"}/>
-        <Row>
-            <Col xs={4}>
-                <Card color={"secondary"} h={"100%"}>
-                    <Flex align={"center"} justify={"space-between"} style={{gap: "0.35rem"}}>
-                        <Text hierarchy={"primary"}>
-                            Enterprise Edition license
-                        </Text>
-                        <Badge color={"success"}>
-                            <Text style={{color: "inherit"}}>
-                                Active
-                            </Text>
-                        </Badge>
-                    </Flex>
-                    <Spacing spacing={"xs"}/>
-                    <Card color={"primary"} mx={-1.2} mb={-1.2}>
-                        <Text>
-                            Active since
-                            about 2 months ago
-                            and active until
-                            in 10 months
-                        </Text>
-                    </Card>
-                </Card>
-            </Col>
-            <Col xs={4}>
-                <Card color={"secondary"} h={"100%"}>
-                    <Text hierarchy={"primary"}>
-                        Workflow usage (2.250)
-                    </Text>
-                    <Spacing spacing={"xs"}/>
-                    <Card color={"primary"} mx={-1.2} mb={-1.2}>
-                        <ProgressLinear value={9} predictionValue={24} max={100}
-                                  color={"linear-gradient(to right, #29BF12 0%, #D90429 100%)"}/>
-                        <Spacing spacing={"xs"}/>
-                        <Text>
-                            You used 9% of your available workflow executions and will used 24% until its reseted.
-                        </Text>
-                    </Card>
-                </Card>
-            </Col>
-            <Col xs={4}>
-                <Card color={"secondary"} h={"100%"}>
-                    <Text hierarchy={"primary"}>
-                        AI usage (250)
-                    </Text>
-                    <Spacing spacing={"xs"}/>
-                    <Card color={"primary"} mx={-1.2} mb={-1.2}>
-                        <ProgressLinear value={50} predictionValue={89} max={100} color={"#70ffb2"}/>
-                        <Spacing spacing={"xs"}/>
-                        <Text>
-                            You used 50% of your available workflow executions and will used 89% until its reseted.
-                        </Text>
-                    </Card>
-                </Card>
-            </Col>
-        </Row>
-        <Spacing spacing={"xl"}/>
+        <Spacing spacing={"xs"}/>
+        <Text size={"md"} hierarchy={"tertiary"}>
+            Manage the licenses of this namespace. Your active license decides which workflow and AI entitlements
+            everyone in this namespace can use.
+        </Text>
+        <Spacing spacing={"md"}/>
+        <Text size={"md"} hierarchy={"secondary"}>Current plan</Text>
+        <Spacing spacing={"lg"}/>
         <Card color={"secondary"}>
-            <Text hierarchy={"primary"}>
-                All used or future licenses
-            </Text>
-            <Spacing spacing={"xs"}/>
-            <Card color={"primary"} mx={-1.2} mb={-1.2}>
-                <NamespaceLicensesDataTableComponent namespaceId={namespaceId}/>
-            </Card>
+            <LicenseSummarySectionComponent license={license}
+                                            fallbackName={"Free plan"}
+                                            action={<UpgradeButtonComponent namespaceId={namespaceIndex}
+                                                                            color={"tertiary"}
+                                                                            paddingSize={"xxs"}/>}/>
+            <LicenseUsageSectionComponent title={"Workflow usage"}
+                                          unit={"workflow executions"}
+                                          used={usage?.runtimeCount ?? 0}
+                                          limit={limits.workflow}
+                                          afterDate={afterDate}
+                                          beforeDate={beforeDate}/>
+            <LicenseUsageSectionComponent title={"AI usage"}
+                                          unit={"AI tokens"}
+                                          used={usage?.aiValue ?? 0}
+                                          limit={limits.ai}
+                                          afterDate={afterDate}
+                                          beforeDate={beforeDate}/>
         </Card>
+        <Spacing spacing={"lg"}/>
+        <Text size={"md"} hierarchy={"secondary"}>All used or future licenses</Text>
+        <Spacing spacing={"lg"}/>
+        <NamespaceLicensesDataTableComponent namespaceId={namespaceId}/>
     </TabContent>
 }
