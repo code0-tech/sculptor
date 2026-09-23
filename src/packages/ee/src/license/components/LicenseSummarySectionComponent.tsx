@@ -34,23 +34,22 @@ export const LicenseSummarySectionComponent: React.FC<LicenseSummarySectionCompo
                 </Text>
                 <Text size={"md"} hierarchy={"tertiary"}>
                     {license?.startDate ? <>
-                        Active since <Text size={"md"} hierarchy={"primary"} display={"inline-block"}>
+                        Active since <Text size={"md"} hierarchy={"primary"} display={"inline"} style={{verticalAlign: "baseline"}}>
                         {formatDistanceToNow(license.startDate, {addSuffix: true})}
-                    </Text> and active until <Text size={"md"} hierarchy={"primary"} display={"inline-block"}>
+                    </Text> and active until <Text size={"md"} hierarchy={"primary"} display={"inline"} style={{verticalAlign: "baseline"}}>
                         {license.endDate ? formatDistanceToNow(license.endDate, {addSuffix: true}) : "further notice"}
-                    </Text>
+                    </Text>.
                     </> : "No license connected yet."}
                     {paymentPeriod ? <>
-                        {" · "}
-                        <Text size={"md"} hierarchy={"primary"} display={"inline-block"}>
-                            {licensePaymentPeriodNames[paymentPeriod] ?? paymentPeriod} billing
-                        </Text>
-                    </> : null}
-                    {customerType ? <>
-                        {" · "}
-                        <Text size={"md"} hierarchy={"primary"} display={"inline-block"}>
-                            {licenseCustomerTypeNames[customerType] ?? customerType} customer
-                        </Text>
+                        {" "}Billed <Text size={"md"} hierarchy={"primary"} display={"inline"} style={{verticalAlign: "baseline"}}>
+                        {(licensePaymentPeriodNames[paymentPeriod] ?? paymentPeriod).toLowerCase()}
+                    </Text>{customerType ? <> as a <Text size={"md"} hierarchy={"primary"} display={"inline"} style={{verticalAlign: "baseline"}}>
+                        {(licenseCustomerTypeNames[customerType] ?? customerType).toLowerCase()}
+                    </Text> customer</> : null}.
+                    </> : customerType ? <>
+                        {" "}Registered as a <Text size={"md"} hierarchy={"primary"} display={"inline"} style={{verticalAlign: "baseline"}}>
+                        {(licenseCustomerTypeNames[customerType] ?? customerType).toLowerCase()}
+                    </Text> customer.
                     </> : null}
                 </Text>
             </Flex>

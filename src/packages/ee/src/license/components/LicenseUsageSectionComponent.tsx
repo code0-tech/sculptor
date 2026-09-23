@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react";
-import {Badge, Flex, getSize, ProgressLinear, Text} from "@code0-tech/pictor";
+import {Flex, getSize, ProgressLinear, Text} from "@code0-tech/pictor";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {parseISO} from "date-fns";
 import {getUsageColor, getUsageFill} from "@core/util/usage";
@@ -39,22 +39,21 @@ export const LicenseUsageSectionComponent: React.FC<LicenseUsageSectionComponent
                 </Text>
                 <Text size={"md"} hierarchy={"tertiary"}>
                     {bounded ? <>
-                        You used <Text size={"md"} hierarchy={"primary"} display={"inline-block"}>
+                        You used <Text size={"md"} hierarchy={"primary"} display={"inline"} style={{verticalAlign: "baseline"}}>
                         {usedPercent}%
-                    </Text> of your <Text size={"md"} hierarchy={"primary"} display={"inline-block"}>
+                    </Text> of your <Text size={"md"} hierarchy={"primary"} display={"inline"} style={{verticalAlign: "baseline"}}>
                         {numberFormat.format(limit!)} {unit}
-                    </Text> and will have used <Text size={"md"} hierarchy={"primary"} display={"inline-block"}>
+                    </Text> and will have used <Text size={"md"} hierarchy={"primary"} display={"inline"} style={{verticalAlign: "baseline"}}>
                         {projectedPercent}%
                     </Text> once the period resets.
                     </> : exhausted ? <>
-                        Your plan includes <Text size={"md"} hierarchy={"primary"} display={"inline-block"}>
+                        Your plan includes <Text size={"md"} hierarchy={"primary"} display={"inline"} style={{verticalAlign: "baseline"}}>
                         no {unit}
                     </Text>. Connect an active license to unlock them.
                     </> : <>
-                        You used <Text size={"md"} hierarchy={"primary"} display={"inline-block"}>
+                        You used <Text size={"md"} hierarchy={"primary"} display={"inline"} style={{verticalAlign: "baseline"}}>
                         {numberFormat.format(used)} {unit}
-                    </Text> in this period. Your plan has <Text size={"md"} hierarchy={"primary"}
-                                                                display={"inline-block"}>
+                    </Text> in this period. Your plan has <Text size={"md"} hierarchy={"primary"} display={"inline"} style={{verticalAlign: "baseline"}}>
                         no limit
                     </Text>.
                     </>}
@@ -65,11 +64,9 @@ export const LicenseUsageSectionComponent: React.FC<LicenseUsageSectionComponent
                                 value={usedPercent}
                                 predictionValue={projectedPercent}
                                 color={getUsageColor(used, limit)}/>
-                <Badge color={"secondary"}>
-                    <Text>
-                        {bounded ? `${usedPercent}%` : exhausted ? "none included" : "unlimited"}
-                    </Text>
-                </Badge>
+                <Text size={"md"} hierarchy={"primary"}>
+                    {bounded ? `${usedPercent}%` : exhausted ? "none included" : "unlimited"}
+                </Text>
             </Flex>
         </Flex>
     </CardSection>
