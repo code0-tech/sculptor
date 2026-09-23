@@ -7,6 +7,7 @@ import {Namespace} from "@code0-tech/sagittarius-graphql-types";
 import {NamespaceService} from "@cloud-internal/namespace/services/Namespace.service";
 import {isLicenseActive} from "@core/util/license";
 import {UpgradeButtonComponent} from "@cloud-internal/license/components/UpgradeButtonComponent";
+import {useUpgradeVisibility} from "@cloud-internal/license/hooks/License.upgradeVisibility.hook";
 
 export const NamespaceUpgradeView: React.FC = () => {
 
@@ -23,8 +24,9 @@ export const NamespaceUpgradeView: React.FC = () => {
     )
 
     const hasActiveLicense = namespace?.licenses?.nodes?.some(license => isLicenseActive(license)) ?? false
+    const upgradeVisible = useUpgradeVisibility()
 
-    if (hasActiveLicense) return null
+    if (hasActiveLicense || !upgradeVisible) return null
 
     return <UpgradeButtonComponent namespaceId={namespaceIndex} color={"tertiary"} fullWidth paddingSize={"xxs"}/>
 }

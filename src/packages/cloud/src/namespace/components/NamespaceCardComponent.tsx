@@ -10,6 +10,7 @@ import {OrganizationService} from "@edition/organization/services/Organization.s
 import {UserService} from "@edition/user/services/User.service";
 import {getNamespaceName} from "@edition/namespace/util/Namespace.name.util";
 import {UpgradeButtonComponent} from "@cloud-internal/license/components/UpgradeButtonComponent";
+import {useUpgradeVisibility} from "@cloud-internal/license/hooks/License.upgradeVisibility.hook";
 
 export interface NamespaceCardComponentProps {
     namespace: Namespace
@@ -27,6 +28,8 @@ export const NamespaceCardComponent: React.FC<NamespaceCardComponentProps> = (pr
     const isPersonal = namespace.parent?.__typename === "User"
     const user = namespace.parent?.__typename === "User"
         ? userService.getById(namespace.parent.id) : undefined
+
+    const upgradeVisible = useUpgradeVisibility()
 
     const hasActiveLicense = namespace.licenses?.nodes?.some(license =>
         !!license?.startDate && !!license?.endDate && isPast(license.startDate) && isFuture(license.endDate)
@@ -63,7 +66,7 @@ export const NamespaceCardComponent: React.FC<NamespaceCardComponentProps> = (pr
         </Card>
     </Link>
 
-    return hasActiveLicense ? (Content) : (
+    return hasActiveLicense || !upgradeVisible ? (Content) : (
         <Card p={"0"}
               style={{boxShadow: "inset 0 -1px 1px #bfbfbf1a"}}
               color={"primary"}>
