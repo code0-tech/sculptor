@@ -16,7 +16,8 @@ export const useUsageLicense = (): UsageLicense => {
     const userStore = useStore(UserService)
     const currentSession = useUserSession()
 
-    const license = React.useMemo(() => applicationService.get()?.currentLicense, [applicationStore])
+    const application = React.useMemo(() => applicationService.get(), [applicationStore])
+    const license = application?.currentLicense
 
     const currentUser = React.useMemo(
         () => userService.getById(currentSession?.user?.id),
@@ -28,6 +29,7 @@ export const useUsageLicense = (): UsageLicense => {
     return {
         license,
         licenseLevel: "application",
+        resolved: !!application,
         licenseStartDate: active ? (license?.startDate ?? undefined) : undefined,
         limits: active
             ? {
