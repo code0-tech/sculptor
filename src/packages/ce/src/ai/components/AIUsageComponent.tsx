@@ -14,7 +14,7 @@ export const AIUsageComponent: React.FC = () => {
     const used = overallUsage?.aiValue ?? 0
     const limit = limits.ai
 
-    return <Flex align={"center"} justify={"space-between"} p={0.35} style={{gap: "0.35rem"}}>
+    return <Flex align={"center"} justify={"space-between"} px={0.35} style={{gap: "0.35rem"}}>
         <Text>
             {!accessible || limit == null
                 ? "Upgrade your license to increase your AI usage limit"
