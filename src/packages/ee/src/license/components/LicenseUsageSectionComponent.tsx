@@ -3,8 +3,7 @@
 import React from "react";
 import {Flex, getSize, ProgressLinear, Text} from "@code0-tech/pictor";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
-import {parseISO} from "date-fns";
-import {getUsageColor, getUsageFill} from "@core/util/usage";
+import {getUsageColor, getUsageFill, getUsageProjectedFill} from "@core/util/usage";
 
 const numberFormat = new Intl.NumberFormat()
 
@@ -21,15 +20,11 @@ export const LicenseUsageSectionComponent: React.FC<LicenseUsageSectionComponent
 
     const {title, unit, used, limit, afterDate, beforeDate} = props
 
-    const periodStart = parseISO(afterDate).getTime()
-    const periodEnd = parseISO(beforeDate).getTime()
-    const elapsed = Math.min(1, Math.max(0.01, (Date.now() - periodStart) / (periodEnd - periodStart)))
-
     const bounded = limit != null && limit > 0
     const exhausted = limit != null && limit <= 0
 
     const usedPercent = getUsageFill(used, limit)
-    const projectedPercent = bounded ? Math.round((used / elapsed / limit!) * 100) : usedPercent
+    const projectedPercent = getUsageProjectedFill(used, limit, afterDate, beforeDate)
 
     return <CardSection border>
         <Flex justify={"space-between"} align={"center"} style={{gap: getSize("md")}}>

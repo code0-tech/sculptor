@@ -27,6 +27,7 @@ import {useUsageLicense} from "@edition/usage/hooks/Usage.license.hook";
 import {getLicensePeriod} from "@core/util/license";
 import {LicenseSummarySectionComponent} from "@ee-internal/license/components/LicenseSummarySectionComponent";
 import {LicenseUsageSectionComponent} from "@ee-internal/license/components/LicenseUsageSectionComponent";
+import {LicenseLimitsSectionComponent} from "@ee-internal/license/components/LicenseLimitsSectionComponent";
 
 export const ApplicationLicensesView: React.FC = () => {
 
@@ -72,7 +73,7 @@ export const ApplicationLicensesView: React.FC = () => {
                         </TooltipPortal>
                     </Tooltip>
                 </Link>
-                <Link href={"https://codezero.build/subscription"}>
+                <Link target={"_blank"} href={"https://codezero.build/subscription"}>
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button variant={"none"} paddingSize={"xxs"}>
@@ -107,6 +108,25 @@ export const ApplicationLicensesView: React.FC = () => {
                                                     Connect a license
                                                 </Button>
                                             </Link>}/>
+            <LicenseLimitsSectionComponent afterDate={afterDate}
+                                           beforeDate={beforeDate}
+                                           usages={[
+                                               {
+                                                   title: "Workflow executions",
+                                                   used: usage?.runtimeCount ?? 0,
+                                                   limit: limits.workflow
+                                               },
+                                               {
+                                                   title: "AI tokens",
+                                                   used: usage?.aiValue ?? 0,
+                                                   limit: limits.ai
+                                               }
+                                           ]}
+                                           action={<Link target={"_blank"} href={"https://codezero.build/subscription"}>
+                                               <Button color={"warning"} paddingSize={"xxs"}>
+                                                   Increase limits
+                                               </Button>
+                                           </Link>}/>
             <LicenseUsageSectionComponent title={"Workflow usage"}
                                           unit={"workflow executions"}
                                           used={usage?.runtimeCount ?? 0}

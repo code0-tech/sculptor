@@ -32,6 +32,7 @@ import {getLicensePeriod} from "@core/util/license";
 import {UpgradeButtonComponent} from "@cloud-internal/license/components/UpgradeButtonComponent";
 import {LicenseSummarySectionComponent} from "@ee-internal/license/components/LicenseSummarySectionComponent";
 import {LicenseUsageSectionComponent} from "@ee-internal/license/components/LicenseUsageSectionComponent";
+import {LicenseLimitsSectionComponent} from "@ee-internal/license/components/LicenseLimitsSectionComponent";
 
 export const NamespaceLicensesView: React.FC = () => {
 
@@ -115,6 +116,24 @@ export const NamespaceLicensesView: React.FC = () => {
                                             action={<UpgradeButtonComponent namespaceId={namespaceIndex}
                                                                             color={"tertiary"}
                                                                             paddingSize={"xxs"}/>}/>
+            <LicenseLimitsSectionComponent afterDate={afterDate}
+                                           beforeDate={beforeDate}
+                                           usages={[
+                                               {
+                                                   title: "Workflow executions",
+                                                   used: usage?.runtimeCount ?? 0,
+                                                   limit: limits.workflow
+                                               },
+                                               {
+                                                   title: "AI tokens",
+                                                   used: usage?.aiValue ?? 0,
+                                                   limit: limits.ai
+                                               }
+                                           ]}
+                                           action={<UpgradeButtonComponent namespaceId={namespaceIndex}
+                                                                           paddingSize={"xxs"}>
+                                               Increase limits
+                                           </UpgradeButtonComponent>}/>
             <LicenseUsageSectionComponent title={"Workflow usage"}
                                           unit={"workflow executions"}
                                           used={usage?.runtimeCount ?? 0}

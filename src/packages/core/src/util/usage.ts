@@ -1,3 +1,5 @@
+import {parseISO} from "date-fns";
+
 /**
  * Traffic light shared by every usage display: the sidebar bars, the license
  * tabs and the AI chat. White while there is headroom, warning when the limit
@@ -29,3 +31,34 @@ export const getUsageColor = (used: number, limit?: number | null): string => {
  */
 export const getUsageFill = (used: number, limit?: number | null): number =>
     limit == null || limit <= 0 ? 100 : Math.min(100, Math.round((used / limit) * 100))
+
+/**
+ * Share of the billing period that has already passed, clamped so a period that
+ * just started does not project towards infinity.
+ */
+export const getUsageElapsed = (afterDate: string, beforeDate: string): number => {
+    const periodStart = parseISO(afterDate).getTime()
+    const periodEnd = parseISO(beforeDate).getTime()
+    return Math.min(1, Math.max(0.01, (Date.now() - periodStart) / (periodEnd - periodStart)))
+}
+
+/**
+ * Percentage the bar is expected to reach once the period resets, extrapolated
+ * from the pace so far. Without a cap there is nothing to project against.
+ */
+export const getUsageProjectedFill = (used: number, limit: number | null | undefined, afterDate: string, beforeDate: string): number =>
+    limit == null || limit <= 0
+        ? getUsageFill(used, limit)
+        : Math.round((used / getUsageElapsed(afterDate, beforeDate) / limit) * 100)
+
+/**
+ * Whether to nudge towards raising the limits: the allowance already sits in the
+ * warning zone, or the current pace runs it out before the period resets. A plan
+ * without a cap, or one that includes no allowance at all, has nothing to run out
+ * of and is left to the upgrade action on the plan itself.
+ */
+export const isUsageAtRisk = (used: number, limit: number | null | undefined, afterDate: string, beforeDate: string): boolean =>
+    limit != null && limit > 0 && (
+        getUsageColor(used, limit) !== USAGE_NEUTRAL_COLOR
+        || getUsageProjectedFill(used, limit, afterDate, beforeDate) >= 100
+    )
