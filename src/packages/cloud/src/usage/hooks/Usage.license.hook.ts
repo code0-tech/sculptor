@@ -20,16 +20,17 @@ export const useUsageLicense = (): UsageLicense => {
     const namespaceIndex = params.namespaceId as any as number
     const namespaceId: Namespace["id"] = `gid://sagittarius/Namespace/${namespaceIndex}`
 
-    const license = React.useMemo(
-        () => namespaceIndex
-            ? namespaceService.getById(namespaceId)?.licenses?.nodes?.find(license => isLicenseActive(license))
-            : undefined,
+    const namespace = React.useMemo(
+        () => namespaceIndex ? namespaceService.getById(namespaceId) : undefined,
         [namespaceStore, namespaceIndex, namespaceId]
     )
+
+    const license = namespace?.licenses?.nodes?.find(license => isLicenseActive(license))
 
     return {
         license,
         licenseLevel: "namespace",
+        resolved: !namespaceIndex || !!namespace,
         licenseStartDate: license?.startDate ?? undefined,
         limits: license
             ? {
