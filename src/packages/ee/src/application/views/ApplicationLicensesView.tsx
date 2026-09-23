@@ -10,6 +10,10 @@ import {
     Flex,
     Spacing,
     Text,
+    Tooltip,
+    TooltipContent,
+    TooltipPortal,
+    TooltipTrigger,
     useService,
     useStore
 } from "@code0-tech/pictor";
@@ -36,13 +40,13 @@ export const ApplicationLicensesView: React.FC = () => {
         [applicationStore]
     )
 
-    const {license, licenseStartDate, limits} = useUsageLicense()
+    const {license, licenseStartDate, limits, resolved} = useUsageLicense()
 
     const {afterDate, beforeDate} = getLicensePeriod(licenseStartDate)
 
     const usage = React.useMemo(
-        () => usageService.getApplicationUsage({afterDate, beforeDate}),
-        [usageStore, afterDate, beforeDate]
+        () => resolved ? usageService.getApplicationUsage({afterDate, beforeDate}) : undefined,
+        [usageStore, resolved, afterDate, beforeDate]
     )
 
     return <TabContent value={"license"}>
@@ -53,15 +57,37 @@ export const ApplicationLicensesView: React.FC = () => {
             </Flex>
             <ButtonGroup>
                 <Link href={"/licenses/add"}>
-                    <Button variant={"none"} paddingSize={"xxs"}>
-                        <IconPlus size={13}/>
-                    </Button>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button variant={"none"} paddingSize={"xxs"}>
+                                <IconPlus size={13}/>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipPortal>
+                            <TooltipContent sideOffset={8} color={"secondary"}>
+                                <Text size={"sm"}>
+                                    Connect a license
+                                </Text>
+                            </TooltipContent>
+                        </TooltipPortal>
+                    </Tooltip>
                 </Link>
                 <Link href={"https://codezero.build/subscription"}>
-                    <Button variant={"none"} paddingSize={"xxs"}>
-                        <AuroraBackground/>
-                        <IconShoppingCart size={13}/>
-                    </Button>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button variant={"none"} paddingSize={"xxs"}>
+                                <AuroraBackground/>
+                                <IconShoppingCart size={13}/>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipPortal>
+                            <TooltipContent sideOffset={8} color={"secondary"}>
+                                <Text size={"sm"}>
+                                    Buy a subscription
+                                </Text>
+                            </TooltipContent>
+                        </TooltipPortal>
+                    </Tooltip>
                 </Link>
             </ButtonGroup>
         </Flex>
