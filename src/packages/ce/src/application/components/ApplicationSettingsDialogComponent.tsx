@@ -26,6 +26,13 @@ export const ApplicationSettingsDialogComponent: React.FC<ApplicationSettingsDia
                           title={"Application settings"}
                           description={"General settings and restrictions for your Sculptor application. These settings affect all users and organizations."}
                           trigger={<TabList>
+                              <TabTrigger value={"general"} w={"100%"} asChild>
+                                  <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
+                                      <IconSettings2 size={13}/>
+                                      <Text size={"md"}>Settings</Text>
+                                  </Button>
+                              </TabTrigger>
+                              <ApplicationLicensesTabTriggerView/>
                               <TabTrigger value={"users"} w={"100%"} asChild>
                                   <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
                                       <IconUsers size={13}/>
@@ -36,12 +43,6 @@ export const ApplicationSettingsDialogComponent: React.FC<ApplicationSettingsDia
                                   <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
                                       <IconServer size={13}/>
                                       <Text size={"md"}>Servers</Text>
-                                  </Button>
-                              </TabTrigger>
-                              <TabTrigger value={"general"} w={"100%"} asChild>
-                                  <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                      <IconSettings2 size={13}/>
-                                      <Text size={"md"}>Settings</Text>
                                   </Button>
                               </TabTrigger>
                               <TabTrigger value={"restrictions"} w={"100%"} asChild>
@@ -56,13 +57,12 @@ export const ApplicationSettingsDialogComponent: React.FC<ApplicationSettingsDia
                                       <Text size={"md"}>Identity providers</Text>
                                   </Button>
                               </TabTrigger>
-                              <ApplicationLicensesTabTriggerView/>
                           </TabList>}>
+        <ApplicationGeneralSettingsView/>
+        <ApplicationLicensesView/>
         <ApplicationUsersView/>
         <ApplicationServersView/>
-        <ApplicationGeneralSettingsView/>
         <ApplicationRestrictionsView/>
         <ApplicationIdentityProvidersView/>
-        <ApplicationLicensesView/>
     </SettingDialog>
 }
