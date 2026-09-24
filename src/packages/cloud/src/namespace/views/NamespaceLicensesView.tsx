@@ -126,12 +126,12 @@ export const NamespaceLicensesView: React.FC = () => {
                                             warning={licensed ? undefined : getUsageRiskDescription(atRisk, afterDate, beforeDate)}
                                             action={<UpgradeButtonComponent namespaceId={namespaceIndex}
                                                                             color={"tertiary"}
-                                                                            paddingSize={"xxs"}/>}/>
+                                                                            reference={"namespace_settings_plan"}/>}/>
             {licensed ? <LicenseLimitsSectionComponent afterDate={afterDate}
                                                        beforeDate={beforeDate}
                                                        usages={usages}
                                                        action={<UpgradeButtonComponent namespaceId={namespaceIndex}
-                                                                                       paddingSize={"xxs"}/>}/> : null}
+                                                                                       reference={"namespace_settings_limits_alert"}/>}/> : null}
             <LicenseUsageSectionComponent title={"Workflow usage"}
                                           unit={"workflow executions"}
                                           used={usage?.runtimeCount ?? 0}

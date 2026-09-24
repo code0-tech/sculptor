@@ -63,6 +63,7 @@ export const UpgradeDialogComponent: React.FC<UpgradeDialogComponentProps> = ({o
     const [pending, startTransition] = React.useTransition()
 
     const namespaceIndex = searchParams.get("namespace") as any as number
+    const reference = searchParams.get("ref")
     const namespaceId: Namespace['id'] = `gid://sagittarius/Namespace/${namespaceIndex}`
 
     const namespace = React.useMemo(
@@ -77,13 +78,14 @@ export const UpgradeDialogComponent: React.FC<UpgradeDialogComponentProps> = ({o
                 fetch("/api/config").then(response => response.json()),
                 userService.usersCreateCraterToken()
             ])
-            const subscriptionUrl = config?.subscriptionUrl as string | null | undefined
+            const checkoutUrl = config?.checkoutUrl as string | null | undefined
             const token = tokenPayload?.token?.token
-            if (!subscriptionUrl || !token) {
+            if (!checkoutUrl || !token) {
                 target?.close()
                 return
             }
-            const url = new URL(subscriptionUrl)
+            const url = new URL(checkoutUrl)
+            if (reference) url.searchParams.set("ref", reference)
             if (namespaceIndex) url.searchParams.set("namespace", namespaceIndex.toString())
             url.searchParams.set("token", token)
             if (target) target.location.href = url.toString()

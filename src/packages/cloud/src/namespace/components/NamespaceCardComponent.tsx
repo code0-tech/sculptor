@@ -23,7 +23,7 @@ export const NamespaceCardComponent: React.FC<NamespaceCardComponentProps> = (pr
     const organizationService = useService(OrganizationService)
     const userService = useService(UserService)
 
-    const number = namespace.id?.match(/Namespace\/(\d+)$/)?.[1]
+    const namespaceIndex = namespace.id?.match(/Namespace\/(\d+)$/)?.[1]
     const name = getNamespaceName(namespace, organizationService, userService) ?? ""
     const isPersonal = namespace.parent?.__typename === "User"
     const user = namespace.parent?.__typename === "User"
@@ -35,7 +35,7 @@ export const NamespaceCardComponent: React.FC<NamespaceCardComponentProps> = (pr
         !!license?.startDate && !!license?.endDate && isPast(license.startDate) && isFuture(license.endDate)
     ) ?? false
 
-    const Content = <Link href={`/namespace/${number}`} prefetch style={{display: "contents"}}>
+    const Content = <Link href={`/namespace/${namespaceIndex}`} prefetch style={{display: "contents"}}>
         <Card color={"secondary"} clickable h={"100%"}>
             <Flex style={{flexDirection: "column", gap: "1.25rem"}}>
                 <Flex align={"center"} style={{gap: "0.85rem"}}>
@@ -75,7 +75,7 @@ export const NamespaceCardComponent: React.FC<NamespaceCardComponentProps> = (pr
                 <Text size={"sm"} hierarchy={"secondary"}>
                     Free plan, executions & AI capped
                 </Text>
-                <UpgradeButtonComponent namespaceId={number} color={"primary"} paddingSize={"xxs"}/>
+                <UpgradeButtonComponent namespaceId={namespaceIndex} color={"primary"} reference={"namespace_card"}/>
             </Flex>
         </Card>
     )
