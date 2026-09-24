@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react";
-import {Button} from "@code0-tech/pictor";
+import {Button, Text} from "@code0-tech/pictor";
 import BorderBeam from "border-beam";
 import {useUsageOverview} from "@edition/usage/hooks/Usage.overview.hook";
 import {useUsageLicense} from "@edition/usage/hooks/Usage.license.hook";
@@ -28,10 +28,12 @@ export const UpgradeButtonComponent: React.FC<UpgradeButtonComponentProps> = (pr
 
     const {afterDate, beforeDate} = getLicensePeriod(licenseStartDate)
 
-    return <BorderBeam strength={1} size={"sm"} theme={"dark"} duration={5} style={{display}}>
+    return <BorderBeam strength={1} size={"sm"} theme={"dark"} duration={5} style={{display, overflow: "initial"}}>
         <Button onClick={upgrade} disabled={pending} paddingSize={"xxs"} color={color}
                 justify={"center"} w={fullWidth ? "100%" : undefined}>
-            {(licensed ? getUsageUpgradeLabel(atRisk, afterDate, beforeDate) : undefined) ?? "Unlock the full potential"}
+            <Text style={{textWrap: "nowrap"}}>
+                {(licensed ? getUsageUpgradeLabel(atRisk, afterDate, beforeDate) : undefined) ?? "Unlock the full potential"}
+            </Text>
         </Button>
     </BorderBeam>
 }
