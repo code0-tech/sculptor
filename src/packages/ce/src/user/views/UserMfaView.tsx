@@ -11,6 +11,7 @@ import {IconCheck, IconCopy, IconDownload} from "@tabler/icons-react";
 import {UserService} from "@edition/user/services/User.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {QrCodeComponent} from "@core/components/QrCodeComponent";
+import {useMfa} from "@edition/user/components/MfaProviderComponent";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 
@@ -54,6 +55,7 @@ export const UserMfaView: React.FC = () => {
     const userService = useService(UserService)
     const userStore = useStore(UserService)
     const session = useUserSession()
+    const withMfa = useMfa()
 
     const user = React.useMemo(
         () => userService.getById(session?.user?.id),
@@ -102,7 +104,7 @@ export const UserMfaView: React.FC = () => {
         }
     })
 
-    return <TabContent value={"mfa"} style={{overflow: "hidden"}}>
+    return <TabContent value={"mfa"}>
         <Text size={"lg"} hierarchy={"primary"} display={"block"}>
             2-Step Verification
         </Text>
@@ -197,7 +199,7 @@ export const UserMfaView: React.FC = () => {
                                   onAutoSubmit={() => validate()}
                                   {...inputs.getInputProps("code")}>
                             {Array.from({length: 6}).map((_, index) => (
-                                <PinInputField key={index}/>
+                                <PinInputField size={1} key={index}/>
                             ))}
                         </PinInput>
                     </CardSection>
@@ -227,14 +229,25 @@ export const UserMfaView: React.FC = () => {
                     Regenerating replaces all existing codes.
                 </Text>
                 <Spacing spacing={"md"}/>
-                <Button w={"100%"} color={"secondary"} onClick={() => startTransition(() => {
-                    userService.usersMfaBackupCodesRotate({}).then(payload => {
-                        if (!payload?.codes || (payload.errors?.length ?? 0) > 0) return
-                        setBackupCodes(payload.codes)
-                    })
-                })}>
-                    Regenerate backup codes
-                </Button>
+                <Flex style={{gap: ".5rem"}}>
+                    <Button w={"100%"} color={"secondary"} onClick={() => startTransition(() => {
+                        userService.usersMfaBackupCodesRotate({}).then(payload => {
+                            if (!payload?.codes || (payload.errors?.length ?? 0) > 0) return
+                            setBackupCodes(payload.codes)
+                        })
+                    })}>
+                        Regenerate backup codes
+                    </Button>
+                    <Button w={"100%"} color={"error"} onClick={() => startTransition(async () => {
+                        // usersMfaTotpDisable always needs a fresh second factor, so the step-up
+                        // dialog opens immediately instead of after a rejected first attempt.
+                        const payload = await withMfa((mfa) => userService.usersMfaTotpDisable({mfa: mfa!}), {required: true})
+                        if (!payload?.user || (payload.errors?.length ?? 0) > 0) return
+                        toast({title: "Two-factor authentication disabled", color: "success"})
+                    })}>
+                        Turn off
+                    </Button>
+                </Flex>
             </>
         ) : (
             <Button w={"100%"} color={"success"} onClick={() => startTransition(() => {

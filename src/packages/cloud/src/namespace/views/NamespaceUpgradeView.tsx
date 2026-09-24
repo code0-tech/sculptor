@@ -2,11 +2,12 @@
 
 import React from "react";
 import {useService, useStore} from "@code0-tech/pictor";
-import {isFuture, isPast} from "date-fns";
 import {useParams} from "next/navigation";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
 import {NamespaceService} from "@cloud-internal/namespace/services/Namespace.service";
+import {isLicenseActive} from "@core/util/license";
 import {UpgradeButtonComponent} from "@cloud-internal/license/components/UpgradeButtonComponent";
+import {useUpgradeVisibility} from "@cloud-internal/license/hooks/License.upgradeVisibility.hook";
 
 export const NamespaceUpgradeView: React.FC = () => {
 
@@ -22,11 +23,11 @@ export const NamespaceUpgradeView: React.FC = () => {
         [namespaceStore, namespaceId]
     )
 
-    const hasActiveLicense = namespace?.licenses?.nodes?.some(license =>
-        !!license?.startDate && !!license?.endDate && isPast(license.startDate) && isFuture(license.endDate)
-    ) ?? false
+    const hasActiveLicense = isLicenseActive(namespace?.currentLicense)
+    const upgradeVisible = useUpgradeVisibility()
 
-    if (hasActiveLicense) return null
+    if (hasActiveLicense || !upgradeVisible) return null
 
-    return <UpgradeButtonComponent namespaceId={namespaceIndex} color={"tertiary"} fullWidth paddingSize={"xxs"}/>
+    return <UpgradeButtonComponent namespaceId={namespaceIndex} color={"tertiary"} fullWidth
+                                   reference={"namespace_sidebar"}/>
 }

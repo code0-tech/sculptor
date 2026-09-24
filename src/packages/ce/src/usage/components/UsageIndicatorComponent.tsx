@@ -11,119 +11,68 @@ import {
     Tooltip,
     TooltipContent,
     TooltipPortal,
-    TooltipTrigger,
-    useService,
-    useStore
+    TooltipTrigger
 } from "@code0-tech/pictor";
-import {useParams} from "next/navigation";
-import {addMonths, differenceInMonths, endOfMonth, format, parseISO, startOfMonth} from "date-fns";
-import {UserService} from "@edition/user/services/User.service";
-import {useUserSession} from "@edition/user/hooks/User.session.hook";
-import {LicenseLevel, UsageLevel, UsageLimits, UsageService} from "@edition/usage/services/Usage.service";
+import {getUsageColor, getUsageFill, USAGE_NEUTRAL_COLOR} from "@core/util/usage";
+import {useUsageOverview} from "@edition/usage/hooks/Usage.overview.hook";
+import {UpgradeButtonComponent} from "@edition/license/components/UpgradeButtonComponent";
 
-const NEUTRAL_COLOR = "#ffffff"
-const WARNING_COLOR = "#FFBE0B"
-const DANGER_COLOR = "#D90429"
-
-const RANK: Record<UsageLevel, number> = {application: 0, namespace: 1, project: 2, flow: 3}
 const numberFormat = new Intl.NumberFormat()
 
 export interface UsageIndicatorComponentProps {
-    licenseLevel?: LicenseLevel
-    licenseStartDate?: string
-    limits?: UsageLimits
+    metric?: "workflow" | "ai"
+    side?: React.ComponentProps<typeof TooltipContent>["side"]
+    align?: React.ComponentProps<typeof TooltipContent>["align"]
+    paddingSize?: React.ComponentProps<typeof Button>["paddingSize"]
 }
 
 export const UsageIndicatorComponent: React.FC<UsageIndicatorComponentProps> = (props) => {
 
-    const {licenseLevel, licenseStartDate, limits = {workflow: undefined, ai: undefined}} = props
+    const {metric, side = "left", align, paddingSize = "xs"} = props
 
-    const userService = useService(UserService)
-    const userStore = useStore(UserService)
-    const usageService = useService(UsageService)
-    const usageStore = useStore(UsageService)
-
-    const params = useParams()
-    const currentSession = useUserSession()
-
-    const namespaceIndex = params.namespaceId as any as number
-    const projectIndex = params.projectId as any as number
-    const flowIndex = params.flowId as any as number
-    const namespaceId = `gid://sagittarius/Namespace/${namespaceIndex}`
-    const projectId = `gid://sagittarius/NamespaceProject/${projectIndex}`
-    const flowId = `gid://sagittarius/Flow/${flowIndex}`
-
-    const currentUser = React.useMemo(
-        () => userService.getById(currentSession?.user?.id),
-        [userStore, currentSession]
-    )
-
-    const overallLevel: UsageLevel = licenseLevel === "namespace" ? "namespace" : "application"
-    const contextLevel: UsageLevel = flowIndex ? "flow" : projectIndex ? "project" : namespaceIndex ? "namespace" : "application"
-    const contextLabel = contextLevel === "flow" ? "Flow" : contextLevel === "project" ? "Project" : "Namespace"
-
-    const overallAccessible = overallLevel === "application" ? !!currentUser?.admin : !!namespaceIndex
-
-    const now = new Date()
-    const licenseStart = licenseStartDate ? parseISO(licenseStartDate) : undefined
-    const monthsElapsed = licenseStart ? differenceInMonths(now, licenseStart) : 0
-    const periodStart = licenseStart ? addMonths(licenseStart, monthsElapsed) : startOfMonth(now)
-    const periodEnd = licenseStart ? addMonths(licenseStart, monthsElapsed + 1) : addMonths(periodStart, 1)
-    const afterDate = format(periodStart, "yyyy-MM-dd")
-    const beforeDate = format(periodEnd, "yyyy-MM-dd")
-
-    const overallUsage = React.useMemo(() => {
-        if (!overallAccessible) return undefined
-        return overallLevel === "namespace"
-            ? usageService.getNamespaceUsage(namespaceId, {afterDate, beforeDate})
-            : usageService.getApplicationUsage({afterDate, beforeDate})
-    }, [usageStore, overallLevel, overallAccessible, namespaceId, afterDate, beforeDate])
-
-    const contextUsage = React.useMemo(() => {
-        if (RANK[contextLevel] <= RANK[overallLevel]) return undefined
-        if (contextLevel === "flow") return usageService.getFlowUsage(namespaceId, projectId, flowId, {afterDate, beforeDate})
-        if (contextLevel === "project") return usageService.getProjectUsage(namespaceId, projectId, {afterDate, beforeDate})
-        return usageService.getNamespaceUsage(namespaceId, {afterDate, beforeDate})
-    }, [usageStore, contextLevel, overallLevel, namespaceId, projectId, flowId, afterDate, beforeDate])
-
-    if (!overallAccessible) return null
-
+    const {accessible, limits, namespaceIndex, contextLabel, overallUsage, contextUsage} = useUsageOverview()
+    const [tooltipOpen, setTooltipOpen] = React.useState(false)
     const hasContext = !!contextUsage
 
+    if (!accessible) return null
+
     const sections = [
-        {title: "Workflow usage", overall: overallUsage?.runtimeCount ?? 0, context: contextUsage?.runtimeCount ?? 0, limit: limits.workflow},
-        {title: "AI usage", overall: overallUsage?.aiValue ?? 0, context: contextUsage?.aiValue ?? 0, limit: limits.ai}
-    ].map(section => {
+        {metric: "workflow", title: "Workflow usage", overall: overallUsage?.runtimeCount ?? 0, context: contextUsage?.runtimeCount ?? 0, limit: limits.workflow},
+        {metric: "ai", title: "AI usage", overall: overallUsage?.aiValue ?? 0, context: contextUsage?.aiValue ?? 0, limit: limits.ai}
+    ].filter(section => !metric || section.metric === metric).map(section => {
 
         const bounded = section.limit != null && section.limit > 0
-        const exhausted = section.limit != null && section.limit <= 0
-        const ratio = bounded ? section.overall / section.limit! : 0
 
         return {
             ...section,
             bounded,
             free: bounded ? Math.max(0, section.limit! - section.overall) : 0,
-            overallFill: section.limit == null || exhausted ? 100 : Math.min(100, Math.round(ratio * 100)),
+            overallFill: getUsageFill(section.overall, section.limit),
             contextFill: section.limit == null
                 ? (section.overall > 0 ? Math.min(100, Math.round((section.context / section.overall) * 100)) : 0)
-                : exhausted ? 100 : Math.min(100, Math.round((section.context / section.limit!) * 100)),
-            color: bounded
-                ? (ratio < 0.75 ? NEUTRAL_COLOR : ratio < 0.9 ? WARNING_COLOR : DANGER_COLOR)
-                : exhausted ? DANGER_COLOR : NEUTRAL_COLOR
+                : getUsageFill(section.context, section.limit),
+            color: getUsageColor(section.overall, section.limit)
         }
     })
 
-    return <Tooltip>
+    return <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
         <TooltipTrigger asChild>
             <Button variant={"none"} style={{padding: getSize("xs")}}>
                 <Flex w={"16px"} h={"16px"} align={"center"} justify={"center"}>
-                    <ProgressCircle style={{position: "absolute"}} value={sections[0].overallFill} color={sections[0].color} size={16}/>
-                    <ProgressCircle value={sections[1].overallFill} color={sections[1].color} size={10}/>
+                    {sections.map((section, index) => (
+                        <ProgressCircle key={section.title}
+                                        style={index < sections.length - 1 ? {position: "absolute"} : undefined}
+                                        value={section.overallFill}
+                                        color={section.color}
+                                        size={16 - (index * 6)}/>
+                    ))}
                 </Flex>
             </Button>
         </TooltipTrigger>
         <TooltipPortal>
-            <TooltipContent color={"primary"} side={"left"} sideOffset={8}>
+            <TooltipContent color={"primary"} side={side} align={align} sideOffset={8}
+                            style={{zIndex: 49}}
+                            onClick={() => setTooltipOpen(false)}>
                 <Flex style={{flexDirection: "column", gap: getSize("md"), minWidth: "220px"}}>
                     {sections.map((section, index) => {
 
@@ -174,6 +123,11 @@ export const UsageIndicatorComponent: React.FC<UsageIndicatorComponentProps> = (
                             </Flex>
                         </React.Fragment>
                     })}
+                    {sections.some(section => section.color !== USAGE_NEUTRAL_COLOR) ? (
+                        <UpgradeButtonComponent namespaceId={namespaceIndex}
+                                                fullWidth
+                                                reference={"usage_indication"}/>
+                    ) : null}
                 </Flex>
             </TooltipContent>
         </TooltipPortal>

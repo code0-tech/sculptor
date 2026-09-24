@@ -28,7 +28,7 @@ import {IconApiApp, IconCheck, IconChevronDown} from "@tabler/icons-react";
 import {isValidRedirect} from "@core/util/redirect";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {OrganizationService} from "@ce-internal/organization/services/Organization.service";
-import {UserService} from "@ce-internal/user/services/User.service";
+import {UserService} from "@cloud-internal/user/services/User.service";
 import {OrganizationView} from "@ce-internal/organization/services/Organization.view";
 
 export const UserRedirectPage: React.FC = () => {

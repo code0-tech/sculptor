@@ -59,7 +59,7 @@ export const ProjectRecentListView: React.FC = () => {
                          prefetch>
                 <Button variant={"none"} w={"100%"} justify={"flex-start"} paddingSize={"xxs"}>
                     <Avatar identifier={project.name ?? ""} color={hashToColor(project?.name ?? "", 0, 180)} size={13}/>
-                    <Text size={"md"}>
+                    <Text>
                         {project.name}
                     </Text>
                 </Button>

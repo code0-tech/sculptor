@@ -26,6 +26,7 @@ import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/Butto
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {SuggestionDialogComponent} from "@edition/function/components/suggestion/SuggestionDialogComponent";
 import {useHotkeys} from "react-hotkeys-hook";
+import {useParams} from "next/navigation";
 import {useSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
 import {useFunctionSuggestions} from "@edition/function/hooks/Function.suggestion.hook";
 import {IconArrowBigUp, IconBackspace, IconLetterA, IconLetterQ, IconLetterX} from "@tabler/icons-react";
@@ -38,6 +39,7 @@ import {useFlowCompareStore} from "@edition/flow/hooks/Flow.compare.hook";
 import {FunctionNodeComponentProps} from "@edition/function/components/nodes/FunctionNodeComponent";
 import {FlowView} from "@edition/flow/services/Flow.view";
 import {FlowExecuteDialogComponent} from "@edition/flow/components/FlowExecuteDialogComponent";
+import {FlowPanelUsageComponent} from "@edition/flow/components/panels/FlowPanelUsageComponent";
 
 export interface FlowPanelControlComponentProps {
     namespaceId: Namespace['id']
@@ -56,6 +58,8 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
     const compareFlow = useFlowCompareStore(state => state.flow)
     const setCompareFlow = useFlowCompareStore(state => state.setFlow)
     const clearCompareFlow = useFlowCompareStore(state => state.clearFlow)
+
+    const params = useParams()
 
     const [, startTransition] = React.useTransition()
     const [suggestionDialogOpen, setSuggestionDialogOpen] = React.useState(false)
@@ -173,6 +177,8 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
                                            open={suggestionDialogOpen}
                                            onSuggestionSelect={addNodeToFlow}
                                            onOpenChange={setSuggestionDialogOpen}/>
+
+                {params.namespaceId ? <FlowPanelUsageComponent/> : null}
 
                 <ButtonGroup style={{textWrap: "nowrap"}}>
                     <Tooltip>

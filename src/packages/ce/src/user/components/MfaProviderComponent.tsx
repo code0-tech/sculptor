@@ -30,9 +30,15 @@ interface MfaDialog {
     close: () => void
 }
 
+// Options accepted by useMfa(): `required` skips the optimistic first attempt for
+// operations whose input demands an MfaInput, so the dialog opens right away.
+export interface WithMfaOptions {
+    required?: boolean
+}
+
 // Returned by useMfa(): wraps an operation with MFA step-up so callers only pass the operation.
 export interface WithMfa {
-    <T extends PayloadWithErrors | undefined>(operation: (mfa?: MfaInput) => Promise<T>): Promise<T>
+    <T extends PayloadWithErrors | undefined>(operation: (mfa?: MfaInput) => Promise<T>, options?: WithMfaOptions): Promise<T>
 }
 
 interface ErrorLike {
@@ -66,8 +72,11 @@ const requestAndRetry = async <T extends PayloadWithErrors | undefined>(
 
 const withMfaRetry = async <T extends PayloadWithErrors | undefined>(
     operation: (mfa?: MfaInput) => Promise<T>,
-    dialog: MfaDialog
+    dialog: MfaDialog,
+    options: WithMfaOptions = {}
 ): Promise<T> => {
+    if (options.required) return requestAndRetry(operation, dialog, undefined as T)
+
     const result = await operation()
     if (!hasError(result, MFA_TRIGGER_ERRORS)) return result
     return requestAndRetry(operation, dialog, result)
@@ -102,8 +111,15 @@ export const MfaProviderComponent: React.FC<{ children: React.ReactNode }> = ({c
         new Promise<MfaInput | null>((resolve) => {
             resolverRef.current?.(null)
             resolverRef.current = resolve
-            setRequestId(id => id + 1)
-            setState({open: true, error: options.error, loading: false})
+            // Callers await this promise inside startTransition. React entangles every
+            // transition update with the pending async action, so opening the dialog in
+            // that scope would only commit once the action settles — which can never
+            // happen while the action waits for this dialog. The microtask leaves the
+            // transition scope so the dialog opens as an urgent update instead.
+            queueMicrotask(() => {
+                setRequestId(id => id + 1)
+                setState({open: true, error: options.error, loading: false})
+            })
         }), [])
 
     const close = React.useCallback(() => {
@@ -112,7 +128,7 @@ export const MfaProviderComponent: React.FC<{ children: React.ReactNode }> = ({c
 
     const dialog = React.useMemo<MfaDialog>(() => ({request, close}), [request, close])
 
-    const withMfa = React.useMemo<WithMfa>(() => (operation) => withMfaRetry(operation, dialog), [dialog])
+    const withMfa = React.useMemo<WithMfa>(() => (operation, options) => withMfaRetry(operation, dialog, options), [dialog])
 
     const initialValues = React.useMemo<{ code: string | null }>(() => ({code: null}), [requestId])
 
@@ -162,7 +178,8 @@ export const MfaProviderComponent: React.FC<{ children: React.ReactNode }> = ({c
             </Flex>
             <Spacing spacing={"xs"}/>
             <Text size={"md"} hierarchy={"tertiary"}>
-                This action requires multi-factor authentication. Enter a code from your authenticator app or one of your backup codes to continue.
+                This action requires multi-factor authentication. Enter a code from your authenticator app or one of
+                your backup codes to continue.
             </Text>
             <Spacing spacing={"md"}/>
             <MfaInputComponent key={requestId}

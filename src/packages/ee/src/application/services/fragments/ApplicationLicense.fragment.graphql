@@ -7,6 +7,19 @@ fragment ApplicationLicense on License {
     endDate
     licensee
 
+    options {
+        __typename
+        customerType
+        paymentPeriod
+        plan
+    }
+
+    restrictions {
+        __typename
+        aiTokens
+        workflowExecutions
+    }
+
     userAbilities {
         __typename
         deleteLicense

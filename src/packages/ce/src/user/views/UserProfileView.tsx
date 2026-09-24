@@ -3,17 +3,7 @@
 import React from "react";
 import {useParams} from "next/navigation";
 import Link from "next/link";
-import {
-    AuroraBackground,
-    Avatar,
-    Badge,
-    Button,
-    Flex,
-    Spacing,
-    Text,
-    useService,
-    useStore
-} from "@code0-tech/pictor";
+import {Avatar, Badge, Button, Flex, Text, useService, useStore} from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {User} from "@code0-tech/sagittarius-graphql-types";
@@ -85,11 +75,6 @@ export const UserProfileView: React.FC = () => {
                 <Link href={"/users/@me/settings"} style={{width: "100%"}}>
                     <Button w={"100%"} color={"tertiary"}>Edit Profile</Button>
                 </Link>
-                <Spacing spacing={"xs"}/>
-                <Button color={"primary"} w={"100%"} disabled>
-                    Upgrade to Pro
-                    <AuroraBackground/>
-                </Button>
             </div>
         )}
     </Flex>

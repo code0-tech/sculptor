@@ -62,7 +62,7 @@ export const FlowRecentListView: React.FC = () => {
                          prefetch>
                 <Button variant={"none"} w={"100%"} justify={"flex-start"} paddingSize={"xxs"}>
                     <FlowRecentListIcon flow={flow} project={project}/>
-                    <Text size={"md"}>
+                    <Text>
                         {displayName}
                     </Text>
                 </Button>
