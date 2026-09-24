@@ -52,6 +52,13 @@ export const getUsageProjectedFill = (used: number, limit: number | null | undef
         : Math.round((used / getUsageElapsed(afterDate, beforeDate) / limit) * 100)
 
 /**
+ * Whether the allowance is gone for the rest of the period, so whatever it pays
+ * for stops working until the period resets.
+ */
+export const isUsageExhausted = (used: number, limit?: number | null): boolean =>
+    limit != null && limit > 0 && used >= limit
+
+/**
  * Whether to nudge towards raising the limits: the allowance already sits in the
  * warning zone, or the current pace runs it out before the period resets. A plan
  * without a cap, or one that includes no allowance at all, has nothing to run out
@@ -78,10 +85,19 @@ export const getUsagesAtRisk = (usages: UsageLimitEntry[], afterDate: string, be
 
 /**
  * Headline for the entries at risk: a single metric is named, several are
- * summarised as the limits as a whole.
+ * summarised as the limits as a whole. An allowance that is already gone is
+ * stated as a fact, everything else as what is about to happen.
  */
-export const getUsageRiskTitle = (atRisk: UsageLimitEntry[]): string =>
-    atRisk.length > 1 ? "Your limits are running out" : `Your ${atRisk[0]?.title.toLowerCase()} are running out`
+export const getUsageRiskTitle = (atRisk: UsageLimitEntry[]): string => {
+
+    const exhausted = atRisk.filter(usage => isUsageExhausted(usage.used, usage.limit))
+
+    if (exhausted.length > 0) return exhausted.length > 1
+        ? "Your limits are used up"
+        : `Your ${exhausted[0].title.toLowerCase()} are used up`
+
+    return atRisk.length > 1 ? "Your limits are running out" : `Your ${atRisk[0]?.title.toLowerCase()} are running out`
+}
 
 /**
  * Sentence naming what runs out and how soon. Undefined while nothing is at
@@ -91,10 +107,47 @@ export const getUsageRiskDescription = (atRisk: UsageLimitEntry[], afterDate: st
 
     if (atRisk.length <= 0) return undefined
 
-    const names = atRisk.map(usage => usage.title.toLowerCase()).join(" and ")
+    const names = (usages: UsageLimitEntry[]) => usages.map(usage => usage.title.toLowerCase()).join(" and ")
+    const exhausted = atRisk.filter(usage => isUsageExhausted(usage.used, usage.limit))
     const exceeding = atRisk.some(usage => getUsageProjectedFill(usage.used, usage.limit, afterDate, beforeDate) >= 100)
 
+    if (exhausted.length > 0) return `Your ${names(exhausted)} are used up until this period resets.`
+
     return exceeding
-        ? `Your ${names} will be used up before this period resets.`
-        : `Your ${names} are close to their limit for this period.`
+        ? `Your ${names(atRisk)} will be used up before this period resets.`
+        : `Your ${names(atRisk)} are close to their limit for this period.`
+}
+
+/**
+ * Closing line of the warning card: raising the limits picks an exhausted
+ * allowance back up, and keeps a shrinking one from ever stopping.
+ */
+export const getUsageRiskAdvice = (atRisk: UsageLimitEntry[]): string | undefined => {
+
+    if (atRisk.length <= 0) return undefined
+
+    return atRisk.some(usage => isUsageExhausted(usage.used, usage.limit))
+        ? "Increase your limits to pick up where you left off."
+        : "Increase your limits to avoid interruptions."
+}
+
+/**
+ * Label for the upgrade action, taken from the entry that runs out first: what
+ * already stopped once its allowance is gone, what is about to stop while it
+ * still runs. Undefined while nothing is at risk, so callers can keep their own
+ * invitation.
+ */
+export const getUsageUpgradeLabel = (atRisk: UsageLimitEntry[], afterDate: string, beforeDate: string): string | undefined => {
+
+    if (atRisk.length <= 0) return undefined
+
+    const projected = (usage: UsageLimitEntry) => getUsageProjectedFill(usage.used, usage.limit, afterDate, beforeDate)
+    const worst = [...atRisk].sort((a, b) => projected(b) - projected(a))[0]
+    const ai = worst.title === "AI tokens"
+
+    if (isUsageExhausted(worst.used, worst.limit)) return ai ? "Get AI back" : "Get your flows running again"
+
+    return projected(worst) >= 90
+        ? ai ? "Don't lose AI access" : "Don't let your flows stop"
+        : ai ? "Keep AI available" : "Keep your flows running"
 }

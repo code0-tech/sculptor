@@ -5,6 +5,7 @@ import {Flex, getSize, Text} from "@code0-tech/pictor";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {IconAlertTriangle} from "@tabler/icons-react";
 import {
+    getUsageRiskAdvice,
     getUsageRiskDescription,
     getUsageRiskTitle,
     getUsagesAtRisk,
@@ -37,7 +38,7 @@ export const LicenseLimitsSectionComponent: React.FC<LicenseLimitsSectionCompone
                     </Text>
                     <Text size={"md"} hierarchy={"tertiary"}>
                         {getUsageRiskDescription(atRisk, afterDate, beforeDate)}
-                        {" "}Increase your limits to avoid interruptions.
+                        {" "}{getUsageRiskAdvice(atRisk)}
                     </Text>
                 </Flex>
             </Flex>
