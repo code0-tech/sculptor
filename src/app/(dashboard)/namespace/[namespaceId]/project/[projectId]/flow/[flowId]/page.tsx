@@ -60,7 +60,7 @@ export default function Page() {
     }, [tab, reactFlow])
 
     return <ResizablePanel id={"2"}>
-        <FlowExecutionWatcherComponent/>
+        <FlowExecutionWatcherComponent flowId={flowId}/>
         <Layout layoutGap={16} showLayoutSplitter={false} rightContent={
             <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
                 <Button aria-selected={tab === "file"}
