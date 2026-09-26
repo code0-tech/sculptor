@@ -22,6 +22,8 @@ import {
     ScrollAreaScrollbar,
     ScrollAreaThumb,
     ScrollAreaViewport,
+    SegmentedControl,
+    SegmentedControlItem,
     Spacing,
     Text,
     useForm,
@@ -33,15 +35,22 @@ import {Tab, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/T
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {ModuleService} from "@edition/module/services/Module.service";
 import {FlowNameInputComponent} from "@edition/flow/components/FlowNameInputComponent";
-import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import {useParams} from "next/navigation";
 import {ProjectService} from "@edition/project/services/Project.service";
 import {RuntimeService} from "@edition/runtime/services/Runtime.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
+import {FunctionService} from "@edition/function/services/Function.service";
+import {ensureUniqueFlowName} from "@edition/ai/util/AI.flow.mapper";
 import Link from "next/link";
 import {icon, IconString} from "@core/util/icons";
 import {FALLBACK_FLOW_TYPE_NAME} from "@core/util/fallback-translations";
 import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
+import {
+    buildFlowTemplateInput,
+    FlowTemplate,
+    FlowTemplateResolution,
+    resolveFlowTemplate
+} from "@core/util/flow-template";
 
 export interface FlowCreateDialogComponentProps {
     open?: boolean
@@ -55,14 +64,23 @@ interface FlowTypeGroup {
     icon?: string
 }
 
+interface FlowTemplateGroup {
+    resolutions: FlowTemplateResolution[]
+    displayMessage?: string
+    icon?: string
+}
+
 export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps> = (props) => {
 
     const {open, onOpenChange, flowTypeId} = props
 
     const params = useParams()
     const flowService = useService(FlowService)
+    const flowStore = useStore(FlowService)
     const flowTypeService = useService(FlowTypeService)
     const flowTypeStore = useStore(FlowTypeService)
+    const functionService = useService(FunctionService)
+    const functionStore = useStore(FunctionService)
     const moduleService = useService(ModuleService)
     const moduleStore = useStore(ModuleService)
     const projectService = useService(ProjectService)
@@ -75,6 +93,9 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
     const projectId: NamespaceProject['id'] = `gid://sagittarius/NamespaceProject/${projectIndex}`
 
     const [step, setStep] = React.useState<"type" | "name">(flowTypeId ? "name" : "type")
+    const [mode, setMode] = React.useState<"trigger" | "template">("trigger")
+    const [templates, setTemplates] = React.useState<FlowTemplate[]>([])
+    const [selectedTemplateSlug, setSelectedTemplateSlug] = React.useState<FlowTemplate['slug'] | undefined>(undefined)
     const [selectedFlowTypeId, setSelectedFlowTypeId] = React.useState<FlowType['id'] | undefined>(flowTypeId)
     const [currentTab, setCurrentTab] = React.useState<string>("group-0")
     const [holdCurrentTab, setHoldCurrentTab] = React.useState<string>("group-0")
@@ -82,11 +103,6 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
     const selectedFlowType = React.useMemo(() => {
         return flowTypeService.getById(selectedFlowTypeId)
     }, [selectedFlowTypeId, flowTypeStore])
-
-    const initialValues = React.useMemo(
-        () => ({name: null}),
-        []
-    )
 
     const project = React.useMemo(
         () => projectService.getById(projectId),
@@ -107,9 +123,45 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
         [flowTypeStore]
     )
 
+    const functions = React.useMemo(
+        () => functionService.values({
+            runtimeId: primaryRuntime?.id!,
+            projectId: projectId,
+            namespaceId: project?.namespace?.id!
+        }),
+        [functionStore, primaryRuntime]
+    )
+
+    const flows = React.useMemo(
+        () => flowService.values({namespaceId: project?.namespace?.id!, projectId: projectId}),
+        [flowStore, project]
+    )
+
     const modules = React.useMemo(
         () => moduleService.values(),
         [moduleService, moduleStore]
+    )
+
+    const resolutions = React.useMemo(
+        () => templates
+            .map(template => resolveFlowTemplate(template, flowTypes, functions))
+            .filter(resolution => resolution.available),
+        [templates, flowTypes, functions]
+    )
+
+    const selectedTemplate = React.useMemo(
+        () => resolutions.find(resolution => resolution.template.slug === selectedTemplateSlug),
+        [resolutions, selectedTemplateSlug]
+    )
+
+    const templateAdjustments = React.useMemo(
+        () => selectedTemplate ? buildFlowTemplateInput(selectedTemplate, "", flows)?.adjustments ?? [] : [],
+        [selectedTemplate, flowStore]
+    )
+
+    const initialValues = React.useMemo(
+        () => ({name: selectedTemplate ? ensureUniqueFlowName(selectedTemplate.template.name, flows.map(flow => flow.name!).filter(name => !!name)) : null}),
+        [selectedTemplateSlug]
     )
 
     const flowTypeGroups: FlowTypeGroup[] = React.useMemo(() => {
@@ -143,6 +195,39 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
         ]
     }, [flowTypes, modules])
 
+    const templateGroups: FlowTemplateGroup[] = React.useMemo(() => {
+        const groupedByModule = new Map<string, { resolutions: FlowTemplateResolution[], module: any }>()
+
+        resolutions.forEach((resolution) => {
+            const moduleId = resolution.flowType?.runtimeModule?.id ?? ""
+            const module = modules.find(m => m.id === moduleId)
+
+            if (!groupedByModule.has(moduleId)) {
+                groupedByModule.set(moduleId, {
+                    resolutions: [],
+                    module: module
+                })
+            }
+
+            groupedByModule.get(moduleId)!.resolutions.push(resolution)
+        })
+
+        return [
+            {
+                resolutions: resolutions,
+                displayMessage: "All",
+                icon: undefined
+            },
+            ...Array.from(groupedByModule.values()).map((group) => ({
+                resolutions: group.resolutions,
+                displayMessage: group.module?.names?.[0]?.content,
+                icon: group.module?.icon
+            }))
+        ]
+    }, [resolutions, modules])
+
+    const groups = mode === "template" ? templateGroups : flowTypeGroups
+
     const createFlow = React.useCallback((name: string, type: FlowType['id']) => {
         if (!type) return
         startTransition(() => {
@@ -166,10 +251,38 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
         })
     }, [flowService, selectedFlowType])
 
+    const createFlowFromTemplate = React.useCallback((name: string) => {
+        if (!selectedTemplate) return
+        const payload = buildFlowTemplateInput(selectedTemplate, name, flows)
+        if (!payload) return
+        startTransition(() => {
+            flowService.flowCreate({
+                flow: payload.input,
+                projectId: projectId
+            }).then(result => {
+                if ((result?.errors?.length ?? 0) <= 0) {
+                    toast({title: "Created flow from template", color: "success"})
+                } else {
+                    toast({title: "Could not create the flow from this template", color: "error"})
+                }
+            })
+        })
+    }, [flowService, selectedTemplate, flows])
+
+    React.useEffect(() => {
+        if (!open || templates.length > 0) return
+        fetch("/api/flow-templates")
+            .then(response => response.ok ? response.json() : {templates: []})
+            .then(data => setTemplates(data.templates ?? []))
+            .catch(() => setTemplates([]))
+    }, [open])
+
     React.useEffect(() => {
         if (open) {
             setSelectedFlowTypeId(flowTypeId)
+            setSelectedTemplateSlug(undefined)
             setStep(flowTypeId ? "name" : "type")
+            setMode("trigger")
             setCurrentTab("group-0")
             setHoldCurrentTab("group-0")
         }
@@ -185,7 +298,8 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
             }
         },
         onSubmit: (values) => {
-            createFlow?.(values.name!, selectedFlowTypeId!)
+            if (selectedTemplate) createFlowFromTemplate(values.name!)
+            else createFlow?.(values.name!, selectedFlowTypeId!)
             onOpenChange?.(false)
         }
     })
@@ -212,12 +326,14 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                     )}
                     <Spacing spacing={"xl"}/>
                     <Flex justify={"space-between"} align={"center"} style={{gap: "1.3rem"}}>
-                        <Link style={{width: "100%"}} tabIndex={-1} href={`/namespace/${namespaceIndex}/project/${projectIndex}/settings`}>
+                        <Link style={{width: "100%"}} tabIndex={-1}
+                              href={`/namespace/${namespaceIndex}/project/${projectIndex}/settings`}>
                             <Button w={"100%"} color={"tertiary"}>
                                 <Text>Assign</Text>
                             </Button>
                         </Link>
-                        <Link style={{width: "100%"}} tabIndex={-1} href={`/namespace/${namespaceIndex}/runtimes/create`}>
+                        <Link style={{width: "100%"}} tabIndex={-1}
+                              href={`/namespace/${namespaceIndex}/runtimes/create`}>
                             <Button w={"100%"} color={"tertiary"}>
                                 <Text>Create</Text>
                             </Button>
@@ -240,7 +356,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                                 <Badge><IconArrowsUpDown size={13}/></Badge>
                                 <Text>to navigate and</Text>
                                 <Badge><IconCornerDownLeft size={13}/></Badge>
-                                <Text>to select a trigger</Text>
+                                <Text>to select a {mode === "template" ? "template" : "trigger"}</Text>
                             </Flex>
                             <Flex style={{gap: "0.35rem"}} align={"center"}>
                                 <Badge>ESC</Badge>
@@ -248,14 +364,41 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                             </Flex>
                         </Flex>
                     </div>}
-                    topContent={<div style={{padding: "0.35rem 0.7rem"}}><CommandInput onChange={(event) => {
-                        if (event.target.value == "") {
-                            setCurrentTab(holdCurrentTab)
-                        } else {
-                            if (currentTab != "group-0") setHoldCurrentTab(currentTab)
-                            if (currentTab != "group-0") setCurrentTab("group-0")
-                        }
-                    }} left={<IconSearch size={13}/>} placeholder="Search for triggers..."/>
+                    topContent={<div style={{padding: "0.35rem 0.7rem"}}>
+                        <Flex align={"center"} style={{gap: "0.7rem"}}>
+                            <div style={{flex: 1}}>
+                                <CommandInput onChange={(event) => {
+                                    if (event.target.value == "") {
+                                        setCurrentTab(holdCurrentTab)
+                                    } else {
+                                        if (currentTab != "group-0") setHoldCurrentTab(currentTab)
+                                        if (currentTab != "group-0") setCurrentTab("group-0")
+                                    }
+                                }} left={<IconSearch size={13}/>}
+                                              placeholder={mode === "template" ? "Search for templates..." : "Search for triggers..."}/>
+                            </div>
+                            {resolutions.length > 0 ? <SegmentedControl type={"single"}
+                                              color={"primary"}
+                                              value={mode}
+                                              onValueChange={(value) => {
+                                                  if (!value) return
+                                                  setMode(value as "trigger" | "template")
+                                                  setCurrentTab("group-0")
+                                                  setHoldCurrentTab("group-0")
+                                              }}>
+                                <SegmentedControlItem value={"trigger"} asChild>
+                                    <Button paddingSize={"xxs"}>
+                                        <Text>Triggers</Text>
+                                    </Button>
+                                </SegmentedControlItem>
+                                <SegmentedControlItem data-qa-selector={"flow-create-template-mode"}
+                                                      value={"template"} asChild>
+                                    <Button paddingSize={"xxs"}>
+                                        <Text>Templates</Text>
+                                    </Button>
+                                </SegmentedControlItem>
+                            </SegmentedControl> : null}
+                        </Flex>
                     </div>}>
                 <Card m={0.1} h={"100%"} paddingSize={"md"}>
                     <Tab h={"100%"} orientation={"vertical"} value={currentTab}
@@ -268,7 +411,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                                 leftContent={<ScrollArea h={"100%"} type={"always"} miw={"150px"}>
                                     <ScrollAreaViewport h={"100%"} w={"100%"}>
                                         <TabList>
-                                            {flowTypeGroups.map((group, index) => {
+                                            {groups.map((group, index) => {
 
                                                 const DisplayIcon = icon(group.icon as IconString)
 
@@ -290,7 +433,40 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                                 <ScrollAreaViewport style={{minWidth: "auto"}}>
                                     <CommandList w={"100%"}>
                                         <CommandEmpty>No results found.</CommandEmpty>
-                                        {flowTypeGroups.map((group, index) => {
+                                        {mode === "template" ? templateGroups.map((group, index) => {
+                                            return currentTab === `group-${index}` && <>
+                                                {group.resolutions.map((resolution, resolutionIndex) => {
+
+                                                    const template = resolution.template
+                                                    const DisplayIcon = icon(resolution.flowType?.displayIcon as IconString)
+
+                                                    return <>
+                                                        <CommandItem
+                                                            data-qa-selector={"flow-create-template-select-item"}
+                                                            keywords={[template.name, template.description, resolution.flowType?.names?.[0]?.content ?? ""]}
+                                                            display={"block"}
+                                                            my={0.7}
+                                                            style={{boxSizing: "border-box", overflow: "hidden"}}
+                                                            value={resolutionIndex.toString()} onSelect={() => {
+                                                            setSelectedTemplateSlug(template.slug)
+                                                            setSelectedFlowTypeId(resolution.flowType?.id)
+                                                            setStep("name")
+                                                        }}>
+                                                            <Flex style={{gap: "0.35rem"}} align={"center"}>
+                                                                <DisplayIcon color={hashToColor(`group-${index}`)}
+                                                                             size={16}/>
+                                                                <Text size={"sm"}>{template.name}</Text>
+                                                            </Flex>
+                                                            <Spacing spacing={"xxs"}/>
+                                                            <Text hierarchy={"tertiary"} size={"sm"}>
+                                                                {template.description}
+                                                            </Text>
+                                                        </CommandItem>
+                                                        <CommandSeparator/>
+                                                    </>
+                                                })}
+                                            </>
+                                        }) : flowTypeGroups.map((group, index) => {
                                             return currentTab === `group-${index}` && <>
                                                 {group.flowTypes.map((flowType, flowTypeIndex) => {
 
@@ -349,7 +525,9 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                                 {selectedFlowType?.names?.[0]?.content ?? FALLBACK_FLOW_TYPE_NAME}
                             </Text>
                         </Badge>
-                        <Text hierarchy={"primary"} size={"md"}>/ Create new flow</Text>
+                        <Text hierarchy={"primary"} size={"md"}>
+                            / {selectedTemplate ? "Create flow from template" : "Create new flow"}
+                        </Text>
                     </Flex>
                     <DialogClose asChild>
                         <Button color={"tertiary"} variant={"none"}>
@@ -357,13 +535,32 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                         </Button>
                     </DialogClose>
                 </Flex>
+                {selectedTemplate ? <>
+                    <Spacing spacing={"md"}/>
+                    <Text hierarchy={"tertiary"} size={"sm"}>
+                        {selectedTemplate.template.description}
+                    </Text>
+                    <Spacing spacing={"xs"}/>
+                    <Text hierarchy={"tertiary"} size={"sm"}>
+                        {selectedTemplate.template.nodes.length} steps are created for you and can be changed
+                        afterwards.
+                    </Text>
+                </> : null}
                 <Spacing spacing={"xl"}/>
                 <FlowNameInputComponent
+                    key={selectedTemplateSlug ?? "flow"}
                     data-qa-selector={"flow-create-name"}
                     description={"You can choose a name here and only use alphanumeric names."}
                     title={"Name of the flow"}
                     {...inputs.getInputProps("name")}
                     onChange={() => validate("name")}/>
+                {templateAdjustments.map(adjustment => <>
+                    <Spacing spacing={"xs"}/>
+                    <Text hierarchy={"tertiary"} size={"sm"}>
+                        {adjustment.name} is set to {adjustment.to}, because {adjustment.from} is already used by
+                        another flow in this project.
+                    </Text>
+                </>)}
                 <Spacing spacing={"xl"}/>
                 <Flex justify={"space-between"} align={"center"}>
                     {flowTypeId ? (
@@ -372,7 +569,10 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                         </DialogClose>
                     ) : (
                         <Button color={"tertiary"}
-                                onClick={() => setStep("type")}>No, go back!</Button>
+                                onClick={() => {
+                                    setSelectedTemplateSlug(undefined)
+                                    setStep("type")
+                                }}>No, go back!</Button>
                     )}
                     <Button data-qa-selector={"flow-create-send"} color={"success"}
                             onClick={validate}>Yes, create!</Button>

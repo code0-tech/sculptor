@@ -16,6 +16,7 @@ import {
     ValidationFlow,
     Value
 } from "@code0-tech/tucana/shared"
+import {FlowTemplate, FlowTemplateValue} from "@core/util/flow-template"
 
 const TIMESTAMP = "2026-01-01T00:00:00Z"
 const RUNTIME_ID = "gid://sagittarius/Runtime/1"
@@ -127,7 +128,7 @@ const mapFlowTypeSetting = (setting: FlowTypeSetting, id: string) => ({
     __typename: "FlowTypeSetting",
     id,
     identifier: setting.identifier,
-    unique: setting.unique === FlowTypeSetting_UniquenessScope.PROJECT,
+    unique: setting.unique === FlowTypeSetting_UniquenessScope.PROJECT ? "PROJECT" : "NONE",
     optional: setting.optional ?? false,
     hidden: setting.hidden ?? false,
     defaultValue: setting.defaultValue ? plainValue(setting.defaultValue) : null,
@@ -422,3 +423,75 @@ export const mapFlows = (modules: Module[], flows: ValidationFlow[]) => {
     const flowTypeId = new Map(flowTypeEntries.map(({flowType}, index) => [flowType.identifier, gid("FlowType", index + 1)]))
     return flows.map(flow => mapFlow(flow, flowTypeId, functionId, parameterId))
 }
+
+const templateSlug = (name: string) => name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")
+
+const mapTemplateValue = (value?: NodeValue): FlowTemplateValue | null => {
+    const inner = value?.value
+
+    if (inner?.oneofKind === "literalValue") return {
+        kind: "literal",
+        value: plainValue(inner.literalValue.value),
+        references: inner.literalValue.references
+            .map(reference => ({signature: reference.signature, value: mapTemplateValue(reference.value)}))
+            .filter((reference): reference is { signature: string, value: FlowTemplateValue } => !!reference.value)
+    }
+
+    if (inner?.oneofKind === "referenceValue") {
+        const target = inner.referenceValue.target
+        const path = inner.referenceValue.paths.map(entry => ({
+            path: entry.path ?? null,
+            arrayIndex: entry.arrayIndex != null ? Number(entry.arrayIndex) : null
+        }))
+        if (target.oneofKind === "inputType") return {
+            kind: "reference",
+            nodeId: Number(target.inputType.nodeId),
+            parameterIndex: Number(target.inputType.parameterIndex),
+            inputIndex: Number(target.inputType.inputIndex),
+            path
+        }
+        return {
+            kind: "reference",
+            nodeId: target.oneofKind === "nodeId" ? Number(target.nodeId) : null,
+            parameterIndex: null,
+            inputIndex: null,
+            path
+        }
+    }
+
+    if (inner?.oneofKind === "subFlow") {
+        const executionReference = inner.subFlow.executionReference
+        return {
+            kind: "subFlow",
+            startingNodeId: executionReference.oneofKind === "startingNodeId" ? Number(executionReference.startingNodeId) : null,
+            functionIdentifier: executionReference.oneofKind === "function" ? executionReference.function.functionIdentifier : null,
+            signature: inner.subFlow.signature ?? ""
+        }
+    }
+
+    return null
+}
+
+export const mapFlowTemplates = (flows: (ValidationFlow & { description?: string })[]): FlowTemplate[] => flows.map(flow => ({
+    slug: templateSlug(flow.name),
+    name: flow.name,
+    description: flow.description ?? "",
+    flowTypeIdentifier: flow.type,
+    signature: flow.signature ?? "",
+    startingNodeId: Number(flow.startingNodeId),
+    settings: flow.settings.map(setting => ({
+        identifier: setting.flowSettingId,
+        cast: setting.cast ?? null,
+        value: plainValue(setting.value)
+    })),
+    nodes: flow.nodeFunctions.map(node => ({
+        id: Number(node.databaseId ?? 0),
+        nextId: node.nextNodeId != null ? Number(node.nextNodeId) : null,
+        functionIdentifier: node.runtimeFunctionId,
+        parameters: node.parameters.map(parameter => ({
+            identifier: parameter.runtimeParameterId,
+            cast: parameter.cast ?? null,
+            value: mapTemplateValue(parameter.value)
+        }))
+    }))
+}))

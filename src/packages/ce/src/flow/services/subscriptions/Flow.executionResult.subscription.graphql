@@ -1,5 +1,5 @@
-subscription flowExecutionResult($executionIdentifier: String!) {
-    namespacesProjectsFlowsExecutionResult(executionIdentifier: $executionIdentifier) {
+subscription flowExecutionResult($flowId: FlowID!) {
+    namespacesProjectsFlowsExecutionResult(flowId: $flowId) {
         executionResult {
             __typename
             id
