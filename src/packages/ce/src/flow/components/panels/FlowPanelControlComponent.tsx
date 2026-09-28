@@ -75,7 +75,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
         const data = selectedNode.data as FunctionNodeComponentProps
         // @ts-ignore
         startTransition(async () => {
-            if (data?.isParameter && data?.parentNodeId && data?.parameterIndex != null) {
+            if (data?.isParameter && !data?.isInlinedReference && data?.parentNodeId && data?.parameterIndex != null) {
                 await flowService.removeParameterMapping(flowId, data.parentNodeId, data.parameterIndex, data.referenceSignature)
             } else {
                 await flowService.deleteNodeById(flowId, selectedNode?.id as NodeFunction['id'])
