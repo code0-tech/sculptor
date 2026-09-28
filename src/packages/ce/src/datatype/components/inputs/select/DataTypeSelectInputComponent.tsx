@@ -2,8 +2,6 @@ import {DataTypeInputComponentProps} from "@edition/datatype/components/inputs/D
 import React from "react";
 import {useDebouncedCallback} from "use-debounce";
 import {
-    Button,
-    ButtonGroup,
     Flex,
     InputDescription,
     InputLabel,
@@ -17,9 +15,10 @@ import {
     SelectViewport,
     Text
 } from "@code0-tech/pictor";
-import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
-import {IconChevronDown, IconX} from "@tabler/icons-react";
+import {IconChevronDown} from "@tabler/icons-react";
 import lodash from "lodash"
+import {LiteralValue, NodeFunction, ReferenceValue, SubFlowValue} from "@code0-tech/sagittarius-graphql-types";
+import {DataTypeInputControlsComponent} from "@edition/datatype/components/inputs/DataTypeInputControlsComponent";
 
 
 export type DataTypeSelectInputComponentProps = DataTypeInputComponentProps
@@ -33,8 +32,8 @@ export const DataTypeSelectInputComponent: React.FC<DataTypeSelectInputComponent
         return initialValue && lodash.isMatch(initialValue, suggest)
     }), [suggestions])!
 
-    const onChangeDebounced = useDebouncedCallback((value: string | null) => {
-        onChange?.((!!value ? suggestions?.[Number(value)] : null) ?? null)
+    const onChangeDebounced = useDebouncedCallback((value: LiteralValue | SubFlowValue | NodeFunction | ReferenceValue | null) => {
+        onChange?.(value)
     }, 200)
 
     return React.useMemo(() => <>
@@ -45,18 +44,15 @@ export const DataTypeSelectInputComponent: React.FC<DataTypeSelectInputComponent
                      maw={"100%"}
                      key={defaultValue}
                      onValueChange={(value) => {
-                         formValidation?.setValue?.((!!value ? suggestions?.[Number(value)] : null) ?? null)
-                         onChangeDebounced?.(value)
+                         const suggestion = (!!value ? suggestions?.[Number(value)] : null) ?? null
+                         formValidation?.setValue?.(suggestion)
+                         onChangeDebounced(suggestion)
                      }}
                      right={
-                         <ButtonGroup color={"primary"}>
-                             <Button tabIndex={-1} color={"secondary"} onClick={() => {
-                                 formValidation?.setValue?.(null)
-                                 onChangeDebounced(null)
-                             }} paddingSize={"xxs"}>
-                                 <IconX size={13}/>
-                             </Button>
-                         </ButtonGroup>
+                         <DataTypeInputControlsComponent suggestions={suggestions} onSelect={value => {
+                             formValidation?.setValue?.(value)
+                             onChangeDebounced(value)
+                         }}/>
                      }
                      rightType={"action"}>
             <SelectTrigger asChild>
@@ -72,23 +68,15 @@ export const DataTypeSelectInputComponent: React.FC<DataTypeSelectInputComponent
                     <SelectViewport>
                         {suggestions?.map((suggest, index) => {
 
-                            if (suggest.__typename === "LiteralValue") {
-                                return <SelectItem value={index.toString()}>
-                                    <SelectItemText>
-                                        <Flex style={{gap: "0.35rem"}} align={"center"}>
-                                            {(suggest)?.value}
-                                        </Flex>
-                                    </SelectItemText>
-                                </SelectItem>
-                            }
+                            if (suggest.__typename !== "LiteralValue") return null
 
-                            if (suggest.__typename === "ReferenceValue") {
-                                return <SelectItem value={index.toString()}>
-                                    <SelectItemText>
-                                        <ReferenceBadgeComponent value={suggest}/>
-                                    </SelectItemText>
-                                </SelectItem>
-                            }
+                            return <SelectItem key={index} value={index.toString()}>
+                                <SelectItemText>
+                                    <Flex style={{gap: "0.35rem"}} align={"center"}>
+                                        {(suggest)?.value}
+                                    </Flex>
+                                </SelectItemText>
+                            </SelectItem>
                         })}
                     </SelectViewport>
                 </SelectContent>
