@@ -7,6 +7,7 @@ import {FunctionService} from "@edition/function/services/Function.service";
 import {FunctionNodeComponentProps} from "@edition/function/components/nodes/FunctionNodeComponent";
 import {useFlowSchema} from "@edition/flow/hooks/Flow.schema.hook";
 import {useFlowCompareStore} from "@edition/flow/hooks/Flow.compare.hook";
+import {useInlinedReferenceNodes} from "@edition/flow/hooks/Flow.references.hook";
 
 export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], projectId?: NamespaceProject["id"]): Node<FunctionNodeComponentProps>[] => {
 
@@ -22,6 +23,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
     )
 
     const flowSchema = useFlowSchema(flowId, namespaceId, projectId)
+    const inlinedNodes = useInlinedReferenceNodes(flowId)
 
     return React.useMemo<Node<FunctionNodeComponentProps>[]>(() => {
         if (!flow) return []
@@ -57,6 +59,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
 
             const functionDefinition = functionService.getById(node.functionDefinition?.id)
             const nodeId = node.id
+            const inlinedReference = inlinedNodes.get(nodeId)
 
             if (!visited.has(nodeId)) {
                 visited.add(nodeId)
@@ -72,6 +75,10 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                         nodeId: nodeId,
                         flowId: flowId,
                         index: globalIndex,
+                        isParameter: !!inlinedReference,
+                        isInlinedReference: !!inlinedReference,
+                        parentNodeId: inlinedReference?.hostNodeId,
+                        parameterIndex: inlinedReference?.parameterIndex,
                         color: hashToColor(nodeId),
                         schema: flowSchema?.find(signatureSchema => signatureSchema?.nodeId === node.id)?.parameters ?? []
                     },
@@ -134,6 +141,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                             extent: parentGroup ? "parent" : undefined,
                             data: {
                                 isParameter: true,
+                                parameterIndex: parameterIndex,
                                 nodeId: nodeId,
                                 flowId: flowId,
                                 color: hashToColor(subFlow?.startingNodeId ?? ""),
@@ -159,5 +167,5 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
         }
 
         return nodes
-    }, [flowStore, flow?.editedAt, flow, flowToCompare, functionStore.length, flowSchema, flowId])
+    }, [flowStore, flow?.editedAt, flow, flowToCompare, functionStore.length, flowSchema, flowId, inlinedNodes])
 }
