@@ -16,10 +16,12 @@ import {
     ButtonGroup,
     ButtonProps,
     Flex,
+    hashToColor,
     Menu,
     MenuContent,
     MenuItem,
     MenuPortal,
+    MenuSeparator,
     MenuSub,
     MenuSubContent,
     MenuSubTrigger,
@@ -35,6 +37,8 @@ import {
     TooltipTrigger
 } from "@code0-tech/pictor"
 import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeComponent";
+import {useMappedSuggestions} from "@edition/function/components/suggestion/Suggestion.util";
+import {icon, IconString} from "@core/util/icons";
 
 export interface DataTypeInputControlsComponentProps {
     suggestions?: (NodeFunction | SubFlowValue | ReferenceValue | LiteralValue)[]
@@ -142,6 +146,8 @@ export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsCompo
     const flowId: Flow['id'] = `gid://sagittarius/Flow/${flowIndex}`
     const setHoveredNodeId = useFlowReferenceHoverStore(state => state.setHoveredNodeId)
 
+    const nodeFunctionGroups = useMappedSuggestions(suggestions ?? [], "NodeFunction")
+
     const menuEntries = React.useMemo(() => {
         if (!suggestions) return []
 
@@ -191,6 +197,8 @@ export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsCompo
         return entries
     }, [suggestions])
 
+    const hasSuggestions = menuEntries.length > 0 || nodeFunctionGroups.length > 0
+
     return <ButtonGroup color={"primary"}>
         {showSuggestions ? (
             <Menu onOpenChange={(open) => {
@@ -198,15 +206,15 @@ export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsCompo
             }}>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <MenuTrigger asChild disabled={menuEntries.length <= 0}>
-                            <Button tabIndex={menuEntries.length <= 0 ? -1 : 0} paddingSize={"xxs"}>
+                        <MenuTrigger asChild disabled={!hasSuggestions}>
+                            <Button tabIndex={!hasSuggestions ? -1 : 0} paddingSize={"xxs"}>
                                 <IconVariable size={13}/>
                             </Button>
                         </MenuTrigger>
                     </TooltipTrigger>
                     <TooltipPortal>
                         <TooltipContent side={"top"} sideOffset={8}>
-                            {menuEntries.length <= 0 ? <Text>
+                            {!hasSuggestions ? <Text>
                                 No suggestion available
                             </Text> : <Text>
                                 Suggestions for this parameter
@@ -274,6 +282,43 @@ export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsCompo
                                 }
 
                                 return null
+                            })}
+                            {menuEntries.length > 0 && nodeFunctionGroups.length > 0 ? <MenuSeparator/> : null}
+                            {nodeFunctionGroups.map((group, index) => {
+
+                                const ModuleIcon = icon(group.icon as IconString)
+
+                                return <MenuSub key={`group-${index}`}>
+                                    <MenuSubTrigger onMouseEnter={() => setHoveredNodeId(null)}>
+                                        <Flex align={"center"} justify={"space-between"} style={{gap: "0.7rem"}}
+                                              w={"100%"}>
+                                            <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                                <ModuleIcon size={13} color={hashToColor(`group-${index}`)}/>
+                                                <Text>{group.displayMessage}</Text>
+                                            </Flex>
+                                            <IconChevronRight size={12}/>
+                                        </Flex>
+                                    </MenuSubTrigger>
+                                    <MenuSubContent align={"start"} collisionPadding={16} alignOffset={0}
+                                                    sideOffset={0}>
+                                        <MenuScrollArea>
+                                            {group.suggestions.map((suggestion, suggestionIndex) => {
+
+                                                const FunctionIcon = icon(suggestion.icon as IconString)
+
+                                                return <MenuItem key={suggestionIndex}
+                                                                 title={suggestion.description}
+                                                                 onSelect={() => onSelect?.(suggestion.value)}>
+                                                    <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                                        <FunctionIcon size={13}
+                                                                      color={hashToColor(`group-${index}`)}/>
+                                                        <Text>{suggestion.displayMessage}</Text>
+                                                    </Flex>
+                                                </MenuItem>
+                                            })}
+                                        </MenuScrollArea>
+                                    </MenuSubContent>
+                                </MenuSub>
                             })}
                         </MenuScrollArea>
                     </MenuContent>
