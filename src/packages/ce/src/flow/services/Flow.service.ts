@@ -374,6 +374,58 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
 
     }
 
+    addPreviousNodeById(flowId: FlowView['id'], nodeId: NodeFunction['id'] | null, previousNode: NodeFunction): NodeFunction['id'] | undefined {
+        const flow = this.getById(flowId)
+        const index = this.values().findIndex(f => f.id === flowId)
+        const node = nodeId ? this.getNodeById(flowId, nodeId) : undefined
+
+        if (!flow || (nodeId && !node)) return undefined
+
+        const nextNodeIndex: number = Math.max(0, ...flow.nodes?.nodes?.map(node => Number(node?.id?.match(/NodeFunction\/(\d+)$/)?.[1] ?? 0)) ?? [0])
+        const addingNodeId: NodeFunction['id'] = `gid://sagittarius/NodeFunction/${nextNodeIndex + 1}`
+        const addingNode: NodeFunction = {
+            ...JSON.parse(JSON.stringify(previousNode)),
+            id: addingNodeId,
+            nextNodeId: nodeId ?? flow.startingNodeId,
+        }
+
+        const parentNode = nodeId ? flow.nodes?.nodes?.find(n => n?.nextNodeId === nodeId) : undefined
+        const parentSubFlow = nodeId && !parentNode && flow.startingNodeId !== nodeId
+            ? this.getSubFlowByStartingNodeId(flow, nodeId)
+            : undefined
+
+        if (parentNode) {
+            parentNode.nextNodeId = addingNodeId
+        } else if (parentSubFlow) {
+            parentSubFlow.startingNodeId = addingNodeId
+        } else if (!nodeId || flow.startingNodeId === nodeId) {
+            flow.startingNodeId = addingNodeId
+        } else {
+            return undefined
+        }
+
+        flow.nodes?.nodes?.push(addingNode)
+        flow.editedAt = new Date().toISOString()
+
+        this.set(index, new View(flow))
+
+        return addingNode.id
+    }
+
+    private getSubFlowByStartingNodeId(flow: FlowView, nodeId: NodeFunction['id']): SubFlowValue | undefined {
+        for (const node of flow.nodes?.nodes ?? []) {
+            for (const parameter of node?.parameters?.nodes ?? []) {
+                const value = parameter?.value
+                if (value?.__typename === "SubFlowValue" && value.startingNodeId === nodeId) return value
+                if (value?.__typename === "LiteralValue") {
+                    const reference = value.references?.find(r => r?.value?.__typename === "SubFlowValue" && (r.value as SubFlowValue).startingNodeId === nodeId)
+                    if (reference) return reference.value as SubFlowValue
+                }
+            }
+        }
+        return undefined
+    }
+
     async addNextNodeById(flowId: FlowView['id'], parentNodeId: NodeFunction['id'] | null, nextNode: NodeFunction): Promise<void> {
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
