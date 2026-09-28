@@ -33,7 +33,7 @@ import {FunctionNodeSquareComponent} from "@edition/function/components/nodes/Fu
  * - Parameter nodes are centered vertically alongside their parent node and recursively laid out horizontally.
  * - Sub-parameter nodes do NOT influence the vertical stacking of main nodes; only direct parameters are considered.
  *
- * @param nodes Array of all nodes to be positioned. Each node should have at least: id, measured?.width, measured?.height, data?.isParameter, data?.parentId, and optionally data?.paramIndex.
+ * @param nodes Array of all nodes to be positioned. Each node should have at least: id, measured?.width, measured?.height, data?.isParameter, data?.parentId, and optionally data?.parameterIndex.
  * @param edges Array of edge objects, unchanged by this function (used only for return type symmetry).
  * @returns An object containing the new positioned nodes and the unchanged edges.
  */
@@ -213,8 +213,8 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                             if (p.type === "group") gParams.push(p)
                             else right.push(p)
                         }
-                        right.sort((a, b) => (+(a.data as any)?.paramIndex) - (+(b.data as any)?.paramIndex))
-                        gParams.sort((a, b) => (+(a.data as any)?.paramIndex) - (+(b.data as any)?.paramIndex))
+                        right.sort((a, b) => (+(a.data as any)?.parameterIndex) - (+(b.data as any)?.parameterIndex))
+                        gParams.sort((a, b) => (+(a.data as any)?.parameterIndex) - (+(b.data as any)?.parameterIndex))
 
                         f.right = right
                         f.gParams = gParams
@@ -500,7 +500,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
             if (!pGroups.length) continue
 
             const ordered = pGroups.slice().sort((a, b) =>
-                (+((a.data as any)?.paramIndex) || 0) - (+((b.data as any)?.paramIndex) || 0)
+                (+((a.data as any)?.parameterIndex) || 0) - (+((b.data as any)?.parameterIndex) || 0)
             )
 
             const widths: number[] = []
