@@ -199,7 +199,7 @@ export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsCompo
 
     const hasSuggestions = menuEntries.length > 0 || nodeFunctionGroups.length > 0
 
-    return <ButtonGroup color={"primary"}>
+    return <ButtonGroup color={"primary"} onClick={event => event.stopPropagation()}>
         {showSuggestions ? (
             <Menu onOpenChange={(open) => {
                 if (!open) setHoveredNodeId(null)
@@ -329,9 +329,9 @@ export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsCompo
             (children ?? null as unknown as ReactElement<any>)
         }
         <Button paddingSize={"xxs"} tabIndex={-1} onClick={(event) => {
-            onSelect?.(null)
             event.stopPropagation()
             event.preventDefault()
+            onSelect?.(null)
         }}>
             <IconX size={13}/>
         </Button>
