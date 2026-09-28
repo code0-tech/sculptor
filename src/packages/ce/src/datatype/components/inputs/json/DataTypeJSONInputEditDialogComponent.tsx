@@ -246,7 +246,13 @@ export const DataTypeJSONInputEditDialogComponent: React.FC<DataTypeJSONInputEdi
         })
     }
 
-    const handleReferenceChange = (signature: string, referenceValue: ReferenceValue | SubFlowValue) => {
+    const handleReferenceChange = (signature: string, picked: ReferenceValue | SubFlowValue | NodeFunction) => {
+        const addedNodeId = picked.__typename === "NodeFunction" && flowId ? flowService.addPreviousNodeById(flowId, nodeId ?? null, picked) : undefined
+        const referenceValue = picked.__typename === "NodeFunction"
+            ? (addedNodeId ? {__typename: "ReferenceValue", nodeFunctionId: addedNodeId} as ReferenceValue : null)
+            : picked as ReferenceValue | SubFlowValue
+        if (!referenceValue) return
+
         setEditedObject(prev => {
             if (!prev) return prev
             const updated: LiteralValue = {

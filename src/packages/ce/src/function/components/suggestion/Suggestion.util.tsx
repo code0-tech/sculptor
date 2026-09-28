@@ -19,7 +19,10 @@ export interface SuggestionGroup {
     icon?: string
 }
 
-export const useMappedSuggestions = (suggestions: (NodeFunction | SubFlowValue | ReferenceValue | LiteralValue)[]): SuggestionGroup[] => {
+export const useMappedSuggestions = (
+    suggestions: (NodeFunction | SubFlowValue | ReferenceValue | LiteralValue)[],
+    only?: (NodeFunction | SubFlowValue | ReferenceValue | LiteralValue)["__typename"]
+): SuggestionGroup[] => {
 
     const moduleService = useService(ModuleService)
     const moduleStore = useStore(ModuleService)
@@ -40,75 +43,79 @@ export const useMappedSuggestions = (suggestions: (NodeFunction | SubFlowValue |
         [functionService, functionStore]
     )
 
-    const mappedSuggestions: Suggestion[] = suggestions.map((suggestion) => {
+    return React.useMemo(() => {
 
-        if (suggestion.__typename === "NodeFunction") {
-            const functionDefinition = functions.find(f => f.id === suggestion.functionDefinition?.id)
-            const module = modules.find(m => m.id === functionDefinition?.runtimeModule?.id)
+        const mappedSuggestions: Suggestion[] = suggestions.filter(suggestion => !only || suggestion.__typename === only).map((suggestion) => {
 
-            return {
-                value: suggestion,
-                icon: functionDefinition?.displayIcon,
-                displayMessage: functionDefinition?.names?.[0].content,
-                aliases: functionDefinition?.aliases?.[0]?.content?.split(";"),
-                definitionSource: module?.identifier,
-                description: functionDefinition?.descriptions?.[0]?.content,
+            if (suggestion.__typename === "NodeFunction") {
+                const functionDefinition = functions.find(f => f.id === suggestion.functionDefinition?.id)
+                if (!functionDefinition) return null
+                const module = modules.find(m => m.id === functionDefinition?.runtimeModule?.id)
+
+                return {
+                    value: suggestion,
+                    icon: functionDefinition?.displayIcon,
+                    displayMessage: functionDefinition?.names?.[0].content,
+                    aliases: functionDefinition?.aliases?.[0]?.content?.split(";"),
+                    definitionSource: module?.identifier,
+                    description: functionDefinition?.descriptions?.[0]?.content,
+                }
             }
-        }
 
-        if (suggestion.__typename === "LiteralValue") {
+            if (suggestion.__typename === "LiteralValue") {
 
-            return {
-                value: suggestion,
-                icon: "",
-                displayMessage: "functionDefinition?.names?.[0].content",
-                aliases: [""],
-                definitionSource: "literal-values",
-                description: "functionDefinition?.descriptions?.[0].content",
+                return {
+                    value: suggestion,
+                    icon: "",
+                    displayMessage: "functionDefinition?.names?.[0].content",
+                    aliases: [""],
+                    definitionSource: "literal-values",
+                    description: "functionDefinition?.descriptions?.[0].content",
+                }
             }
-        }
 
-        if (suggestion.__typename === "SubFlowValue" && suggestion.functionDefinition?.id) {
+            if (suggestion.__typename === "SubFlowValue" && suggestion.functionDefinition?.id) {
 
-            return {
-                value: suggestion,
-                icon: suggestion.functionDefinition?.displayIcon,
-                displayMessage: suggestion.functionDefinition?.names?.[0]?.content,
-                aliases: (suggestion.functionDefinition?.aliases?.[0]?.content ?? "")?.split(";"),
-                definitionSource: suggestion.functionDefinition.runtimeModule?.identifier,
-                description: suggestion.functionDefinition?.descriptions?.[0]?.content ?? "",
+                return {
+                    value: suggestion,
+                    icon: suggestion.functionDefinition?.displayIcon,
+                    displayMessage: suggestion.functionDefinition?.names?.[0]?.content,
+                    aliases: (suggestion.functionDefinition?.aliases?.[0]?.content ?? "")?.split(";"),
+                    definitionSource: suggestion.functionDefinition.runtimeModule?.identifier,
+                    description: suggestion.functionDefinition?.descriptions?.[0]?.content ?? "",
+                }
             }
-        }
 
-        return null
-    }).filter((Boolean)) as Suggestion[]
+            return null
+        }).filter((Boolean)) as Suggestion[]
 
-    const groupedByModule = new Map<string, { suggestions: Suggestion[], module: any }>()
+        const groupedByModule = new Map<string, { suggestions: Suggestion[], module: any }>()
 
-    mappedSuggestions.forEach((suggestion) => {
-        const moduleId = suggestion.definitionSource
-        const module = modules.find(m => m.identifier === moduleId)
+        mappedSuggestions.forEach((suggestion) => {
+            const moduleId = suggestion.definitionSource
+            const module = modules.find(m => m.identifier === moduleId)
 
-        if (!groupedByModule.has(moduleId)) {
-            groupedByModule.set(moduleId, {
-                suggestions: [],
-                module: module
-            })
-        }
+            if (!groupedByModule.has(moduleId)) {
+                groupedByModule.set(moduleId, {
+                    suggestions: [],
+                    module: module
+                })
+            }
 
-        groupedByModule.get(moduleId)!.suggestions.push(suggestion)
-    })
+            groupedByModule.get(moduleId)!.suggestions.push(suggestion)
+        })
 
-    return [
-        {
-            suggestions: mappedSuggestions,
-            displayMessage: "All",
-            icon: undefined
-        },
-        ...Array.from(groupedByModule.values()).map((group) => ({
-            suggestions: group.suggestions,
-            displayMessage: group.module?.names?.[0].content,
-            icon: group.module?.icon
-        }))
-    ]
+        return [
+            ...(only ? [] : [{
+                suggestions: mappedSuggestions,
+                displayMessage: "All",
+                icon: undefined
+            }]),
+            ...Array.from(groupedByModule.values()).map((group) => ({
+                suggestions: group.suggestions,
+                displayMessage: group.module?.names?.[0].content,
+                icon: group.module?.icon
+            }))
+        ]
+    }, [suggestions, only, modules, functions])
 }

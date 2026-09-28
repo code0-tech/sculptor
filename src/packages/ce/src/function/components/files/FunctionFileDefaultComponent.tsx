@@ -140,6 +140,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
 
                 const schema = (flowNode?.data?.schema as NodeSchema[])?.[index]
                 const cast = node.parameters?.nodes?.[index]?.cast ?? null
+                const inputProps = inputs.getInputProps(parameterDefinition.id!)
 
                 return <div key={parameterDefinition.id}>
                     <DataTypeInputComponent data-qa-selector={"flow-builder-parameter"}
@@ -160,7 +161,22 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                                                 changedParameter.current.add(parameterDefinition.id!)
                                                 validate()
                                             }}
-                                            {...inputs.getInputProps(parameterDefinition.id!)}
+                                            {...inputProps}
+                                            formValidation={{
+                                                ...inputProps.formValidation,
+                                                setValue: (value: NodeParameterValue | NodeFunction | null) => {
+                                                    if (value?.__typename !== "NodeFunction") {
+                                                        inputProps.formValidation?.setValue?.(value)
+                                                        return
+                                                    }
+                                                    const addedNodeId = flowService.addPreviousNodeById(flowId, node.id!!, value)
+                                                    if (!addedNodeId) return
+                                                    inputProps.formValidation?.setValue?.({
+                                                        __typename: "ReferenceValue",
+                                                        nodeFunctionId: addedNodeId
+                                                    } as ReferenceValue)
+                                                }
+                                            }}
                     />
                     <Spacing spacing={"xl"}/>
                 </div>
