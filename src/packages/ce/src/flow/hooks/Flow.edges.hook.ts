@@ -7,6 +7,7 @@ import {FunctionService} from "@edition/function/services/Function.service";
 import {FALLBACK_FUNCTION_PARAMETER_NAME} from "@core/util/fallback-translations";
 import {FlowBuilderEdgeDataProps} from "@edition/flow/components/builder/FlowBuilderEdgeComponent";
 import {useFlowCompareStore} from "@edition/flow/hooks/Flow.compare.hook";
+import {useInlinedReferenceNodes} from "@edition/flow/hooks/Flow.references.hook";
 
 // @ts-ignore
 export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], projectId?: NamespaceProject['id']): Edge<FlowBuilderEdgeDataProps>[] => {
@@ -16,6 +17,7 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
     const functionService = useService(FunctionService);
     const functionStore = useStore(FunctionService)
     const flowToCompare = useFlowCompareStore(state => state.flow)
+    const inlinedNodes = useInlinedReferenceNodes(flowId)
 
     const flow = React.useMemo(
         () => flowService.getById(flowId, {namespaceId, projectId}),
@@ -33,6 +35,11 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
 
         let idCounter = 0;
 
+        let firstChainNodeId = flow.startingNodeId
+        while (firstChainNodeId && inlinedNodes.has(firstChainNodeId)) {
+            firstChainNodeId = flowService.getNodeById(flowId, firstChainNodeId)?.nextNodeId ?? undefined
+        }
+
         const traverse = (
             node: NodeFunction,
             parentNode?: NodeFunction,
@@ -40,7 +47,9 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
         ): string => {
             if (!node) return ""
 
-            if (node.id == flow.startingNodeId) {
+            const inlinedReference = inlinedNodes.get(node.id!)
+
+            if (node.id == firstChainNodeId) {
                 edges.push({
                     id: `trigger-${node.id}-next`,
                     source: flow.id as string,
@@ -56,7 +65,24 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                 });
             }
 
-            if (parentNode?.id && !isParameter) {
+            if (inlinedReference) {
+                edges.push({
+                    id: `${node.id}-${inlinedReference.hostNodeId}-reference`,
+                    source: node.id!,
+                    target: inlinedReference.hostNodeId,
+                    targetHandle: `param`,
+                    deletable: false,
+                    selectable: false,
+                    animated: true,
+                    data: {
+                        color: hashToColor(node.id!),
+                        type: 'parameter',
+                        flowId: flowId
+                    }
+                })
+            }
+
+            if (parentNode?.id && !isParameter && !inlinedReference) {
                 const startGroups = groupsWithValue.get(parentNode.id) ?? [];
 
                 if (startGroups.length > 0) {
@@ -158,7 +184,11 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
             });
 
             if (node.nextNodeId) {
-                traverse(flowService.getNodeById(flow.id!!, node.nextNodeId!!)!!, node);
+                traverse(
+                    flowService.getNodeById(flow.id!!, node.nextNodeId!!)!!,
+                    inlinedReference ? parentNode : node,
+                    inlinedReference ? isParameter : false
+                );
             }
 
             return node.id!;
@@ -169,5 +199,5 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
         }
 
         return edges
-    }, [flowStore, flow?.editedAt, flow, flowToCompare, functionStore.length]);
+    }, [flowStore, flow?.editedAt, flow, flowToCompare, functionStore.length, inlinedNodes]);
 };
