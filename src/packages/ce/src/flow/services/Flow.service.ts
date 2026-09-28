@@ -376,7 +376,6 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
 
     addPreviousNodeById(flowId: FlowView['id'], nodeId: NodeFunction['id'] | null, previousNode: NodeFunction): NodeFunction['id'] | undefined {
         const flow = this.getById(flowId)
-        const index = this.values().findIndex(f => f.id === flowId)
         const node = nodeId ? this.getNodeById(flowId, nodeId) : undefined
 
         if (!flow || (nodeId && !node)) return undefined
@@ -406,8 +405,6 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
 
         flow.nodes?.nodes?.push(addingNode)
         flow.editedAt = new Date().toISOString()
-
-        this.set(index, new View(flow))
 
         return addingNode.id
     }
