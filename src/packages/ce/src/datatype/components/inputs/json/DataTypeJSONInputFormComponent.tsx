@@ -14,7 +14,7 @@ export interface DataTypeJSONInputFormComponentProps {
     onActivePathChange: (path: string[]) => void
     onValueChange: (path: string[], value: unknown) => void
     onStructureChange: (path: string[], value: unknown) => void
-    onReferenceChange: (signature: string, value: ReferenceValue | SubFlowValue) => void
+    onReferenceChange: (signature: string, value: ReferenceValue | SubFlowValue | NodeFunction) => void
 }
 
 type InputChange = ReferenceValue | SubFlowValue | LiteralValue | NodeFunction | null
@@ -153,8 +153,8 @@ export const DataTypeJSONInputFormComponent: React.FC<DataTypeJSONInputFormCompo
     const toRawValue = (change: InputChange): unknown =>
         change === null ? null : change.__typename === "LiteralValue" ? change.value : change
 
-    const isReference = (change: InputChange): change is ReferenceValue | SubFlowValue =>
-        change !== null && change.__typename !== "LiteralValue" && change.__typename !== "NodeFunction"
+    const isReference = (change: InputChange): change is ReferenceValue | SubFlowValue | NodeFunction =>
+        change !== null && change.__typename !== "LiteralValue"
 
     const commitItems = (next: ListEntry[]) => {
         setItems(next)
