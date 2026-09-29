@@ -91,13 +91,13 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
 
                 const subFlowValues: { subFlow: SubFlowValue, key: string, signature?: string }[] =
                     value.__typename === "SubFlowValue"
-                        ? [{subFlow: value, key: `${param?.id}`}]
+                        ? [{subFlow: value, key: `${parameterIndex}`}]
                         : value.__typename === "LiteralValue"
                             ? (value.references ?? [])
                                 .filter(reference => reference?.value?.__typename === "SubFlowValue")
                                 .map((reference, index) => ({
                                     subFlow: reference!.value as SubFlowValue,
-                                    key: `${param?.id}-${reference?.signature ?? index}`,
+                                    key: `${parameterIndex}-${reference?.signature ?? index}`,
                                     signature: reference?.signature ?? undefined
                                 }))
                             : []

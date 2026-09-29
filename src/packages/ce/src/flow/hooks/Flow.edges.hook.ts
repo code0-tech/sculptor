@@ -32,6 +32,7 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
         const edges: Edge<FlowBuilderEdgeDataProps>[] = []
 
         const groupsWithValue = new Map<string, string[]>();
+        const labeledParameters = new Set<string>();
 
         let idCounter = 0;
 
@@ -66,6 +67,10 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
             }
 
             if (inlinedReference) {
+                const hostNode = flowService.getNodeById(flowId, inlinedReference.hostNodeId)
+                const hostParameterDefinition = functionService.getById(hostNode?.functionDefinition?.id!!)?.parameterDefinitions?.nodes?.[inlinedReference.parameterIndex];
+                const hostLabelKey = `${inlinedReference.hostNodeId}-${inlinedReference.parameterIndex}`
+
                 edges.push({
                     id: `${node.id}-${inlinedReference.hostNodeId}-reference`,
                     source: node.id!,
@@ -74,12 +79,15 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                     deletable: false,
                     selectable: false,
                     animated: true,
+                    label: labeledParameters.has(hostLabelKey) ? undefined : hostParameterDefinition?.names!![0]?.content ?? FALLBACK_FUNCTION_PARAMETER_NAME,
                     data: {
                         color: hashToColor(node.id!),
                         type: 'parameter',
                         flowId: flowId
                     }
                 })
+
+                labeledParameters.add(hostLabelKey)
             }
 
             if (parentNode?.id && !isParameter && !inlinedReference) {
@@ -123,17 +131,19 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
 
                 const subFlowValues: { subFlow: SubFlowValue, key: string }[] =
                     parameterValue.__typename === "SubFlowValue"
-                        ? [{subFlow: parameterValue, key: `${param.id}`}]
+                        ? [{subFlow: parameterValue, key: `${index}`}]
                         : parameterValue.__typename === "LiteralValue"
                             ? (parameterValue.references ?? [])
                                 .filter(reference => reference?.value?.__typename === "SubFlowValue")
                                 .map((reference, referenceIndex) => ({
                                     subFlow: reference!.value as SubFlowValue,
-                                    key: `${param.id}-${reference?.signature ?? referenceIndex}`
+                                    key: `${index}-${reference?.signature ?? referenceIndex}`
                                 }))
                             : []
 
                 subFlowValues.forEach(({subFlow, key}) => {
+
+                    const labelKey = `${node.id}-${index}`
 
                     if (!subFlow.startingNodeId && subFlow.functionDefinition?.id) {
                         edges.push({
@@ -144,12 +154,15 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                             deletable: false,
                             selectable: false,
                             animated: true,
+                            label: labeledParameters.has(labelKey) ? undefined : parameterDefinition?.names!![0]?.content ?? FALLBACK_FUNCTION_PARAMETER_NAME,
                             data: {
                                 color: hashToColor(subFlow?.startingNodeId || subFlow.functionDefinition?.id || ""),
                                 type: 'parameter',
                                 flowId: flowId
                             }
                         })
+
+                        labeledParameters.add(labelKey)
                         return
                     }
 
