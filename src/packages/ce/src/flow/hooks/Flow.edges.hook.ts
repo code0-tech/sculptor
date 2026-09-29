@@ -141,6 +141,8 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                                 }))
                             : []
 
+                let previousKey: string | undefined
+
                 subFlowValues.forEach(({subFlow, key}) => {
 
                     const labelKey = `${node.id}-${index}`
@@ -149,8 +151,8 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                         edges.push({
                             id: `${node.id}-${key}-next`,
                             source: `${node.id}-${key}`,
-                            target: node.id!,
-                            targetHandle: `param`,
+                            target: previousKey ? `${node.id}-${previousKey}` : node.id!,
+                            targetHandle: previousKey ? undefined : `param`,
                             deletable: false,
                             selectable: false,
                             animated: true,
@@ -163,6 +165,7 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                         })
 
                         labeledParameters.add(labelKey)
+                        previousKey = key
                         return
                     }
 
