@@ -22,14 +22,7 @@ import {
     useService,
     useStore
 } from "@code0-tech/pictor";
-import {
-    IconAdjustmentsFilled,
-    IconApps,
-    IconArrowAutofitLeft,
-    IconArrowAutofitLeftFilled,
-    IconSettingsFilled,
-    IconUser
-} from "@tabler/icons-react";
+import {IconAdjustmentsFilled, IconApps, IconArrowAutofitLeft, IconSettingsFilled, IconUser} from "@tabler/icons-react";
 import Link from "next/link";
 import {UserService} from "@edition/user/services/User.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
@@ -123,20 +116,6 @@ export const ApplicationNavigationView: React.FC = () => {
                     </TooltipContent>
                 </TooltipPortal>
             </Tooltip>}
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <Button onClick={userLogout} variant={"none"} style={{padding: getSize("xs"), marginTop: 'auto'}}>
-                        <IconArrowAutofitLeftFilled color={"#fff"} size={16}/>
-                    </Button>
-                </TooltipTrigger>
-                <TooltipPortal>
-                    <TooltipContent color={"primary"} side={"left"} sideOffset={8}>
-                        <Text>
-                            Logout
-                        </Text>
-                    </TooltipContent>
-                </TooltipPortal>
-            </Tooltip>
             <Menu>
                 <MenuTrigger asChild>
                     <Button variant={"none"} style={{marginTop: 'auto', padding: getSize("xs")}}>
