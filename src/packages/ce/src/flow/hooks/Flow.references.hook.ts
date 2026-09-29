@@ -119,26 +119,19 @@ export const useInlinedReferenceNodes = (flowId: Flow["id"]): Map<string, Inline
             inlined.set(target, {hostNodeId, parameterIndex})
         })
 
-        let dropped = true
+        inlined.forEach(({hostNodeId}, target) => {
+            const walked = new Set<string>([target])
+            let current = nodeById.get(target)?.nextNodeId
 
-        while (dropped) {
-            dropped = false
+            while (current && current !== hostNodeId && !walked.has(current)) {
+                walked.add(current)
+                current = nodeById.get(current)?.nextNodeId
+            }
 
-            inlined.forEach(({hostNodeId}, target) => {
-                const walked = new Set<string>([target])
-                let current = nodeById.get(target)?.nextNodeId
+            if (current === hostNodeId) return
 
-                while (current && current !== hostNodeId && inlined.has(current) && !walked.has(current)) {
-                    walked.add(current)
-                    current = nodeById.get(current)?.nextNodeId
-                }
-
-                if (current === hostNodeId) return
-
-                inlined.delete(target)
-                dropped = true
-            })
-        }
+            inlined.delete(target)
+        })
 
         return inlined
     }, [flow, flow?.editedAt, flowStore, flowId])

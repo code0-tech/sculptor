@@ -42,7 +42,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
 
     /* Konstanten */
     const V = 50;          // vertical gap Node ↕ Node
-    const H = 50;          // horizontal gap Parent → Param
+    const H = 75;          // horizontal gap Parent → Param
     const PAD = 16;        // inner padding einer Group (links+rechts / oben+unten)
     const EPS = 0.25;      // Toleranz gegen Rundungsdrift
 
@@ -166,7 +166,18 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         // relatives Layout (Center in globalen Koordinaten)
         const relCenter = new Map<string, Pos>()
 
-        const layoutIter = (root: Node, cx: number, cy: number): number => {
+        // Reihenfolge der gesetzten Center -> erlaubt es, einen ganzen Teilbaum nachträglich zu verschieben
+        const placed: string[] = []
+
+        const shiftPlaced = (from: number, dy: number) => {
+            if (!dy) return
+            for (let i = from; i < placed.length; i++) {
+                const c = relCenter.get(placed[i])!
+                relCenter.set(placed[i], {x: c.x, y: c.y + dy})
+            }
+        }
+
+        const layoutIter = (root: Node, cx: number, cy: number): { top: number, bottom: number } => {
             type Frame = {
                 node: Node
                 cx: number
@@ -177,8 +188,14 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                 right?: Node[]
                 rightIndex?: number
                 rightX?: number
+                rightTop?: number
                 rightBottom?: number
+                rightMark?: number
+                laneY?: number
+                laneBottom?: number
+                laneKey?: string
                 childPs?: Size
+                lastChildTop?: number
                 lastChildBottom?: number
 
                 gParams?: Node[]
@@ -190,11 +207,15 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
 
                 kids?: Node[]
                 kidIndex?: number
+                kidMark?: number
+                kidTop?: number
                 curY?: number
+                top?: number
                 bottom?: number
             }
 
             const stack: Frame[] = [{node: root, cx, cy, phase: 0}]
+            let returnTop = 0
             let returnBottom = 0
 
             while (stack.length) {
@@ -202,6 +223,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                 switch (f.phase) {
                     case 0: {
                         relCenter.set(f.node.id, {x: f.cx, y: f.cy})
+                        placed.push(f.node.id)
                         const {w, h} = size(f.node)
                         f.w = w
                         f.h = h
@@ -220,8 +242,13 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                         f.gParams = gParams
 
                         f.rightX = f.cx + f.w! / 2 + H
+                        f.rightTop = Number.POSITIVE_INFINITY
                         f.rightBottom = f.cy + h / 2
+                        f.rightMark = placed.length
                         f.rightIndex = 0
+                        f.laneY = f.cy
+                        f.laneBottom = f.cy + h / 2
+                        f.laneKey = undefined
                         f.phase = 1
                         break
                     }
@@ -230,15 +257,35 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                         if (f.rightIndex! < f.right!.length) {
                             const p = f.right![f.rightIndex!]
                             const ps = size(p)
+                            const laneKey = `${(p.data as any)?.parameterIndex}`
+
+                            if (f.laneKey !== undefined && laneKey !== f.laneKey) {
+                                f.laneY = f.laneBottom! + V + ps.h / 2
+                                f.laneBottom = f.laneY + ps.h / 2
+                                f.rightX = f.cx + f.w! / 2 + H
+                            }
+
+                            f.laneKey = laneKey
+
                             const pcx = f.rightX! + ps.w / 2
-                            const pcy = f.cy
+                            const pcy = f.laneY!
 
                             f.rightX = f.rightX! + ps.w + H
+                            f.laneBottom = Math.max(f.laneBottom!, pcy + ps.h / 2)
+                            f.rightTop = Math.min(f.rightTop!, pcy - ps.h / 2)
                             f.rightBottom = Math.max(f.rightBottom!, pcy + ps.h / 2)
                             f.childPs = ps
                             stack.push({node: p, cx: pcx, cy: pcy, phase: 0})
                             f.phase = 10
                         } else {
+                            if (f.right!.length) {
+                                const dy = f.cy - (f.rightTop! + f.rightBottom!) / 2
+                                shiftPlaced(f.rightMark!, dy)
+                                f.rightTop! += dy
+                                f.rightBottom! += dy
+                            }
+
+                            f.top = f.right!.length ? Math.min(f.cy - f.h! / 2, f.rightTop!) : f.cy - f.h! / 2
                             f.bottom = Math.max(f.cy + f.h! / 2, f.rightBottom!)
                             f.phase = 2
                         }
@@ -247,6 +294,8 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
 
                     case 10: {
                         const subBottom = f.lastChildBottom!
+                        f.laneBottom = Math.max(f.laneBottom!, subBottom)
+                        f.rightTop = Math.min(f.rightTop!, f.lastChildTop!)
                         f.rightBottom = Math.max(f.rightBottom!, subBottom)
                         f.rightIndex!++
                         f.phase = 1
@@ -325,6 +374,8 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                             const ks = size(k)
                             const ky = f.curY! + ks.h / 2
 
+                            f.kidMark = placed.length
+                            f.kidTop = f.curY
                             stack.push({node: k, cx: f.cx, cy: ky, phase: 0})
                             f.childPs = ks
                             f.phase = 50
@@ -337,7 +388,14 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                     }
 
                     case 50: {
-                        const subBottom = f.lastChildBottom!
+                        let subBottom = f.lastChildBottom!
+                        const overhang = f.kidTop! - f.lastChildTop!
+
+                        if (overhang > 0) {
+                            shiftPlaced(f.kidMark!, overhang)
+                            subBottom += overhang
+                        }
+
                         f.curY = subBottom + V
                         f.kidIndex!++
                         f.phase = 5
@@ -347,8 +405,10 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                     case 6: {
                         const finished = stack.pop()!
                         if (stack.length) {
+                            stack[stack.length - 1].lastChildTop = finished.top
                             stack[stack.length - 1].lastChildBottom = finished.bottom
                         } else {
+                            returnTop = finished.top!
                             returnBottom = finished.bottom!
                         }
                         break
@@ -356,7 +416,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                 }
             }
 
-            return returnBottom
+            return {top: returnTop, bottom: returnBottom}
         }
 
         // Root-Nodes stapeln
@@ -364,8 +424,13 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         for (const r of nodes) {
             const link = (r.data as any)?.parentNodeId ?? (r.type === "group" ? (r.data as any)?.nodeId : undefined)
             if (!link && !r.parentId) {
-                const b = layoutIter(r, 0, yCursor + size(r).h / 2)
-                yCursor = b + V
+                const mark = placed.length
+                const wantTop = yCursor
+                const {top, bottom} = layoutIter(r, 0, yCursor + size(r).h / 2)
+                const overhang = wantTop - top
+
+                if (overhang > 0) shiftPlaced(mark, overhang)
+                yCursor = (overhang > 0 ? bottom + overhang : bottom) + V
             }
         }
 
