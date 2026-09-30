@@ -7,7 +7,7 @@ import {
     SubFlowValue
 } from "@code0-tech/sagittarius-graphql-types";
 import React, {ReactElement} from "react";
-import {IconChevronRight, IconVariable, IconX} from "@tabler/icons-react";
+import {IconChevronRight, IconPlus, IconVariable, IconX} from "@tabler/icons-react";
 import {useParams} from "next/navigation";
 import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
 import {useFlowReferenceHoverStore} from "@edition/flow/hooks/Flow.reference.hover.hook";
@@ -26,10 +26,6 @@ import {
     MenuSubContent,
     MenuSubTrigger,
     MenuTrigger,
-    ScrollArea,
-    ScrollAreaScrollbar,
-    ScrollAreaThumb,
-    ScrollAreaViewport,
     Text,
     Tooltip,
     TooltipContent,
@@ -37,12 +33,18 @@ import {
     TooltipTrigger
 } from "@code0-tech/pictor"
 import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeComponent";
-import {useMappedSuggestions} from "@edition/function/components/suggestion/Suggestion.util";
+import {Suggestion, useMappedSuggestions} from "@edition/function/components/suggestion/Suggestion.util";
+import {
+    SuggestionVariantDialogComponent
+} from "@edition/function/components/suggestion/SuggestionVariantDialogComponent";
 import {icon, IconString} from "@core/util/icons";
 
 export interface DataTypeInputControlsComponentProps {
     suggestions?: (NodeFunction | SubFlowValue | ReferenceValue | LiteralValue)[]
+    nodeId?: NodeFunction['id']
+    parameterIndex?: number
     onSelect?: (value: NodeFunction | SubFlowValue | ReferenceValue | LiteralValue | null) => void
+    onCustomLogicGroupSelect?: () => void
     showSuggestions?: boolean
     children?: React.ReactElement<ButtonProps>
 }
@@ -64,7 +66,7 @@ interface ReferenceGroup {
 }
 
 type MenuEntry =
-    | { kind: "value", value: LiteralValue | SubFlowValue }
+    | { kind: "value", value: LiteralValue | SubFlowValue | NodeFunction }
     | { kind: "reference-group", key: string, group: ReferenceGroup }
 
 const referenceGroupKey = (value: ReferenceValue): string => {
@@ -73,34 +75,6 @@ const referenceGroupKey = (value: ReferenceValue): string => {
 
 const referencePathLabel = (path: ReferencePath): string => {
     return `${path.path ?? ""}${path.arrayIndex != null ? `[${path.arrayIndex}]` : ""}`
-}
-
-const MenuScrollArea: React.FC<React.PropsWithChildren> = ({children}) => {
-    const contentRef = React.useRef<HTMLDivElement>(null)
-    const [height, setHeight] = React.useState<number>()
-
-    React.useLayoutEffect(() => {
-        const el = contentRef.current
-        if (!el) return
-        const observer = new ResizeObserver((entries) => {
-            const entry = entries[0]
-            if (entry) setHeight(entry.contentRect.height)
-        })
-        observer.observe(el)
-        return () => observer.disconnect()
-    }, [])
-
-    return <ScrollArea mah={"calc(var(--radix-popper-available-height) - 0rem)"}
-                       h={height !== undefined ? `${height}px` : undefined}>
-        <ScrollAreaViewport>
-            <div ref={contentRef}>
-                {children}
-            </div>
-        </ScrollAreaViewport>
-        <ScrollAreaScrollbar orientation={"vertical"}>
-            <ScrollAreaThumb/>
-        </ScrollAreaScrollbar>
-    </ScrollArea>
 }
 
 const ReferencePathMenuItems: React.FC<{
@@ -123,14 +97,12 @@ const ReferencePathMenuItems: React.FC<{
                     </Flex>
                 </MenuSubTrigger>
                 <MenuSubContent align={"start"} collisionPadding={16} alignOffset={0} sideOffset={0}>
-                    <MenuScrollArea>
-                        {node.value ? (
-                            <MenuItem onSelect={() => onSelect?.(node.value!)}>
-                                {node.label}
-                            </MenuItem>
-                        ) : null}
-                        <ReferencePathMenuItems nodes={node.children} onSelect={onSelect}/>
-                    </MenuScrollArea>
+                    {node.value ? (
+                        <MenuItem onSelect={() => onSelect?.(node.value!)}>
+                            {node.label}
+                        </MenuItem>
+                    ) : null}
+                    <ReferencePathMenuItems nodes={node.children} onSelect={onSelect}/>
                 </MenuSubContent>
             </MenuSub>
         })}
@@ -139,14 +111,20 @@ const ReferencePathMenuItems: React.FC<{
 
 export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsComponentProps> = (props) => {
 
-    const {suggestions, showSuggestions = true, onSelect, children} = props
+    const {suggestions, nodeId, parameterIndex, showSuggestions = true, onSelect, onCustomLogicGroupSelect, children} = props
 
     const params = useParams()
     const flowIndex = params.flowId as any as number
     const flowId: Flow['id'] = `gid://sagittarius/Flow/${flowIndex}`
     const setHoveredNodeId = useFlowReferenceHoverStore(state => state.setHoveredNodeId)
+    const [variantSuggestion, setVariantSuggestion] = React.useState<Suggestion | null>(null)
 
-    const nodeFunctionGroups = useMappedSuggestions(suggestions ?? [], "NodeFunction")
+    const moduleGroups = useMappedSuggestions(suggestions ?? [], ["SubFlowValue", "NodeFunction"])
+
+    const groupedValues = React.useMemo(
+        () => new Set(moduleGroups.flatMap(group => group.suggestions.flatMap(suggestion => suggestion.variants))),
+        [moduleGroups]
+    )
 
     const menuEntries = React.useMemo(() => {
         if (!suggestions) return []
@@ -155,8 +133,13 @@ export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsCompo
         const groups = new Map<string, ReferenceGroup>()
 
         suggestions.forEach(suggest => {
-            if (suggest.__typename === "LiteralValue" || suggest.__typename === "SubFlowValue") {
+            if (suggest.__typename === "LiteralValue") {
                 entries.push({kind: "value", value: suggest})
+                return
+            }
+
+            if (suggest.__typename === "SubFlowValue" || suggest.__typename === "NodeFunction") {
+                if (!groupedValues.has(suggest)) entries.push({kind: "value", value: suggest})
                 return
             }
 
@@ -195,36 +178,58 @@ export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsCompo
         })
 
         return entries
-    }, [suggestions])
+    }, [suggestions, groupedValues])
 
-    const hasSuggestions = menuEntries.length > 0 || nodeFunctionGroups.length > 0
+    const hasSuggestions = menuEntries.length > 0 || moduleGroups.length > 0 || !!onCustomLogicGroupSelect
 
-    return <ButtonGroup color={"primary"} onClick={event => event.stopPropagation()}>
-        {showSuggestions ? (
-            <Menu onOpenChange={(open) => {
-                if (!open) setHoveredNodeId(null)
-            }}>
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <MenuTrigger asChild disabled={!hasSuggestions}>
-                            <Button tabIndex={!hasSuggestions ? -1 : 0} paddingSize={"xxs"}>
-                                <IconVariable size={13}/>
-                            </Button>
-                        </MenuTrigger>
-                    </TooltipTrigger>
-                    <TooltipPortal>
-                        <TooltipContent side={"top"} sideOffset={8}>
-                            {!hasSuggestions ? <Text>
-                                No suggestion available
-                            </Text> : <Text>
-                                Suggestions for this parameter
-                            </Text>}
-                        </TooltipContent>
-                    </TooltipPortal>
-                </Tooltip>
-                <MenuPortal>
-                    <MenuContent align={"center"} alignOffset={0} sideOffset={0}>
-                        <MenuScrollArea>
+    return <>
+        <SuggestionVariantDialogComponent suggestion={variantSuggestion}
+                                         flowId={flowId}
+                                         nodeId={nodeId}
+                                         parameterIndex={parameterIndex}
+                                         open={!!variantSuggestion}
+                                         onOpenChange={open => {
+                                             if (!open) setVariantSuggestion(null)
+                                         }}
+                                         onVariantSelect={value => {
+                                             setVariantSuggestion(null)
+                                             onSelect?.(value)
+                                         }}/>
+        <ButtonGroup color={"primary"} onClick={event => event.stopPropagation()}>
+            {showSuggestions ? (
+                <Menu onOpenChange={(open) => {
+                    if (!open) setHoveredNodeId(null)
+                }}>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <MenuTrigger asChild disabled={!hasSuggestions}>
+                                <Button tabIndex={!hasSuggestions ? -1 : 0} paddingSize={"xxs"}>
+                                    <IconVariable size={13}/>
+                                </Button>
+                            </MenuTrigger>
+                        </TooltipTrigger>
+                        <TooltipPortal>
+                            <TooltipContent side={"top"} sideOffset={8}>
+                                {!hasSuggestions ? <Text>
+                                    No suggestion available
+                                </Text> : <Text>
+                                    Suggestions for this parameter
+                                </Text>}
+                            </TooltipContent>
+                        </TooltipPortal>
+                    </Tooltip>
+                    <MenuPortal>
+                        <MenuContent align={"center"} alignOffset={0} sideOffset={0}>
+                            {onCustomLogicGroupSelect ? <>
+                                <MenuItem onMouseEnter={() => setHoveredNodeId(null)}
+                                          onSelect={() => onCustomLogicGroupSelect()}>
+                                    <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                        <IconPlus size={13}/>
+                                        <Text>Add custom logic group</Text>
+                                    </Flex>
+                                </MenuItem>
+                                {menuEntries.length > 0 || moduleGroups.length > 0 ? <MenuSeparator/> : null}
+                            </> : null}
                             {menuEntries.map((entry, index) => {
                                 if (entry.kind === "value" && entry.value.__typename === "LiteralValue") {
                                     return <MenuItem key={index} onMouseEnter={() => setHoveredNodeId(null)}
@@ -239,6 +244,16 @@ export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsCompo
                                     return <MenuItem key={index} onMouseEnter={() => setHoveredNodeId(null)}
                                                      onSelect={() => onSelect?.(entry.value)}>
                                         <NodeBadgeComponent value={entry.value}/>
+                                    </MenuItem>
+                                }
+
+                                if (entry.kind === "value" && entry.value.__typename === "NodeFunction") {
+                                    return <MenuItem key={index} onMouseEnter={() => setHoveredNodeId(null)}
+                                                     onSelect={() => onSelect?.(entry.value)}>
+                                        <NodeBadgeComponent value={{
+                                            __typename: "SubFlowValue",
+                                            functionDefinition: entry.value.functionDefinition
+                                        }}/>
                                     </MenuItem>
                                 }
 
@@ -269,22 +284,20 @@ export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsCompo
                                         </MenuSubTrigger>
                                         <MenuSubContent onMouseEnter={() => setHoveredNodeId(targetNodeId)}
                                                         onMouseLeave={() => setHoveredNodeId(null)}>
-                                            <MenuScrollArea>
-                                                {group.value ? (
-                                                    <MenuItem onSelect={() => onSelect?.(group.value!)}>
-                                                        <ReferenceBadgeComponent value={group.value}/>
-                                                    </MenuItem>
-                                                ) : null}
-                                                <ReferencePathMenuItems nodes={group.children} onSelect={onSelect}/>
-                                            </MenuScrollArea>
+                                            {group.value ? (
+                                                <MenuItem onSelect={() => onSelect?.(group.value!)}>
+                                                    <ReferenceBadgeComponent value={group.value}/>
+                                                </MenuItem>
+                                            ) : null}
+                                            <ReferencePathMenuItems nodes={group.children} onSelect={onSelect}/>
                                         </MenuSubContent>
                                     </MenuSub>
                                 }
 
                                 return null
                             })}
-                            {menuEntries.length > 0 && nodeFunctionGroups.length > 0 ? <MenuSeparator/> : null}
-                            {nodeFunctionGroups.map((group, index) => {
+                            {menuEntries.length > 0 && moduleGroups.length > 0 ? <MenuSeparator/> : null}
+                            {moduleGroups.map((group, index) => {
 
                                 const ModuleIcon = icon(group.icon as IconString)
 
@@ -301,40 +314,52 @@ export const DataTypeInputControlsComponent: React.FC<DataTypeInputControlsCompo
                                     </MenuSubTrigger>
                                     <MenuSubContent align={"start"} collisionPadding={16} alignOffset={0}
                                                     sideOffset={0}>
-                                        <MenuScrollArea>
-                                            {group.suggestions.map((suggestion, suggestionIndex) => {
+                                        {group.suggestions.map((suggestion, suggestionIndex) => {
 
-                                                const FunctionIcon = icon(suggestion.icon as IconString)
+                                            const FunctionIcon = icon(suggestion.icon as IconString)
+                                            const directValue = suggestion.variants.find(variant => variant.__typename === "SubFlowValue")
+                                            const resultValue = suggestion.variants.find(variant => variant.__typename === "NodeFunction")
 
+                                            if (directValue && resultValue) {
                                                 return <MenuItem key={suggestionIndex}
                                                                  title={suggestion.description}
-                                                                 onSelect={() => onSelect?.(suggestion.value)}>
+                                                                 onSelect={() => setVariantSuggestion(suggestion)}>
                                                     <Flex align={"center"} style={{gap: "0.35rem"}}>
                                                         <FunctionIcon size={13}
                                                                       color={hashToColor(`group-${index}`)}/>
                                                         <Text>{suggestion.displayMessage}</Text>
                                                     </Flex>
                                                 </MenuItem>
-                                            })}
-                                        </MenuScrollArea>
+                                            }
+
+                                            return <MenuItem key={suggestionIndex}
+                                                             title={suggestion.description}
+                                                             onSelect={() => onSelect?.(suggestion.value)}>
+                                                <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                                    <FunctionIcon size={13}
+                                                                  color={hashToColor(`group-${index}`)}/>
+                                                    <Text>{suggestion.displayMessage}</Text>
+                                                </Flex>
+                                            </MenuItem>
+                                        })}
                                     </MenuSubContent>
                                 </MenuSub>
                             })}
-                        </MenuScrollArea>
-                    </MenuContent>
-                </MenuPortal>
-            </Menu>
-        ) : <></>}
-        {
-            (children ?? null as unknown as ReactElement<any>)
-        }
-        <Button paddingSize={"xxs"} tabIndex={-1} onClick={(event) => {
-            event.stopPropagation()
-            event.preventDefault()
-            onSelect?.(null)
-        }}>
-            <IconX size={13}/>
-        </Button>
-    </ButtonGroup>
+                        </MenuContent>
+                    </MenuPortal>
+                </Menu>
+            ) : <></>}
+            {
+                (children ?? null as unknown as ReactElement<any>)
+            }
+            <Button paddingSize={"xxs"} tabIndex={-1} onClick={(event) => {
+                event.stopPropagation()
+                event.preventDefault()
+                onSelect?.(null)
+            }}>
+                <IconX size={13}/>
+            </Button>
+        </ButtonGroup>
+    </>
 
 }
