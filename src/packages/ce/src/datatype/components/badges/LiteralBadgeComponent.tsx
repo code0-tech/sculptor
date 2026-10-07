@@ -19,7 +19,7 @@ export const LiteralBadgeComponent: React.FC<LiteralBadgeComponentProps> = (prop
     const content = React.useMemo(() => {
         const literal = value?.value as any
 
-        if (typeof literal?.hue === "number" && typeof literal?.saturation === "number" && typeof literal?.lightness === "number") {
+        if (schema?.input === "color" && typeof literal?.hue === "number" && typeof literal?.saturation === "number" && typeof literal?.lightness === "number") {
             const color = `hsla(${literal.hue}, ${literal.saturation}%, ${literal.lightness}%, ${literal.alpha ?? 1})`
             return <>
                 <div style={{

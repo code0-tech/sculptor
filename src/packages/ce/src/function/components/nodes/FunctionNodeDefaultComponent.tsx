@@ -101,7 +101,8 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
             switch (nodeParameter?.value?.__typename) {
                 case "LiteralValue":
                     return <div style={{...decorationStyle, display: "inline-block"}}>
-                        <LiteralBadgeComponent value={nodeParameter.value}/>
+                        <LiteralBadgeComponent value={nodeParameter.value}
+                                               schema={data.schema?.[parameterIndex!]?.schema}/>
                     </div>
                 case "ReferenceValue":
                     return <div style={{...decorationStyle, display: "inline-block"}}>

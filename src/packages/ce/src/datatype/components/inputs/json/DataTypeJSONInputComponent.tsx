@@ -9,7 +9,8 @@ import {
 } from "@edition/datatype/components/inputs/json/DataTypeJSONInputEditDialogComponent";
 import {DataTypeInputValueComponent} from "@edition/datatype/components/inputs/DataTypeInputValueComponent";
 import {useDebouncedCallback} from "use-debounce";
-import {DataInput, ListInput, Schema} from "@code0-tech/triangulum";
+import {DataInput, Schema} from "@code0-tech/triangulum";
+import {generateDefaultDataValue} from "@edition/datatype/utils/DataType.defaultValue.util";
 
 export interface EditableJSONEntry {
     key: string
@@ -61,6 +62,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
                     nodeId={nodeId}
                     parameterIndex={parameterIndex}
                     onOpenChange={open => setEditDialogOpen(open)}
+                    onObjectChange={(value) => formValidation?.setValue?.(value)}
                     onObjectClose={(value) => {
                         formValidation?.setValue?.(value)
                         onChangeDebounced(value)
@@ -90,26 +92,4 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
             </DataTypeInputValueComponent>
         </>
     )
-}
-
-
-const generateDefaultDataValue = (schema: DataInput): LiteralValue => {
-    return {
-        __typename: "LiteralValue",
-        value: Object.assign({}, ...Object.entries(schema.properties ?? {}).map(([key, propSchema]) => {
-            if (!Array.isArray(propSchema)) {
-                if (propSchema.input === "data") {
-                    return {[key]: generateDefaultDataValue(propSchema).value}
-                }
-                if (propSchema.input === "list") {
-                    const itemSchema = (propSchema as ListInput).items?.[0]
-                    if (itemSchema && !Array.isArray(itemSchema) && itemSchema.input === "data") {
-                        return {[key]: [generateDefaultDataValue(itemSchema as DataInput).value]}
-                    }
-                    return {[key]: []}
-                }
-                return {[key]: null}
-            }
-        }))
-    }
 }

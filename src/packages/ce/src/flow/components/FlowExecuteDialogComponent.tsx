@@ -27,7 +27,8 @@ import {useSchemaAction} from "@edition/flow/components/FlowWorkerProvider";
 import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent";
 import {useFlowExecutionStore} from "@edition/flow/hooks/Flow.execution.hook";
 import {useFlowViewStore} from "@edition/flow/hooks/Flow.view.hook";
-import {Schema} from "@code0-tech/triangulum";
+import {DataInput, Schema} from "@code0-tech/triangulum";
+import {generateDefaultDataValue} from "@edition/datatype/utils/DataType.defaultValue.util";
 
 export interface FlowExecuteDialogComponentProps {
     flowId: Flow['id']
@@ -76,6 +77,11 @@ export const FlowExecuteDialogComponent: React.FC<FlowExecuteDialogComponentProp
     const [inputs, validate, values] = useForm<ManualExecutionForm>({
         initialValues,
     })
+
+    const defaultInput = React.useMemo(
+        () => triggerSchema?.input === "list" ? [] : generateDefaultDataValue(triggerSchema as DataInput).value,
+        [triggerSchema]
+    )
 
     const flow = React.useMemo(
         () => flowService.getById(flowId, {
@@ -186,7 +192,7 @@ export const FlowExecuteDialogComponent: React.FC<FlowExecuteDialogComponentProp
         flowService.triggerExecution({
             flowId: flowId!,
             runtimeId,
-            input: (values.input?.value ?? {}) as any,
+            input: (values.input?.value ?? defaultInput) as any,
         }).then(payload => {
             setExecuting(false)
             if ((payload?.errors?.length ?? 0) > 0 || !payload?.executionIdentifier) return
@@ -202,7 +208,7 @@ export const FlowExecuteDialogComponent: React.FC<FlowExecuteDialogComponentProp
             onOpenChange?.(false)
             openTab("execution")
         }).catch(() => setExecuting(false))
-    }, [project?.primaryRuntime?.id, executing, flow?.editedAt, flow?.updatedAt, flowService, flowId, values.input, addExecution, namespaceId, projectId, openTab, onOpenChange])
+    }, [project?.primaryRuntime?.id, executing, flow?.editedAt, flow?.updatedAt, flowService, flowId, values.input, defaultInput, addExecution, namespaceId, projectId, openTab, onOpenChange])
 
     return <Dialog open={open} onOpenChange={(open) => onOpenChange?.(open)}>
         <DialogPortal>
