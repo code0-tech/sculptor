@@ -22,6 +22,10 @@ const csp = (frameAncestors: string) => `
 const nextConfig: NextConfig = {
     output: "standalone",
     devIndicators: false,
+    allowedDevOrigins: (process.env.ALLOWED_DEV_ORIGINS ?? "192.168.*.*,10.*.*.*,*.local")
+        .split(",")
+        .map(origin => origin.trim())
+        .filter(Boolean),
     async headers() {
         return [
             {

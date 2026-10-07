@@ -6,7 +6,7 @@ import lodash from "lodash"
 import {useFunctionSuggestions} from "@edition/function/hooks/Function.suggestion.hook";
 import {DataTypeInputValueComponent} from "@edition/datatype/components/inputs/DataTypeInputValueComponent";
 import {SuggestionDialogComponent} from "@edition/function/components/suggestion/SuggestionDialogComponent";
-import {Flow, LiteralValue, ReferenceValue, SubFlowValue} from "@code0-tech/sagittarius-graphql-types";
+import {Flow, LiteralValue, NodeFunction, ReferenceValue, SubFlowValue} from "@code0-tech/sagittarius-graphql-types";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {useParams} from "next/navigation";
 
@@ -29,15 +29,33 @@ export const DataTypeSubFlowInputComponent: React.FC<DataTypeSubFlowInputCompone
     }), [suggestions])!
 
     const [suggestionDialogOpen, setSuggestionDialogOpen] = React.useState(false)
-    const result = useFunctionSuggestions()
+    const [customLogicDialogOpen, setCustomLogicDialogOpen] = React.useState(false)
+    const functionSuggestions = useFunctionSuggestions()
 
-    const onChangeDebounced = useDebouncedCallback((value: LiteralValue | SubFlowValue | ReferenceValue | null) => {
+    const onChangeDebounced = useDebouncedCallback((value: LiteralValue | SubFlowValue | NodeFunction | ReferenceValue | null) => {
         onChange?.(value ?? null)
     }, 200)
 
+    const referenceSuggestions = React.useMemo(() => suggestions ?? [], [suggestions])
+
     return <>
-        <SuggestionDialogComponent suggestions={[...suggestions!, ...result]}
+        <SuggestionDialogComponent suggestions={suggestions}
+                                   flowId={flowId}
+                                   nodeId={props.nodeId}
+                                   parameterIndex={props.parameterIndex}
                                    open={suggestionDialogOpen}
+                                   onSuggestionSelect={value => {
+                                       formValidation?.setValue?.(value ?? null)
+                                       onChangeDebounced(value ?? null)
+                                   }}
+                                   onCustomLogicGroupSelect={() => setCustomLogicDialogOpen(true)}
+                                   onOpenChange={setSuggestionDialogOpen}/>
+        <SuggestionDialogComponent suggestions={functionSuggestions}
+                                   flowId={flowId}
+                                   nodeId={props.nodeId}
+                                   parameterIndex={props.parameterIndex}
+                                   open={customLogicDialogOpen}
+                                   onBackSelect={() => setSuggestionDialogOpen(true)}
                                    onSuggestionSelect={value => {
                                        if (value?.__typename === "NodeFunction") {
                                            const nodeId = flowService.addNodeById(flowId, value)
@@ -49,27 +67,22 @@ export const DataTypeSubFlowInputComponent: React.FC<DataTypeSubFlowInputCompone
                                        formValidation?.setValue?.(value ?? null)
                                        onChangeDebounced(value as SubFlowValue)
                                    }}
-                                   onOpenChange={setSuggestionDialogOpen}/>
+                                   onOpenChange={setCustomLogicDialogOpen}/>
         {title && <InputLabel>{title}</InputLabel>}
         {description && <InputDescription>{description}</InputDescription>}
         <DataTypeInputValueComponent inside
-                                     showSuggestions={false}
                                      onClick={() => {
                                          setSuggestionDialogOpen(true)
                                      }}
                                      initialValue={initialValue}
                                      onChange={(value) => {
-                                         if (value?.__typename === "NodeFunction") {
-                                             const nodeId = flowService.addNodeById(flowId, value)
-                                             value = {
-                                                 __typename: "SubFlowValue",
-                                                 startingNodeId: nodeId
-                                             }
-                                         }
                                          formValidation?.setValue?.(value ?? null)
-                                         onChangeDebounced(value as SubFlowValue)
+                                         onChangeDebounced(value ?? null)
                                      }}
-                                     suggestions={suggestions}
+                                     suggestions={referenceSuggestions}
+                                     nodeId={props.nodeId}
+                                     parameterIndex={props.parameterIndex}
+                                     onCustomLogicGroupSelect={() => setCustomLogicDialogOpen(true)}
                                      formValidation={formValidation}>
             <Text>Select next node</Text>
         </DataTypeInputValueComponent>

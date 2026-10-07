@@ -6,81 +6,147 @@ import {
     TagInput,
     TagInputTrigger,
     TagInputValue,
-    TagValue
+    TagValue,
+    useService
 } from "@code0-tech/pictor";
 import {useDebouncedCallback} from "use-debounce";
 import {
+    Flow,
     LiteralValue,
     NodeFunction,
     NodeParameterValue,
     ReferenceValue,
     SubFlowValue
 } from "@code0-tech/sagittarius-graphql-types";
+import {useParams} from "next/navigation";
+import {FlowService} from "@edition/flow/services/Flow.service";
 import {DataTypeInputControlsComponent} from "@edition/datatype/components/inputs/DataTypeInputControlsComponent";
 import {DataTypeInputValueComponent} from "@edition/datatype/components/inputs/DataTypeInputValueComponent";
+import {
+    listCurrentEntries,
+    listElementSuggestions,
+    listInitialArray,
+    listInitialLiteral,
+    listInitialTags,
+    listReferences,
+    listTagKeys,
+    listValueKey,
+    toListEntry,
+    toListLiteral
+} from "@edition/datatype/components/inputs/list/DataTypeListInput.util";
+import {
+    DataTypeInputMenuSuggestionsComponent
+} from "@edition/datatype/components/inputs/DataTypeInputMenuSuggestionsComponent";
+import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
+import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeComponent";
 
 export type DataTypeListNumberInputComponentProps = DataTypeInputComponentProps
 
 export const DataTypeListNumberInputComponent: React.FC<DataTypeListNumberInputComponentProps> = (props) => {
 
-    const {formValidation, title, initialValue, description, suggestions, onChange} = props
+    const {schema, formValidation, title, initialValue, description, suggestions, onChange} = props
+
+    const params = useParams()
+    const flowService = useService(FlowService)
+    const flowId: Flow['id'] = props.flowId ?? `gid://sagittarius/Flow/${Number(params.flowId) || 1}`
 
     const defaultValue: NodeParameterValue | NodeFunction | undefined = React.useMemo(() => initialValue ?? undefined, [initialValue])
-    const onChangeDebounced = useDebouncedCallback((value: LiteralValue | SubFlowValue | NodeFunction | ReferenceValue | null) => {
-        onChange?.(value)
-    }, 400)
 
-    const referenceSuggestions = React.useMemo(
-        () => (suggestions ?? []).filter(suggest => suggest.__typename !== "LiteralValue"),
-        [suggestions]
-    )
+    const elementSuggestions = React.useMemo(() => listElementSuggestions(schema, suggestions), [schema, suggestions])
+    const tagKeys = React.useMemo(() => listTagKeys(elementSuggestions), [elementSuggestions])
+    const referenceSuggestions = React.useMemo(() => suggestions ?? [], [suggestions])
 
-    const initialArray = (initialValue as LiteralValue)?.__typename === "LiteralValue" && Array.isArray((initialValue as LiteralValue).value)
-        ? (initialValue as LiteralValue).value as unknown[]
-        : []
+    const initialArray = listInitialArray(initialValue)
     const initialKey = JSON.stringify(initialArray)
-    const initialTags: TagValue[] = React.useMemo(
-        () => initialArray.map(entry => ({value: entry})),
-        [initialKey]
-    )
+    const initialTags = React.useMemo(() => listInitialTags(initialArray), [initialKey])
+    const references = React.useMemo(() => listReferences(elementSuggestions, initialValue), [elementSuggestions, initialKey])
+    const currentEntries = listCurrentEntries(initialArray, references)
+    const lastValueKey = React.useRef(listValueKey(initialArray, listInitialLiteral(initialValue)?.references))
 
-    const lastValueKey = React.useRef(initialKey)
+    const onChangeDebounced = useDebouncedCallback((
+        changed: TagValue[] | LiteralValue | ReferenceValue | SubFlowValue | NodeFunction | null,
+        entryIndex?: number
+    ) => {
+
+        if (!Array.isArray(changed) && entryIndex === undefined) {
+            formValidation?.setValue?.(changed)
+            onChange?.(changed)
+            return
+        }
+
+        const entries = Array.isArray(changed)
+            ? changed.map(tag => {
+                const tagKey = String(tag.value)
+                const suggested = references.get(tagKey)
+
+                if (!suggested) {
+                    const number = Number(tagKey)
+                    return tagKey === "" || Number.isNaN(number) ? tagKey : number
+                }
+
+                const entry = toListEntry(suggested, flowService, flowId, props.nodeId)
+                references.set(tagKey, entry as ReferenceValue | SubFlowValue)
+                return entry
+            })
+            : Array.from({length: Math.max(currentEntries.length, (entryIndex ?? 0) + 1)}, (_, index) =>
+                index === entryIndex
+                    ? toListEntry(changed, flowService, flowId, props.nodeId)
+                    : currentEntries[index])
+
+        const literal = toListLiteral(entries, references)
+        const key = listValueKey(literal.value, literal.references)
+        if (key === lastValueKey.current) return
+
+        lastValueKey.current = key
+        formValidation?.setValue?.(literal)
+        onChange?.(literal)
+    }, 400, {flushOnExit: true})
 
     return React.useMemo(() => <>
         {title && <InputLabel>{title}</InputLabel>}
         {description && <InputDescription>{description}</InputDescription>}
-        <DataTypeInputValueComponent initialValue={initialValue} onChange={value => {
-            formValidation?.setValue?.(value)
-            onChangeDebounced(value)
-        }} suggestions={referenceSuggestions}
+        <DataTypeInputValueComponent initialValue={initialValue}
+                                     onChange={onChangeDebounced}
+                                     suggestions={referenceSuggestions}
                                      formValidation={formValidation}>
             <TagInput allowCustomValues={true}
                       placeholder={typeof title === "string" ? title : undefined}
                       initialValue={initialTags}
                       maw={"100%"}
+                      tokenRules={[
+                          {
+                              pattern: /^\$\{.+}$/,
+                              void: true,
+                              wrap: matchedText => {
+                                  const reference = references.get(matchedText)
+                                  if (reference?.__typename === "ReferenceValue") return <ReferenceBadgeComponent
+                                      value={reference}/>
+                                  if (reference?.__typename === "SubFlowValue") return <NodeBadgeComponent
+                                      value={reference}/>
+                                  if (reference?.__typename === "NodeFunction") return <NodeBadgeComponent value={{
+                                      __typename: "SubFlowValue",
+                                      functionDefinition: reference.functionDefinition
+                                  }}/>
+                                  return null
+                              }
+                          }
+                      ]}
                       formValidation={{...formValidation, setValue: undefined}}
-                      onChange={tags => {
-                          const value = tags.map(tag => {
-                              const number = Number(tag.value)
-                              return tag.value === "" || Number.isNaN(number) ? tag.value : number
-                          })
-                          const key = JSON.stringify(value)
-                          if (key === lastValueKey.current) return
-                          lastValueKey.current = key
-                          const literal: LiteralValue = {__typename: "LiteralValue", value}
-                          formValidation?.setValue?.(literal)
-                          onChangeDebounced(literal)
-                      }}
+                      onChange={onChangeDebounced}
                       right={
-                          <DataTypeInputControlsComponent suggestions={referenceSuggestions} onSelect={value => {
-                              formValidation?.setValue?.(value)
-                              onChangeDebounced(value)
-                          }}/>
+                          <DataTypeInputControlsComponent suggestions={referenceSuggestions}
+                                                          onSelect={onChangeDebounced}/>
                       }
                       rightType={"action"}>
+                <DataTypeInputMenuSuggestionsComponent suggestions={elementSuggestions}
+                                                      tagKeys={tagKeys}
+                                                      flowId={flowId}
+                                                      nodeId={props.nodeId}
+                                                      parameterIndex={props.parameterIndex}
+                                                      onVariantSelect={value => onChangeDebounced(value, currentEntries.length)}/>
                 <TagInputValue/>
                 <TagInputTrigger/>
             </TagInput>
         </DataTypeInputValueComponent>
-    </>, [formValidation, defaultValue])
+    </>, [formValidation, defaultValue, elementSuggestions, tagKeys, references])
 }

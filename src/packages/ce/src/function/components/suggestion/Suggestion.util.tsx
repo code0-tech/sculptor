@@ -1,11 +1,23 @@
-import {LiteralValue, NodeFunction, ReferenceValue, SubFlowValue} from "@code0-tech/sagittarius-graphql-types";
+import {
+    Flow,
+    LiteralValue,
+    NodeFunction,
+    ReferencePath,
+    ReferenceValue,
+    SubFlowValue
+} from "@code0-tech/sagittarius-graphql-types";
 import {useService, useStore} from "@code0-tech/pictor";
 import {ModuleService} from "@edition/module/services/Module.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import React from "react";
 
+export type SuggestionValue = LiteralValue | ReferenceValue | NodeFunction | SubFlowValue
+
+export type SuggestionTagKey = string | number | boolean | null
+
 export interface Suggestion {
-    value: LiteralValue | ReferenceValue | NodeFunction | SubFlowValue
+    value: SuggestionValue
+    variants: SuggestionValue[]
     displayMessage: string
     definitionSource: string
     aliases: string[]
@@ -20,8 +32,8 @@ export interface SuggestionGroup {
 }
 
 export const useMappedSuggestions = (
-    suggestions: (NodeFunction | SubFlowValue | ReferenceValue | LiteralValue)[],
-    only?: (NodeFunction | SubFlowValue | ReferenceValue | LiteralValue)["__typename"]
+    suggestions: SuggestionValue[],
+    only?: SuggestionValue["__typename"] | SuggestionValue["__typename"][]
 ): SuggestionGroup[] => {
 
     const moduleService = useService(ModuleService)
@@ -43,9 +55,16 @@ export const useMappedSuggestions = (
         [functionService, functionStore]
     )
 
+    const onlyKey = Array.isArray(only) ? only.join("|") : only ?? ""
+
+    const onlyTypes = React.useMemo(
+        () => only === undefined ? undefined : Array.isArray(only) ? only : [only],
+        [onlyKey]
+    )
+
     return React.useMemo(() => {
 
-        const mappedSuggestions: Suggestion[] = suggestions.filter(suggestion => !only || suggestion.__typename === only).map((suggestion) => {
+        const mappedSuggestions = suggestions.filter(suggestion => !onlyTypes || onlyTypes.includes(suggestion.__typename)).map((suggestion) => {
 
             if (suggestion.__typename === "NodeFunction") {
                 const functionDefinition = functions.find(f => f.id === suggestion.functionDefinition?.id)
@@ -87,11 +106,33 @@ export const useMappedSuggestions = (
             }
 
             return null
-        }).filter((Boolean)) as Suggestion[]
+        }).filter((Boolean)) as Omit<Suggestion, "variants">[]
+
+        const collapsedSuggestions: Suggestion[] = []
+        const byFunction = new Map<string, Suggestion>()
+
+        mappedSuggestions.forEach((mapped) => {
+
+            const value = mapped.value
+            const functionId = value.__typename === "NodeFunction" ? value.functionDefinition?.id
+                : value.__typename === "SubFlowValue" ? value.functionDefinition?.id
+                    : undefined
+
+            const existing = functionId ? byFunction.get(functionId) : undefined
+
+            if (existing) {
+                existing.variants.push(value)
+                return
+            }
+
+            const suggestion: Suggestion = {...mapped, variants: [value]}
+            if (functionId) byFunction.set(functionId, suggestion)
+            collapsedSuggestions.push(suggestion)
+        })
 
         const groupedByModule = new Map<string, { suggestions: Suggestion[], module: any }>()
 
-        mappedSuggestions.forEach((suggestion) => {
+        collapsedSuggestions.forEach((suggestion) => {
             const moduleId = suggestion.definitionSource
             const module = modules.find(m => m.identifier === moduleId)
 
@@ -106,8 +147,8 @@ export const useMappedSuggestions = (
         })
 
         return [
-            ...(only ? [] : [{
-                suggestions: mappedSuggestions,
+            ...(onlyTypes ? [] : [{
+                suggestions: collapsedSuggestions,
                 displayMessage: "All",
                 icon: undefined
             }]),
@@ -117,5 +158,98 @@ export const useMappedSuggestions = (
                 icon: group.module?.icon
             }))
         ]
-    }, [suggestions, only, modules, functions])
+    }, [suggestions, onlyTypes, modules, functions])
+}
+
+export interface SuggestionPathNode {
+    label: string
+    value?: ReferenceValue
+    index?: number
+    children: Map<string, SuggestionPathNode>
+}
+
+export interface SuggestionReferenceGroup {
+    root: ReferenceValue
+    targetNodeId: string
+    value?: ReferenceValue
+    index?: number
+    children: Map<string, SuggestionPathNode>
+    suggestions: { value: ReferenceValue, index: number }[]
+}
+
+export type SuggestionMenuEntry =
+    | { kind: "value", value: LiteralValue | SubFlowValue | NodeFunction, index: number }
+    | { kind: "reference-group", key: string, group: SuggestionReferenceGroup }
+
+const referenceGroupKey = (value: ReferenceValue): string =>
+    [value.nodeFunctionId, value.inputTypeIdentifier, value.inputIndex, value.parameterIndex].join("/")
+
+const referencePathLabel = (segment: ReferencePath): string =>
+    `${segment.path ?? ""}${segment.arrayIndex != null ? `[${segment.arrayIndex}]` : ""}`
+
+const newReferenceGroup = (root: ReferenceValue, flowId: Flow['id']): SuggestionReferenceGroup => {
+    const nodeFunctionId = root.nodeFunctionId as string | null | undefined
+
+    return {
+        root: {...root, referencePath: undefined},
+        targetNodeId: (!nodeFunctionId || nodeFunctionId === "undefined" ? flowId : nodeFunctionId) as string,
+        children: new Map(),
+        suggestions: []
+    }
+}
+
+const childPathNode = (children: Map<string, SuggestionPathNode>, label: string): SuggestionPathNode => {
+    const existing = children.get(label)
+    if (existing) return existing
+
+    const created: SuggestionPathNode = {label, children: new Map()}
+    children.set(label, created)
+    return created
+}
+
+const pathNodeAt = (group: SuggestionReferenceGroup, segments: ReferencePath[]): SuggestionPathNode =>
+    segments.reduce(
+        (parent, segment) => childPathNode(parent.children, referencePathLabel(segment)),
+        {label: "", children: group.children} as SuggestionPathNode
+    )
+
+export const useSuggestionMenuEntries = (suggestions: SuggestionValue[], flowId: Flow['id']) => {
+
+    const moduleGroups = useMappedSuggestions(suggestions, ["SubFlowValue", "NodeFunction"])
+
+    const groupedValues = React.useMemo(
+        () => new Set(moduleGroups.flatMap(group => group.suggestions.flatMap(suggestion => suggestion.variants))),
+        [moduleGroups]
+    )
+
+    const entries = React.useMemo(() => {
+
+        const groups = new Map<string, SuggestionReferenceGroup>()
+
+        return suggestions.flatMap((suggest, index): SuggestionMenuEntry[] => {
+
+            if (suggest.__typename === "LiteralValue") return [{kind: "value", value: suggest, index}]
+
+            if (suggest.__typename === "SubFlowValue" || suggest.__typename === "NodeFunction")
+                return groupedValues.has(suggest) ? [] : [{kind: "value", value: suggest, index}]
+
+            if (suggest.__typename !== "ReferenceValue") return []
+
+            const key = referenceGroupKey(suggest)
+            const known = groups.get(key)
+            const group = known ?? newReferenceGroup(suggest, flowId)
+            const segments = suggest.referencePath ?? []
+
+            groups.set(key, group)
+            group.suggestions.push({value: suggest, index})
+
+            const target = segments.length <= 0 ? group : pathNodeAt(group, segments)
+            target.value = suggest
+            target.index = index
+
+            return known ? [] : [{kind: "reference-group", key, group}]
+        })
+    }, [suggestions, groupedValues, flowId])
+
+    return {entries, moduleGroups}
 }

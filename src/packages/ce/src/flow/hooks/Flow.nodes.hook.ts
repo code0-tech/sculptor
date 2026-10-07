@@ -66,7 +66,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
 
                 nodes.push({
                     id: nodeId,
-                    type: functionDefinition && "design" in functionDefinition ? functionDefinition?.design as string : "default",
+                    type: functionDefinition && "design" in functionDefinition ? functionDefinition?.design as string : inlinedReference ? "square" : "default",
                     position: {x: 0, y: 0},
                     draggable: false,
                     parentId: parentGroup,
@@ -106,7 +106,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                     if (!subFlow.startingNodeId && subFlow.functionDefinition?.id) {
                         nodes.push({
                             id: `${nodeId}-${key}`,
-                            type: functionDefinition && "design" in functionDefinition ? functionDefinition?.design as string : "square",
+                            type: functionDefinition && "design" in functionDefinition ? functionDefinition?.design as string : "round",
                             position: {x: 0, y: 0},
                             draggable: false,
                             parentId: parentGroup,

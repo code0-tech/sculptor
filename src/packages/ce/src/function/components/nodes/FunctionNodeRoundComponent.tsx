@@ -15,9 +15,9 @@ import {useSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.sele
 import {useReferencedNodeIds} from "@edition/flow/hooks/Flow.references.hook";
 import {useFlowReferenceHoverStore} from "@edition/flow/hooks/Flow.reference.hover.hook";
 
-export type FunctionNodeSquareComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
+export type FunctionNodeRoundComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
 
-export const FunctionNodeSquareComponent: React.FC<FunctionNodeSquareComponentProps> = memo((props) => {
+export const FunctionNodeRoundComponent: React.FC<FunctionNodeRoundComponentProps> = memo((props) => {
     const {data, id, selected} = props
 
     const flowService = useService(FlowService)
@@ -101,6 +101,7 @@ export const FunctionNodeSquareComponent: React.FC<FunctionNodeSquareComponentPr
                 className={`d-flow-node ${selectedNode?.id == id ? "d-flow-node--active" : ""} ${isReferenced === false ? "d-flow-node--notReferenced" : ""}`}
                 color={"primary"} style={{
                     aspectRatio: "50/50",
+                    borderRadius: "50%",
                 ...(isReferenced === true || hoveredNodeId === id ? {boxShadow: `0 0 5rem 0 ${withAlpha(data.color, 0.25)}`} : {}),
             }}>
 
