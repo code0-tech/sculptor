@@ -103,11 +103,27 @@ const isListReference = (entry: ListEntry): entry is ReferenceValue | SubFlowVal
 
 export const toListLiteral = (
     entries: ListEntry[],
-    references: Map<string, ReferenceValue | SubFlowValue | NodeFunction>
+    references: Map<string, ReferenceValue | SubFlowValue | NodeFunction>,
+    tokens?: string[]
 ): LiteralValue => {
 
-    const referenceIndexes = entries.flatMap((entry, index) => isListReference(entry) ? [index] : [])
-    const signatures = new Map(referenceIndexes.map((index, position) => [index, `item_${position}`]))
+    const kept = entries.map((entry, index) =>
+        isListReference(entry) ? tokens?.[index]?.match(/^\$\{(item_\d+)}$/)?.[1] : undefined)
+    const claimed = new Set(kept.filter((signature): signature is string => !!signature))
+
+    const signatures = entries.reduce<Map<number, string>>((assigned, entry, index) => {
+        if (!isListReference(entry)) return assigned
+
+        const taken = new Set(assigned.values())
+        const wanted = kept[index]
+
+        if (wanted && !taken.has(wanted)) return new Map([...assigned, [index, wanted]])
+
+        const free = Array.from({length: entries.length + claimed.size + 1}, (_, position) => `item_${position}`)
+            .find(signature => !taken.has(signature) && !claimed.has(signature))!
+
+        return new Map([...assigned, [index, free]])
+    }, new Map())
 
     const inlineReferences: InlineReferenceValue[] = [...signatures].map(([index, signature]) => ({
         __typename: "InlineReferenceValue",

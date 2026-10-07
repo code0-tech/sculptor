@@ -38,7 +38,6 @@ import {
     listElementSuggestions,
     listInitialArray,
     listInitialLiteral,
-    listInitialTags,
     listReferences,
     listTagKeys,
     listValueKey,
@@ -72,6 +71,8 @@ export const DataTypeListInputComponent: React.FC<DataTypeListInputComponentProp
     const defaultValue: NodeParameterValue | NodeFunction | undefined = React.useMemo(() => initialValue ?? undefined, [initialValue])
     const [openToken, setOpenToken] = React.useState<string | null>(null)
     const addedShapes = React.useRef(new Map<number, Schema>())
+    const listTokenIds = React.useRef<string[]>([])
+    const nextTokenId = React.useRef(0)
 
     const listSchema = React.useMemo(
         () => (schema && "schema" in schema ? (schema as NodeSchema).schema : schema) as ListInput | undefined,
@@ -105,7 +106,17 @@ export const DataTypeListInputComponent: React.FC<DataTypeListInputComponentProp
 
     const initialArray = listInitialArray(initialValue)
     const initialKey = JSON.stringify(initialArray)
-    const initialTags = React.useMemo(() => listInitialTags(initialArray, true), [initialKey])
+    const listTokens = React.useMemo(() => {
+        const tokens = initialArray.reduce<string[]>((previousTokens, entry, index) => {
+            if (typeof entry === "string" && /^\$\{.+}$/.test(entry)) return [...previousTokens, entry]
+            const previous = listTokenIds.current[index]
+            const stable = !!previous && /^\$\{literal_\d+}$/.test(previous) && !previousTokens.includes(previous)
+            return [...previousTokens, stable ? previous : `\${literal_${nextTokenId.current++}}`]
+        }, [])
+        listTokenIds.current = tokens
+        return tokens
+    }, [initialKey])
+    const initialTags = React.useMemo(() => listTokens.map(value => ({value})), [listTokens])
     const references = React.useMemo(() => listReferences(elementSuggestions, initialValue), [elementSuggestions, initialKey])
     const currentEntries = listCurrentEntries(initialArray, references)
     const lastValueKey = React.useRef(listValueKey(initialArray, listInitialLiteral(initialValue)?.references))
@@ -123,19 +134,25 @@ export const DataTypeListInputComponent: React.FC<DataTypeListInputComponentProp
 
         if (entryIndex !== undefined && changed !== null) addedShapes.current.delete(entryIndex)
 
+        const tokens = Array.isArray(changed)
+            ? changed.map(tag => listTokenIds.current.includes(String(tag.value))
+                ? String(tag.value)
+                : `\${literal_${nextTokenId.current++}}`)
+            : listTokenIds.current
+
         const entries = Array.isArray(changed)
             ? changed.map((tag, index) => {
                 const tagKey = String(tag.value)
 
                 if (tagKey.startsWith("${add_")) {
                     addedShapes.current.set(index, tag.valueData as Schema)
-                    setOpenToken(`\${literal_${index}}`)
+                    setOpenToken(tokens[index])
                     return null
                 }
 
-                const literalIndex = tagKey.match(/^\$\{literal_(\d+)}$/)?.[1]
+                const literalIndex = /^\$\{literal_\d+}$/.test(tagKey) ? listTokenIds.current.indexOf(tagKey) : -1
 
-                if (literalIndex) return initialArray[Number(literalIndex)]
+                if (literalIndex >= 0) return initialArray[literalIndex]
 
                 const suggested = references.get(tagKey)
 
@@ -150,10 +167,11 @@ export const DataTypeListInputComponent: React.FC<DataTypeListInputComponentProp
                     ? toListEntry(changed, flowService, flowId, nodeId)
                     : currentEntries[index])
 
-        const literal = toListLiteral(entries, references)
+        const literal = toListLiteral(entries, references, tokens)
         const key = listValueKey(literal.value, literal.references)
         if (key === lastValueKey.current) return
 
+        listTokenIds.current = tokens
         lastValueKey.current = key
         formValidation?.setValue?.(literal)
         onChange?.(literal)
@@ -176,8 +194,9 @@ export const DataTypeListInputComponent: React.FC<DataTypeListInputComponentProp
                           {
                               pattern: /^\$\{literal_(\d+)}$/,
                               void: true,
-                              wrap: (matchedText, children, match) => {
-                                  const index = Number(match[1])
+                              wrap: matchedText => {
+                                  const index = listTokenIds.current.indexOf(matchedText)
+                                  if (index < 0) return null
                                   const entry = initialArray[index]
                                   const entered = listSchema?.items?.length === initialArray.length
                                       ? listSchema?.items?.[index]
@@ -251,5 +270,5 @@ export const DataTypeListInputComponent: React.FC<DataTypeListInputComponentProp
                 <TagInputTrigger/>
             </TagInput>
         </DataTypeInputValueComponent>
-    </>, [formValidation, defaultValue, addEntries, elementSuggestions, referenceSuggestions, tagKeys, references, initialTags, openToken, initialKey, itemsKey])
+    </>, [formValidation, defaultValue, addEntries, elementSuggestions, referenceSuggestions, tagKeys, references, listTokens, openToken, initialKey, itemsKey])
 }
