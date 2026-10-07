@@ -34,8 +34,12 @@ export const DataTypeListInputItemMenuComponent: React.FC<DataTypeListInputItemM
             </span>
         </MenuTrigger>
         <MenuPortal>
-            <MenuContent color={"primary"} align={"start"} alignOffset={0} sideOffset={4}
+            <MenuContent color={"primary"}
+                         align={"start"}
+                         alignOffset={0}
+                         sideOffset={8}
                          style={{zIndex: 49}}
+                         miw={"200px"}
                          onKeyDown={event => event.stopPropagation()}
                          onCloseAutoFocus={event => event.preventDefault()}>
                 <DataTypeInputComponent schema={{...(schema as Schema)}}

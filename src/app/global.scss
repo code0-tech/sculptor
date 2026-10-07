@@ -23,6 +23,11 @@ a {
 .scroll-area__viewport > div {
   height: 100%;
   display: block !important;
+  width: 100%;
+}
+
+.scroll-area--auto {
+  width: 100%;
 }
 
 [data-sonner-toast] {
