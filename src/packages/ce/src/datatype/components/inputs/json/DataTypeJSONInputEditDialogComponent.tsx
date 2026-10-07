@@ -108,7 +108,8 @@ export const DataTypeJSONInputEditDialogComponent: React.FC<DataTypeJSONInputEdi
             const requestId = ++latestSchemaRequest.current
             execute({flow: snapshot, dataTypes, functions, nodeId}).then(signatureSchema => {
                 if (requestId !== latestSchemaRequest.current) return
-                setLiveSchema(signatureSchema?.parameters?.[parameterIndex]?.schema)
+                const live = signatureSchema?.parameters?.[parameterIndex]?.schema
+                setLiveSchema(live?.input === schema?.input ? live : undefined)
             })
         }, 200)
         return () => clearTimeout(timeout)
