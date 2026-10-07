@@ -43,5 +43,6 @@ export const NamespaceLicensesListItemComponent: React.FC<NamespaceLicensesListI
     return <LicenseCardComponent license={license}
                                  fallbackName={"Cloud license"}
                                  active={active}
+                                 namespaceId={namespaceId?.match(/Namespace\/(\d+)$/)?.[1]}
                                  onRemove={licenseRemove}/>
 }

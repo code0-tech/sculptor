@@ -33,6 +33,7 @@ import {NamespaceService} from "@cloud-internal/namespace/services/Namespace.ser
 import {OrganizationService} from "@edition/organization/services/Organization.service";
 import {UserService} from "@edition/user/services/User.service";
 import {getNamespaceName} from "@edition/namespace/util/Namespace.name.util";
+import {useLicenseUpgrade} from "@edition/license/hooks/License.upgrade.hook";
 
 const benefits = [
     {
@@ -77,7 +78,6 @@ export const UpgradeDialogComponent: React.FC<UpgradeDialogComponentProps> = ({o
     const namespaceStore = useStore(NamespaceService)
     const organizationService = useService(OrganizationService)
     const userService = useService(UserService)
-    const [pending, startTransition] = React.useTransition()
     const [discountVisible, setDiscountVisible] = React.useState(false)
     const [remaining, setRemaining] = React.useState<number | null>(null)
 
@@ -133,26 +133,7 @@ export const UpgradeDialogComponent: React.FC<UpgradeDialogComponentProps> = ({o
         [namespaceStore, namespaceIndex, namespaceId]
     )
 
-    const openSubscription = () => {
-        const target = window.open("about:blank", "_blank")
-        startTransition(async () => {
-            const [config, tokenPayload] = await Promise.all([
-                fetch("/api/config").then(response => response.json()),
-                userService.usersCreateCraterToken()
-            ])
-            const checkoutUrl = config?.checkoutUrl as string | null | undefined
-            const token = tokenPayload?.token?.token
-            if (!checkoutUrl || !token) {
-                target?.close()
-                return
-            }
-            const url = new URL(checkoutUrl)
-            if (reference) url.searchParams.set("ref", reference)
-            if (namespaceIndex) url.searchParams.set("namespace", namespaceIndex.toString())
-            url.searchParams.set("token", token)
-            if (target) target.location.href = url.toString()
-        })
-    }
+    const {pending, upgrade} = useLicenseUpgrade(reference ?? "upgrade_dialog", namespaceIndex, {target: "checkout"})
 
     const name = namespace ? getNamespaceName(namespace, organizationService, userService) : undefined
     const subject = namespace?.parent?.__typename === "Organization"
@@ -323,7 +304,7 @@ export const UpgradeDialogComponent: React.FC<UpgradeDialogComponentProps> = ({o
                 <Spacing spacing={"xs"}/>
                 <BorderBeam strength={1} size={"line"} theme={"dark"} duration={5} style={{display: "block"}}>
                     <Button color={"tertiary"} paddingSize={"xxs"} disabled={pending}
-                            onClick={openSubscription} justify={"center"} w={"100%"}>
+                            onClick={upgrade} justify={"center"} w={"100%"}>
                         Choose your plan
                         <IconArrowRight size={16}/>
                     </Button>

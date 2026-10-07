@@ -1,8 +1,15 @@
 "use client"
 
 import React from "react";
+import {License} from "@code0-tech/sagittarius-graphql-types";
 import {useUsageOverview} from "@edition/usage/hooks/Usage.overview.hook";
-import {useUsageLicense} from "@edition/usage/hooks/Usage.license.hook";
+
+export type LicenseUpgradeTarget = "checkout" | "subscription"
+
+export interface LicenseUpgradeOptions {
+    target?: LicenseUpgradeTarget
+    license?: License | null
+}
 
 export interface LicenseUpgrade {
     available: boolean
@@ -10,35 +17,33 @@ export interface LicenseUpgrade {
     upgrade: () => void
 }
 
-export const useLicenseUpgrade = (reference: string, namespaceId?: string | number): LicenseUpgrade => {
+export const useLicenseUpgrade = (reference: string, namespaceId?: string | number, options?: LicenseUpgradeOptions): LicenseUpgrade => {
 
     const {licensed, atRisk} = useUsageOverview()
-    const {license} = useUsageLicense()
     const [pending, startTransition] = React.useTransition()
 
+    const target = options?.target
+
     const upgrade = React.useCallback(() => {
-        const target = window.open("about:blank", "_blank")
+        const frame = window.open("about:blank", "_blank")
 
         startTransition(async () => {
 
-            const config = await Promise.resolve(fetch("/api/config").then(response => response.json()))
+            const config = await fetch("/api/config").then(response => response.json())
             const subscriptionUrl = config?.subscriptionUrl as string
             const checkoutUrl = config?.checkoutUrl as string
 
-            if (!subscriptionUrl) {
-                target?.close()
+            const manage = target ? target === "subscription" : licensed && atRisk.length > 0
+            const resolved = manage ? subscriptionUrl : checkoutUrl
+
+            if (!resolved) {
+                frame?.close()
                 return
             }
 
-            const url = new URL(licensed && atRisk.length > 0 ? subscriptionUrl : checkoutUrl)
-
-            url.searchParams.set("ref", reference)
-            if (license?.licensee.license_id) url.searchParams.set("licenseId", license?.licensee.license_id)
-            if (license?.licensee.subscription_id) url.searchParams.set("subscriptionId", license?.licensee.subscription_id)
-
-            if (target) target.location.href = url.toString()
+            if (frame) frame.location.href = resolved
         })
-    }, [reference, licensed, atRisk, license])
+    }, [target, licensed, atRisk])
 
     return {available: true, pending, upgrade}
 }

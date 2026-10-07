@@ -3,10 +3,18 @@
 import React from "react";
 import {useService} from "@code0-tech/pictor";
 import {useRouter} from "next/navigation";
+import {License} from "@code0-tech/sagittarius-graphql-types";
 import {useUsageOverview} from "@edition/usage/hooks/Usage.overview.hook";
 import {useUsageLicense} from "@edition/usage/hooks/Usage.license.hook";
 import {UserService} from "@edition/user/services/User.service";
 import {useLicensePurchased} from "@cloud-internal/license/hooks/License.purchased.hook";
+
+export type LicenseUpgradeTarget = "checkout" | "subscription"
+
+export interface LicenseUpgradeOptions {
+    target?: LicenseUpgradeTarget
+    license?: License | null
+}
 
 export interface LicenseUpgrade {
     available: boolean
@@ -14,28 +22,30 @@ export interface LicenseUpgrade {
     upgrade: () => void
 }
 
-export const useLicenseUpgrade = (reference: string, namespaceId?: string | number): LicenseUpgrade => {
+export const useLicenseUpgrade = (reference: string, namespaceId?: string | number, options?: LicenseUpgradeOptions): LicenseUpgrade => {
 
     const router = useRouter()
     const userService = useService(UserService)
     const {licensed, atRisk, namespaceIndex} = useUsageOverview()
-    const {license} = useUsageLicense()
+    const {license: currentLicense} = useUsageLicense()
     const purchased = useLicensePurchased()
     const [pending, startTransition] = React.useTransition()
 
     const namespace = namespaceId ?? namespaceIndex
+    const target = options?.target
+    const license = options?.license ?? currentLicense
 
     const upgrade = React.useCallback(() => {
 
-        if (!purchased) {
-            const target = new URLSearchParams()
-            target.set("ref", reference)
-            if (namespace) target.set("namespace", namespace.toString())
-            router.push(`/upgrade?${target.toString()}`)
+        if (!target && !purchased) {
+            const params = new URLSearchParams()
+            params.set("ref", reference)
+            if (namespace) params.set("namespace", namespace.toString())
+            router.push(`/upgrade?${params.toString()}`)
             return
         }
 
-        const target = window.open("about:blank", "_blank")
+        const frame = window.open("about:blank", "_blank")
 
         startTransition(async () => {
 
@@ -48,22 +58,25 @@ export const useLicenseUpgrade = (reference: string, namespaceId?: string | numb
             const checkoutUrl = config?.checkoutUrl as string
             const token = tokenPayload?.token?.token
 
-            if (!subscriptionUrl || !checkoutUrl || !token) {
-                target?.close()
+            const manage = target ? target === "subscription" : licensed && atRisk.length > 0
+            const resolved = manage ? subscriptionUrl : checkoutUrl
+
+            if (!resolved || !token) {
+                frame?.close()
                 return
             }
 
-            const url = new URL(licensed && atRisk.length > 0 ? subscriptionUrl : checkoutUrl)
+            const url = new URL(resolved)
 
             url.searchParams.set("ref", reference)
             url.searchParams.set("token", token)
             if (namespace) url.searchParams.set("namespace", namespace.toString())
-            if (license?.licensee.license_id) url.searchParams.set("licenseId", license?.licensee.license_id)
-            if (license?.licensee.subscription_id) url.searchParams.set("subscriptionId", license?.licensee.subscription_id)
+            if (license?.licensee.license_id) url.searchParams.set("licenseId", license.licensee.license_id)
+            if (license?.licensee.subscription_id) url.searchParams.set("subscriptionId", license.licensee.subscription_id)
 
-            if (target) target.location.href = url.toString()
+            if (frame) frame.location.href = url.toString()
         })
-    }, [purchased, reference, namespace, licensed, atRisk, license])
+    }, [purchased, reference, namespace, target, licensed, atRisk, license])
 
     return {available: true, pending, upgrade}
 }
