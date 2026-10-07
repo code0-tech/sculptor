@@ -26,6 +26,7 @@ import {FlowPanelSizeComponent} from "@edition/flow/components/panels/FlowPanelS
 import {FlowPanelLayoutComponent} from "@edition/flow/components/panels/FlowPanelLayoutComponent";
 import {FlowPanelControlComponent} from "@edition/flow/components/panels/FlowPanelControlComponent";
 import {FunctionNodeSquareComponent} from "@edition/function/components/nodes/FunctionNodeSquareComponent";
+import {FunctionNodeRoundComponent} from "@edition/function/components/nodes/FunctionNodeRoundComponent";
 
 /**
  * Dynamically layouts a tree of nodes and their parameter nodes for a flow-based editor.
@@ -659,6 +660,7 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
     const nodeTypes = React.useMemo(() => ({
         default: FunctionNodeDefaultComponent,
         square: FunctionNodeSquareComponent,
+        round: FunctionNodeRoundComponent,
         group: FunctionNodeGroupComponent,
         trigger: FunctionNodeTriggerComponent,
     }), [])
