@@ -37,6 +37,7 @@ import {
 import {
     DataTypeListSubFlowInputComponent
 } from "@edition/datatype/components/inputs/list-sub-flow/DataTypeListSubFlowInputComponent";
+import {DataTypeListInputComponent} from "@edition/datatype/components/inputs/list/DataTypeListInputComponent";
 
 export interface DataTypeInputComponentProps extends Omit<InputWrapperProps<NodeParameterValue | NodeFunction>, "onChange"> {
     schema: (NodeSchema | Schema)
@@ -129,6 +130,10 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
                         suggestions={suggestions}
                         {...rest}/>
                 case "list":
+                    return <DataTypeListInputComponent
+                        schema={schema}
+                        suggestions={suggestions}
+                        {...rest}/>
                 case "data":
                     return <DataTypeJSONInputComponent
                         schema={schema}
