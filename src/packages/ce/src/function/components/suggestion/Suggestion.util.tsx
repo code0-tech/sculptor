@@ -1,10 +1,19 @@
-import {LiteralValue, NodeFunction, ReferenceValue, SubFlowValue} from "@code0-tech/sagittarius-graphql-types";
+import {
+    Flow,
+    LiteralValue,
+    NodeFunction,
+    ReferencePath,
+    ReferenceValue,
+    SubFlowValue
+} from "@code0-tech/sagittarius-graphql-types";
 import {useService, useStore} from "@code0-tech/pictor";
 import {ModuleService} from "@edition/module/services/Module.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import React from "react";
 
 export type SuggestionValue = LiteralValue | ReferenceValue | NodeFunction | SubFlowValue
+
+export type SuggestionTagKey = string | number | boolean | null
 
 export interface Suggestion {
     value: SuggestionValue
@@ -150,4 +159,97 @@ export const useMappedSuggestions = (
             }))
         ]
     }, [suggestions, onlyTypes, modules, functions])
+}
+
+export interface SuggestionPathNode {
+    label: string
+    value?: ReferenceValue
+    index?: number
+    children: Map<string, SuggestionPathNode>
+}
+
+export interface SuggestionReferenceGroup {
+    root: ReferenceValue
+    targetNodeId: string
+    value?: ReferenceValue
+    index?: number
+    children: Map<string, SuggestionPathNode>
+    suggestions: { value: ReferenceValue, index: number }[]
+}
+
+export type SuggestionMenuEntry =
+    | { kind: "value", value: LiteralValue | SubFlowValue | NodeFunction, index: number }
+    | { kind: "reference-group", key: string, group: SuggestionReferenceGroup }
+
+const referenceGroupKey = (value: ReferenceValue): string =>
+    [value.nodeFunctionId, value.inputTypeIdentifier, value.inputIndex, value.parameterIndex].join("/")
+
+const referencePathLabel = (segment: ReferencePath): string =>
+    `${segment.path ?? ""}${segment.arrayIndex != null ? `[${segment.arrayIndex}]` : ""}`
+
+const newReferenceGroup = (root: ReferenceValue, flowId: Flow['id']): SuggestionReferenceGroup => {
+    const nodeFunctionId = root.nodeFunctionId as string | null | undefined
+
+    return {
+        root: {...root, referencePath: undefined},
+        targetNodeId: (!nodeFunctionId || nodeFunctionId === "undefined" ? flowId : nodeFunctionId) as string,
+        children: new Map(),
+        suggestions: []
+    }
+}
+
+const childPathNode = (children: Map<string, SuggestionPathNode>, label: string): SuggestionPathNode => {
+    const existing = children.get(label)
+    if (existing) return existing
+
+    const created: SuggestionPathNode = {label, children: new Map()}
+    children.set(label, created)
+    return created
+}
+
+const pathNodeAt = (group: SuggestionReferenceGroup, segments: ReferencePath[]): SuggestionPathNode =>
+    segments.reduce(
+        (parent, segment) => childPathNode(parent.children, referencePathLabel(segment)),
+        {label: "", children: group.children} as SuggestionPathNode
+    )
+
+export const useSuggestionMenuEntries = (suggestions: SuggestionValue[], flowId: Flow['id']) => {
+
+    const moduleGroups = useMappedSuggestions(suggestions, ["SubFlowValue", "NodeFunction"])
+
+    const groupedValues = React.useMemo(
+        () => new Set(moduleGroups.flatMap(group => group.suggestions.flatMap(suggestion => suggestion.variants))),
+        [moduleGroups]
+    )
+
+    const entries = React.useMemo(() => {
+
+        const groups = new Map<string, SuggestionReferenceGroup>()
+
+        return suggestions.flatMap((suggest, index): SuggestionMenuEntry[] => {
+
+            if (suggest.__typename === "LiteralValue") return [{kind: "value", value: suggest, index}]
+
+            if (suggest.__typename === "SubFlowValue" || suggest.__typename === "NodeFunction")
+                return groupedValues.has(suggest) ? [] : [{kind: "value", value: suggest, index}]
+
+            if (suggest.__typename !== "ReferenceValue") return []
+
+            const key = referenceGroupKey(suggest)
+            const known = groups.get(key)
+            const group = known ?? newReferenceGroup(suggest, flowId)
+            const segments = suggest.referencePath ?? []
+
+            groups.set(key, group)
+            group.suggestions.push({value: suggest, index})
+
+            const target = segments.length <= 0 ? group : pathNodeAt(group, segments)
+            target.value = suggest
+            target.index = index
+
+            return known ? [] : [{kind: "reference-group", key, group}]
+        })
+    }, [suggestions, groupedValues, flowId])
+
+    return {entries, moduleGroups}
 }
