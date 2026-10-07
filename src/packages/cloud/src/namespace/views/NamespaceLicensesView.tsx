@@ -17,7 +17,6 @@ import {
     useService,
     useStore
 } from "@code0-tech/pictor";
-import Link from "next/link";
 import {IconPlus, IconShoppingCart} from "@tabler/icons-react";
 import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {
@@ -31,6 +30,7 @@ import {useUsageLicense} from "@edition/usage/hooks/Usage.license.hook";
 import {getLicensePeriod, isLicenseActive} from "@core/util/license";
 import {getUsageRiskDescription, getUsagesAtRisk} from "@core/util/usage";
 import {UpgradeButtonComponent} from "@cloud-internal/license/components/UpgradeButtonComponent";
+import {useLicenseUpgrade} from "@edition/license/hooks/License.upgrade.hook";
 import {LicenseSummarySectionComponent} from "@ee-internal/license/components/LicenseSummarySectionComponent";
 import {LicenseUsageSectionComponent} from "@ee-internal/license/components/LicenseUsageSectionComponent";
 import {LicenseLimitsSectionComponent} from "@ee-internal/license/components/LicenseLimitsSectionComponent";
@@ -53,6 +53,9 @@ export const NamespaceLicensesView: React.FC = () => {
     )
 
     const {license, licenseStartDate, limits, resolved} = useUsageLicense()
+
+    const subscription = useLicenseUpgrade("namespace_settings_licenses_connect", namespaceIndex, {target: "subscription"})
+    const checkout = useLicenseUpgrade("namespace_settings_licenses_buy", namespaceIndex, {target: "checkout"})
 
     const {afterDate, beforeDate} = getLicensePeriod(licenseStartDate)
 
@@ -77,39 +80,37 @@ export const NamespaceLicensesView: React.FC = () => {
                 <Badge color={"secondary"}>{licenseCount}</Badge>
             </Flex>
             <ButtonGroup>
-                <Link target={"_blank"} href={"https://codezero.build/subscription"}>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button variant={"none"} paddingSize={"xxs"}>
-                                <IconPlus size={13}/>
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipPortal>
-                            <TooltipContent sideOffset={8} color={"secondary"}>
-                                <Text size={"sm"}>
-                                    Connect a license
-                                </Text>
-                            </TooltipContent>
-                        </TooltipPortal>
-                    </Tooltip>
-                </Link>
-                <Link target={"_blank"} href={"https://codezero.build/subscription"}>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button variant={"none"} paddingSize={"xxs"}>
-                                <AuroraBackground/>
-                                <IconShoppingCart size={13}/>
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipPortal>
-                            <TooltipContent sideOffset={8} color={"secondary"}>
-                                <Text size={"sm"}>
-                                    Buy a subscription
-                                </Text>
-                            </TooltipContent>
-                        </TooltipPortal>
-                    </Tooltip>
-                </Link>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button variant={"none"} paddingSize={"xxs"} disabled={subscription.pending}
+                                onClick={subscription.upgrade}>
+                            <IconPlus size={13}/>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipPortal>
+                        <TooltipContent sideOffset={8} color={"secondary"}>
+                            <Text size={"sm"}>
+                                Connect a license
+                            </Text>
+                        </TooltipContent>
+                    </TooltipPortal>
+                </Tooltip>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button variant={"none"} paddingSize={"xxs"} disabled={checkout.pending}
+                                onClick={checkout.upgrade}>
+                            <AuroraBackground/>
+                            <IconShoppingCart size={13}/>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipPortal>
+                        <TooltipContent sideOffset={8} color={"secondary"}>
+                            <Text size={"sm"}>
+                                Buy a subscription
+                            </Text>
+                        </TooltipContent>
+                    </TooltipPortal>
+                </Tooltip>
             </ButtonGroup>
         </Flex>
         <Spacing spacing={"xs"}/>

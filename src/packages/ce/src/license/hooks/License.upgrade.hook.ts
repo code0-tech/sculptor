@@ -1,6 +1,14 @@
 "use client"
 
 import React from "react";
+import {License} from "@code0-tech/sagittarius-graphql-types";
+
+export type LicenseUpgradeTarget = "checkout" | "subscription"
+
+export interface LicenseUpgradeOptions {
+    target?: LicenseUpgradeTarget
+    license?: License | null
+}
 
 export interface LicenseUpgrade {
     available: boolean
@@ -8,7 +16,7 @@ export interface LicenseUpgrade {
     upgrade: () => void
 }
 
-export const useLicenseUpgrade = (reference: string, namespaceId?: string | number): LicenseUpgrade => {
+export const useLicenseUpgrade = (reference: string, namespaceId?: string | number, options?: LicenseUpgradeOptions): LicenseUpgrade => {
 
     const upgrade = React.useCallback(() => {
     }, [])

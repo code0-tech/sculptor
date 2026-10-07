@@ -15,10 +15,10 @@ import {
     TooltipTrigger
 } from "@code0-tech/pictor";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
-import Link from "next/link";
 import {License} from "@code0-tech/sagittarius-graphql-types";
 import {IconPencil, IconTrash} from "@tabler/icons-react";
 import {getLicenseName} from "@core/util/license";
+import {useLicenseUpgrade} from "@edition/license/hooks/License.upgrade.hook";
 import {LicenseDetailsComponent} from "@ee-internal/license/components/LicenseDetailsComponent";
 import {
     LicenseEntitlementsSectionComponent
@@ -28,12 +28,18 @@ export interface LicenseCardComponentProps {
     license?: License | null
     fallbackName: string
     active: boolean
+    namespaceId?: string | number
     onRemove: () => void
 }
 
 export const LicenseCardComponent: React.FC<LicenseCardComponentProps> = (props) => {
 
-    const {license, fallbackName, active, onRemove} = props
+    const {license, fallbackName, active, namespaceId, onRemove} = props
+
+    const {pending, upgrade} = useLicenseUpgrade("license_card_edit", namespaceId, {
+        target: "subscription",
+        license
+    })
 
     return <Card color={"secondary"} variant={"outlined"}
                  style={{border: "1px solid rgba(191, 191, 191, 0.1)", boxShadow: "none"}}>
@@ -57,22 +63,20 @@ export const LicenseCardComponent: React.FC<LicenseCardComponentProps> = (props)
                     <LicenseDetailsComponent license={license}/>
                 </Flex>
                 <ButtonGroup style={{flexShrink: 0}}>
-                    <Link target={"_blank"} href={"https://codezero.build/en/subscription"}>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button variant={"none"} paddingSize={"xxs"}>
-                                    <IconPencil size={13}/>
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipPortal>
-                                <TooltipContent sideOffset={8} color={"secondary"}>
-                                    <Text size={"sm"}>
-                                        Edit this subscription
-                                    </Text>
-                                </TooltipContent>
-                            </TooltipPortal>
-                        </Tooltip>
-                    </Link>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button variant={"none"} paddingSize={"xxs"} disabled={pending} onClick={upgrade}>
+                                <IconPencil size={13}/>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipPortal>
+                            <TooltipContent sideOffset={8} color={"secondary"}>
+                                <Text size={"sm"}>
+                                    Edit this subscription
+                                </Text>
+                            </TooltipContent>
+                        </TooltipPortal>
+                    </Tooltip>
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button color={"error"} variant={"none"} paddingSize={"xxs"} onClick={onRemove}>
