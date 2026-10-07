@@ -172,8 +172,8 @@ export const DataTypeListInputComponent: React.FC<DataTypeListInputComponentProp
                                   const index = Number(match[1])
                                   const entry = initialArray[index]
                                   const target = addedShapes.current.get(index) ?? (entry === null || entry === undefined
-                                      ? (schema as ListInput).declaredItems?.[0]
-                                      : (schema as ListInput).items?.[index])
+                                      ? (schema && "schema" in schema ? (schema as NodeSchema).schema as ListInput : schema as ListInput).declaredItems?.[0]
+                                      : (schema && "schema" in schema ? (schema as NodeSchema).schema as ListInput : schema as ListInput).items?.[index])
 
                                   return <DataTypeListInputItemMenuComponent
                                       schema={target}
