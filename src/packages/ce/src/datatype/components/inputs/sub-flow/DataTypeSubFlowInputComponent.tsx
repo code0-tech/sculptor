@@ -36,10 +36,7 @@ export const DataTypeSubFlowInputComponent: React.FC<DataTypeSubFlowInputCompone
         onChange?.(value ?? null)
     }, 200)
 
-    const referenceSuggestions = React.useMemo(
-        () => (suggestions ?? []).filter(suggest => suggest.__typename !== "LiteralValue"),
-        [suggestions]
-    )
+    const referenceSuggestions = React.useMemo(() => suggestions ?? [], [suggestions])
 
     return <>
         <SuggestionDialogComponent suggestions={suggestions}

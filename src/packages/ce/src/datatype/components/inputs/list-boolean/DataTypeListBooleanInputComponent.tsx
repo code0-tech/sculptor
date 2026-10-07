@@ -5,7 +5,6 @@ import {
     InputDescription,
     InputLabel,
     TagInput,
-    TagInputMenu,
     TagInputTrigger,
     TagInputValue,
     TagValue,
@@ -15,18 +14,28 @@ import {
 import {useDebouncedCallback} from "use-debounce";
 import {
     Flow,
-    InlineReferenceValue,
     LiteralValue,
     NodeFunction,
     NodeParameterValue,
     ReferenceValue,
     SubFlowValue
 } from "@code0-tech/sagittarius-graphql-types";
-import {ListInput, NodeSchema, Schema} from "@code0-tech/triangulum";
 import {useParams} from "next/navigation";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DataTypeInputControlsComponent} from "@edition/datatype/components/inputs/DataTypeInputControlsComponent";
 import {DataTypeInputValueComponent} from "@edition/datatype/components/inputs/DataTypeInputValueComponent";
+import {
+    listCurrentEntries,
+    listElementSuggestions,
+    listInitialArray,
+    listInitialLiteral,
+    listInitialTags,
+    listReferences,
+    listTagKeys,
+    listValueKey,
+    toListEntry,
+    toListLiteral
+} from "@edition/datatype/components/inputs/list/DataTypeListInput.util";
 import {
     DataTypeInputMenuSuggestionsComponent
 } from "@edition/datatype/components/inputs/DataTypeInputMenuSuggestionsComponent";
@@ -44,61 +53,60 @@ export const DataTypeListBooleanInputComponent: React.FC<DataTypeListBooleanInpu
     const flowId: Flow['id'] = props.flowId ?? `gid://sagittarius/Flow/${Number(params.flowId) || 1}`
 
     const defaultValue: NodeParameterValue | NodeFunction | undefined = React.useMemo(() => initialValue ?? undefined, [initialValue])
-    const onChangeDebounced = useDebouncedCallback((value: LiteralValue | SubFlowValue | NodeFunction | ReferenceValue | null) => {
-        onChange?.(value)
-    }, 400)
 
-    const elementSuggestions = React.useMemo(() => {
-        const inner = schema && "schema" in schema ? (schema as NodeSchema).schema : (schema as Schema | undefined)
-        const declared = (inner as ListInput | undefined)?.declaredItems ?? []
-        const seen = new Set<string>()
-        return declared.flatMap(item => item.suggestions ?? []).filter(suggest => {
-            const key = JSON.stringify(suggest)
-            if (seen.has(key)) return false
-            seen.add(key)
-            return true
-        })
-    }, [schema])
+    const elementSuggestions = React.useMemo(() => listElementSuggestions(schema, suggestions), [schema, suggestions])
+    const tagKeys = React.useMemo(() => listTagKeys(elementSuggestions), [elementSuggestions])
+    const referenceSuggestions = React.useMemo(() => suggestions ?? [], [suggestions])
 
-    const tagKeys: unknown[] = React.useMemo(() => elementSuggestions.map((suggest, index) =>
-        suggest.__typename === "LiteralValue" ? suggest.value : `\${reference_${index}}`
-    ), [elementSuggestions])
-
-    const referenceSuggestions = React.useMemo(
-        () => (suggestions ?? []).filter(suggest => suggest.__typename !== "LiteralValue"),
-        [suggestions]
-    )
-
-    const initialLiteral = (initialValue as LiteralValue)?.__typename === "LiteralValue" ? (initialValue as LiteralValue) : undefined
-    const initialArray = Array.isArray(initialLiteral?.value) ? initialLiteral.value as unknown[] : []
+    const initialArray = listInitialArray(initialValue)
     const initialKey = JSON.stringify(initialArray)
-    const initialTags: TagValue[] = React.useMemo(
-        () => initialArray.map(entry => ({value: entry})),
-        [initialKey]
-    )
+    const initialTags = React.useMemo(() => listInitialTags(initialArray), [initialKey])
+    const references = React.useMemo(() => listReferences(elementSuggestions, initialValue), [elementSuggestions, initialKey])
+    const currentEntries = listCurrentEntries(initialArray, references)
+    const lastValueKey = React.useRef(listValueKey(initialArray, listInitialLiteral(initialValue)?.references))
 
-    const references = React.useMemo(() => {
-        const map = new Map<string, ReferenceValue | SubFlowValue | NodeFunction>()
-        elementSuggestions.forEach((suggest, index) => {
-            if (suggest.__typename === "LiteralValue") return
-            map.set(`\${reference_${index}}`, suggest as ReferenceValue | SubFlowValue | NodeFunction)
-        })
-        ;(initialLiteral?.references ?? []).forEach(reference => {
-            if (!reference?.value) return
-            map.set(`\${${reference.signature}}`, reference.value as ReferenceValue | SubFlowValue)
-        })
-        return map
-    }, [elementSuggestions, initialKey])
+    const onChangeDebounced = useDebouncedCallback((
+        changed: TagValue[] | LiteralValue | ReferenceValue | SubFlowValue | NodeFunction | null,
+        entryIndex?: number
+    ) => {
 
-    const lastValueKey = React.useRef(JSON.stringify([initialArray, initialLiteral?.references ?? []]))
+        if (!Array.isArray(changed) && entryIndex === undefined) {
+            formValidation?.setValue?.(changed)
+            onChange?.(changed)
+            return
+        }
+
+        const entries = Array.isArray(changed)
+            ? changed.map(tag => {
+                const tagKey = String(tag.value)
+                const suggested = references.get(tagKey)
+
+                if (!suggested) return tag.value
+
+                const entry = toListEntry(suggested, flowService, flowId, props.nodeId)
+                references.set(tagKey, entry as ReferenceValue | SubFlowValue)
+                return entry
+            })
+            : Array.from({length: Math.max(currentEntries.length, (entryIndex ?? 0) + 1)}, (_, index) =>
+                index === entryIndex
+                    ? toListEntry(changed, flowService, flowId, props.nodeId)
+                    : currentEntries[index])
+
+        const literal = toListLiteral(entries, references)
+        const key = listValueKey(literal.value, literal.references)
+        if (key === lastValueKey.current) return
+
+        lastValueKey.current = key
+        formValidation?.setValue?.(literal)
+        onChange?.(literal)
+    }, 400, {flushOnExit: true})
 
     return React.useMemo(() => <>
         {title && <InputLabel>{title}</InputLabel>}
         {description && <InputDescription>{description}</InputDescription>}
-        <DataTypeInputValueComponent initialValue={initialValue} onChange={value => {
-            formValidation?.setValue?.(value)
-            onChangeDebounced(value)
-        }} suggestions={referenceSuggestions}
+        <DataTypeInputValueComponent initialValue={initialValue}
+                                     onChange={onChangeDebounced}
+                                     suggestions={referenceSuggestions}
                                      formValidation={formValidation}>
             <TagInput allowCustomValues={false}
                       placeholder={typeof title === "string" ? title : undefined}
@@ -131,60 +139,18 @@ export const DataTypeListBooleanInputComponent: React.FC<DataTypeListBooleanInpu
                           }
                       ]}
                       formValidation={{...formValidation, setValue: undefined}}
-                      onChange={tags => {
-                          const value: unknown[] = []
-                          const inlineReferences: InlineReferenceValue[] = []
-
-                          tags.forEach(tag => {
-                              const tagKey = String(tag.value)
-                              const reference = references.get(tagKey)
-
-                              if (!reference) {
-                                  value.push(tag.value)
-                                  return
-                              }
-
-                              let resolved = reference
-                              if (resolved.__typename === "NodeFunction") {
-                                  const addedNodeId = flowService.addPreviousNodeById(flowId, props.nodeId ?? null, resolved)
-                                  if (!addedNodeId) return
-                                  resolved = {__typename: "ReferenceValue", nodeFunctionId: addedNodeId}
-                                  references.set(tagKey, resolved)
-                              }
-
-                              const signature = `item_${inlineReferences.length}`
-                              references.set(`\${${signature}}`, resolved)
-                              inlineReferences.push({
-                                  __typename: "InlineReferenceValue",
-                                  signature,
-                                  value: resolved as ReferenceValue | SubFlowValue
-                              })
-                              value.push(`\${${signature}}`)
-                          })
-
-                          const key = JSON.stringify([value, inlineReferences])
-                          if (key === lastValueKey.current) return
-                          lastValueKey.current = key
-                          const literal: LiteralValue = {
-                              __typename: "LiteralValue",
-                              value,
-                              ...(inlineReferences.length > 0 ? {references: inlineReferences} : {})
-                          }
-                          formValidation?.setValue?.(literal)
-                          onChangeDebounced(literal)
-                      }}
+                      onChange={onChangeDebounced}
                       right={
-                          <DataTypeInputControlsComponent suggestions={referenceSuggestions} onSelect={value => {
-                              formValidation?.setValue?.(value)
-                              onChangeDebounced(value)
-                          }}/>
+                          <DataTypeInputControlsComponent suggestions={referenceSuggestions}
+                                                          onSelect={onChangeDebounced}/>
                       }
                       rightType={"action"}>
-                {elementSuggestions.length > 0 ? (
-                    <TagInputMenu openOn={"focus"}>
-                        <DataTypeInputMenuSuggestionsComponent suggestions={elementSuggestions} tagKeys={tagKeys}/>
-                    </TagInputMenu>
-                ) : null}
+                <DataTypeInputMenuSuggestionsComponent suggestions={elementSuggestions}
+                                                      tagKeys={tagKeys}
+                                                      flowId={flowId}
+                                                      nodeId={props.nodeId}
+                                                      parameterIndex={props.parameterIndex}
+                                                      onVariantSelect={value => onChangeDebounced(value, currentEntries.length)}/>
                 <TagInputValue/>
                 <TagInputTrigger/>
             </TagInput>
