@@ -113,6 +113,14 @@ export const FunctionNodeSquareComponent: React.FC<FunctionNodeSquareComponentPr
                     position={data.isParameter ? Position.Right : Position.Top}
                 />
 
+                <Handle
+                    type={"target"}
+                    position={Position.Right}
+                    id={`param`}
+                    isConnectable={false}
+                    className={"d-flow-node__handle d-flow-node__handle--target"}
+                />
+
                 {/* Ausgang */}
                 <Handle
                     isConnectable={false}
