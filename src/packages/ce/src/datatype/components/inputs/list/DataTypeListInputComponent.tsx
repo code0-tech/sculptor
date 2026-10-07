@@ -73,8 +73,14 @@ export const DataTypeListInputComponent: React.FC<DataTypeListInputComponentProp
     const [openToken, setOpenToken] = React.useState<string | null>(null)
     const addedShapes = React.useRef(new Map<number, Schema>())
 
+    const listSchema = React.useMemo(
+        () => (schema && "schema" in schema ? (schema as NodeSchema).schema : schema) as ListInput | undefined,
+        [schema]
+    )
+    const itemsKey = JSON.stringify(listSchema?.items ?? [])
+
     const addEntries = React.useMemo(() => {
-        const inner = ("schema" in schema ? (schema as NodeSchema).schema : schema) as ListInput
+        const inner = listSchema ?? {} as ListInput
         const shapes = new Set<string>()
         const unique = (inner.declaredItems ?? []).filter(item => {
             const shape = `${item.input ?? "generic"}/${item.type ?? ""}`
@@ -114,6 +120,8 @@ export const DataTypeListInputComponent: React.FC<DataTypeListInputComponentProp
             onChange?.(changed)
             return
         }
+
+        if (entryIndex !== undefined && changed !== null) addedShapes.current.delete(entryIndex)
 
         const entries = Array.isArray(changed)
             ? changed.map((tag, index) => {
@@ -171,9 +179,12 @@ export const DataTypeListInputComponent: React.FC<DataTypeListInputComponentProp
                               wrap: (matchedText, children, match) => {
                                   const index = Number(match[1])
                                   const entry = initialArray[index]
-                                  const target = addedShapes.current.get(index) ?? (entry === null || entry === undefined
-                                      ? (schema && "schema" in schema ? (schema as NodeSchema).schema as ListInput : schema as ListInput).declaredItems?.[0]
-                                      : (schema && "schema" in schema ? (schema as NodeSchema).schema as ListInput : schema as ListInput).items?.[index])
+                                  const entered = listSchema?.items?.length === initialArray.length
+                                      ? listSchema?.items?.[index]
+                                      : undefined
+                                  const target = entry === null || entry === undefined
+                                      ? addedShapes.current.get(index) ?? listSchema?.declaredItems?.[0]
+                                      : entered ?? addedShapes.current.get(index)
 
                                   return <DataTypeListInputItemMenuComponent
                                       schema={target}
@@ -240,5 +251,5 @@ export const DataTypeListInputComponent: React.FC<DataTypeListInputComponentProp
                 <TagInputTrigger/>
             </TagInput>
         </DataTypeInputValueComponent>
-    </>, [formValidation, defaultValue, addEntries, elementSuggestions, referenceSuggestions, tagKeys, references, initialTags, openToken])
+    </>, [formValidation, defaultValue, addEntries, elementSuggestions, referenceSuggestions, tagKeys, references, initialTags, openToken, initialKey, itemsKey])
 }

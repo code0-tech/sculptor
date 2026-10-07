@@ -167,6 +167,6 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
                     />
             }
         },
-        [rest.initialValue, inputName, suggestions?.length ?? 0, rest.formValidation?.valid ?? true, rest.formValidation?.notValidMessage ?? "", rest.flowId, rest.nodeId, rest.parameterIndex, rest.cast]
+        [schema, rest.initialValue, inputName, suggestions?.length ?? 0, rest.formValidation?.valid ?? true, rest.formValidation?.notValidMessage ?? "", rest.flowId, rest.nodeId, rest.parameterIndex, rest.cast]
     )
 }
