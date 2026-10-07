@@ -138,10 +138,12 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
 
         if (parameterDefinition) {
             return <div style={{...decorationStyle, display: "inline-block"}}>
-                <LiteralBadgeComponent size={"xs"} value={{
-                    __typename: "LiteralValue",
-                    value: nodeParameter?.value
-                }}/>
+                <LiteralBadgeComponent size={"xs"}
+                                       schema={data.schema?.[parameterIndex!]?.schema}
+                                       value={{
+                                           __typename: "LiteralValue",
+                                           value: nodeParameter?.value
+                                       }}/>
             </div>
         }
         return " " + String(item) + " "
