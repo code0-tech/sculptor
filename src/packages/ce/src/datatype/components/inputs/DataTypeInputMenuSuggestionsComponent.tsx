@@ -88,7 +88,7 @@ export const DataTypeInputMenuSuggestionsComponent: React.FC<DataTypeInputMenuSu
             <MenuSeparator/> : null}
         {hasCustomLogicGroup ? <>
             {mode === "menu" ?
-                <MenuItem onMouseEnter={() => setHoveredNodeId(null)}
+                <MenuItem onMouseEnter={() => setHoveredNodeId(null)} onFocus={() => setHoveredNodeId(null)}
                           onSelect={() => onCustomLogicGroupSelect?.()}>
                     <Flex align={"center"} style={{gap: "0.35rem"}}>
                         <IconPlus size={13}/>
@@ -123,6 +123,7 @@ export const DataTypeInputMenuSuggestionsComponent: React.FC<DataTypeInputMenuSu
                         }}/>
 
                 if (mode === "menu") return <MenuItem key={index} onMouseEnter={() => setHoveredNodeId(null)}
+                                                      onFocus={() => setHoveredNodeId(null)}
                                                       onSelect={() => onSelect?.(entry.value)}>
                     {badge}
                 </MenuItem>
@@ -139,33 +140,53 @@ export const DataTypeInputMenuSuggestionsComponent: React.FC<DataTypeInputMenuSu
             if (group.suggestions.length === 1) {
                 const only = group.suggestions[0]
 
+                const onlyLabel = <Flex align={"center"} w={"100%"}
+                                        onMouseEnter={() => setHoveredNodeId(group.targetNodeId)}
+                                        onMouseLeave={() => setHoveredNodeId(null)}>
+                    <ReferenceBadgeComponent value={only.value}/>
+                </Flex>
+
                 if (mode === "menu") return <MenuItem key={entry.key}
                                                       onMouseEnter={() => setHoveredNodeId(group.targetNodeId)}
                                                       onMouseLeave={() => setHoveredNodeId(null)}
+                                                      onFocus={() => setHoveredNodeId(group.targetNodeId)}
                                                       onSelect={() => onSelect?.(only.value)}>
-                    <ReferenceBadgeComponent value={only.value}/>
+                    {onlyLabel}
                 </MenuItem>
 
                 return <TagInputMenuItem key={entry.key} value={tagKeys?.[only.index]} data={only.value}
                                          aliases={[only.value.inputTypeIdentifier ?? "", ...(only.value.referencePath ?? []).map(path => path.path ?? "")]}
                                          onMouseEnter={() => setHoveredNodeId(group.targetNodeId)}
                                          onMouseLeave={() => setHoveredNodeId(null)}>
-                    <ReferenceBadgeComponent value={only.value}/>
+                    {onlyLabel}
                 </TagInputMenuItem>
             }
 
             const groupTagKey = group.index === undefined ? undefined : tagKeys?.[group.index]
 
+            const groupSelfLabel = group.value
+                ? <Flex align={"center"} w={"100%"}
+                        onMouseEnter={() => setHoveredNodeId(group.targetNodeId)}
+                        onMouseLeave={() => setHoveredNodeId(null)}>
+                    <ReferenceBadgeComponent value={group.value}/>
+                </Flex>
+                : null
+
             const groupSelf = mode === "menu"
                 ? (group.value
-                    ? <MenuItem onSelect={() => onSelect?.(group.value!)}>
-                        <ReferenceBadgeComponent value={group.value}/>
+                    ? <MenuItem onMouseEnter={() => setHoveredNodeId(group.targetNodeId)}
+                                onMouseLeave={() => setHoveredNodeId(null)}
+                                onFocus={() => setHoveredNodeId(group.targetNodeId)}
+                                onSelect={() => onSelect?.(group.value!)}>
+                        {groupSelfLabel}
                     </MenuItem>
                     : null)
                 : (group.value && groupTagKey !== undefined
                     ? <TagInputMenuItem value={groupTagKey} data={group.value}
-                                        aliases={[group.value.inputTypeIdentifier ?? ""]}>
-                        <ReferenceBadgeComponent value={group.value}/>
+                                        aliases={[group.value.inputTypeIdentifier ?? ""]}
+                                        onMouseEnter={() => setHoveredNodeId(group.targetNodeId)}
+                                        onMouseLeave={() => setHoveredNodeId(null)}>
+                        {groupSelfLabel}
                     </TagInputMenuItem>
                     : null)
 
@@ -178,20 +199,23 @@ export const DataTypeInputMenuSuggestionsComponent: React.FC<DataTypeInputMenuSu
 
             if (mode === "menu") return <MenuSub key={entry.key}>
                 <MenuSubTrigger onMouseEnter={() => setHoveredNodeId(group.targetNodeId)}
-                                onMouseLeave={() => setHoveredNodeId(null)}>
+                                onMouseLeave={() => setHoveredNodeId(null)}
+                                onFocus={() => setHoveredNodeId(group.targetNodeId)}>
                     {groupLabel}
                 </MenuSubTrigger>
                 <MenuSubContent onMouseEnter={() => setHoveredNodeId(group.targetNodeId)}
                                 onMouseLeave={() => setHoveredNodeId(null)}>
                     {groupSelf}
-                    <DataTypeInputMenuReferencePathComponent nodes={group.children} mode={mode}
+                    <DataTypeInputMenuReferencePathComponent nodes={group.children}
+                                                             targetNodeId={group.targetNodeId} mode={mode}
                                                              onSelect={onSelect}/>
                 </MenuSubContent>
             </MenuSub>
 
             return <TagInputSubMenu key={entry.key} label={groupLabel}>
                 {groupSelf}
-                <DataTypeInputMenuReferencePathComponent nodes={group.children} mode={mode} tagKeys={tagKeys}/>
+                <DataTypeInputMenuReferencePathComponent nodes={group.children} targetNodeId={group.targetNodeId}
+                                                         mode={mode} tagKeys={tagKeys}/>
             </TagInputSubMenu>
         })}
         {entries.length > 0 && moduleGroups.length > 0 ? <MenuSeparator/> : null}
@@ -216,18 +240,21 @@ export const DataTypeInputMenuSuggestionsComponent: React.FC<DataTypeInputMenuSu
                 const directIndex = directValue ? suggestions.indexOf(directValue) : -1
                 const resultIndex = resultValue ? suggestions.indexOf(resultValue) : -1
 
-                const content = <Flex align={"center"} style={{gap: "0.35rem"}}>
+                const content = <Flex align={"center"} style={{gap: "0.35rem"}}
+                                      onMouseEnter={() => setHoveredNodeId(null)}>
                     <FunctionIcon size={13} color={hashToColor(`group-${index}`)}/>
                     <Text>{suggestion.displayMessage}</Text>
                 </Flex>
 
                 if (directIndex >= 0 && resultIndex >= 0) return <MenuItem key={suggestionIndex}
                                                                            title={suggestion.description}
+                                                                           onFocus={() => setHoveredNodeId(null)}
                                                                            onSelect={() => requestVariant(suggestion)}>
                     {content}
                 </MenuItem>
 
                 if (mode === "menu") return <MenuItem key={suggestionIndex} title={suggestion.description}
+                                                      onFocus={() => setHoveredNodeId(null)}
                                                       onSelect={() => onSelect?.(suggestion.value)}>
                     {content}
                 </MenuItem>
@@ -243,7 +270,8 @@ export const DataTypeInputMenuSuggestionsComponent: React.FC<DataTypeInputMenuSu
             })
 
             if (mode === "menu") return <MenuSub key={`group-${index}`}>
-                <MenuSubTrigger onMouseEnter={() => setHoveredNodeId(null)}>{groupLabel}</MenuSubTrigger>
+                <MenuSubTrigger onMouseEnter={() => setHoveredNodeId(null)}
+                                onFocus={() => setHoveredNodeId(null)}>{groupLabel}</MenuSubTrigger>
                 <MenuSubContent align={"start"} collisionPadding={16} alignOffset={0} sideOffset={0}>
                     {groupItems}
                 </MenuSubContent>
@@ -281,6 +309,6 @@ export const DataTypeInputMenuSuggestionsComponent: React.FC<DataTypeInputMenuSu
 
                                               if (picked.__typename === "SubFlowValue" || picked.__typename === "ReferenceValue") onVariantSelect?.(picked)
                                           }}/>
-        <TagInputMenu openOn={"focus"}>{items}</TagInputMenu>
+        <TagInputMenu openOn={"focus"} onMouseLeave={() => setHoveredNodeId(null)}>{items}</TagInputMenu>
     </>
 }
