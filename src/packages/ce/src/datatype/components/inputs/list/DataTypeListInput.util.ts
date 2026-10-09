@@ -11,6 +11,8 @@ import {ListInput, NodeSchema, Schema} from "@code0-tech/triangulum";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {DataTypeInputComponentProps} from "@edition/datatype/components/inputs/DataTypeInputComponent";
 import {SuggestionTagKey, SuggestionValue} from "@edition/function/components/suggestion/Suggestion.util";
+import {sortSuggestions} from "@edition/datatype/utils/DataType.sortSuggestions.util";
+import {suggestionCertainties} from "@edition/datatype/utils/DataType.suggestionCertainties.util";
 
 export type ListEntry =
     | SuggestionTagKey
@@ -31,8 +33,9 @@ export const listElementSuggestions = (
 
     const all = [...declared.flatMap(item => item.suggestions ?? []), ...elements]
     const keys = all.map(suggest => JSON.stringify(suggest))
+    const unique = all.filter((suggest, index) => keys.indexOf(keys[index]) === index)
 
-    return all.filter((suggest, index) => keys.indexOf(keys[index]) === index)
+    return sortSuggestions(unique, suggestionCertainties(schema))
 }
 
 export const listTagKeys = (elementSuggestions: SuggestionValue[]): SuggestionTagKey[] =>
