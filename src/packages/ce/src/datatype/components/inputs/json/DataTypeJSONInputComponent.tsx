@@ -3,7 +3,7 @@ import "../type/DataTypeTypeInputComponent.style.scss"
 import {DataTypeJSONInputTreeComponent} from "./DataTypeJSONInputTreeComponent";
 import {DataTypeInputComponentProps} from "../DataTypeInputComponent";
 import {LiteralValue, NodeFunction, ReferenceValue, SubFlowValue} from "@code0-tech/sagittarius-graphql-types";
-import {InputDescription, InputLabel, Spacing} from "@code0-tech/pictor";
+import {ButtonProps, InputDescription, InputLabel, Spacing} from "@code0-tech/pictor";
 import {
     DataTypeJSONInputEditDialogComponent
 } from "@edition/datatype/components/inputs/json/DataTypeJSONInputEditDialogComponent";
@@ -18,11 +18,13 @@ export interface EditableJSONEntry {
     path: string[]
 }
 
-export type DataTypeJSONInputComponentProps = DataTypeInputComponentProps
+export interface DataTypeJSONInputComponentProps extends DataTypeInputComponentProps {
+    controlButton?: React.ReactElement<ButtonProps>
+}
 
 export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProps> = (props) => {
 
-    const {schema, title, description, suggestions, formValidation, initialValue, onChange, flowId, nodeId, parameterIndex} = props
+    const {schema, title, description, suggestions, controlButton, formValidation, initialValue, onChange, flowId, nodeId, parameterIndex} = props
 
     const [editDialogOpen, setEditDialogOpen] = React.useState(false)
     const [editEntry, setEditEntry] = React.useState<EditableJSONEntry | undefined>(undefined)
@@ -72,6 +74,7 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
             {title && <InputLabel>{title}</InputLabel>}
             {description && <InputDescription>{description}</InputDescription>}
             <DataTypeInputValueComponent inside
+                                         controlButton={controlButton}
                                          initialValue={value}
                                          onChange={(value) => {
                                              formValidation?.setValue?.(value)
