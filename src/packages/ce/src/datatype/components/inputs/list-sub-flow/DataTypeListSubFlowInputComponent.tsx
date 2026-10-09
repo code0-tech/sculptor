@@ -20,6 +20,8 @@ import {
     SubFlowValue
 } from "@code0-tech/sagittarius-graphql-types";
 import {ListInput, NodeSchema, Schema} from "@code0-tech/triangulum";
+import {sortSuggestions} from "@edition/datatype/utils/DataType.sortSuggestions.util";
+import {suggestionCertainties} from "@edition/datatype/utils/DataType.suggestionCertainties.util";
 import {IconPlus} from "@tabler/icons-react";
 import {useParams} from "next/navigation";
 import {FlowService} from "@edition/flow/services/Flow.service";
@@ -78,7 +80,7 @@ export const DataTypeListSubFlowInputComponent: React.FC<DataTypeListSubFlowInpu
         const inner = schema && "schema" in schema ? (schema as NodeSchema).schema : (schema as Schema | undefined)
         const declared = (inner as ListInput | undefined)?.declaredItems ?? []
         const seen = new Set<string>()
-        return [...declared.flatMap(item => item.suggestions ?? []), ...(suggestions ?? [])]
+        return sortSuggestions([...declared.flatMap(item => item.suggestions ?? []), ...(suggestions ?? [])], suggestionCertainties(schema))
             .filter((suggest): suggest is SubFlowValue | NodeFunction =>
                 suggest.__typename === "SubFlowValue" || suggest.__typename === "NodeFunction")
             .filter(suggest => {

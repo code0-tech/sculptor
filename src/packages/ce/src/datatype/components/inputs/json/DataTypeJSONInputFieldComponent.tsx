@@ -1,6 +1,8 @@
 import React from "react"
 import {LiteralValue, NodeFunction, NodeParameterValue, ReferenceValue, SubFlowValue} from "@code0-tech/sagittarius-graphql-types"
 import {Schema} from "@code0-tech/triangulum"
+import {sortSuggestions} from "@edition/datatype/utils/DataType.sortSuggestions.util"
+import {suggestionCertainties} from "@edition/datatype/utils/DataType.suggestionCertainties.util"
 import {Button, Flex, getSize, InputDescription, InputLabel, Spacing, Text} from "@code0-tech/pictor"
 import {IconChevronRight, IconPencil, IconTrash} from "@tabler/icons-react"
 import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent"
@@ -79,7 +81,9 @@ export const DataTypeJSONInputFieldComponent: React.FC<DataTypeJSONInputFieldCom
                                                   onChange={onChange}/>}
                 </div>
                 {drillIn && (
-                    <DataTypeInputControlsComponent suggestions={schema?.suggestions} onSelect={onSelect}/>
+                    <DataTypeInputControlsComponent
+                        suggestions={sortSuggestions(schema?.suggestions ?? [], suggestionCertainties(schema))}
+                        onSelect={onSelect}/>
                 )}
                 <Button variant={"none"} color={"secondary"} style={{padding: getSize("xs")}} onClick={onRemove}>
                     <IconTrash size={13}/>

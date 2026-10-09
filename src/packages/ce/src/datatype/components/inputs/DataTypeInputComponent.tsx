@@ -38,6 +38,12 @@ import {
     DataTypeListSubFlowInputComponent
 } from "@edition/datatype/components/inputs/list-sub-flow/DataTypeListSubFlowInputComponent";
 import {DataTypeListInputComponent} from "@edition/datatype/components/inputs/list/DataTypeListInputComponent";
+import {
+    DataTypeProducerInputComponent
+} from "@edition/datatype/components/inputs/producer/DataTypeProducerInputComponent";
+import {exactProducers} from "@edition/datatype/utils/DataType.exactProducers.util";
+import {sortSuggestions} from "@edition/datatype/utils/DataType.sortSuggestions.util";
+import {suggestionCertainties} from "@edition/datatype/utils/DataType.suggestionCertainties.util";
 
 export interface DataTypeInputComponentProps extends Omit<InputWrapperProps<NodeParameterValue | NodeFunction>, "onChange"> {
     schema: (NodeSchema | Schema)
@@ -56,7 +62,15 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
 
     const {schema, ...rest} = props
 
-    const suggestions = ("schema" in (schema ?? {}) ? (schema as NodeSchema)?.schema?.suggestions : (schema as Schema)?.suggestions) as (NodeFunction | ReferenceValue | LiteralValue)[]
+    const certainties = React.useMemo(() => suggestionCertainties(schema), [schema])
+
+    const suggestions = React.useMemo(
+        () => sortSuggestions(
+            (("schema" in (schema ?? {}) ? (schema as NodeSchema)?.schema?.suggestions : (schema as Schema)?.suggestions) ?? []) as (NodeFunction | ReferenceValue | LiteralValue)[],
+            certainties
+        ),
+        [schema, certainties]
+    )
     const inputName = "schema" in (schema ?? {}) ? (schema as NodeSchema)?.schema?.input : (schema as Schema)?.input
 
     return React.useMemo(
@@ -135,10 +149,15 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
                         suggestions={suggestions}
                         {...rest}/>
                 case "data":
-                    return <DataTypeJSONInputComponent
-                        schema={schema}
-                        suggestions={suggestions}
-                        {...rest}/>
+                    return exactProducers(schema).length > 0
+                        ? <DataTypeProducerInputComponent
+                            schema={schema}
+                            suggestions={suggestions}
+                            {...rest}/>
+                        : <DataTypeJSONInputComponent
+                            schema={schema}
+                            suggestions={suggestions}
+                            {...rest}/>
                 case "type":
                     return <DataTypeTypeInputComponent
                         schema={schema}
