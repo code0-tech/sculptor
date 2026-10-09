@@ -89,16 +89,19 @@ export const DataTypeListInputComponent: React.FC<DataTypeListInputComponentProp
             shapes.add(shape)
             return true
         })
+        const name = typeof title === "string" && title.length > 0 ? title.toLowerCase() : null
         return unique.map((item, index) => {
             const kind = item.input ?? "value"
             const sameKind = unique.filter(candidate => candidate.input === item.input)
+            const numbered = sameKind.length > 1 ? `${kind} ${sameKind.indexOf(item) + 1}` : kind
             return {
                 key: `\${add_${index}}`,
                 schema: item,
-                label: sameKind.length > 1 ? `${kind} ${sameKind.indexOf(item) + 1}` : kind
+                kind: numbered,
+                label: name ? `${name} ${numbered}` : numbered
             }
         })
-    }, [schema])
+    }, [schema, title])
 
     const elementSuggestions = React.useMemo(() => listElementSuggestions(schema, suggestions), [schema, suggestions])
     const tagKeys = React.useMemo(() => listTagKeys(elementSuggestions), [elementSuggestions])
@@ -258,7 +261,7 @@ export const DataTypeListInputComponent: React.FC<DataTypeListInputComponentProp
                                                        onVariantSelect={value => onChangeDebounced(value, currentEntries.length)}>
                     {addEntries.map(entry => (
                         <TagInputMenuItem key={entry.key} value={entry.key} data={entry.schema}
-                                          aliases={[`add ${entry.label}`, entry.label]}>
+                                          aliases={[`add ${entry.label}`, entry.label, `add ${entry.kind}`, entry.kind]}>
                             <Flex align={"center"} style={{gap: "0.35rem"}}>
                                 <IconPlus size={13}/>
                                 <Text>Add {entry.label}</Text>
