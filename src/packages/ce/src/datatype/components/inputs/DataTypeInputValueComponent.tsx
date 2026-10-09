@@ -2,6 +2,7 @@ import React from "react";
 import {InputWrapper} from "@code0-tech/pictor/dist/components/form/InputWrapper";
 import {DataTypeInputComponentProps} from "@edition/datatype/components/inputs/DataTypeInputComponent";
 import {DataTypeInputControlsComponent} from "@edition/datatype/components/inputs/DataTypeInputControlsComponent";
+import {ButtonProps} from "@code0-tech/pictor";
 import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeComponent";
 import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
 
@@ -9,6 +10,7 @@ export interface DataTypeInputValueComponentProps extends Omit<DataTypeInputComp
     children?: React.ReactNode
     inside?: boolean
     showSuggestions?: boolean
+    controlButton?: React.ReactElement<ButtonProps>
     onCustomLogicGroupSelect?: () => void
 }
 
@@ -22,6 +24,7 @@ export const DataTypeInputValueComponent: React.FC<DataTypeInputValueComponentPr
         onChange,
         formValidation,
         showSuggestions,
+        controlButton,
         onCustomLogicGroupSelect,
         nodeId,
         parameterIndex,
@@ -32,7 +35,9 @@ export const DataTypeInputValueComponent: React.FC<DataTypeInputValueComponentPr
         <InputWrapper formValidation={{...formValidation, setValue: undefined}} right={
             <DataTypeInputControlsComponent showSuggestions={showSuggestions} suggestions={suggestions}
                                             nodeId={nodeId} parameterIndex={parameterIndex}
-                                            onCustomLogicGroupSelect={onCustomLogicGroupSelect} onSelect={onChange}/>
+                                            onCustomLogicGroupSelect={onCustomLogicGroupSelect} onSelect={onChange}>
+                {controlButton}
+            </DataTypeInputControlsComponent>
         } rightType={"action"} {...rest}>
             <div style={{alignSelf: "center", flex: "1 1 auto"}}>
                 {
