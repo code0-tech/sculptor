@@ -8,6 +8,7 @@ import {useUsageOverview} from "@edition/usage/hooks/Usage.overview.hook";
 import {useUsageLicense} from "@edition/usage/hooks/Usage.license.hook";
 import {UserService} from "@edition/user/services/User.service";
 import {useLicensePurchased} from "@cloud-internal/license/hooks/License.purchased.hook";
+import {getLicenseCheckoutUrl} from "@core/util/license";
 
 export type LicenseUpgradeTarget = "checkout" | "subscription"
 
@@ -66,7 +67,7 @@ export const useLicenseUpgrade = (reference: string, namespaceId?: string | numb
                 return
             }
 
-            const url = new URL(resolved)
+            const url = manage ? new URL(resolved) : getLicenseCheckoutUrl(resolved, "cloud")
 
             url.searchParams.set("ref", reference)
             url.searchParams.set("token", token)

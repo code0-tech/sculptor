@@ -52,3 +52,21 @@ export const getLicensePeriod = (startDate?: string | null): { afterDate: string
         beforeDate: format(periodEnd, "yyyy-MM-dd")
     }
 }
+
+export type LicenseDeploymentType = "cloud" | "self_hosted"
+
+/**
+ * Checkout preselects the offer from these params and cannot infer them, so
+ * every checkout link carries them. The subscription portal resolves the same
+ * information from the existing subscription and must not receive them.
+ */
+export const getLicenseCheckoutUrl = (checkoutUrl: string, deploymentType: LicenseDeploymentType): URL => {
+    const url = new URL(checkoutUrl)
+
+    url.searchParams.set("plan", "pro")
+    url.searchParams.set("deploymentType", deploymentType)
+    url.searchParams.set("customerType", "b2c")
+    url.searchParams.set("paymentPeriod", "monthly")
+
+    return url
+}

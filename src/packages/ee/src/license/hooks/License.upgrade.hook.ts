@@ -3,6 +3,7 @@
 import React from "react";
 import {License} from "@code0-tech/sagittarius-graphql-types";
 import {useUsageOverview} from "@edition/usage/hooks/Usage.overview.hook";
+import {getLicenseCheckoutUrl} from "@core/util/license";
 
 export type LicenseUpgradeTarget = "checkout" | "subscription"
 
@@ -41,7 +42,9 @@ export const useLicenseUpgrade = (reference: string, namespaceId?: string | numb
                 return
             }
 
-            if (frame) frame.location.href = resolved
+            const url = manage ? new URL(resolved) : getLicenseCheckoutUrl(resolved, "self_hosted")
+
+            if (frame) frame.location.href = url.toString()
         })
     }, [target, licensed, atRisk])
 
