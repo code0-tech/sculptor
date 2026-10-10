@@ -18,6 +18,7 @@ import {Application, ApplicationService} from "@edition/application/services/App
 import {useApolloClient} from "@apollo/client/react";
 import {GraphqlClient} from "@core/util/graphql-client";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 import {usePersistentReactiveArrayService} from "@/hooks/usePersistentReactiveArrayService";
 import {FullScreen} from "@code0-tech/pictor/dist/components/fullscreen/FullScreen";
@@ -34,14 +35,26 @@ export default function AuthLayout({children}: Readonly<{ children: React.ReactN
 
     const [store, service] = usePersistentReactiveArrayService<User, UserService>("auth-users", (store) => new UserService(graphqlClient, store))
     const organization = usePersistentReactiveArrayService<OrganizationView, OrganizationService>(`dashboard::organizations::${currentSession?.id}`, (store) => new OrganizationService(graphqlClient, store))
-    const application = usePersistentReactiveArrayService<Application, ApplicationService>(`auth::application::${currentSession?.id}`, (store) => new ApplicationService(graphqlClient, store))
+    const [applicationStore, applicationService] = usePersistentReactiveArrayService<Application, ApplicationService>(`auth::application::${currentSession?.id}`, (store) => new ApplicationService(graphqlClient, store))
+
+    const legalUrls = React.useMemo(
+        () => {
+            const application = applicationService.get()
+            return {
+                privacyUrl: application?.privacyUrl,
+                legalNoticeUrl: application?.legalNoticeUrl,
+                termsAndConditionsUrl: application?.termsAndConditionsUrl
+            }
+        },
+        [applicationStore]
+    )
 
     return (
         <FullScreen>
             <ScrollArea mah={"100%"} h={"100%"}>
                 <ScrollAreaViewport>
                     <AuroraBackground/>
-                    <ContextStoreProvider services={[[store, service], organization, application]}>
+                    <ContextStoreProvider services={[[store, service], organization, [applicationStore, applicationService]]}>
                         <Container h={"100%"} w={"100%"}>
                             <Flex h={"100%"} w={"100%"} align={"center"} justify={"center"}>
                                 <Col xs={4} style={{marginTop: "auto", marginBottom: "auto"}}>
@@ -70,10 +83,26 @@ export default function AuthLayout({children}: Readonly<{ children: React.ReactN
                         boxSizing: "border-box",
                         padding: "1.3rem",
                         bottom: 0,
-                        left: 0
+                        left: 0,
+                        zIndex: 2
                     }}>
                         <Flex justify={"center"} align={"center"} w={"100%"} style={{gap: "1.3rem"}}>
                             <Text>All rights reserved &copy; Code0 UG (haftungsbeschränkt)</Text>
+                            {!!legalUrls.privacyUrl && (
+                                <Link href={legalUrls.privacyUrl} target={"_blank"}>
+                                    <Text>Privacy Policy</Text>
+                                </Link>
+                            )}
+                            {!!legalUrls.legalNoticeUrl && (
+                                <Link href={legalUrls.legalNoticeUrl} target={"_blank"}>
+                                    <Text>Legal Notice</Text>
+                                </Link>
+                            )}
+                            {!!legalUrls.termsAndConditionsUrl && (
+                                <Link href={legalUrls.termsAndConditionsUrl} target={"_blank"}>
+                                    <Text>Terms &amp; Conditions</Text>
+                                </Link>
+                            )}
                         </Flex>
                     </div>
                 </ScrollAreaViewport>

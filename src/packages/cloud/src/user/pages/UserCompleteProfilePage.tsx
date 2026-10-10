@@ -10,19 +10,32 @@ import {
     Text,
     TextInput,
     useForm,
-    useService
+    useService,
+    useStore
 } from "@code0-tech/pictor";
 import Link from "next/link";
 import {useRouter, useSearchParams} from "next/navigation";
 import {UserService} from "@cloud-internal/user/services/User.service";
 import {setUserSession} from "@ce-internal/user/hooks/User.session.hook";
+import {UserLegalConsentCheckboxComponent} from "@ce-internal/user/components/UserLegalConsentCheckboxComponent";
+import {ApplicationService} from "@edition/application/services/Application.service";
 
 export const UserCompleteProfilePage: React.FC = () => {
 
     const query = useSearchParams()
     const userService = useService(UserService)
+    const applicationService = useService(ApplicationService)
+    const applicationStore = useStore(ApplicationService)
     const router = useRouter()
     const [loading, startTransition] = React.useTransition()
+
+    const legalConsentRequired = React.useMemo(
+        () => {
+            const application = applicationService.get()
+            return !!application?.privacyUrl || !!application?.termsAndConditionsUrl
+        },
+        [applicationStore]
+    )
 
     const initialValues = React.useMemo(() => ({
         claimToken: query.get("claimToken"),
@@ -31,6 +44,7 @@ export const UserCompleteProfilePage: React.FC = () => {
         lastname: null,
         password: null,
         repeatPassword: null,
+        legalConsent: false,
     }), [query])
 
     const [inputs, validate] = useForm<{
@@ -40,6 +54,7 @@ export const UserCompleteProfilePage: React.FC = () => {
         lastname: string | null,
         password: string | null,
         repeatPassword: string | null,
+        legalConsent: boolean,
     }>({
         useInitialValidation: false,
         initialValues,
@@ -56,6 +71,10 @@ export const UserCompleteProfilePage: React.FC = () => {
             repeatPassword: (value, values) => {
                 if (passwordValidation(value) != null) return passwordValidation(value)
                 if (value != values?.password) return "Passwords do not match"
+                return null
+            },
+            legalConsent: (value) => {
+                if (legalConsentRequired && value !== true) return "Please accept the privacy policy and terms & conditions"
                 return null
             }
         },
@@ -112,6 +131,12 @@ export const UserCompleteProfilePage: React.FC = () => {
                        onChange={() => validate("repeatPassword")}
                        {...inputs.getInputProps("repeatPassword")}/>
         <div style={{marginBottom: "1.3rem"}}/>
+        {legalConsentRequired ? (
+            <>
+                <UserLegalConsentCheckboxComponent {...inputs.getInputProps("legalConsent")}/>
+                <div style={{marginBottom: "1.3rem"}}/>
+            </>
+        ) : null}
         <Button data-qa-selector={"auth-complete-profile-send"} color={"info"} w={"100%"} mb={1.3} onClick={validate}>
             Complete profile
         </Button>

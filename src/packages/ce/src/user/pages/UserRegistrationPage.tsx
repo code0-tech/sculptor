@@ -12,25 +12,45 @@ import {
     Text,
     TextInput,
     useForm,
-    useService
+    useService,
+    useStore
 } from "@code0-tech/pictor";
 import Link from "next/link";
 import {UserService} from "@edition/user/services/User.service";
 import {useRouter} from "next/navigation";
 import {setUserSession} from "@edition/user/hooks/User.session.hook";
 import {IdentityProviderButtonsComponent} from "@edition/user/components/IdentityProviderButtonsComponent";
+import {UserLegalConsentCheckboxComponent} from "@edition/user/components/UserLegalConsentCheckboxComponent";
+import {ApplicationService} from "@edition/application/services/Application.service";
+import {IdentityProviderBasic} from "@code0-tech/sagittarius-graphql-types";
 
 export const UserRegistrationPage: React.FC = () => {
 
     const userService = useService(UserService)
+    const applicationService = useService(ApplicationService)
+    const applicationStore = useStore(ApplicationService)
     const router = useRouter()
     const [loading, startTransition] = React.useTransition()
+
+    const legalConsentRequired = React.useMemo(
+        () => {
+            const application = applicationService.get()
+            return !!application?.privacyUrl || !!application?.termsAndConditionsUrl
+        },
+        [applicationStore]
+    )
+
+    const providers = React.useMemo<IdentityProviderBasic[]>(
+        () => (applicationService.get()?.identityProviders?.nodes ?? []).filter((node): node is IdentityProviderBasic => !!node),
+        [applicationStore]
+    )
 
     const initialValues = React.useMemo(() => ({
         email: null,
         username: null,
         password: null,
         repeatPassword: null,
+        legalConsent: false,
     }), [])
 
     const [inputs, validate] = useForm({
@@ -50,6 +70,10 @@ export const UserRegistrationPage: React.FC = () => {
             repeatPassword: (value, values) => {
                 if (passwordValidation(value) != null) return passwordValidation(value)
                 if (value != values?.password) return "Passwords do not match"
+                return null
+            },
+            legalConsent: (value) => {
+                if (legalConsentRequired && value !== true) return "Please accept the privacy policy and terms & conditions"
                 return null
             }
         },
@@ -97,17 +121,29 @@ export const UserRegistrationPage: React.FC = () => {
                        onChange={() => validate("repeatPassword")}
                        {...inputs.getInputProps("repeatPassword")}/>
         <div style={{marginBottom: "1.3rem"}}/>
+        {legalConsentRequired ? (
+            <>
+                <UserLegalConsentCheckboxComponent {...inputs.getInputProps("legalConsent")}/>
+                <div style={{marginBottom: "1.3rem"}}/>
+            </>
+        ) : null}
         <Button data-qa-selector={"auth-register-send"} color={"info"} w={"100%"} mb={1.3} onClick={validate}>
             Sign up
         </Button>
-        <div style={{display: "flex", alignItems: "center", gap: "0.75rem"}}>
-            <div style={{flex: 1, borderTop: "1px solid rgba(255,255,255, .1)"}}/>
-            <Text size={"md"} hierarchy={"tertiary"}>
-                or sign up with
-            </Text>
-            <div style={{flex: 1, borderTop: "1px solid rgba(255,255,255, .1)"}}/>
-        </div>
-        <Spacing spacing={"md"}/>
+        {
+            providers.length > 0 ? (
+                <>
+                    <div style={{display: "flex", alignItems: "center", gap: "0.75rem"}}>
+                        <div style={{flex: 1, borderTop: "1px solid rgba(255,255,255, .1)"}}/>
+                        <Text size={"md"} hierarchy={"tertiary"}>
+                            or sign up with
+                        </Text>
+                        <div style={{flex: 1, borderTop: "1px solid rgba(255,255,255, .1)"}}/>
+                    </div>
+                    <Spacing spacing={"md"}/>
+                </>
+            ) : null
+        }
         <IdentityProviderButtonsComponent intent={"register"}/>
         <Text display={"flex"} hierarchy={"tertiary"} size={"md"}>
             Have an account
