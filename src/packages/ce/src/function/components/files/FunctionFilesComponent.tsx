@@ -1,5 +1,11 @@
 import React from "react";
-import {Flow, Namespace, NamespaceProject, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
+import {
+    Flow,
+    FunctionDefinition,
+    Namespace,
+    NamespaceProject,
+    NodeFunction
+} from "@code0-tech/sagittarius-graphql-types";
 import {
     Button,
     Flex,
@@ -27,9 +33,10 @@ import {FlowService} from "@edition/flow/services/Flow.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 import {setSelectedFunctionNode, useSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
-import {useReactFlow} from "@xyflow/react";
+import {useNodes, useReactFlow} from "@xyflow/react";
 import {FunctionFileDefaultComponent} from "@edition/function/components/files/FunctionFileDefaultComponent";
 import {FunctionFileTriggerComponent} from "@edition/function/components/files/FunctionFileTriggerComponent";
+import {FunctionFileSubFlowComponent} from "@edition/function/components/files/FunctionFileSubFlowComponent";
 import {FALLBACK_FLOW_TYPE_NAME, FALLBACK_FUNCTION_NAME} from "@core/util/fallback-translations";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowView} from "@edition/flow/services/Flow.view";
@@ -82,6 +89,8 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
         [flow, functionStore]
     )
 
+    const subFlowNodes = useNodes().filter(node => !!node.data?.functionId && !!node.data?.parentNodeId)
+
     React.useEffect(() => {
         setActiveTab(selectedNode?.id ?? undefined)
     }, [selectedNode?.id])
@@ -127,6 +136,20 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
                                         </MenuItem>
                                     })
                                 }
+                                {
+                                    subFlowNodes?.map(node => {
+
+                                        const DisplayIcon = icon(functionService.getById(node?.data?.functionId as FunctionDefinition['id'])?.displayIcon as IconString)
+
+                                        return <MenuItem key={node?.id} onSelect={() => {
+                                            setActiveTab(node?.id)
+                                        }}>
+                                            <DisplayIcon color={hashToColor(node?.id)} size={13}/>
+                                            <Text
+                                                size={"sm"}>{functionService.getById(node?.data?.functionId as FunctionDefinition['id'])?.names?.[0]?.content || FALLBACK_FUNCTION_NAME}</Text>
+                                        </MenuItem>
+                                    })
+                                }
                             </MenuContent>
                         </MenuPortal>
                     </Menu>
@@ -147,6 +170,19 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
                             <DisplayIcon color={hashToColor(node?.id!)} size={13}/>
                             <Text
                                 size={"sm"}>{node?.functionDefinition?.names?.[0]?.content || FALLBACK_FUNCTION_NAME}</Text>
+                        </FileTabsTrigger>
+                    })
+                }
+                {
+                    subFlowNodes?.map(node => {
+
+                        const DisplayIcon = icon(functionService.getById(node?.data?.functionId as FunctionDefinition['id'])?.displayIcon as IconString)
+
+                        return <FileTabsTrigger value={node?.id}
+                                                key={node?.id}>
+                            <DisplayIcon color={hashToColor(node?.id)} size={13}/>
+                            <Text
+                                size={"sm"}>{functionService.getById(node?.data?.functionId as FunctionDefinition['id'])?.names?.[0]?.content || FALLBACK_FUNCTION_NAME}</Text>
                         </FileTabsTrigger>
                     })
                 }
@@ -187,6 +223,19 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
                                                     value={node?.id!}
                                                     key={node?.id!}>
                                 <FunctionFileDefaultComponent nodeId={node?.id!} flowId={flowId}/>
+                            </FileTabsContent>
+                        })
+                    }
+                    {
+                        subFlowNodes?.map(node => {
+                            return <FileTabsContent data-qa-selector={"flow-builder-file-content"}
+                                                    p={"0"}
+                                                    h={"100%"}
+                                                    value={node?.id}
+                                                    key={node?.id}>
+                                <FunctionFileSubFlowComponent flowId={flowId}
+                                                              nodeId={node?.data?.parentNodeId as NodeFunction['id']}
+                                                              functionId={node?.data?.functionId as FunctionDefinition['id']}/>
                             </FileTabsContent>
                         })
                     }
