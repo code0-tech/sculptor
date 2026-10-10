@@ -20,6 +20,7 @@ import {UserService} from "@edition/user/services/User.service";
 import {useRouter} from "next/navigation";
 import {setUserSession} from "@edition/user/hooks/User.session.hook";
 import {IdentityProviderButtonsComponent} from "@edition/user/components/IdentityProviderButtonsComponent";
+import {UserLegalConsentCheckboxComponent} from "@edition/user/components/UserLegalConsentCheckboxComponent";
 import {ApplicationService} from "@edition/application/services/Application.service";
 import {IdentityProviderBasic} from "@code0-tech/sagittarius-graphql-types";
 
@@ -31,6 +32,14 @@ export const UserRegistrationPage: React.FC = () => {
     const router = useRouter()
     const [loading, startTransition] = React.useTransition()
 
+    const legalConsentRequired = React.useMemo(
+        () => {
+            const application = applicationService.get()
+            return !!application?.privacyUrl || !!application?.termsAndConditionsUrl
+        },
+        [applicationStore]
+    )
+
     const providers = React.useMemo<IdentityProviderBasic[]>(
         () => (applicationService.get()?.identityProviders?.nodes ?? []).filter((node): node is IdentityProviderBasic => !!node),
         [applicationStore]
@@ -41,6 +50,7 @@ export const UserRegistrationPage: React.FC = () => {
         username: null,
         password: null,
         repeatPassword: null,
+        legalConsent: false,
     }), [])
 
     const [inputs, validate] = useForm({
@@ -60,6 +70,10 @@ export const UserRegistrationPage: React.FC = () => {
             repeatPassword: (value, values) => {
                 if (passwordValidation(value) != null) return passwordValidation(value)
                 if (value != values?.password) return "Passwords do not match"
+                return null
+            },
+            legalConsent: (value) => {
+                if (legalConsentRequired && value !== true) return "Please accept the privacy policy and terms & conditions"
                 return null
             }
         },
@@ -107,6 +121,12 @@ export const UserRegistrationPage: React.FC = () => {
                        onChange={() => validate("repeatPassword")}
                        {...inputs.getInputProps("repeatPassword")}/>
         <div style={{marginBottom: "1.3rem"}}/>
+        {legalConsentRequired ? (
+            <>
+                <UserLegalConsentCheckboxComponent {...inputs.getInputProps("legalConsent")}/>
+                <div style={{marginBottom: "1.3rem"}}/>
+            </>
+        ) : null}
         <Button data-qa-selector={"auth-register-send"} color={"info"} w={"100%"} mb={1.3} onClick={validate}>
             Sign up
         </Button>
