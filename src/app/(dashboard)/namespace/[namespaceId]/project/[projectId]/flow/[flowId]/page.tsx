@@ -62,7 +62,7 @@ export default function Page() {
     return <ResizablePanel id={"2"}>
         <FlowExecutionWatcherComponent flowId={flowId}/>
         <Layout layoutGap={16} showLayoutSplitter={false} rightContent={
-            <Flex style={{flexDirection: "column", gap: "0.7rem"}}>
+            <Flex data-qa-selector={"flow-builder-tabs"} style={{flexDirection: "column", gap: "0.7rem"}}>
                 <Button aria-selected={tab === "file"}
                         onClick={() => toggleTab("file")} variant={"none"}
                         p={0.5}>

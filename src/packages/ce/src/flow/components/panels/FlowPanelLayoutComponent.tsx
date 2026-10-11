@@ -71,7 +71,7 @@ export const FlowPanelLayoutComponent: React.FC = () => {
         })
     }
 
-    return <Panel position={"top-center"}>
+    return <Panel position={"top-center"} data-qa-selector={"flow-builder-panel-layout"}>
         <Flex align={"center"} style={{gap: getSize("xxs")}}>
             <Text style={{textWrap: "nowrap"}}>{flow?.name}</Text>
             <Tooltip>

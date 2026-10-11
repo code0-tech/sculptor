@@ -72,7 +72,8 @@ export const FlowFolderView: React.FC = () => {
                                    onOpenChange={(open) => setDeleteDialogOpen(open)}
                                    contextData={contextData}
                                    onDelete={deleteFlow}/>
-        <Flex style={{gap: getSize("sm")}} align={"center"} justify={"space-between"}>
+        <Flex data-qa-selector={"dashboard-flow-explorer"} style={{gap: getSize("sm")}} align={"center"}
+              justify={"space-between"}>
             <Text pl={0.7} hierarchy={"tertiary"}>
                 Explorer
             </Text>
@@ -128,7 +129,8 @@ export const FlowFolderView: React.FC = () => {
                 <Text size={"md"} hierarchy={"tertiary"}>Integrations</Text>
             </Button>
         </Link>
-        <Button variant={"none"} w={"100%"} justify={"flex-start"} paddingSize={"xxs"} onClick={() => {
+        <Button data-qa-selector={"dashboard-flow-create"} variant={"none"} w={"100%"} justify={"flex-start"}
+                paddingSize={"xxs"} onClick={() => {
             setCreateDialogOpen(true)
             setFlowTypeId(undefined)
         }}>

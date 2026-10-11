@@ -106,7 +106,7 @@ export const ProjectOverviewPage: React.FC = () => {
                 Let's automate something.
             </Text>
             {/*@ts-ignore*/}
-            <ScrollArea type={"none"} w={"100%"}>
+            <ScrollArea data-qa-selector={"dashboard-project-templates"} type={"none"} w={"100%"}>
                 <ScrollAreaViewport>
                     <Flex style={{gap: "0.7rem"}}>
                         <style>
@@ -157,7 +157,7 @@ export const ProjectOverviewPage: React.FC = () => {
             </ScrollArea>
 
         </Flex>
-        <Panel position={"bottom-center"} style={{width: "60%"}}>
+        <Panel position={"bottom-center"} data-qa-selector={"dashboard-project-ai-chat"} style={{width: "60%"}}>
             <AIChatComponent projectId={projectId} prompt={prompt} onData={onAIData}/>
         </Panel>
     </ResizablePanel>

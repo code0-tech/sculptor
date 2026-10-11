@@ -92,7 +92,7 @@ export const ApplicationStatsView: React.FC = () => {
         {label: "Invalid flows", value: invalidFlows.length, trend: trends.invalidFlows, tone: "warning"},
     ]
 
-    return <Card color={"secondary"}>
+    return <Card data-qa-selector={"dashboard-stats"} color={"secondary"}>
         <Flex align={"center"}>
             {stats.map((stat, index) => (
                 <React.Fragment key={stat.label}>
