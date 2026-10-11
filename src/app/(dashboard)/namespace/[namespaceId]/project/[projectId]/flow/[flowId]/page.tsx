@@ -18,6 +18,7 @@ import {FlowExecutionWatcherComponent} from "@edition/flow/components/FlowExecut
 import {useFlowViewStore} from "@edition/flow/hooks/Flow.view.hook";
 import {useHotkeys} from "react-hotkeys-hook";
 import {Node, useReactFlow} from "@xyflow/react";
+import {setSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
 
 export default function Page() {
 
@@ -32,6 +33,7 @@ export default function Page() {
 
     const tab = useFlowViewStore(s => s.tab)
     const toggleTab = useFlowViewStore(s => s.toggleTab)
+    const setSelectNode = useFlowViewStore(s => s.setSelectNode)
     const reactFlow = useReactFlow()
 
     useHotkeys('shift+1', (keyboardEvent) => {
@@ -45,6 +47,20 @@ export default function Page() {
         keyboardEvent.stopPropagation()
         keyboardEvent.preventDefault()
     }, [])
+
+    React.useEffect(() => {
+        setSelectNode(() => {
+            const nodes = reactFlow.getNodes()
+            if (nodes.some(node => node.selected)) return
+
+            const node = nodes.find(node => node.data.nodeId === node.id) ?? nodes[0]
+            if (!node) return
+
+            setSelectedFunctionNode(node.id, reactFlow)
+        })
+
+        return () => setSelectNode(undefined)
+    }, [setSelectNode, reactFlow])
 
     React.useEffect(() => {
 
