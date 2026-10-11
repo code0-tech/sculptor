@@ -41,6 +41,7 @@ import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {ModuleService} from "@edition/module/services/Module.service";
 import {AIService, Model} from "@edition/ai/services/AI.service";
 import {UsageEntry, UsageService} from "@edition/usage/services/Usage.service";
+import {TutorialButtonComponent} from "@edition/tutorial/components/TutorialButtonComponent";
 
 interface ApplicationLayoutProps {
     children: React.ReactNode
@@ -145,6 +146,7 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, sidebar,
                             <>
                                 {children}
                                 {modal}
+                                <TutorialButtonComponent/>
                             </>
                         </Layout>
                     </Layout>
