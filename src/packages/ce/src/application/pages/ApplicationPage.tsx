@@ -24,7 +24,9 @@ export const ApplicationPage = () => {
                     <Spacing spacing={"xl"}/>
                     <ApplicationAttentionFlowsComponent/>
                     <Spacing spacing={"xl"}/>
-                    <NamespaceRowView/>
+                    <div data-qa-selector={"dashboard-namespace-row"}>
+                        <NamespaceRowView/>
+                    </div>
                 </div>
             </ScrollAreaViewport>
             <ScrollAreaScrollbar orientation={"vertical"}>

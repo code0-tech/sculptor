@@ -770,6 +770,7 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
             onNodesChange={nodeChangeEvent}
             onEdgesChange={edgeChangeEvent}
             {...mergeComponentProps("flow", rest)}
+            data-qa-selector={"flow-builder-canvas"}
             data-tree-visibility={showTree}
             proOptions={{hideAttribution: true}}
             onNodeClick={(_, clickedNode) => {

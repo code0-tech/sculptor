@@ -39,7 +39,8 @@ export const NamespaceListView: React.FC = () => {
         [memberships.length, namespaceStore]
     )
 
-    return <Flex style={{boxSizing: "border-box", flexDirection: 'column'}}>
+    return <Flex data-qa-selector={"dashboard-namespace-list"}
+                 style={{boxSizing: "border-box", flexDirection: 'column'}}>
         <Flex align={"center"} justify={"space-between"}>
             <Text pl={0.7} hierarchy={"tertiary"}>
                 Workspaces

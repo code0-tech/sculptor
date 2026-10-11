@@ -89,7 +89,8 @@ export const NamespaceMenuView: React.FC = () => {
 
     return <Menu>
         <MenuTrigger asChild>
-            <Button paddingSize={"xxs"} style={{padding: getSize("xs"), borderRadius: "50rem"}} w={"100%"}
+            <Button data-qa-selector={"dashboard-namespace-menu"} paddingSize={"xxs"}
+                    style={{padding: getSize("xs"), borderRadius: "50rem"}} w={"100%"}
                     variant={"none"} justify={"flex-start"}>
                 {isPersonal
                     ? <Avatar type={"character"} identifier={user?.username ?? ""} size={16}/>

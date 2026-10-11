@@ -63,7 +63,8 @@ export const ApplicationNavigationView: React.FC = () => {
         })
     }
 
-    return <Flex h={"100%"} style={{boxSizing: "border-box", flexDirection: 'column', gap: "0.7rem"}}>
+    return <Flex data-qa-selector={"dashboard-navigation"} h={"100%"}
+                 style={{boxSizing: "border-box", flexDirection: 'column', gap: "0.7rem"}}>
         <Tooltip>
             <TooltipTrigger asChild>
                 <Link href={"/"} prefetch>
@@ -118,7 +119,8 @@ export const ApplicationNavigationView: React.FC = () => {
             </Tooltip>}
             <Menu>
                 <MenuTrigger asChild>
-                    <Button variant={"none"} style={{marginTop: 'auto', padding: getSize("xs")}}>
+                    <Button data-qa-selector={"dashboard-navigation-user"} variant={"none"}
+                            style={{marginTop: 'auto', padding: getSize("xs")}}>
                         <Avatar type={"character"} identifier={currentUser?.username ?? ""} size={16}/>
                     </Button>
                 </MenuTrigger>

@@ -33,7 +33,9 @@ export const NamespaceOverviewPage: React.FC = () => {
                     <Spacing spacing={"xl"}/>
                     <ApplicationAttentionFlowsComponent namespaceId={namespaceId}/>
                     <Spacing spacing={"xl"}/>
-                    <ProjectTableView/>
+                    <div data-qa-selector={"dashboard-project-table"}>
+                        <ProjectTableView/>
+                    </div>
                 </div>
             </ScrollAreaViewport>
             <ScrollAreaScrollbar orientation={"vertical"}>

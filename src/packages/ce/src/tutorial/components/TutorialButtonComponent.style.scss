@@ -1,0 +1,135 @@
+@use "@core/style/helpers";
+@use "@core/style/variables";
+
+.tutorial {
+
+  &.driver-popover {
+    background: helpers.backgroundColor(variables.$secondary, 1);
+    box-shadow: inset 0 1px 1px #bfbfbf1a;
+    color: variables.$white;
+    max-width: 22rem;
+    padding: variables.$xs;
+
+    & {
+      @include helpers.borderRadius();
+      @include helpers.fontStyle();
+    }
+  }
+
+  .driver-popover-title {
+    font-size: variables.$md;
+    font-weight: 600;
+    padding-right: 2.5rem;
+  }
+
+  .driver-popover-description {
+    color: helpers.color(variables.$white, variables.$hierarchySecondary);
+    font-size: variables.$sm;
+    margin-top: variables.$xxs;
+  }
+
+  .driver-popover-progress-text {
+    color: helpers.color(variables.$white, variables.$hierarchyTertiary);
+    font-size: variables.$sm;
+  }
+
+  .driver-popover-close-btn {
+    align-items: center;
+    background: transparent;
+    box-shadow: none;
+    color: helpers.color(variables.$white, variables.$hierarchySecondary);
+    cursor: pointer;
+    display: flex;
+    font-size: 0;
+    height: calc(16px + 2 * 0.563rem);
+    justify-content: center;
+    padding: 0;
+    right: variables.$xs;
+    top: variables.$xs;
+    transition: none;
+    width: calc(16px + 2 * 0.563rem);
+
+    & {
+      @include helpers.borderRadius();
+    }
+
+    &:before, &:after {
+      background: currentColor;
+      border-radius: 1px;
+      content: "";
+      height: 1.333px;
+      inset: 0;
+      margin: auto;
+      position: absolute;
+      width: 11.314px;
+    }
+
+    &:before {
+      transform: rotate(45deg);
+    }
+
+    &:after {
+      transform: rotate(-45deg);
+    }
+
+    &:hover {
+      background: helpers.backgroundColor(variables.$secondary, 1.5);
+      box-shadow: inset 0 1px 1px rgba(variables.$secondary, .1);
+      color: helpers.color(variables.$white, variables.$hierarchySecondary);
+    }
+  }
+
+  .driver-popover-navigation-btns {
+    gap: variables.$xxs;
+  }
+
+  .driver-popover-footer-btn {
+    align-items: center;
+    border: none;
+    box-sizing: border-box;
+    color: helpers.color(variables.$white, variables.$hierarchySecondary);
+    cursor: pointer;
+    display: flex;
+    font-size: 0.75rem;
+    gap: 0.5rem;
+    height: fit-content;
+    justify-content: center;
+    padding: 0.422rem 0.563rem;
+    position: relative;
+    width: fit-content;
+
+    & {
+      @include helpers.borderRadius();
+      @include helpers.disabled();
+    }
+
+    &:hover {
+      background: helpers.backgroundColor(variables.$tertiary, 1.5);
+      box-shadow: inset 0 1px 1px rgba(variables.$white, .1);
+    }
+
+    &:active, &:focus {
+      background: helpers.backgroundColor(variables.$tertiary, 2);
+      box-shadow: inset 0 1px 1px rgba(variables.$white, .1);
+      outline: none;
+    }
+  }
+
+  .driver-popover-prev-btn {
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .driver-popover-next-btn {
+    background: helpers.backgroundColor(variables.$tertiary, 1);
+    box-shadow: inset 0 1px 1px rgba(variables.$white, .1);
+  }
+
+
+  @each $side in (left, right, top, bottom) {
+    &.driver-popover .driver-popover-arrow-side-#{$side} {
+      border-color: transparent;
+      border-#{$side}-color: helpers.backgroundColor(variables.$secondary, 1);
+    }
+  }
+}

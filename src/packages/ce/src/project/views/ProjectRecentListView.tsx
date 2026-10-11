@@ -40,7 +40,8 @@ export const ProjectRecentListView: React.FC = () => {
         [memberships.length, projectStore]
     )
 
-    return <Flex style={{boxSizing: "border-box", flexDirection: 'column'}}>
+    return <Flex data-qa-selector={"dashboard-project-recent-list"}
+                 style={{boxSizing: "border-box", flexDirection: 'column'}}>
         <Flex align={"center"} justify={"space-between"}>
             <Text pl={0.7} hierarchy={"tertiary"}>
                 Recent projects

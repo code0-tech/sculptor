@@ -28,6 +28,8 @@ export const NamespaceUpgradeView: React.FC = () => {
 
     if (hasActiveLicense || !upgradeVisible) return null
 
-    return <UpgradeButtonComponent namespaceId={namespaceIndex} color={"tertiary"} fullWidth
-                                   reference={"namespace_sidebar"}/>
+    return <div data-qa-selector={"dashboard-namespace-upgrade"}>
+        <UpgradeButtonComponent namespaceId={namespaceIndex} color={"tertiary"} fullWidth
+                                reference={"namespace_sidebar"}/>
+    </div>
 }
