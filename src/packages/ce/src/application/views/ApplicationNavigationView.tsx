@@ -28,6 +28,7 @@ import {UserService} from "@edition/user/services/User.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {usePathname, useRouter} from "next/navigation";
 import {ApplicationUsageView} from "@edition/application/views/ApplicationUsageView";
+import {OnboardingButtonView} from "@edition/onboarding/views/OnboardingButtonView";
 
 export const ApplicationNavigationView: React.FC = () => {
 
@@ -100,6 +101,7 @@ export const ApplicationNavigationView: React.FC = () => {
             </Tooltip>
         )}
         {!isAddLicensePage && <ApplicationUsageView/>}
+        {!isAddLicensePage && <OnboardingButtonView/>}
         <Flex style={{marginTop: "auto", boxSizing: "border-box", flexDirection: 'column', gap: "0.7rem"}}>
             {!isAddLicensePage && <Tooltip>
                 <TooltipTrigger asChild>
