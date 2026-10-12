@@ -1,10 +1,13 @@
 "use client"
 
 import React, {startTransition} from "react";
-import {Button, Spacing, TextInput, toast, useForm, useService} from "@code0-tech/pictor";
+import {Button, Spacing, TextInput, toast, useForm, useService, useStore} from "@code0-tech/pictor";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
 import {ProjectService} from "@edition/project/services/Project.service";
 import {InputDialog} from "@core/components/InputDialog";
+import {UserService} from "@edition/user/services/User.service";
+import {useUserSession} from "@edition/user/hooks/User.session.hook";
+import {useOnboardingStore} from "@edition/onboarding/hooks/Onboarding.state.hook";
 
 export interface ProjectCreateDialogComponentProps {
     open?: boolean
@@ -17,8 +20,29 @@ export const ProjectCreateDialogComponent: React.FC<ProjectCreateDialogComponent
     //TODO: user abilities for project creation within namespace
 
     const projectService = useService(ProjectService)
+    const userService = useService(UserService)
+    const userStore = useStore(UserService)
+    const currentSession = useUserSession()
+    const onboardingRunning = useOnboardingStore(state => state.running)
+    const onboardingStep = useOnboardingStore(state => state.step)
 
-    const initialValues = React.useMemo(() => ({name: null, description: null}), [])
+    const currentUser = React.useMemo(
+        () => userService.getById(currentSession?.user?.id),
+        [userStore, currentSession]
+    )
+
+    const guided = React.useMemo(
+        () => onboardingRunning && onboardingStep === "project" && !!currentUser?.username,
+        [onboardingRunning, onboardingStep, currentUser]
+    )
+
+    const initialValues = React.useMemo(
+        () => guided ? {
+            name: `${currentUser?.username}'s first project`.slice(0, 50),
+            description: "My first project to explore flows and modules."
+        } : {name: null, description: null},
+        [guided, currentUser]
+    )
 
     const [inputs, validate] = useForm<{ name: string | null, description: string | null }>({
         useInitialValidation: false,
