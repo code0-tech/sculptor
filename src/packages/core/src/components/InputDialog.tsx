@@ -67,7 +67,8 @@ export const InputDialog: React.FC<InputDialogProps> = (props) => {
                     <Card color={"primary"} p={"0"} paddingSize={"md"} h={"100%"} w={"100%"}>
                         <ScrollArea h={"100%"} type={"scroll"}>
                             <ScrollAreaViewport>
-                                <div style={{maxWidth: "75%", margin: "0 auto", padding: "4rem 1rem"}}>
+                                <div data-qa-selector={"dashboard-input-dialog-form"}
+                                     style={{maxWidth: "75%", margin: "0 auto", padding: "4rem 1rem"}}>
                                     {children!}
                                 </div>
                             </ScrollAreaViewport>
