@@ -248,32 +248,34 @@ export const FlowExecuteDialogComponent: React.FC<FlowExecuteDialogComponentProp
                 )}
                 <hr style={{width: "100%"}} color={"#201e2c"}/>
                 <Spacing spacing={"xl"}/>
-                {triggerSchema && triggerSchema.input !== "generic" && (
-                    <>
-                        <DataTypeInputComponent
-                            data-qa-selector={"flow-builder-manual-execution-input"}
-                            title={"Input for manual execution"}
-                            description={"The input passed to the trigger for this manual execution."}
-                            schema={triggerSchema}
-                            clearable
-                            key={"flow-builder-manual-execution-input"}
-                            {...inputs.getInputProps("input")}
-                            onChange={() => validate("input")}
-                        />
-                        <Spacing spacing={"xl"}/>
-                    </>
-                )}
-                <Flex justify={"flex-end"}>
-                    <Button onClick={onExecute}
-                            w={"100%"}
-                            disabled={executing || !project?.primaryRuntime?.id}
-                            color={"tertiary"}
-                            data-qa-selector={"flow-builder-manual-execution-trigger"}>
-                        <Text>
-                            Manually execute workflow
-                        </Text>
-                    </Button>
-                </Flex>
+                <div data-qa-selector={"flow-builder-manual-execution-form"}>
+                    {triggerSchema && triggerSchema.input !== "generic" && (
+                        <>
+                            <DataTypeInputComponent
+                                data-qa-selector={"flow-builder-manual-execution-input"}
+                                title={"Input for manual execution"}
+                                description={"The input passed to the trigger for this manual execution."}
+                                schema={triggerSchema}
+                                clearable
+                                key={"flow-builder-manual-execution-input"}
+                                {...inputs.getInputProps("input")}
+                                onChange={() => validate("input")}
+                            />
+                            <Spacing spacing={"xl"}/>
+                        </>
+                    )}
+                    <Flex justify={"flex-end"}>
+                        <Button onClick={onExecute}
+                                w={"100%"}
+                                disabled={executing || !project?.primaryRuntime?.id}
+                                color={"tertiary"}
+                                data-qa-selector={"flow-builder-manual-execution-trigger"}>
+                            <Text>
+                                Manually execute workflow
+                            </Text>
+                        </Button>
+                    </Flex>
+                </div>
             </DialogContent>
         </DialogPortal>
     </Dialog>
