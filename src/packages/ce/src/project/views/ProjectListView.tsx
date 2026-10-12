@@ -49,7 +49,8 @@ export const ProjectListView: React.FC = () => {
             </Link>
         })}
         <Link href={`/namespace/${namespaceIndex}/project/create`} style={{width: "100%"}} prefetch>
-            <Button variant={"none"} w={"100%"} justify={"flex-start"} paddingSize={"xxs"}>
+            <Button data-qa-selector={"dashboard-project-create"} variant={"none"} w={"100%"}
+                    justify={"flex-start"} paddingSize={"xxs"}>
                 <IconPlus size={13}/>
                 <Text size={"md"} hierarchy={"tertiary"}>
                     Create Project
