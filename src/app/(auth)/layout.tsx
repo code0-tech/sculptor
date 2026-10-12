@@ -54,27 +54,26 @@ export default function AuthLayout({children}: Readonly<{ children: React.ReactN
             <ScrollArea mah={"100%"} h={"100%"}>
                 <ScrollAreaViewport>
                     <AuroraBackground/>
-                    <ContextStoreProvider services={[[store, service], organization, [applicationStore, applicationService]]}>
-                        <Container h={"100%"} w={"100%"}>
-                            <Flex h={"100%"} w={"100%"} align={"center"} justify={"center"}>
-                                <Col xs={4} style={{marginTop: "auto", marginBottom: "auto"}}>
-                                    <Image src={"/CodeZero_Logo.png"} alt={"CodeZero Logo"}
-                                           width={40}
-                                           height={40}/>
-                                    <Spacing spacing={"xl"}/>
-                                    <Text style={{fontSize: "2rem", fontWeight: "600"}}
-                                          hierarchy={"primary"}
-                                          display={"inline"}>
-                                        Every great idea starts at zero. {" "}
-                                    </Text>
-                                    <Text style={{fontSize: "2rem", fontWeight: "600"}}
-                                          hierarchy={"tertiary"} display={"inline"}>
-                                        Start with CodeZero.
-                                    </Text>
-                                    <Spacing spacing={"xl"}/>
-                                    {children}
-                                </Col>
-                            </Flex>
+                    <ContextStoreProvider
+                        services={[[store, service], organization, [applicationStore, applicationService]]}>
+                        <Container h={"100%"} w={"100%"} display={"flex"} justify={"center"}>
+                            <Col xs={4} py={5} style={{marginTop: "auto", marginBottom: "auto"}}>
+                                <Image src={"/CodeZero_Logo.png"} alt={"CodeZero Logo"}
+                                       width={40}
+                                       height={40}/>
+                                <Spacing spacing={"xl"}/>
+                                <Text style={{fontSize: "2rem", fontWeight: "600"}}
+                                      hierarchy={"primary"}
+                                      display={"inline"}>
+                                    Every great idea starts at zero. {" "}
+                                </Text>
+                                <Text style={{fontSize: "2rem", fontWeight: "600"}}
+                                      hierarchy={"tertiary"} display={"inline"}>
+                                    Start with CodeZero.
+                                </Text>
+                                <Spacing spacing={"xl"}/>
+                                {children}
+                            </Col>
                         </Container>
                     </ContextStoreProvider>
                     <div style={{
