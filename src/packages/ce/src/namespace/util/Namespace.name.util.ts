@@ -2,6 +2,7 @@ import {Namespace} from "@code0-tech/sagittarius-graphql-types";
 import {OrganizationService} from "@edition/organization/services/Organization.service";
 import {UserService} from "@edition/user/services/User.service";
 
+//TODO: the services shouldn't be passed in
 /**
  * A namespace has no own name. Its display name is derived from its parent:
  * the organization name or the username of the user it belongs to.

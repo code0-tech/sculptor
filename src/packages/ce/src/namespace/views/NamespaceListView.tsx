@@ -57,7 +57,8 @@ export const NamespaceListView: React.FC = () => {
             const user = namespace.parent?.__typename === "User"
                 ? userService.getById(namespace.parent.id) : undefined
             return <Link key={namespace.id} href={`/namespace/${number}`} style={{width: "100%"}} prefetch>
-                <Button variant={"none"} w={"100%"} justify={"flex-start"} paddingSize={"xxs"}>
+                <Button data-qa-selector={isPersonal ? "dashboard-namespace-personal" : undefined}
+                        variant={"none"} w={"100%"} justify={"flex-start"} paddingSize={"xxs"}>
                     {isPersonal
                         ? <Avatar type={"character"} identifier={user?.username ?? ""} size={13}/>
                         : <Avatar bg={"transparent"} color={hashToColor(name, 200, 360)}
