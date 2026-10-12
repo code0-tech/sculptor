@@ -215,6 +215,7 @@ export const FlowFolderComponent = React.forwardRef<FlowFolderComponentHandle, F
                         flow={item.flow!}
                         active={item.flow!.id === activeFlowId}
                         data-flow-id={item.flow!.id ?? undefined}
+                        data-qa-selector={"dashboard-flow-item"}
                         {...props}
                     />
                 ))}

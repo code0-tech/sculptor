@@ -7,6 +7,7 @@ import {useRouter, useSearchParams} from "next/navigation";
 import {IconLoader2} from "@tabler/icons-react";
 import {motion} from "framer-motion";
 import {setUserSession} from "@edition/user/hooks/User.session.hook";
+import {useOnboardingStore} from "@edition/onboarding/hooks/Onboarding.state.hook";
 
 export const UserCallbackPage: React.FC = () => {
 
@@ -19,6 +20,7 @@ export const UserCallbackPage: React.FC = () => {
     const userService = useService(UserService)
     const params = useSearchParams()
     const router = useRouter()
+    const startOnboarding = useOnboardingStore(state => state.start)
     const [error, setError] = React.useState<string | null>(null)
     const handled = React.useRef(false)
 
@@ -86,6 +88,7 @@ export const UserCallbackPage: React.FC = () => {
                 return
             }
             setUserSession(payload.userSession)
+            if (state.intent === "register") startOnboarding()
             router.push("/")
             router.refresh()
         })

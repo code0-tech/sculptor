@@ -1,0 +1,17 @@
+// driver.js disables pointer events on everything but the highlighted element. The
+// onboarding only guides the eye, so the lock is lifted for the whole page while a run
+// is active - a spotlight on an input must never make the rest of its dialog, or a menu
+// that portals out of it, unusable. The card itself stays interactive either way.
+body.onboarding-active.driver-active,
+body.onboarding-active.driver-active * {
+  pointer-events: auto;
+}
+
+body.onboarding-active.driver-active .driver-overlay {
+  pointer-events: none;
+}
+
+.driver-active .onboarding-card,
+.driver-active .onboarding-card * {
+  pointer-events: auto;
+}

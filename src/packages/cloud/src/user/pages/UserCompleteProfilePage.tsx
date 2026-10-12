@@ -18,6 +18,7 @@ import {useRouter, useSearchParams} from "next/navigation";
 import {UserService} from "@cloud-internal/user/services/User.service";
 import {setUserSession} from "@ce-internal/user/hooks/User.session.hook";
 import {UserLegalConsentCheckboxComponent} from "@ce-internal/user/components/UserLegalConsentCheckboxComponent";
+import {useOnboardingStore} from "@ce-internal/onboarding/hooks/Onboarding.state.hook";
 import {ApplicationService} from "@edition/application/services/Application.service";
 
 export const UserCompleteProfilePage: React.FC = () => {
@@ -27,6 +28,7 @@ export const UserCompleteProfilePage: React.FC = () => {
     const applicationService = useService(ApplicationService)
     const applicationStore = useStore(ApplicationService)
     const router = useRouter()
+    const startOnboarding = useOnboardingStore(state => state.start)
     const [loading, startTransition] = React.useTransition()
 
     const legalConsentRequired = React.useMemo(
@@ -91,6 +93,7 @@ export const UserCompleteProfilePage: React.FC = () => {
                 }).then(payload => {
                     if (payload?.userSession) {
                         setUserSession(payload.userSession)
+                        startOnboarding()
                         router.push("/")
                         router.refresh()
                     }

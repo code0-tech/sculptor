@@ -51,6 +51,8 @@ import {
     FlowTemplateResolution,
     resolveFlowTemplate
 } from "@core/util/flow-template";
+import {useOnboardingStore} from "@edition/onboarding/hooks/Onboarding.state.hook";
+import {getOnboardingFlowTemplate} from "@edition/onboarding/utils/Onboarding.template.util";
 
 export interface FlowCreateDialogComponentProps {
     open?: boolean
@@ -87,6 +89,8 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
     const projectStore = useStore(ProjectService)
     const runtimeService = useService(RuntimeService)
     const runtimeStore = useStore(RuntimeService)
+    const onboardingRunning = useOnboardingStore(state => state.running)
+    const onboardingStep = useOnboardingStore(state => state.step)
 
     const namespaceIndex = params.namespaceId as any as number
     const projectIndex = params.projectId as any as number
@@ -142,11 +146,23 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
         [moduleService, moduleStore]
     )
 
+    const onboardingResolution = React.useMemo(
+        () => resolveFlowTemplate(getOnboardingFlowTemplate(flowTypes), flowTypes, functions),
+        [flowTypes, functions]
+    )
+
+    // Narrowing may only depend on the flow types: the functions arrive later, and
+    // until they do the list would show every trigger.
+    const guided = React.useMemo(
+        () => onboardingRunning && onboardingStep === "flow" && !!onboardingResolution.flowType,
+        [onboardingRunning, onboardingStep, onboardingResolution]
+    )
+
     const resolutions = React.useMemo(
-        () => templates
+        () => guided ? [onboardingResolution] : templates
             .map(template => resolveFlowTemplate(template, flowTypes, functions))
             .filter(resolution => resolution.available),
-        [templates, flowTypes, functions]
+        [templates, flowTypes, functions, guided, onboardingResolution]
     )
 
     const selectedTemplate = React.useMemo(
@@ -155,7 +171,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
     )
 
     const templateAdjustments = React.useMemo(
-        () => selectedTemplate ? buildFlowTemplateInput(selectedTemplate, "", flows)?.adjustments ?? [] : [],
+        () => selectedTemplate?.available ? buildFlowTemplateInput(selectedTemplate, "", flows)?.adjustments ?? [] : [],
         [selectedTemplate, flowStore]
     )
 
@@ -164,10 +180,15 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
         [selectedTemplateSlug]
     )
 
+    const visibleFlowTypes = React.useMemo(
+        () => guided && onboardingResolution.flowType ? [onboardingResolution.flowType] : flowTypes,
+        [guided, onboardingResolution, flowTypes]
+    )
+
     const flowTypeGroups: FlowTypeGroup[] = React.useMemo(() => {
         const groupedByModule = new Map<string, { flowTypes: FlowType[], module: any }>()
 
-        flowTypes.forEach((flowType) => {
+        visibleFlowTypes.forEach((flowType) => {
             const moduleId = flowType.runtimeModule?.id ?? ""
             const module = modules.find(m => m.id === moduleId)
 
@@ -183,7 +204,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
 
         return [
             {
-                flowTypes: flowTypes,
+                flowTypes: visibleFlowTypes,
                 displayMessage: "All",
                 icon: undefined
             },
@@ -193,7 +214,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                 icon: group.module?.icon
             }))
         ]
-    }, [flowTypes, modules])
+    }, [visibleFlowTypes, modules])
 
     const templateGroups: FlowTemplateGroup[] = React.useMemo(() => {
         const groupedByModule = new Map<string, { resolutions: FlowTemplateResolution[], module: any }>()
@@ -288,6 +309,13 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
         }
     }, [open, flowTypeId])
 
+    // The statically coded template already carries its name, so it is selected as soon
+    // as the trigger is known. Waiting for it to resolve leaves the name input empty.
+    React.useEffect(() => {
+        if (!open || !guided) return
+        setSelectedTemplateSlug(onboardingResolution.template.slug)
+    }, [open, guided, onboardingResolution])
+
     const [inputs, validate] = useForm({
         useInitialValidation: false,
         initialValues: initialValues,
@@ -298,7 +326,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
             }
         },
         onSubmit: (values) => {
-            if (selectedTemplate) createFlowFromTemplate(values.name!)
+            if (selectedTemplate?.available) createFlowFromTemplate(values.name!)
             else createFlow?.(values.name!, selectedFlowTypeId!)
             onOpenChange?.(false)
         }
@@ -377,7 +405,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                                 }} left={<IconSearch size={13}/>}
                                               placeholder={mode === "template" ? "Search for templates..." : "Search for triggers..."}/>
                             </div>
-                            {resolutions.length > 0 ? <SegmentedControl type={"single"}
+                            {resolutions.length > 0 && !guided ? <SegmentedControl type={"single"}
                                               color={"primary"}
                                               value={mode}
                                               onValueChange={(value) => {
@@ -431,7 +459,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                                 </ScrollArea>}>
                             <ScrollArea h={"100%"} w={"100%"} type={"always"}>
                                 <ScrollAreaViewport style={{minWidth: "auto"}}>
-                                    <CommandList w={"100%"}>
+                                    <CommandList w={"100%"} data-qa-selector={"flow-create-list"}>
                                         <CommandEmpty>No results found.</CommandEmpty>
                                         {mode === "template" ? templateGroups.map((group, index) => {
                                             return currentTab === `group-${index}` && <>
@@ -547,36 +575,38 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                     </Text>
                 </> : null}
                 <Spacing spacing={"xl"}/>
-                <FlowNameInputComponent
-                    key={selectedTemplateSlug ?? "flow"}
-                    data-qa-selector={"flow-create-name"}
-                    description={"You can choose a name here and only use alphanumeric names."}
-                    title={"Name of the flow"}
-                    {...inputs.getInputProps("name")}
-                    onChange={() => validate("name")}/>
-                {templateAdjustments.map(adjustment => <>
-                    <Spacing spacing={"xs"}/>
-                    <Text hierarchy={"tertiary"} size={"sm"}>
-                        {adjustment.name} is set to {adjustment.to}, because {adjustment.from} is already used by
-                        another flow in this project.
-                    </Text>
-                </>)}
-                <Spacing spacing={"xl"}/>
-                <Flex justify={"space-between"} align={"center"}>
-                    {flowTypeId ? (
-                        <DialogClose asChild>
-                            <Button color={"tertiary"} variant={"filled"}>No, go back!</Button>
-                        </DialogClose>
-                    ) : (
-                        <Button color={"tertiary"}
-                                onClick={() => {
-                                    setSelectedTemplateSlug(undefined)
-                                    setStep("type")
-                                }}>No, go back!</Button>
-                    )}
-                    <Button data-qa-selector={"flow-create-send"} color={"success"}
-                            onClick={validate}>Yes, create!</Button>
-                </Flex>
+                <div data-qa-selector={"flow-create-form"}>
+                    <FlowNameInputComponent
+                        key={selectedTemplateSlug ?? "flow"}
+                        data-qa-selector={"flow-create-name"}
+                        description={"You can choose a name here and only use alphanumeric names."}
+                        title={"Name of the flow"}
+                        {...inputs.getInputProps("name")}
+                        onChange={() => validate("name")}/>
+                    {templateAdjustments.map(adjustment => <>
+                        <Spacing spacing={"xs"}/>
+                        <Text hierarchy={"tertiary"} size={"sm"}>
+                            {adjustment.name} is set to {adjustment.to}, because {adjustment.from} is already used by
+                            another flow in this project.
+                        </Text>
+                    </>)}
+                    <Spacing spacing={"xl"}/>
+                    <Flex justify={"space-between"} align={"center"}>
+                        {flowTypeId ? (
+                            <DialogClose asChild>
+                                <Button color={"tertiary"} variant={"filled"}>No, go back!</Button>
+                            </DialogClose>
+                        ) : (
+                            <Button color={"tertiary"}
+                                    onClick={() => {
+                                        setSelectedTemplateSlug(undefined)
+                                        setStep("type")
+                                    }}>No, go back!</Button>
+                        )}
+                        <Button data-qa-selector={"flow-create-send"} color={"success"}
+                                onClick={validate}>Yes, create!</Button>
+                    </Flex>
+                </div>
             </DialogContent>
         </DialogPortal>
     </Dialog>

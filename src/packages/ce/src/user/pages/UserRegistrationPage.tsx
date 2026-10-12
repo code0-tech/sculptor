@@ -23,6 +23,7 @@ import {IdentityProviderButtonsComponent} from "@edition/user/components/Identit
 import {UserLegalConsentCheckboxComponent} from "@edition/user/components/UserLegalConsentCheckboxComponent";
 import {ApplicationService} from "@edition/application/services/Application.service";
 import {IdentityProviderBasic} from "@code0-tech/sagittarius-graphql-types";
+import {useOnboardingStore} from "@edition/onboarding/hooks/Onboarding.state.hook";
 
 export const UserRegistrationPage: React.FC = () => {
 
@@ -30,6 +31,7 @@ export const UserRegistrationPage: React.FC = () => {
     const applicationService = useService(ApplicationService)
     const applicationStore = useStore(ApplicationService)
     const router = useRouter()
+    const startOnboarding = useOnboardingStore(state => state.start)
     const [loading, startTransition] = React.useTransition()
 
     const legalConsentRequired = React.useMemo(
@@ -88,6 +90,7 @@ export const UserRegistrationPage: React.FC = () => {
                 }).then(payload => {
                     if (payload?.userSession) {
                         setUserSession(payload.userSession)
+                        startOnboarding()
                         router.push("/")
                         router.refresh()
                     }
