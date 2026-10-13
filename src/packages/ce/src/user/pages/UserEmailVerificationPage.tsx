@@ -8,15 +8,20 @@ import {useRouter, useSearchParams} from "next/navigation";
 
 export const UserEmailVerificationPage: React.FC = () => {
 
+    const query = useSearchParams()
     const userService = useService(UserService)
     const [loading, startTransition] = React.useTransition()
     const router = useRouter()
 
-    const [inputs, validate] = useForm({
+    const initialValues = React.useMemo(() => ({
+        code: query.get("code"),
+    }), [query])
+
+    const [inputs, validate] = useForm<{
+        code: string | null,
+    }>({
         useInitialValidation: false,
-        initialValues: {
-            code: null,
-        },
+        initialValues,
         validate: {
             code: (value) => {
                 if (!value) return "Code is required"
@@ -24,10 +29,11 @@ export const UserEmailVerificationPage: React.FC = () => {
             }
         },
         onSubmit: (values) => {
-            if (!values.code) return
+            const code = values.code
+            if (!code) return
             startTransition(async () => {
                 await userService.usersEmailVerification({
-                    token: (values.code as unknown as string),
+                    token: code,
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
                         router.push("/?emailVerified=true")

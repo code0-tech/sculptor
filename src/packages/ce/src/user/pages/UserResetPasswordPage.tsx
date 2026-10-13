@@ -18,18 +18,24 @@ import {useRouter, useSearchParams} from "next/navigation";
 
 export const UserResetPasswordPage: React.FC = () => {
 
-    const query = useSearchParams() //can be passwordReset
+    const query = useSearchParams() //can be passwordReset or code
     const userService = useService(UserService)
     const [loading, startTransition] = React.useTransition()
     const router = useRouter()
 
-    const [inputs, validate] = useForm({
+    const initialValues = React.useMemo(() => ({
+        code: query.get("code"),
+        password: null,
+        repeatPassword: null,
+    }), [query])
+
+    const [inputs, validate] = useForm<{
+        code: string | null,
+        password: string | null,
+        repeatPassword: string | null,
+    }>({
         useInitialValidation: false,
-        initialValues: {
-            code: null,
-            password: null,
-            repeatPassword: null,
-        },
+        initialValues,
         validate: {
             code: (value) => {
                 if (!value) return "Code is required"
@@ -43,12 +49,13 @@ export const UserResetPasswordPage: React.FC = () => {
             }
         },
         onSubmit: (values) => {
-            if (!values.code || !values.password || !values.repeatPassword) return
+            const {code, password, repeatPassword} = values
+            if (!code || !password || !repeatPassword) return
             startTransition(async () => {
                 await userService.usersPasswordReset({
-                    resetToken: (values.code as unknown as string),
-                    newPassword: (values.password as unknown as string),
-                    newPasswordConfirmation: (values.repeatPassword as unknown as string),
+                    resetToken: code,
+                    newPassword: password,
+                    newPasswordConfirmation: repeatPassword,
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
                         router.push("/login?passwordReset=true")
