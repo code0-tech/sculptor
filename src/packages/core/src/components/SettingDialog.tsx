@@ -16,6 +16,7 @@ import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 import {IconArrowLeft} from "@tabler/icons-react";
 import {Tab} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
+import {markDialogPathname} from "@core/util/Navigation.lastPage.util";
 
 export interface SettingDialogProps {
     open?: boolean
@@ -34,6 +35,8 @@ export const SettingDialog: React.FC<SettingDialogProps> = (props) => {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
+    const [closing, setClosing] = React.useState(false)
+    const route = React.useRef(pathname)
 
     const activeTab = searchParams.get("tab") || defaultValue
 
@@ -43,7 +46,18 @@ export const SettingDialog: React.FC<SettingDialogProps> = (props) => {
         router.replace(`${pathname}?${next.toString()}`, {scroll: false})
     }
 
-    return <Dialog open={open} onOpenChange={(open) => onOpenChange?.(open)}>
+    React.useEffect(() => {
+        setClosing(false)
+    }, [pathname, open])
+
+    React.useEffect(() => {
+        if (open) markDialogPathname(route.current)
+    }, [])
+
+    return <Dialog open={open && !closing && pathname === route.current} onOpenChange={(next) => {
+        setClosing(!next)
+        onOpenChange?.(next)
+    }}>
         <DialogPortal>
             <DialogOverlay/>
             <DialogContent style={{padding: "2px"}}

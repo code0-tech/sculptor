@@ -1,6 +1,8 @@
 "use client"
 
 import React from "react";
+import {usePathname} from "next/navigation";
+import {markDialogPathname} from "@core/util/Navigation.lastPage.util";
 import {
     Button,
     Card,
@@ -31,7 +33,22 @@ export const InputDialog: React.FC<InputDialogProps> = (props) => {
 
     const {open, onOpenChange, title, description, children} = props
 
-    return <Dialog open={open} onOpenChange={(open) => onOpenChange?.(open)}>
+    const pathname = usePathname()
+    const [closing, setClosing] = React.useState(false)
+    const route = React.useRef(pathname)
+
+    React.useEffect(() => {
+        setClosing(false)
+    }, [pathname, open])
+
+    React.useEffect(() => {
+        if (open) markDialogPathname(route.current)
+    }, [])
+
+    return <Dialog open={open && !closing && pathname === route.current} onOpenChange={(next) => {
+        setClosing(!next)
+        onOpenChange?.(next)
+    }}>
         <DialogPortal>
             <DialogOverlay/>
             <DialogContent style={{padding: "2px"}}
