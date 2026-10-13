@@ -15,15 +15,6 @@ export const RoleSettingsPage: React.FC = () => {
     return <RoleSettingsDialogComponent open={true}
                                         onOpenChange={(open) => {
                                             if (open) return
-
-                                            const nav = (window as unknown as { navigation?: { entries(): { url: string }[], currentEntry?: { index: number } } }).navigation
-                                            if (!nav?.entries) {
-                                                router.back()
-                                                return
-                                            }
-
-                                            const index = nav.currentEntry?.index ?? 0
-                                            if (index > 0) router.back()
-                                            else router.push(settingsHref)
+                                            router.replace(`${settingsHref}?tab=roles`)
                                         }}/>
 }

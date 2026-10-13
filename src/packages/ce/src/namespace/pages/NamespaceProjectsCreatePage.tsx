@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react";
+import {lastPageUrl} from "@core/util/Navigation.lastPage.util";
 import {useParams, useRouter} from "next/navigation";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
 import {ProjectCreateDialogComponent} from "@edition/project/components/ProjectCreateDialogComponent";
@@ -18,15 +19,6 @@ export const NamespaceProjectsCreatePage: React.FC = () => {
                                          namespaceId={namespaceId}
                                          onOpenChange={(open) => {
                                              if (open) return
-
-                                             const nav = (window as unknown as { navigation?: { entries(): { url: string }[], currentEntry?: { index: number } } }).navigation
-                                             if (!nav?.entries) {
-                                                 router.back()
-                                                 return
-                                             }
-
-                                             const index = nav.currentEntry?.index ?? 0
-                                             if (index > 0) router.back()
-                                             else router.push(fallbackHref)
+                                             router.replace(lastPageUrl() ?? fallbackHref)
                                          }}/>
 }

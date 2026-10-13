@@ -25,21 +25,12 @@ export const RuntimeCreatePage: React.FC = () => {
         notFound()
     }
 
-    const runtimesHref = namespaceIndex ? `/namespace/${namespaceIndex}/runtimes` : "/runtimes"
+    const runtimesHref = namespaceIndex ? `/namespace/${namespaceIndex}/settings?tab=servers` : "/settings?tab=servers"
 
     return <RuntimeCreateDialogComponent open={true}
                                          namespaceId={namespaceIndex ? `gid://sagittarius/Namespace/${namespaceIndex}` : undefined}
                                          onOpenChange={(open) => {
                                              if (open) return
-
-                                             const nav = (window as unknown as { navigation?: { entries(): { url: string }[], currentEntry?: { index: number } } }).navigation
-                                             if (!nav?.entries) {
-                                                 router.back()
-                                                 return
-                                             }
-
-                                             const index = nav.currentEntry?.index ?? 0
-                                             if (index > 0) router.back()
-                                             else router.push(runtimesHref)
+                                             router.replace(runtimesHref)
                                          }}/>
 }
