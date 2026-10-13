@@ -36,7 +36,7 @@ export const NamespaceCardComponent: React.FC<NamespaceCardComponentProps> = (pr
     ) ?? false
 
     const Content = <Link href={`/namespace/${namespaceIndex}`} prefetch style={{display: "contents"}}>
-        <Card color={"secondary"} clickable h={"100%"}>
+        <Card color={"secondary"} clickable>
             <Flex style={{flexDirection: "column", gap: "1.25rem"}}>
                 <Flex align={"center"} style={{gap: "0.85rem"}}>
                     {isPersonal
