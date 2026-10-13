@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react";
+import {lastPageUrl} from "@core/util/Navigation.lastPage.util";
 import {notFound, useParams, useRouter} from "next/navigation";
 import {useService, useStore} from "@code0-tech/pictor";
 import {User} from "@code0-tech/sagittarius-graphql-types";
@@ -37,18 +38,7 @@ export const UserSettingsPage: React.FC = () => {
                                     open={true}
                                     onOpenChange={(open) => {
                                         if (open) return
-
-                                        const nav = (window as unknown as { navigation?: { entries(): { url: string }[], currentEntry?: { index: number } } }).navigation
-                                        if (!nav?.entries) {
-                                            router.back()
-                                            return
-                                        }
-
-                                        const index = nav.currentEntry?.index ?? 0
-                                        const previous = index > 0 ? nav.entries()[index - 1] : undefined
-                                        const previousIsSettings = !!previous && new URL(previous.url).pathname.endsWith("/settings")
-
-                                        if (previous && !previousIsSettings) router.back()
-                                        else router.push(isMe ? "/users/@me" : `/users/${userIndex}`)
+                                        if (!isMe) router.replace("/settings?tab=users")
+                                        else router.replace(lastPageUrl() ?? "/users/@me")
                                     }}/>
 }

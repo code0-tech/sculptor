@@ -27,7 +27,8 @@ import {
 } from "@tabler/icons-react";
 import BorderBeam from "border-beam";
 import {animate, AnimatePresence, motion, useMotionValue, useTransform} from "framer-motion";
-import {useSearchParams} from "next/navigation";
+import {usePathname, useSearchParams} from "next/navigation";
+import {markDialogPathname} from "@core/util/Navigation.lastPage.util";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
 import {NamespaceService} from "@cloud-internal/namespace/services/Namespace.service";
 import {OrganizationService} from "@edition/organization/services/Organization.service";
@@ -140,7 +141,22 @@ export const UpgradeDialogComponent: React.FC<UpgradeDialogComponentProps> = ({o
         ? (name ? `the ${name} workspace` : "your workspace")
         : name ?? "your workspace"
 
-    return <Dialog open={open} onOpenChange={onOpenChange}>
+    const pathname = usePathname()
+    const [closing, setClosing] = React.useState(false)
+    const route = React.useRef(pathname)
+
+    React.useEffect(() => {
+        setClosing(false)
+    }, [pathname, open])
+
+    React.useEffect(() => {
+        if (open) markDialogPathname(route.current)
+    }, [])
+
+    return <Dialog open={open && !closing && pathname === route.current} onOpenChange={(next) => {
+        setClosing(!next)
+        onOpenChange?.(next)
+    }}>
         <DialogPortal>
             <DialogOverlay/>
             <DialogContent w={"480px"}>
