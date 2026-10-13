@@ -21,9 +21,14 @@ import {
     IconAdjustmentsHorizontal,
     IconArrowRight,
     IconBolt,
+    IconChartBar,
+    IconClock,
     IconDiscount2,
     IconHeadset,
-    IconSparkles
+    IconRocket,
+    IconShieldCheck,
+    IconSparkles,
+    IconUsers
 } from "@tabler/icons-react";
 import BorderBeam from "border-beam";
 import {animate, AnimatePresence, motion, useMotionValue, useTransform} from "framer-motion";
@@ -36,35 +41,17 @@ import {UserService} from "@edition/user/services/User.service";
 import {getNamespaceName} from "@edition/namespace/util/Namespace.name.util";
 import {useLicenseUpgrade} from "@edition/license/hooks/License.upgrade.hook";
 
-const benefits = [
-    {
-        icon: IconBolt,
-        title: "Up to 10k executions",
-        text: "Run your flows without hitting the execution cap of this workspace.",
-    },
-    {
-        icon: IconSparkles,
-        title: "Up to 4mio AI tokens",
-        text: "Higher token limits for AI actions across the whole workspace.",
-    },
-    {
-        icon: IconAdjustmentsHorizontal,
-        title: "Limits that fit you",
-        text: "Scale executions and AI as you grow. Pro, Max or fully custom.",
-    },
-    {
-        icon: IconHeadset,
-        title: "Priority support",
-        text: "Get faster help from our team when it matters most.",
-    },
-]
-
-const discount = {
-    code: "HELLO20",
-    label: "20% off",
-    basePrice: 8.95,
-    discountedPrice: 7.16,
-    durationMinutes: 30,
+const benefitIcons: Record<string, typeof IconBolt> = {
+    bolt: IconBolt,
+    sparkles: IconSparkles,
+    adjustments: IconAdjustmentsHorizontal,
+    headset: IconHeadset,
+    discount: IconDiscount2,
+    rocket: IconRocket,
+    shield: IconShieldCheck,
+    users: IconUsers,
+    clock: IconClock,
+    chart: IconChartBar,
 }
 
 export interface UpgradeDialogComponentProps {
@@ -81,21 +68,40 @@ export const UpgradeDialogComponent: React.FC<UpgradeDialogComponentProps> = ({o
     const userService = useService(UserService)
     const [discountVisible, setDiscountVisible] = React.useState(false)
     const [remaining, setRemaining] = React.useState<number | null>(null)
+    const [config, setConfig] = React.useState<{
+        upgradeDescription: string
+        upgradeBenefits: { icon: string, title: string, text: string }[]
+        upgradePriceLabel: string
+        upgradeCtaLabel: string
+        upgradeDiscountHint: string
+        upgradeDiscountCode: string
+        upgradeDiscountLabel: string
+        upgradeBasePrice: number
+        upgradeDiscountedPrice: number
+        upgradeDiscountDurationMinutes: number
+        upgradeDiscountDelaySeconds: number
+    }>()
 
     React.useEffect(() => {
-        if (!open) {
+        fetch("/api/config")
+            .then(response => response.json())
+            .then(setConfig)
+    }, [])
+
+    React.useEffect(() => {
+        if (!open || !config) {
             setDiscountVisible(false)
             return
         }
-        const timeout = setTimeout(() => setDiscountVisible(true), 1500)
+        const timeout = setTimeout(() => setDiscountVisible(true), config.upgradeDiscountDelaySeconds * 1000)
         return () => clearTimeout(timeout)
-    }, [open])
+    }, [open, config])
 
     React.useEffect(() => {
-        if (!discountVisible) return
-        const key = `upgrade-discount-remaining-${discount.code}`
+        if (!discountVisible || !config) return
+        const key = `upgrade-discount-remaining-${config.upgradeDiscountCode}`
         const stored = window.localStorage.getItem(key)
-        const start = stored === null ? discount.durationMinutes * 60_000 : Math.max(0, Number(stored))
+        const start = stored === null ? config.upgradeDiscountDurationMinutes * 60_000 : Math.max(0, Number(stored))
         window.localStorage.setItem(key, start.toString())
         setRemaining(start)
         if (start <= 0) return
@@ -107,20 +113,27 @@ export const UpgradeDialogComponent: React.FC<UpgradeDialogComponentProps> = ({o
             if (left <= 0) clearInterval(interval)
         }, 1000)
         return () => clearInterval(interval)
-    }, [discountVisible])
+    }, [discountVisible, config])
 
-    const price = useMotionValue(discount.basePrice)
+    const price = useMotionValue(0)
     const priceLabel = useTransform(price, value => `${value.toFixed(2).replace(".", ",")}€`)
+    const priced = React.useRef(false)
 
     const discountActive = discountVisible && remaining !== null && remaining > 0
     React.useEffect(() => {
-        const controls = animate(price, discountActive ? discount.discountedPrice : discount.basePrice, {
+        if (!config) return
+        if (!priced.current) {
+            priced.current = true
+            price.set(config.upgradeBasePrice)
+            return
+        }
+        const controls = animate(price, discountActive ? config.upgradeDiscountedPrice : config.upgradeBasePrice, {
             duration: 1.1,
             ease: [0.22, 1, 0.36, 1],
             delay: discountActive ? 0.25 : 0
         })
         return () => controls.stop()
-    }, [discountActive, price])
+    }, [discountActive, price, config])
 
     const countdown = remaining === null ? "" :
         `${Math.floor(remaining / 60_000)}:${Math.floor((remaining % 60_000) / 1000).toString().padStart(2, "0")}`
@@ -188,15 +201,17 @@ export const UpgradeDialogComponent: React.FC<UpgradeDialogComponentProps> = ({o
                     </Text>
                     <Spacing spacing={"xs"}/>
                     <Text size={"sm"} hierarchy={"tertiary"}>
-                        Unlock higher limits for executions and AI usage.
-                        <br/>
-                        Pick the plan that fits. Pro, Max or fully custom.
+                        {config?.upgradeDescription.split("\n").map((line, index) =>
+                            <React.Fragment key={line}>
+                                {index > 0 && <br/>}
+                                {line}
+                            </React.Fragment>)}
                     </Text>
                 </Card>
                 <Spacing mb={2.6} spacing={"xl"}/>
                 <Row>
-                    {benefits.map(benefit => {
-                        const Icon = benefit.icon
+                    {config?.upgradeBenefits.map(benefit => {
+                        const Icon = benefitIcons[benefit.icon] ?? IconSparkles
                         return <Col key={benefit.title} xs={6} mb={1.3}>
                             <Flex style={{gap: "0.7rem"}}>
                                 <Icon size={16} style={{minWidth: "16px", minHeight: "16px"}}/>
@@ -211,7 +226,7 @@ export const UpgradeDialogComponent: React.FC<UpgradeDialogComponentProps> = ({o
                 <Spacing spacing={"xl"}/>
                 <Flex justify={"space-between"} align={"baseline"}>
                     <Text>
-                        Full access starts at
+                        {config?.upgradePriceLabel}
                     </Text>
                     <Flex style={{gap: "0.35rem", alignItems: "baseline"}}>
                         <motion.div style={{transformOrigin: "right bottom"}}
@@ -219,7 +234,7 @@ export const UpgradeDialogComponent: React.FC<UpgradeDialogComponentProps> = ({o
                                     transition={{duration: 0.5, ease: [0.22, 1, 0.36, 1]}}>
                             <Text fz={1.6} hierarchy={"primary"}
                                   style={{textDecoration: discountActive ? "line-through" : "none"}}>
-                                {`${discount.basePrice.toFixed(2).replace(".", ",")}€`}
+                                {config ? `${config.upgradeBasePrice.toFixed(2).replace(".", ",")}€` : ""}
                             </Text>
                         </motion.div>
                         <AnimatePresence>
@@ -290,11 +305,11 @@ export const UpgradeDialogComponent: React.FC<UpgradeDialogComponentProps> = ({o
                                     <Flex style={{flexDirection: "column", minWidth: 0}}>
                                         <Text display={"inline"} style={{verticalAlign: "baseline"}} size={"md"} hierarchy={"tertiary"} fw={500}>
                                             {"Use "}
-                                            <Text display={"inline"} style={{verticalAlign: "baseline"}} size={"md"} hierarchy={"primary"} fw={500}>{discount.code}</Text>
-                                            {` for ${discount.label}`}
+                                            <Text display={"inline"} style={{verticalAlign: "baseline"}} size={"md"} hierarchy={"primary"} fw={500}>{config?.upgradeDiscountCode}</Text>
+                                            {` for ${config?.upgradeDiscountLabel}`}
                                         </Text>
                                         <Text size={"sm"} hierarchy={"tertiary"}>
-                                            Once the timer runs out, this code is gone.
+                                            {config?.upgradeDiscountHint}
                                         </Text>
                                     </Flex>
                                     </motion.div>
@@ -321,7 +336,7 @@ export const UpgradeDialogComponent: React.FC<UpgradeDialogComponentProps> = ({o
                 <BorderBeam strength={1} size={"line"} theme={"dark"} duration={5} style={{display: "block"}}>
                     <Button color={"tertiary"} paddingSize={"xxs"} disabled={pending}
                             onClick={upgrade} justify={"center"} w={"100%"}>
-                        Choose your plan
+                        {config?.upgradeCtaLabel}
                         <IconArrowRight size={16}/>
                     </Button>
                 </BorderBeam>
