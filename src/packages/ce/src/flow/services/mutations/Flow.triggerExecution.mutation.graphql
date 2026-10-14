@@ -1,4 +1,4 @@
-mutation flowTriggerExecution($flowId: FlowID!, $input: JSON!, $runtimeId: RuntimeID!) {
+mutation flowTriggerExecution($flowId: FlowID!, $input: JSON, $runtimeId: RuntimeID!) {
     namespacesProjectsFlowsTriggerExecution(input: {
         flowId: $flowId
         input: $input
