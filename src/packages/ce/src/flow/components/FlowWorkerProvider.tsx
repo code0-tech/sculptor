@@ -202,7 +202,7 @@ export const useTypeExtractionAction = () =>
     useWorkerAction<string, FlowWorkerTypeExtractionPayload>("type_extraction");
 
 export const useValueExtractionAction = () =>
-    useWorkerAction<any[], FlowWorkerValueExtractionPayload>("value_extraction");
+    useWorkerAction<LiteralValue, FlowWorkerValueExtractionPayload>("value_extraction");
 
 export const useJsonSchemaAction = () =>
     useWorkerAction<JsonSchema, FlowWorkerJsonSchemaPayload>("json_schema");

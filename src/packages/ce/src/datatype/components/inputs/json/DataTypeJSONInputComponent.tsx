@@ -9,8 +9,8 @@ import {
 } from "@edition/datatype/components/inputs/json/DataTypeJSONInputEditDialogComponent";
 import {DataTypeInputValueComponent} from "@edition/datatype/components/inputs/DataTypeInputValueComponent";
 import {useDebouncedCallback} from "use-debounce";
-import {DataInput, Schema} from "@code0-tech/triangulum";
-import {generateDefaultDataValue} from "@edition/datatype/utils/DataType.defaultValue.util";
+import {Schema} from "@code0-tech/triangulum";
+import {useDefaultValue} from "@edition/datatype/hooks/DataType.defaultValue.hook";
 
 export interface EditableJSONEntry {
     key: string
@@ -34,12 +34,16 @@ export const DataTypeJSONInputComponent: React.FC<DataTypeJSONInputComponentProp
         onChange?.(value)
     }, 200)
 
+    const schemaType = React.useMemo(
+        () => ("schema" in schema ? schema.schema as Schema : schema as Schema).type,
+        [schema]
+    )
+
+    const defaultValue = useDefaultValue(schemaType)
+
     const value = React.useMemo(
-        () => initialValue ?? (("schema" in schema ? schema.schema.input === "list" : schema.input === "list") ? {
-            __typename: "LiteralValue",
-            value: []
-        } as LiteralValue : generateDefaultDataValue("schema" in schema ? schema.schema as DataInput : schema as DataInput)),
-            [initialValue, schema]
+        () => initialValue ?? defaultValue ?? {__typename: "LiteralValue", value: {}} as LiteralValue,
+        [initialValue, defaultValue]
     )
 
     const setCollapsedState = (path: string[], collapsed: boolean) => {

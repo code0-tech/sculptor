@@ -27,8 +27,9 @@ import {useSchemaAction} from "@edition/flow/components/FlowWorkerProvider";
 import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent";
 import {useFlowExecutionStore} from "@edition/flow/hooks/Flow.execution.hook";
 import {useFlowViewStore} from "@edition/flow/hooks/Flow.view.hook";
-import {DataInput, Schema} from "@code0-tech/triangulum";
-import {generateDefaultDataValue} from "@edition/datatype/utils/DataType.defaultValue.util";
+import {Schema} from "@code0-tech/triangulum";
+import {useDefaultValue} from "@edition/datatype/hooks/DataType.defaultValue.hook";
+import {isVoidType} from "@edition/datatype/utils/DataType.isVoidType.util";
 
 export interface FlowExecuteDialogComponentProps {
     flowId: Flow['id']
@@ -72,16 +73,16 @@ export const FlowExecuteDialogComponent: React.FC<FlowExecuteDialogComponentProp
     // (there is no explicit reset API on useForm).
     const [formSeed, setFormSeed] = React.useState(0)
 
-    const initialValues = React.useMemo<ManualExecutionForm>(() => ({input: undefined}), [formSeed])
+    const defaultInput = useDefaultValue(triggerSchema?.type)
+
+    const initialValues = React.useMemo<ManualExecutionForm>(
+        () => ({input: defaultInput ?? undefined}),
+        [formSeed, defaultInput]
+    )
 
     const [inputs, validate, values] = useForm<ManualExecutionForm>({
         initialValues,
     })
-
-    const defaultInput = React.useMemo(
-        () => triggerSchema?.input === "list" ? [] : generateDefaultDataValue(triggerSchema as DataInput).value,
-        [triggerSchema]
-    )
 
     const flow = React.useMemo(
         () => flowService.getById(flowId, {
@@ -192,7 +193,7 @@ export const FlowExecuteDialogComponent: React.FC<FlowExecuteDialogComponentProp
         flowService.triggerExecution({
             flowId: flowId!,
             runtimeId,
-            input: (values.input?.value ?? defaultInput) as any,
+            input: (values.input?.value ?? defaultInput?.value ?? null) as any,
         }).then(payload => {
             setExecuting(false)
             if ((payload?.errors?.length ?? 0) > 0 || !payload?.executionIdentifier) return
@@ -249,7 +250,7 @@ export const FlowExecuteDialogComponent: React.FC<FlowExecuteDialogComponentProp
                 <hr style={{width: "100%"}} color={"#201e2c"}/>
                 <Spacing spacing={"xl"}/>
                 <div data-qa-selector={"flow-builder-manual-execution-form"}>
-                    {triggerSchema && triggerSchema.input !== "generic" && (
+                    {triggerSchema && !isVoidType(triggerSchema.type) && (
                         <>
                             <DataTypeInputComponent
                                 data-qa-selector={"flow-builder-manual-execution-input"}
