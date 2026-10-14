@@ -227,7 +227,7 @@ export const RolePermissionView: React.FC = () => {
         }
     })
 
-    return <TabContent pl={"0.7"} value={"permission"} style={{overflow: "hidden"}}>
+    return <TabContent tabIndex={-1} pl={"0.7"} value={"permission"} style={{overflow: "hidden"}}>
         <Flex align={"center"} justify={"space-between"}>
             <Text size={"lg"} hierarchy={"primary"} display={"block"}>Permissions</Text>
             <Button paddingSize={"xxs"} color={"success"} variant={"none"} onClick={validate}>Save changes</Button>

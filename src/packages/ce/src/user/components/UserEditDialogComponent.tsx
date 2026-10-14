@@ -202,7 +202,7 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                                   </Button>
                               </TabTrigger>
                           </TabList>}>
-        <TabContent value={"general"} style={{overflow: "hidden"}}>
+        <TabContent tabIndex={-1} value={"general"} style={{overflow: "hidden"}}>
             <Flex justify={"space-between"} align={"center"}>
                 <Text size={"lg"} hierarchy={"primary"} display={"block"}>General</Text>
                 <Button paddingSize={"xxs"} color={"success"} variant={"none"}
@@ -252,7 +252,7 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                            description={"A short bio or notes shown on the user's profile."}
                            {...inputs.getInputProps("readme")}/>
         </TabContent>
-        <TabContent value={"permissions"}
+        <TabContent tabIndex={-1} value={"permissions"}
                     style={{overflow: "hidden", display: isSelf ? "none" : undefined}}>
             <Flex justify={"space-between"} align={"center"}>
                 <Text size={"lg"} hierarchy={"primary"} display={"block"}>Access</Text>
@@ -291,7 +291,7 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                 </CardSection>
             </Card>
         </TabContent>
-        <TabContent value={"security"} style={{overflow: "hidden"}}>
+        <TabContent tabIndex={-1} value={"security"} style={{overflow: "hidden"}}>
             <Flex justify={"space-between"} align={"center"}>
                 <Text size={"lg"} hierarchy={"primary"} display={"block"}>Security</Text>
                 <Button paddingSize={"xxs"} color={"success"} variant={"none"}
@@ -321,7 +321,7 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
         </TabContent>
         {isSelf ? <UserMfaView/> : <></>}
         {isSelf && providers.length > 0 ? <UserIdentitiesView/> : <></>}
-        <TabContent value={"sessions"}
+        <TabContent tabIndex={-1} value={"sessions"}
                     style={{
                         overflow: "hidden",
                         height: "100%",

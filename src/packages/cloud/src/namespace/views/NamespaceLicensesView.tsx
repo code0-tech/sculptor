@@ -73,7 +73,7 @@ export const NamespaceLicensesView: React.FC = () => {
 
     const atRisk = getUsagesAtRisk(usages, afterDate, beforeDate)
 
-    return <TabContent value={"licenses"}>
+    return <TabContent tabIndex={-1} value={"licenses"}>
         <Flex justify={"space-between"} align={"center"}>
             <Flex align={"center"} style={{gap: "0.5rem"}}>
                 <Text size={"lg"} hierarchy={"primary"} display={"block"}>Licenses</Text>

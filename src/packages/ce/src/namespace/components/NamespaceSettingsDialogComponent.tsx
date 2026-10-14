@@ -82,17 +82,17 @@ export const NamespaceSettingsDialogComponent: React.FC<NamespaceSettingsDialogC
                               )}
                               <NamespaceLicensesTabTriggerView/>
                           </TabList>}>
-        <TabContent value={"members"} style={{overflow: "hidden"}}>
+        <TabContent tabIndex={-1} value={"members"} style={{overflow: "hidden"}}>
             <MembersView/>
         </TabContent>
-        <TabContent value={"roles"} style={{overflow: "hidden"}}>
+        <TabContent tabIndex={-1} value={"roles"} style={{overflow: "hidden"}}>
             <RolesView/>
         </TabContent>
         <NamespaceServersView/>
-        <TabContent value={"general"} style={{overflow: "hidden"}}>
+        <TabContent tabIndex={-1} value={"general"} style={{overflow: "hidden"}}>
             <NamespaceGeneralSettingsView/>
         </TabContent>
-        <TabContent value={"delete"} style={{overflow: "hidden"}}>
+        <TabContent tabIndex={-1} value={"delete"} style={{overflow: "hidden"}}>
             <NamespaceDeleteView/>
         </TabContent>
         <NamespaceLicensesView/>

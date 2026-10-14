@@ -84,7 +84,7 @@ export const ProjectSettingsGeneralView: React.FC = () => {
         }
     })
 
-    return <TabContent value={"general"} style={{overflow: "hidden"}}>
+    return <TabContent tabIndex={-1} value={"general"} style={{overflow: "hidden"}}>
         <Flex justify={"space-between"} align={"center"}>
             <Text size={"lg"} hierarchy={"primary"} display={"block"}>General</Text>
             <Button paddingSize={"xxs"} color={"success"} variant={"none"} onClick={validate}>

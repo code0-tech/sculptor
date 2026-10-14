@@ -35,7 +35,7 @@ export const RoleDeleteView: React.FC = () => {
         })
     }, [])
 
-    return <TabContent pl={"0.7"} value={"delete"} style={{overflow: "hidden"}}>
+    return <TabContent tabIndex={-1} pl={"0.7"} value={"delete"} style={{overflow: "hidden"}}>
         <Text size={"lg"} hierarchy={"primary"} display={"block"}>Delete role</Text>
         <Spacing spacing={"xs"}/>
         <Text size={"md"} hierarchy={"tertiary"}>

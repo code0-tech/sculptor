@@ -71,7 +71,7 @@ export const ProjectSettingsAssignedServersView: React.FC = () => {
         })
     }, [projectService, projectId, project])
 
-    return <TabContent value={"servers"} style={{overflow: "hidden"}}>
+    return <TabContent tabIndex={-1} value={"servers"} style={{overflow: "hidden"}}>
         <Flex justify={"space-between"} align={"center"}>
             <Flex align={"center"} style={{gap: "0.5rem"}}>
                 <Text size={"lg"} hierarchy={"primary"} display={"block"}>Assigned servers</Text>

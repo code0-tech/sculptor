@@ -33,7 +33,7 @@ export const UserIdentitiesView: React.FC = () => {
         ? window.location.pathname + window.location.search
         : undefined
 
-    return <TabContent value={"connections"}
+    return <TabContent tabIndex={-1} value={"connections"}
                        style={{
                            overflow: "hidden",
                            height: "100%",

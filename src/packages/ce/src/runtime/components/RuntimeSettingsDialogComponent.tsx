@@ -121,7 +121,7 @@ export const RuntimeSettingsDialogComponent: React.FC<RuntimeSettingsDialogCompo
                                   </Button>
                               </TabTrigger>
                           </TabList>}>
-        <TabContent value={"general"} style={{overflow: "hidden"}}>
+        <TabContent tabIndex={-1} value={"general"} style={{overflow: "hidden"}}>
             <Flex justify={"space-between"} align={"center"}>
                 <Text size={"lg"} hierarchy={"primary"} display={"block"}>General</Text>
                 <Button paddingSize={"xxs"} color={"success"} variant={"none"} onClick={validate}>
@@ -145,7 +145,7 @@ export const RuntimeSettingsDialogComponent: React.FC<RuntimeSettingsDialogCompo
                        description={"A short summary of what this runtime is used for."}
                        {...inputs.getInputProps("description")}/>
         </TabContent>
-        <TabContent value={"access"} style={{overflow: "hidden"}}>
+        <TabContent tabIndex={-1} value={"access"} style={{overflow: "hidden"}}>
             <Text size={"lg"} hierarchy={"primary"} display={"block"}>How to connect</Text>
             <Spacing spacing={"xs"}/>
             <Text size={"md"} hierarchy={"tertiary"}>
@@ -160,7 +160,7 @@ export const RuntimeSettingsDialogComponent: React.FC<RuntimeSettingsDialogCompo
                 </Button>
             )}
         </TabContent>
-        <TabContent value={"delete"} style={{overflow: "hidden"}}>
+        <TabContent tabIndex={-1} value={"delete"} style={{overflow: "hidden"}}>
             <Text size={"lg"} hierarchy={"primary"} display={"block"}>Delete runtime</Text>
             <Spacing spacing={"xs"}/>
             <Text size={"md"} hierarchy={"tertiary"}>

@@ -104,7 +104,7 @@ export const UserMfaView: React.FC = () => {
         }
     })
 
-    return <TabContent value={"mfa"}>
+    return <TabContent tabIndex={-1} value={"mfa"}>
         <Text size={"lg"} hierarchy={"primary"} display={"block"}>
             2-Step Verification
         </Text>

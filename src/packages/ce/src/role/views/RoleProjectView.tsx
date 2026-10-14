@@ -114,7 +114,7 @@ export const RoleProjectView: React.FC = () => {
         [assignedProjects, nameFilter]
     )
 
-    return <TabContent pl={"0.7"} value={"project"} style={{overflow: "hidden"}}>
+    return <TabContent tabIndex={-1} pl={"0.7"} value={"project"} style={{overflow: "hidden"}}>
         <Flex align={"center"} justify={"space-between"}>
             <Flex align={"center"} style={{gap: "0.5rem"}}>
                 <Text size={"lg"} hierarchy={"primary"} display={"block"}>Assigned projects</Text>

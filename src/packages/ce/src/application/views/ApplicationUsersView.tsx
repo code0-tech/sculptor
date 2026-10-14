@@ -59,7 +59,7 @@ export const ApplicationUsersView: React.FC = () => {
 
     const sortProps: DataTableSortProps = {[sort]: "asc"}
 
-    return <TabContent value={"users"}>
+    return <TabContent tabIndex={-1} value={"users"}>
         <Flex justify={"space-between"} align={"center"}>
             <Flex align={"center"} style={{gap: "0.5rem"}}>
                 <Text size={"lg"} hierarchy={"primary"} display={"block"}>Users</Text>

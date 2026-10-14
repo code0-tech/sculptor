@@ -63,7 +63,7 @@ export const ApplicationGeneralSettingsView: React.FC = () => {
         }
     })
 
-    return <TabContent value={"general"}>
+    return <TabContent tabIndex={-1} value={"general"}>
         <Flex justify={"space-between"} align={"center"}>
             <Text size={"lg"} hierarchy={"primary"} display={"block"}>Settings</Text>
             <Button paddingSize={"xxs"} color={"success"} variant={"none"} onClick={validate}>Save changes</Button>

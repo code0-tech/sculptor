@@ -63,7 +63,7 @@ export const ApplicationServersView: React.FC = () => {
 
     const sortProps: DataTableSortProps = {[sort]: "asc"}
 
-    return <TabContent value={"servers"}>
+    return <TabContent tabIndex={-1} value={"servers"}>
         <Flex justify={"space-between"} align={"center"}>
             <Flex align={"center"} style={{gap: "0.5rem"}}>
                 <Text size={"lg"} hierarchy={"primary"} display={"block"}>Servers</Text>

@@ -43,7 +43,7 @@ export const ApplicationRestrictionsView: React.FC = () => {
         }
     })
 
-    return <TabContent value={"restrictions"}>
+    return <TabContent tabIndex={-1} value={"restrictions"}>
         <Flex justify={"space-between"} align={"center"}>
             <Text size={"lg"} hierarchy={"primary"} display={"block"}>Restrictions</Text>
             <Button paddingSize={"xxs"} color={"success"} variant={"none"} onClick={validate}>Save changes</Button>

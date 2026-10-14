@@ -103,7 +103,7 @@ export const ApplicationIdentityProvidersView: React.FC = () => {
         })
     }, [providers, applicationService])
 
-    return <TabContent value={"identityProviders"}>
+    return <TabContent tabIndex={-1} value={"identityProviders"}>
         <Flex justify={"space-between"} align={"center"}>
             <Flex align={"center"} style={{gap: "0.5rem"}}>
                 <Text size={"lg"} hierarchy={"primary"} display={"block"}>Identity providers</Text>

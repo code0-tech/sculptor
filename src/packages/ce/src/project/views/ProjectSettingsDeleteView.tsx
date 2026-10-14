@@ -30,7 +30,7 @@ export const ProjectSettingsDeleteView: React.FC = () => {
     }, [projectId])
 
 
-    return <TabContent value={"delete"} style={{overflow: "hidden"}}>
+    return <TabContent tabIndex={-1} value={"delete"} style={{overflow: "hidden"}}>
         <Text size={"lg"} hierarchy={"primary"} display={"block"}>Delete project</Text>
         <Spacing spacing={"xs"}/>
         <Text size={"md"} hierarchy={"tertiary"}>
