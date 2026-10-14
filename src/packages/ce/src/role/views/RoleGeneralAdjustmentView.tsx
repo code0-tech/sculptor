@@ -2,7 +2,6 @@
 
 import React from "react";
 import {Button, Flex, Spacing, Text, TextInput, useForm, useService, useStore} from "@code0-tech/pictor";
-import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {RoleService} from "@edition/role/services/Role.service";
 import type {Namespace, NamespaceRole} from "@code0-tech/sagittarius-graphql-types";
 import {useParams} from "next/navigation";
@@ -56,7 +55,7 @@ export const RoleGeneralAdjustmentView: React.FC = () => {
         }
     })
 
-    return <TabContent tabIndex={-1} pl={"0.7"} value={"general"} style={{overflow: "hidden"}}>
+    return <>
         <Flex align={"center"} justify={"space-between"}>
             <Text size={"lg"} hierarchy={"primary"} display={"block"}>General</Text>
             <Button paddingSize={"xxs"} color={"success"} variant={"none"} onClick={validate}>Save changes</Button>
@@ -70,5 +69,5 @@ export const RoleGeneralAdjustmentView: React.FC = () => {
                    title={"Name"}
                    description={"The display name shown for this role."}
                    {...inputs.getInputProps("name")}/>
-    </TabContent>
+    </>
 }

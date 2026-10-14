@@ -20,7 +20,6 @@ import {
 import Link from "next/link";
 import {IconPlus, IconShoppingCart} from "@tabler/icons-react";
 import {ApplicationLicensesListComponent} from "@ee-internal/application/components/ApplicationLicensesListComponent";
-import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {ApplicationService} from "@edition/application/services/Application.service";
 import {UsageService} from "@edition/usage/services/Usage.service";
 import {useUsageLicense} from "@edition/usage/hooks/Usage.license.hook";
@@ -61,7 +60,7 @@ export const ApplicationLicensesView: React.FC = () => {
 
     const atRisk = getUsagesAtRisk(usages, afterDate, beforeDate)
 
-    return <TabContent tabIndex={-1} value={"license"}>
+    return <>
         <Flex justify={"space-between"} align={"center"}>
             <Flex align={"center"} style={{gap: "0.5rem"}}>
                 <Text size={"lg"} hierarchy={"primary"} display={"block"}>Licenses</Text>
@@ -141,5 +140,5 @@ export const ApplicationLicensesView: React.FC = () => {
         <Text size={"md"} hierarchy={"secondary"}>All used or future licenses</Text>
         <Spacing spacing={"lg"}/>
         <ApplicationLicensesListComponent/>
-    </TabContent>
+    </>
 }

@@ -1,5 +1,3 @@
-import React from "react";
+import {SettingDialogTab} from "@core/components/SettingDialog";
 
-export const NamespaceLicensesTabTriggerView: React.FC = () => {
-    return null
-}
+export const NamespaceLicensesTab: SettingDialogTab | undefined = undefined

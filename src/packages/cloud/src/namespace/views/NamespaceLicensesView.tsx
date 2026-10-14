@@ -18,7 +18,6 @@ import {
     useStore
 } from "@code0-tech/pictor";
 import {IconPlus, IconShoppingCart} from "@tabler/icons-react";
-import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {
     NamespaceLicensesListComponent
 } from "@cloud-internal/namespace/components/NamespaceLicensesListComponent";
@@ -73,7 +72,7 @@ export const NamespaceLicensesView: React.FC = () => {
 
     const atRisk = getUsagesAtRisk(usages, afterDate, beforeDate)
 
-    return <TabContent tabIndex={-1} value={"licenses"}>
+    return <>
         <Flex justify={"space-between"} align={"center"}>
             <Flex align={"center"} style={{gap: "0.5rem"}}>
                 <Text size={"lg"} hierarchy={"primary"} display={"block"}>Licenses</Text>
@@ -150,5 +149,5 @@ export const NamespaceLicensesView: React.FC = () => {
         <Text size={"md"} hierarchy={"secondary"}>All used or future licenses</Text>
         <Spacing spacing={"lg"}/>
         <NamespaceLicensesListComponent namespaceId={namespaceId}/>
-    </TabContent>
+    </>
 }

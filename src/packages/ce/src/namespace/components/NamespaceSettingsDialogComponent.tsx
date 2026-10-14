@@ -1,8 +1,7 @@
 "use client"
 
 import React from "react";
-import {Button, Text, useService, useStore} from "@code0-tech/pictor";
-import {TabContent, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
+import {useService, useStore} from "@code0-tech/pictor";
 import {IconServer, IconSettings2, IconShieldLock, IconTrash, IconUsers} from "@tabler/icons-react";
 import {useParams} from "next/navigation";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
@@ -12,8 +11,7 @@ import {RolesView} from "@edition/role/views/RolesView";
 import {NamespaceServersView} from "@edition/namespace/views/NamespaceServersView";
 import {NamespaceGeneralSettingsView} from "@edition/namespace/views/NamespaceGeneralSettingsView";
 import {NamespaceDeleteView} from "@edition/namespace/views/NamespaceDeleteView";
-import {NamespaceLicensesView} from "@edition/namespace/views/NamespaceLicensesView";
-import {NamespaceLicensesTabTriggerView} from "@edition/namespace/views/NamespaceLicensesTabTriggerView";
+import {NamespaceLicensesTab} from "@edition/namespace/views/NamespaceLicensesTabTriggerView";
 import {SettingDialog} from "@core/components/SettingDialog";
 
 export interface NamespaceSettingsDialogComponentProps {
@@ -45,56 +43,37 @@ export const NamespaceSettingsDialogComponent: React.FC<NamespaceSettingsDialogC
                           onOpenChange={(open) => onOpenChange?.(open)}
                           title={"Workspace settings"}
                           description={"Members, roles and general settings for your workspace. These settings affect everyone who has access to this workspace."}
-                          trigger={<TabList>
-                              <TabTrigger value={"members"} w={"100%"} asChild>
-                                  <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                      <IconUsers size={13}/>
-                                      <Text size={"md"}>Members</Text>
-                                  </Button>
-                              </TabTrigger>
-                              <TabTrigger value={"roles"} w={"100%"} asChild>
-                                  <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                      <IconShieldLock size={13}/>
-                                      <Text size={"md"}>Roles</Text>
-                                  </Button>
-                              </TabTrigger>
-                              <TabTrigger value={"servers"} w={"100%"} asChild>
-                                  <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                      <IconServer size={13}/>
-                                      <Text size={"md"}>Servers</Text>
-                                  </Button>
-                              </TabTrigger>
-                              {isOrganization && (
-                                  <>
-                                      <TabTrigger value={"general"} w={"100%"} asChild>
-                                          <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                              <IconSettings2 size={13}/>
-                                              <Text size={"md"}>General</Text>
-                                          </Button>
-                                      </TabTrigger>
-                                      <TabTrigger value={"delete"} w={"100%"} asChild>
-                                          <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                              <IconTrash size={13}/>
-                                              <Text size={"md"}>Delete workspace</Text>
-                                          </Button>
-                                      </TabTrigger>
-                                  </>
-                              )}
-                              <NamespaceLicensesTabTriggerView/>
-                          </TabList>}>
-        <TabContent tabIndex={-1} value={"members"} style={{overflow: "hidden"}}>
-            <MembersView/>
-        </TabContent>
-        <TabContent tabIndex={-1} value={"roles"} style={{overflow: "hidden"}}>
-            <RolesView/>
-        </TabContent>
-        <NamespaceServersView/>
-        <TabContent tabIndex={-1} value={"general"} style={{overflow: "hidden"}}>
-            <NamespaceGeneralSettingsView/>
-        </TabContent>
-        <TabContent tabIndex={-1} value={"delete"} style={{overflow: "hidden"}}>
-            <NamespaceDeleteView/>
-        </TabContent>
-        <NamespaceLicensesView/>
-    </SettingDialog>
+                          tabs={[
+                              {
+                                  value: "members",
+                                  label: "Members",
+                                  icon: IconUsers,
+                                  content: <MembersView/>
+                              },
+                              {
+                                  value: "roles",
+                                  label: "Roles",
+                                  icon: IconShieldLock,
+                                  content: <RolesView/>
+                              },
+                              {
+                                  value: "servers",
+                                  label: "Servers",
+                                  icon: IconServer,
+                                  content: <NamespaceServersView/>
+                              },
+                              isOrganization ? {
+                                  value: "general",
+                                  label: "General",
+                                  icon: IconSettings2,
+                                  content: <NamespaceGeneralSettingsView/>
+                              } : undefined,
+                              isOrganization ? {
+                                  value: "delete",
+                                  label: "Delete workspace",
+                                  icon: IconTrash,
+                                  content: <NamespaceDeleteView/>
+                              } : undefined,
+                              NamespaceLicensesTab
+                          ]}/>
 }

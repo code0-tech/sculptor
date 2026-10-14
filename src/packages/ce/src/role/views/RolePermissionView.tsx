@@ -17,7 +17,6 @@ import {
 import React from "react";
 import type {Namespace, NamespaceRole, NamespaceRoleAbility} from "@code0-tech/sagittarius-graphql-types";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
-import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {useParams} from "next/navigation";
 import {RoleService} from "@edition/role/services/Role.service";
 import {RolePermissionComponent} from "@edition/role/components/RolePermissionComponent";
@@ -227,7 +226,7 @@ export const RolePermissionView: React.FC = () => {
         }
     })
 
-    return <TabContent tabIndex={-1} pl={"0.7"} value={"permission"} style={{overflow: "hidden"}}>
+    return <>
         <Flex align={"center"} justify={"space-between"}>
             <Text size={"lg"} hierarchy={"primary"} display={"block"}>Permissions</Text>
             <Button paddingSize={"xxs"} color={"success"} variant={"none"} onClick={validate}>Save changes</Button>
@@ -300,5 +299,5 @@ export const RolePermissionView: React.FC = () => {
                 </CardSection>
             })}
         </Card>
-    </TabContent>
+    </>
 }

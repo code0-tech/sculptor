@@ -12,7 +12,6 @@ import {UserService} from "@edition/user/services/User.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {QrCodeComponent} from "@core/components/QrCodeComponent";
 import {useMfa} from "@edition/user/components/MfaProviderComponent";
-import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 
 // Fallback used during SSR (no `window`) or when the hostname can't be read.
@@ -104,7 +103,7 @@ export const UserMfaView: React.FC = () => {
         }
     })
 
-    return <TabContent tabIndex={-1} value={"mfa"}>
+    return <>
         <Text size={"lg"} hierarchy={"primary"} display={"block"}>
             2-Step Verification
         </Text>
@@ -258,5 +257,5 @@ export const UserMfaView: React.FC = () => {
                 })
             })}>Set up authenticator app</Button>
         )}
-    </TabContent>
+    </>
 }

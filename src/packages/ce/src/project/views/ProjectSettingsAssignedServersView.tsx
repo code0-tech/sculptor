@@ -19,7 +19,6 @@ import {
     useService,
     useStore
 } from "@code0-tech/pictor";
-import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {IconPlus} from "@tabler/icons-react";
 import {useParams, useRouter} from "next/navigation";
 import {Namespace, NamespaceProject, Runtime} from "@code0-tech/sagittarius-graphql-types";
@@ -71,7 +70,7 @@ export const ProjectSettingsAssignedServersView: React.FC = () => {
         })
     }, [projectService, projectId, project])
 
-    return <TabContent tabIndex={-1} value={"servers"} style={{overflow: "hidden"}}>
+    return <>
         <Flex justify={"space-between"} align={"center"}>
             <Flex align={"center"} style={{gap: "0.5rem"}}>
                 <Text size={"lg"} hierarchy={"primary"} display={"block"}>Assigned servers</Text>
@@ -121,5 +120,5 @@ export const ProjectSettingsAssignedServersView: React.FC = () => {
                                               const number = runtime?.id?.match(/Runtime\/(\d+)$/)?.[1]
                                               if (number) router.push(`/namespace/${namespaceIndex}/runtimes/${number}/settings`)
                                           }}/>
-    </TabContent>
+    </>
 }
