@@ -105,7 +105,9 @@ export const SettingDialog: React.FC<SettingDialogProps> = (props) => {
                         <Spacing spacing={"xl"}/>*/}
                             <SegmentedControl type={"single"}
                                               color={"secondary"}
-                                              className={"setting-dialog__tabs"}
+                                              style={{
+                                                  flexDirection: "column"
+                                              }}
                                               value={activeTab}
                                               onValueChange={(value) => value && onTabChange(value)}>
                                 {visibleTabs.map((tab) => (
