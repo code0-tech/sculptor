@@ -55,10 +55,8 @@ export const OrganizationCreateDialogComponent: React.FC<OrganizationCreateDialo
                    placeholder={"E.g. CodeZero"}
                    {...inputs.getInputProps("name")}/>
         <Spacing spacing={"xl"}/>
-        <Flex justify={"end"}>
-            <Button data-qa-selector={"dashboard-organization-create-send"} color={"success"} onClick={validate}>
-                Create organization
-            </Button>
-        </Flex>
+        <Button w={"100%"} data-qa-selector={"dashboard-organization-create-send"} color={"success"} onClick={validate}>
+            Create organization
+        </Button>
     </InputDialog>
 }
