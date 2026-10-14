@@ -11,6 +11,10 @@ import {
     MenuPortal,
     MenuSeparator,
     MenuTrigger,
+    ScrollArea,
+    ScrollAreaScrollbar,
+    ScrollAreaThumb,
+    ScrollAreaViewport,
     Spacing,
     Text,
     useService,
@@ -132,24 +136,34 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
                     </Menu>
                 }
             >
-                <FileTabsTrigger value={flowId!}
-                                 key={flowId!}>
-                    <DisplayIcon color={hashToColor(flowId!)} size={13}/>
-                    <Text size={"sm"}>{flow?.type?.names?.[0]?.content || FALLBACK_FLOW_TYPE_NAME}</Text>
-                </FileTabsTrigger>
-                {
-                    nodes?.map(node => {
+                <ScrollArea w={"100%"} type={"scroll"}>
+                    <ScrollAreaViewport>
+                        <Flex align={"center"} style={{gap: "0.422rem"}}>
+                            <FileTabsTrigger value={flowId!}
+                                             key={flowId!}>
+                                <DisplayIcon color={hashToColor(flowId!)} size={13}/>
+                                <Text
+                                    size={"sm"}>{flow?.type?.names?.[0]?.content || FALLBACK_FLOW_TYPE_NAME}</Text>
+                            </FileTabsTrigger>
+                            {
+                                nodes?.map(node => {
 
-                        const DisplayIcon = icon(node?.functionDefinition?.displayIcon as IconString)
+                                    const DisplayIcon = icon(node?.functionDefinition?.displayIcon as IconString)
 
-                        return <FileTabsTrigger value={node?.id!}
-                                                key={node?.id!}>
-                            <DisplayIcon color={hashToColor(node?.id!)} size={13}/>
-                            <Text
-                                size={"sm"}>{node?.functionDefinition?.names?.[0]?.content || FALLBACK_FUNCTION_NAME}</Text>
-                        </FileTabsTrigger>
-                    })
-                }
+                                    return <FileTabsTrigger value={node?.id!}
+                                                            key={node?.id!}>
+                                        <DisplayIcon color={hashToColor(node?.id!)} size={13}/>
+                                        <Text
+                                            size={"sm"}>{node?.functionDefinition?.names?.[0]?.content || FALLBACK_FUNCTION_NAME}</Text>
+                                    </FileTabsTrigger>
+                                })
+                            }
+                        </Flex>
+                    </ScrollAreaViewport>
+                    <ScrollAreaScrollbar orientation={"horizontal"}>
+                        <ScrollAreaThumb/>
+                    </ScrollAreaScrollbar>
+                </ScrollArea>
             </FileTabsList>}>
                 <>
                     {

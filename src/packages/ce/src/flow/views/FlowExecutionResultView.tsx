@@ -26,6 +26,10 @@ import {
     MenuItem,
     MenuPortal,
     MenuTrigger,
+    ScrollArea,
+    ScrollAreaScrollbar,
+    ScrollAreaThumb,
+    ScrollAreaViewport,
     Spacing,
     Text,
     Tooltip,
@@ -266,38 +270,51 @@ export const FlowExecutionResultView: React.FC = () => {
                     ) : null
                 }
             >
-                {pendingExecutions.map(execution => (
-                    <FileTabsTrigger value={execution.executionIdentifier}
-                                     key={execution.executionIdentifier}>
-                        <Flex align={"center"} style={{gap: "0.35rem"}}>
-                            <motion.div style={{display: "flex"}}
-                                        animate={{rotate: 360}}
-                                        transition={{duration: 1, ease: "linear", repeat: Infinity}}>
-                                <IconLoader2 size={13}/>
-                            </motion.div>
-                            <Text size={"sm"}>
-                                Executing...
-                            </Text>
-                        </Flex>
-                    </FileTabsTrigger>
-                ))}
-                {Array.from(ganttItems)?.map(([id, items]) => {
+                <ScrollArea w={"100%"} type={"scroll"}>
+                    <ScrollAreaViewport>
+                        <Flex align={"center"} style={{gap: "0.422rem"}}>
+                            {pendingExecutions.map(execution => (
+                                <FileTabsTrigger value={execution.executionIdentifier}
+                                                 key={execution.executionIdentifier}>
+                                    <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                        <motion.div style={{display: "flex"}}
+                                                    animate={{rotate: 360}}
+                                                    transition={{
+                                                        duration: 1,
+                                                        ease: "linear",
+                                                        repeat: Infinity
+                                                    }}>
+                                            <IconLoader2 size={13}/>
+                                        </motion.div>
+                                        <Text size={"sm"}>
+                                            Executing...
+                                        </Text>
+                                    </Flex>
+                                </FileTabsTrigger>
+                            ))}
+                            {Array.from(ganttItems)?.map(([id, items]) => {
 
-                    const execution = flowExecutionResults.find(execution => execution?.id === id)
+                                const execution = flowExecutionResults.find(execution => execution?.id === id)
 
-                    return <FileTabsTrigger value={id!}
-                                            key={id!}>
-                        <Flex align={"center"} style={{gap: "0.35rem"}}>
-                            <IconPlayerPlayFilled size={13} color={hashToColor(id ?? "")}/>
-                            <Text size={"sm"}>
-                                #{id?.match(/\/ExecutionResult\/(\d+)(?:\/|$)/)?.[1]}
-                            </Text>
-                            <Text size={"sm"} hierarchy={"tertiary"}>
-                                {formatDistanceToNow(execution?.createdAt ?? "")}
-                            </Text>
+                                return <FileTabsTrigger value={id!}
+                                                        key={id!}>
+                                    <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                        <IconPlayerPlayFilled size={13} color={hashToColor(id ?? "")}/>
+                                        <Text size={"sm"}>
+                                            #{id?.match(/\/ExecutionResult\/(\d+)(?:\/|$)/)?.[1]}
+                                        </Text>
+                                        <Text size={"sm"} hierarchy={"tertiary"}>
+                                            {formatDistanceToNow(execution?.createdAt ?? "")}
+                                        </Text>
+                                    </Flex>
+                                </FileTabsTrigger>
+                            })}
                         </Flex>
-                    </FileTabsTrigger>
-                })}
+                    </ScrollAreaViewport>
+                    <ScrollAreaScrollbar orientation={"horizontal"}>
+                        <ScrollAreaThumb/>
+                    </ScrollAreaScrollbar>
+                </ScrollArea>
             </FileTabsList>}>
                 <>
                     {pendingExecutions.map(execution => (
