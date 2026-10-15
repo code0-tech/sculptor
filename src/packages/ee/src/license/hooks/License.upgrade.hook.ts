@@ -7,8 +7,11 @@ import {getLicenseCheckoutUrl} from "@core/util/license";
 
 export type LicenseUpgradeTarget = "checkout" | "subscription"
 
+export type LicenseUpgradeAction = "license" | "upgrade" | "customer"
+
 export interface LicenseUpgradeOptions {
     target?: LicenseUpgradeTarget
+    action?: LicenseUpgradeAction
     license?: License | null
 }
 
@@ -24,6 +27,7 @@ export const useLicenseUpgrade = (reference: string, namespaceId?: string | numb
     const [pending, startTransition] = React.useTransition()
 
     const target = options?.target
+    const action = options?.action ?? (options?.target ? undefined : "upgrade")
 
     const upgrade = React.useCallback(() => {
         const frame = window.open("about:blank", "_blank")
@@ -44,9 +48,11 @@ export const useLicenseUpgrade = (reference: string, namespaceId?: string | numb
 
             const url = manage ? new URL(resolved) : getLicenseCheckoutUrl(resolved, "self_hosted")
 
+            if (manage && action) url.searchParams.set("action", action)
+
             if (frame) frame.location.href = url.toString()
         })
-    }, [target, licensed, atRisk])
+    }, [target, action, licensed, atRisk])
 
     return {available: true, pending, upgrade}
 }

@@ -6,6 +6,7 @@ import {License} from "@code0-tech/sagittarius-graphql-types";
 import {ApplicationService} from "@ee-internal/application/services/Application.service";
 import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 import {LicenseCardComponent} from "@ee-internal/license/components/LicenseCardComponent";
+import {LicenseCardActionsComponent} from "@ee-internal/license/components/LicenseCardActionsComponent";
 import {isLicenseActive} from "@core/util/license";
 
 export interface ApplicationLicensesListItemComponentProps {
@@ -42,5 +43,6 @@ export const ApplicationLicensesListItemComponent: React.FC<ApplicationLicensesL
     return <LicenseCardComponent license={license}
                                  fallbackName={"Enterprise Edition subscription"}
                                  active={active}
-                                 onRemove={licenseRemove}/>
+                                 actions={<LicenseCardActionsComponent license={license}
+                                                                       onRemove={licenseRemove}/>}/>
 }

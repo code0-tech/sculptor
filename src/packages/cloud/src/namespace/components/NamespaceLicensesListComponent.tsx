@@ -43,7 +43,7 @@ export const NamespaceLicensesListComponent: React.FC<NamespaceLicensesListCompo
             <Link href={`/upgrade?namespace=${namespaceId?.match(/Namespace\/(\d+)$/)?.[1]}`}
                   style={{display: "block"}}>
                 <Text size={"md"} hierarchy={"tertiary"}>
-                    No subscription connected yet. Upgrade your plan to unlock the cloud features.
+                    No subscription linked to this workspace yet. Upgrade your plan to unlock the cloud features.
                 </Text>
             </Link>
         </CardSection>

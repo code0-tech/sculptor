@@ -12,8 +12,11 @@ import {getLicenseCheckoutUrl} from "@core/util/license";
 
 export type LicenseUpgradeTarget = "checkout" | "subscription"
 
+export type LicenseUpgradeAction = "license" | "upgrade" | "customer"
+
 export interface LicenseUpgradeOptions {
     target?: LicenseUpgradeTarget
+    action?: LicenseUpgradeAction
     license?: License | null
 }
 
@@ -34,6 +37,7 @@ export const useLicenseUpgrade = (reference: string, namespaceId?: string | numb
 
     const namespace = namespaceId ?? namespaceIndex
     const target = options?.target
+    const action = options?.action ?? (options?.target ? undefined : "upgrade")
     const license = options?.license ?? currentLicense
 
     const upgrade = React.useCallback(() => {
@@ -71,13 +75,14 @@ export const useLicenseUpgrade = (reference: string, namespaceId?: string | numb
 
             url.searchParams.set("ref", reference)
             url.searchParams.set("token", token)
+            if (manage && action) url.searchParams.set("action", action)
             if (namespace) url.searchParams.set("namespace", namespace.toString())
             if (license?.licensee.license_id) url.searchParams.set("licenseId", license.licensee.license_id)
             if (license?.licensee.subscription_id) url.searchParams.set("subscriptionId", license.licensee.subscription_id)
 
             if (frame) frame.location.href = url.toString()
         })
-    }, [purchased, reference, namespace, target, licensed, atRisk, license])
+    }, [purchased, reference, namespace, target, action, licensed, atRisk, license])
 
     return {available: true, pending, upgrade}
 }

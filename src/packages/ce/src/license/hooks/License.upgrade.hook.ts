@@ -5,8 +5,11 @@ import {License} from "@code0-tech/sagittarius-graphql-types";
 
 export type LicenseUpgradeTarget = "checkout" | "subscription"
 
+export type LicenseUpgradeAction = "license" | "upgrade" | "customer"
+
 export interface LicenseUpgradeOptions {
     target?: LicenseUpgradeTarget
+    action?: LicenseUpgradeAction
     license?: License | null
 }
 

@@ -1,24 +1,10 @@
 "use client"
 
 import React from "react";
-import {
-    Badge,
-    Button,
-    ButtonGroup,
-    Card,
-    Flex,
-    getSize,
-    Text,
-    Tooltip,
-    TooltipContent,
-    TooltipPortal,
-    TooltipTrigger
-} from "@code0-tech/pictor";
+import {Badge, Card, Flex, getSize, Text} from "@code0-tech/pictor";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {License} from "@code0-tech/sagittarius-graphql-types";
-import {IconPencil, IconTrash} from "@tabler/icons-react";
 import {getLicenseName} from "@core/util/license";
-import {useLicenseUpgrade} from "@edition/license/hooks/License.upgrade.hook";
 import {LicenseDetailsComponent} from "@ee-internal/license/components/LicenseDetailsComponent";
 import {
     LicenseEntitlementsSectionComponent
@@ -28,18 +14,12 @@ export interface LicenseCardComponentProps {
     license?: License | null
     fallbackName: string
     active: boolean
-    namespaceId?: string | number
-    onRemove: () => void
+    actions: React.ReactNode
 }
 
 export const LicenseCardComponent: React.FC<LicenseCardComponentProps> = (props) => {
 
-    const {license, fallbackName, active, namespaceId, onRemove} = props
-
-    const {pending, upgrade} = useLicenseUpgrade("license_card_edit", namespaceId, {
-        target: "subscription",
-        license
-    })
+    const {license, fallbackName, active, actions} = props
 
     return <Card color={"secondary"} variant={"outlined"}
                  style={{border: "1px solid rgba(191, 191, 191, 0.1)", boxShadow: "none"}}>
@@ -62,36 +42,9 @@ export const LicenseCardComponent: React.FC<LicenseCardComponentProps> = (props)
                     </Flex>
                     <LicenseDetailsComponent license={license}/>
                 </Flex>
-                <ButtonGroup style={{flexShrink: 0}}>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button variant={"none"} paddingSize={"xxs"} disabled={pending} onClick={upgrade}>
-                                <IconPencil size={13}/>
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipPortal>
-                            <TooltipContent sideOffset={8} color={"secondary"}>
-                                <Text size={"sm"}>
-                                    Edit this subscription
-                                </Text>
-                            </TooltipContent>
-                        </TooltipPortal>
-                    </Tooltip>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button color={"error"} variant={"none"} paddingSize={"xxs"} onClick={onRemove}>
-                                <IconTrash size={13}/>
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipPortal>
-                            <TooltipContent sideOffset={8} color={"secondary"}>
-                                <Text size={"sm"}>
-                                    Remove this subscription
-                                </Text>
-                            </TooltipContent>
-                        </TooltipPortal>
-                    </Tooltip>
-                </ButtonGroup>
+                <Flex align={"center"} style={{flexShrink: 0}}>
+                    {actions}
+                </Flex>
             </Flex>
         </CardSection>
         <LicenseEntitlementsSectionComponent license={license}/>

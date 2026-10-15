@@ -1,11 +1,12 @@
 "use client"
 
 import React from "react";
-import {useService, useStore} from "@code0-tech/pictor";
+import {Button, getSize, useService, useStore} from "@code0-tech/pictor";
 import {License, Namespace} from "@code0-tech/sagittarius-graphql-types";
+import {IconDotsVertical} from "@tabler/icons-react";
 import {NamespaceService} from "@cloud-internal/namespace/services/Namespace.service";
-import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 import {LicenseCardComponent} from "@ee-internal/license/components/LicenseCardComponent";
+import {LicenseMenuComponent} from "@cloud-internal/license/components/LicenseMenuComponent";
 import {isLicenseActive} from "@core/util/license";
 
 export interface NamespaceLicensesListItemComponentProps {
@@ -30,19 +31,11 @@ export const NamespaceLicensesListItemComponent: React.FC<NamespaceLicensesListI
         [namespaceStore, namespaceId, license, licenseId]
     )
 
-    const licenseRemove = React.useCallback(() => {
-        namespaceService.namespaceLicenseRemove({
-            licenseId: licenseId!
-        }).then(payload => {
-            if ((payload?.errors?.length ?? 0) <= 0) {
-                toast({title: "Deleted subscription", color: "success"})
-            }
-        })
-    }, [licenseId])
-
     return <LicenseCardComponent license={license}
                                  fallbackName={"Cloud subscription"}
                                  active={active}
-                                 namespaceId={namespaceId?.match(/Namespace\/(\d+)$/)?.[1]}
-                                 onRemove={licenseRemove}/>
+                                 actions={<LicenseMenuComponent license={license}
+                                                                trigger={<Button style={{padding: getSize("xs")}}>
+                                                                    <IconDotsVertical size={13}/>
+                                                                </Button>}/>}/>
 }

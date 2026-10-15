@@ -33,6 +33,7 @@ import {useLicenseUpgrade} from "@edition/license/hooks/License.upgrade.hook";
 import {LicenseSummarySectionComponent} from "@ee-internal/license/components/LicenseSummarySectionComponent";
 import {LicenseUsageSectionComponent} from "@ee-internal/license/components/LicenseUsageSectionComponent";
 import {LicenseLimitsSectionComponent} from "@ee-internal/license/components/LicenseLimitsSectionComponent";
+import {LicenseDashboardHintView} from "@cloud-internal/license/views/LicenseDashboardHintView";
 
 export const NamespaceLicensesView: React.FC = () => {
 
@@ -89,7 +90,7 @@ export const NamespaceLicensesView: React.FC = () => {
                     <TooltipPortal>
                         <TooltipContent sideOffset={8} color={"secondary"}>
                             <Text size={"sm"}>
-                                Connect a subscription
+                                Link an existing subscription to this workspace
                             </Text>
                         </TooltipContent>
                     </TooltipPortal>
@@ -105,7 +106,7 @@ export const NamespaceLicensesView: React.FC = () => {
                     <TooltipPortal>
                         <TooltipContent sideOffset={8} color={"secondary"}>
                             <Text size={"sm"}>
-                                Buy a subscription
+                                Buy a new subscription in the checkout
                             </Text>
                         </TooltipContent>
                     </TooltipPortal>
@@ -114,9 +115,11 @@ export const NamespaceLicensesView: React.FC = () => {
         </Flex>
         <Spacing spacing={"xs"}/>
         <Text size={"md"} hierarchy={"tertiary"}>
-            Manage the subscriptions of this workspace. Your active subscription decides which workflow and AI
+            See which subscriptions are linked to this workspace. The active one decides which workflow and AI
             entitlements everyone in this workspace can use.
         </Text>
+        <Spacing spacing={"md"}/>
+        <LicenseDashboardHintView/>
         <Spacing spacing={"md"}/>
         <Text size={"md"} hierarchy={"secondary"}>Current plan</Text>
         <Spacing spacing={"lg"}/>
@@ -146,7 +149,7 @@ export const NamespaceLicensesView: React.FC = () => {
                                           beforeDate={beforeDate}/>
         </Card>
         <Spacing spacing={"lg"}/>
-        <Text size={"md"} hierarchy={"secondary"}>All used or future subscriptions</Text>
+        <Text size={"md"} hierarchy={"secondary"}>Subscriptions linked to this workspace</Text>
         <Spacing spacing={"lg"}/>
         <NamespaceLicensesListComponent namespaceId={namespaceId}/>
     </>
