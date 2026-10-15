@@ -22,7 +22,7 @@ import {
     useService,
     useStore
 } from "@code0-tech/pictor";
-import {IconAdjustmentsFilled, IconApps, IconArrowAutofitLeft, IconSettingsFilled, IconUser} from "@tabler/icons-react";
+import {IconAdjustmentsFilled, IconApps, IconArrowAutofitLeft, IconUser} from "@tabler/icons-react";
 import Link from "next/link";
 import {UserService} from "@edition/user/services/User.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
@@ -82,6 +82,48 @@ export const ApplicationNavigationView: React.FC = () => {
                 </TooltipContent>
             </TooltipPortal>
         </Tooltip>
+        <Menu>
+            <MenuTrigger asChild>
+                <Button data-qa-selector={"dashboard-navigation-user"} variant={"none"}
+                        style={{padding: getSize("xs")}}>
+                    <Avatar type={"character"} identifier={currentUser?.username ?? ""} size={16}/>
+                </Button>
+            </MenuTrigger>
+            <MenuPortal>
+                <MenuContent align={"end"} alignOffset={-4} side={"right"} sideOffset={8}>
+                    <MenuLabel>
+                        User menu
+                    </MenuLabel>
+                    {!isAddLicensePage && <>
+                        <Link href={`/users/@me`}>
+                            <MenuItem>
+                                <IconUser size={16}/>Profile
+                            </MenuItem>
+                        </Link>
+                        <Link href={`/users/@me/settings`}>
+                            <MenuItem>
+                                <IconUser color={"transparent"} size={16}/>Settings
+                            </MenuItem>
+                        </Link>
+                        <MenuSeparator/>
+                        <Link href={"/"}>
+                            <MenuItem>
+                                <IconApps size={16}/>Workspaces
+                            </MenuItem>
+                        </Link>
+                        <Link href={`/namespace/${userNamespaceIndex}`}>
+                            <MenuItem>
+                                <IconApps color={"transparent"} size={16}/>Personal Workspace
+                            </MenuItem>
+                        </Link>
+                        <MenuSeparator/>
+                    </>}
+                    <MenuItem onSelect={userLogout}>
+                        <IconArrowAutofitLeft size={16}/>Logout
+                    </MenuItem>
+                </MenuContent>
+            </MenuPortal>
+        </Menu>
         {currentUser?.admin && !isAddLicensePage && (
             <Tooltip>
                 <TooltipTrigger asChild>
@@ -102,65 +144,5 @@ export const ApplicationNavigationView: React.FC = () => {
         )}
         {!isAddLicensePage && <ApplicationUsageView/>}
         {!isAddLicensePage && <OnboardingButtonView/>}
-        <Flex style={{marginTop: "auto", boxSizing: "border-box", flexDirection: 'column', gap: "0.7rem"}}>
-            {!isAddLicensePage && <Tooltip>
-                <TooltipTrigger asChild>
-                    <Link href={"/users/@me/settings"} prefetch>
-                        <Button variant={"none"} style={{padding: getSize("xs"), marginTop: 'auto'}}>
-                            <IconSettingsFilled color={"#fff"} size={16}/>
-                        </Button>
-                    </Link>
-                </TooltipTrigger>
-                <TooltipPortal>
-                    <TooltipContent color={"primary"} side={"left"} sideOffset={8}>
-                        <Text>
-                            User Settings
-                        </Text>
-                    </TooltipContent>
-                </TooltipPortal>
-            </Tooltip>}
-            <Menu>
-                <MenuTrigger asChild>
-                    <Button data-qa-selector={"dashboard-navigation-user"} variant={"none"}
-                            style={{marginTop: 'auto', padding: getSize("xs")}}>
-                        <Avatar type={"character"} identifier={currentUser?.username ?? ""} size={16}/>
-                    </Button>
-                </MenuTrigger>
-                <MenuPortal>
-                    <MenuContent align={"end"} alignOffset={-4} side={"right"} sideOffset={8}>
-                        <MenuLabel>
-                            User menu
-                        </MenuLabel>
-                        {!isAddLicensePage && <>
-                            <Link href={`/users/@me`}>
-                                <MenuItem>
-                                    <IconUser size={16}/>Profile
-                                </MenuItem>
-                            </Link>
-                            <Link href={`/users/@me/settings`}>
-                                <MenuItem>
-                                    <IconUser color={"transparent"} size={16}/>Settings
-                                </MenuItem>
-                            </Link>
-                            <MenuSeparator/>
-                            <Link href={"/"}>
-                                <MenuItem>
-                                    <IconApps size={16}/>Workspaces
-                                </MenuItem>
-                            </Link>
-                            <Link href={`/namespace/${userNamespaceIndex}`}>
-                                <MenuItem>
-                                    <IconApps color={"transparent"} size={16}/>Personal Workspace
-                                </MenuItem>
-                            </Link>
-                            <MenuSeparator/>
-                        </>}
-                        <MenuItem onSelect={userLogout}>
-                            <IconArrowAutofitLeft size={16}/>Logout
-                        </MenuItem>
-                    </MenuContent>
-                </MenuPortal>
-            </Menu>
-        </Flex>
     </Flex>
 }
