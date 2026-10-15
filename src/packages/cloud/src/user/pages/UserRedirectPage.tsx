@@ -19,6 +19,7 @@ import {
     Spacing,
     Text,
     TextInput,
+    useForm,
     useService,
     useStore
 } from "@code0-tech/pictor";
@@ -43,7 +44,37 @@ export const UserRedirectPage: React.FC = () => {
     const organizationService = useService(OrganizationService)
     const organizationStore = useStore(OrganizationService)
     const userService = useService(UserService)
-    const [namespaceId, setNamespaceId] = React.useState<string | null>(null);
+
+    const initialValues = React.useMemo(
+        () => ({namespaceId: ""}),
+        []
+    )
+
+    const [inputs, validate] = useForm<{
+        namespaceId: string
+    }>({
+        useInitialValidation: false,
+        initialValues,
+        validate: {
+            namespaceId: (value) => {
+                if (selectNamespace && !value) return "Please select an organization to continue"
+                return null
+            }
+        },
+        onSubmit: async (values) => {
+            if (!callbackUrl || !userSession) return
+            const payload = await userService.usersCreateCraterToken()
+            const craterToken = payload?.token?.token
+            if (!craterToken) return
+            document.cookie = "codezero_callback=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+            document.cookie = "codezero_selectNamespace=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+            document.cookie = "codezero_cancel=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+            const targetURL = new URL(callbackUrl)
+            targetURL.searchParams.set('token', craterToken)
+            if (selectNamespace && values.namespaceId) targetURL.searchParams.set('namespace', values.namespaceId)
+            router.push(targetURL.toString())
+        }
+    })
 
     const namespaces: ({
         title?: string
@@ -90,7 +121,7 @@ export const UserRedirectPage: React.FC = () => {
                 <>
                     <InputLabel>Organization</InputLabel>
                     <InputDescription>Choose the organization this application can access.</InputDescription>
-                    <SelectInput onValueChange={setNamespaceId}>
+                    <SelectInput {...inputs.getInputProps("namespaceId")}>
                         <SelectTrigger asChild>
                             <Flex justify={"space-between"} align={"center"} px={0.7} py={0.7}>
                                 <Text hierarchy={"secondary"}>
@@ -153,20 +184,8 @@ export const UserRedirectPage: React.FC = () => {
                     mb={1.3}>
                 No, go back
             </Button>
-            <Button type={"submit"} onClick={async () => {
-                if (callbackUrl && userSession) {
-                    const payload = await userService.usersCreateCraterToken()
-                    const craterToken = payload?.token?.token
-                    if (!craterToken) return
-                    document.cookie = "codezero_callback=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-                    document.cookie = "codezero_selectNamespace=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-                    document.cookie = "codezero_cancel=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-                    const targetURL = new URL(callbackUrl)
-                    targetURL.searchParams.set('token', craterToken)
-                    if (selectNamespace && namespaceId) targetURL.searchParams.set('namespace', namespaceId)
-                    router.push(targetURL.toString())
-                }
-            }} data-qa-selector={"auth-login-send"} color={isValidCallback ? "success" : "error"} w={"100%"} mb={1.3}>
+            <Button type={"submit"} onClick={() => validate()} data-qa-selector={"auth-login-send"}
+                    color={isValidCallback ? "success" : "error"} w={"100%"} mb={1.3}>
                 {isValidCallback ? "Authorize" : "Authorize and ignore warning"}
             </Button>
         </Flex>
