@@ -114,8 +114,8 @@ export const NamespaceLicensesView: React.FC = () => {
         </Flex>
         <Spacing spacing={"xs"}/>
         <Text size={"md"} hierarchy={"tertiary"}>
-            Manage the subscriptions of this namespace. Your active subscription decides which workflow and AI
-            entitlements everyone in this namespace can use.
+            Manage the subscriptions of this workspace. Your active subscription decides which workflow and AI
+            entitlements everyone in this workspace can use.
         </Text>
         <Spacing spacing={"md"}/>
         <Text size={"md"} hierarchy={"secondary"}>Current plan</Text>
