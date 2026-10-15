@@ -120,7 +120,7 @@ export const NamespaceServersView: React.FC = () => {
         </Flex>
         <Spacing spacing={"xs"}/>
         <Text size={"md"} hierarchy={"tertiary"}>
-            Runtimes are the environments where the applications of this namespace run.
+            Runtimes are the environments where the applications of this workspace run.
         </Text>
         <Spacing spacing={"md"}/>
         <RuntimeDataTableComponent sort={sortProps}

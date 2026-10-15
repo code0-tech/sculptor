@@ -106,7 +106,7 @@ const permissions: PermissionGroup[] = [
     {
         title: "Administrator permissions",
         permissions: [
-            {label: "Namespace administrator", ability: "NAMESPACE_ADMINISTRATOR"},
+            {label: "Workspace administrator", ability: "NAMESPACE_ADMINISTRATOR"},
         ]
     }
 ]

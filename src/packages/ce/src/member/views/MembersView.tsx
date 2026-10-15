@@ -158,7 +158,7 @@ export const MembersView: React.FC = () => {
         </Flex>
         <Spacing spacing={"xs"}/>
         <Text size={"md"} hierarchy={"tertiary"}>
-            Manage members that belong to this namespace. You can add new members and manage their permissions.
+            Manage members that belong to this workspace. You can add new members and manage their permissions.
         </Text>
         <Spacing spacing={"md"}/>
         <MemberDataTableComponent sort={sortProps}
