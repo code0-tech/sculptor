@@ -38,6 +38,7 @@ import {OrganizationService} from "@edition/organization/services/Organization.s
 import {UserService} from "@edition/user/services/User.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {getNamespaceName} from "@edition/namespace/util/Namespace.name.util";
+import {LicensePlanBadgeComponent} from "@edition/license/components/LicensePlanBadgeComponent";
 
 export const NamespaceMenuView: React.FC = () => {
 
@@ -101,7 +102,8 @@ export const NamespaceMenuView: React.FC = () => {
                         {name}
                     </Text>
                 </Flex>
-                <Flex align={"center"} justify={"center"} style={{marginLeft: "auto"}}>
+                <Flex align={"center"} justify={"center"} style={{marginLeft: "auto", gap: getSize("xs")}}>
+                    <LicensePlanBadgeComponent license={namespace?.currentLicense}/>
                     <IconChevronDown size={16}/>
                 </Flex>
             </Button>
