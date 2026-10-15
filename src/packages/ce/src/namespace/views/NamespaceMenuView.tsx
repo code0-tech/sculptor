@@ -102,11 +102,9 @@ export const NamespaceMenuView: React.FC = () => {
                     ? <Avatar type={"character"} identifier={user?.username ?? ""} size={16}/>
                     : <Avatar bg={"transparent"} color={hashToColor(name, 200, 360)}
                               identifier={name} size={16}/>}
-                <Flex align={"flex-start"} style={{flexDirection: "column", minWidth: 0}}>
-                    <Text>
-                        {name}
-                    </Text>
-                </Flex>
+                <Text style={{textAlign: "left"}}>
+                    {name}
+                </Text>
                 <Flex align={"center"} justify={"center"} style={{marginLeft: "auto", gap: getSize("xs")}}>
                     <LicensePlanBadgeComponent license={namespace?.currentLicense}/>
                     <IconChevronDown size={16}/>
