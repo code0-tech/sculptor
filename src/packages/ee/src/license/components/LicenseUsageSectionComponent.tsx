@@ -44,7 +44,7 @@ export const LicenseUsageSectionComponent: React.FC<LicenseUsageSectionComponent
                     </> : exhausted ? <>
                         Your plan includes <Text size={"md"} hierarchy={"primary"} display={"inline"} style={{verticalAlign: "baseline"}}>
                         no {unit}
-                    </Text>. Connect an active license to unlock them.
+                    </Text>. Connect an active subscription to unlock them.
                     </> : <>
                         You used <Text size={"md"} hierarchy={"primary"} display={"inline"} style={{verticalAlign: "baseline"}}>
                         {numberFormat.format(used)} {unit}

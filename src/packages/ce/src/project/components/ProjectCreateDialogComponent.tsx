@@ -64,7 +64,7 @@ export const ProjectCreateDialogComponent: React.FC<ProjectCreateDialogComponent
             startTransition(() => {
                 if (!namespaceId) {
                     toast({
-                        title: "The current user does not have a personal namespace.",
+                        title: "The current user does not have a personal workspace.",
                         color: "error",
                     })
                     return

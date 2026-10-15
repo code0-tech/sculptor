@@ -35,13 +35,13 @@ export const NamespaceLicensesListItemComponent: React.FC<NamespaceLicensesListI
             licenseId: licenseId!
         }).then(payload => {
             if ((payload?.errors?.length ?? 0) <= 0) {
-                toast({title: "Deleted license", color: "success"})
+                toast({title: "Deleted subscription", color: "success"})
             }
         })
     }, [licenseId])
 
     return <LicenseCardComponent license={license}
-                                 fallbackName={"Cloud license"}
+                                 fallbackName={"Cloud subscription"}
                                  active={active}
                                  namespaceId={namespaceId?.match(/Namespace\/(\d+)$/)?.[1]}
                                  onRemove={licenseRemove}/>

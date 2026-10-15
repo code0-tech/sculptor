@@ -75,7 +75,7 @@ export const NamespaceLicensesView: React.FC = () => {
     return <>
         <Flex justify={"space-between"} align={"center"}>
             <Flex align={"center"} style={{gap: "0.5rem"}}>
-                <Text size={"lg"} hierarchy={"primary"} display={"block"}>Licenses</Text>
+                <Text size={"lg"} hierarchy={"primary"} display={"block"}>Subscriptions</Text>
                 <Badge color={"secondary"}>{licenseCount}</Badge>
             </Flex>
             <ButtonGroup>
@@ -89,7 +89,7 @@ export const NamespaceLicensesView: React.FC = () => {
                     <TooltipPortal>
                         <TooltipContent sideOffset={8} color={"secondary"}>
                             <Text size={"sm"}>
-                                Connect a license
+                                Connect a subscription
                             </Text>
                         </TooltipContent>
                     </TooltipPortal>
@@ -114,8 +114,8 @@ export const NamespaceLicensesView: React.FC = () => {
         </Flex>
         <Spacing spacing={"xs"}/>
         <Text size={"md"} hierarchy={"tertiary"}>
-            Manage the licenses of this namespace. Your active license decides which workflow and AI entitlements
-            everyone in this namespace can use.
+            Manage the subscriptions of this workspace. Your active subscription decides which workflow and AI
+            entitlements everyone in this workspace can use.
         </Text>
         <Spacing spacing={"md"}/>
         <Text size={"md"} hierarchy={"secondary"}>Current plan</Text>
@@ -146,7 +146,7 @@ export const NamespaceLicensesView: React.FC = () => {
                                           beforeDate={beforeDate}/>
         </Card>
         <Spacing spacing={"lg"}/>
-        <Text size={"md"} hierarchy={"secondary"}>All used or future licenses</Text>
+        <Text size={"md"} hierarchy={"secondary"}>All used or future subscriptions</Text>
         <Spacing spacing={"lg"}/>
         <NamespaceLicensesListComponent namespaceId={namespaceId}/>
     </>

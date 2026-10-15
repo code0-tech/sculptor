@@ -41,7 +41,7 @@ export const ApplicationLicensesListComponent: React.FC<ApplicationLicensesListC
         <CardSection border>
             <Link href={"/licenses/add"} style={{display: "block"}}>
                 <Text size={"md"} hierarchy={"tertiary"}>
-                    No license connected yet. Add one to unlock the enterprise features.
+                    No subscription connected yet. Add one to unlock the enterprise features.
                 </Text>
             </Link>
         </CardSection>

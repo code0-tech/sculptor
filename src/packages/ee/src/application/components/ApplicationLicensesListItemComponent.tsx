@@ -34,13 +34,13 @@ export const ApplicationLicensesListItemComponent: React.FC<ApplicationLicensesL
             licenseId: licenseId!
         }).then(payload => {
             if ((payload?.errors?.length ?? 0) <= 0) {
-                toast({title: "Deleted license", color: "success"})
+                toast({title: "Deleted subscription", color: "success"})
             }
         })
     }, [licenseId])
 
     return <LicenseCardComponent license={license}
-                                 fallbackName={"Enterprise Edition license"}
+                                 fallbackName={"Enterprise Edition subscription"}
                                  active={active}
                                  onRemove={licenseRemove}/>
 }

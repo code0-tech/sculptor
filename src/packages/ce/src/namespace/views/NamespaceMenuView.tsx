@@ -25,9 +25,10 @@ import {
     IconChevronDown,
     IconChevronRight,
     IconServer,
-    IconSettings,
+    IconSettings2,
     IconShieldLock,
     IconSwitch,
+    IconTrash,
     IconUsers
 } from "@tabler/icons-react";
 import Link from "next/link";
@@ -38,6 +39,10 @@ import {OrganizationService} from "@edition/organization/services/Organization.s
 import {UserService} from "@edition/user/services/User.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {getNamespaceName} from "@edition/namespace/util/Namespace.name.util";
+import {LicensePlanBadgeComponent} from "@edition/license/components/LicensePlanBadgeComponent";
+import {
+    NamespaceSubscriptionsMenuItemComponent
+} from "@edition/license/components/NamespaceSubscriptionsMenuItemComponent";
 
 export const NamespaceMenuView: React.FC = () => {
 
@@ -60,6 +65,7 @@ export const NamespaceMenuView: React.FC = () => {
     )
 
     const isPersonal = namespace?.parent?.__typename === "User"
+    const isOrganization = namespace?.parent?.__typename === "Organization"
     const user = isPersonal && namespace?.parent?.__typename === "User"
         ? userService.getById(namespace.parent.id) : undefined
 
@@ -96,12 +102,11 @@ export const NamespaceMenuView: React.FC = () => {
                     ? <Avatar type={"character"} identifier={user?.username ?? ""} size={16}/>
                     : <Avatar bg={"transparent"} color={hashToColor(name, 200, 360)}
                               identifier={name} size={16}/>}
-                <Flex align={"flex-start"} style={{flexDirection: "column", minWidth: 0}}>
-                    <Text>
-                        {name}
-                    </Text>
-                </Flex>
-                <Flex align={"center"} justify={"center"} style={{marginLeft: "auto"}}>
+                <Text style={{textAlign: "left"}}>
+                    {name}
+                </Text>
+                <Flex align={"center"} justify={"center"} style={{marginLeft: "auto", gap: getSize("xs")}}>
+                    <LicensePlanBadgeComponent license={namespace?.currentLicense}/>
                     <IconChevronDown size={16}/>
                 </Flex>
             </Button>
@@ -111,30 +116,39 @@ export const NamespaceMenuView: React.FC = () => {
                 <MenuLabel>
                     Workspace
                 </MenuLabel>
-                <Link href={`/namespace/${namespaceIndex}/settings`} prefetch style={{display: "contents"}}>
-                    <MenuItem>
-                        <IconSettings size={16}/>
-                        Settings
-                    </MenuItem>
-                </Link>
                 <Link href={`/namespace/${namespaceIndex}/settings?tab=members`} prefetch style={{display: "contents"}}>
                     <MenuItem>
-                        <IconSettings color={"transparent"} size={16}/>
+                        <IconUsers size={16}/>
                         Members
                     </MenuItem>
                 </Link>
                 <Link href={`/namespace/${namespaceIndex}/settings?tab=roles`} prefetch style={{display: "contents"}}>
                     <MenuItem>
-                        <IconSettings color={"transparent"} size={16}/>
+                        <IconShieldLock size={16}/>
                         Roles
                     </MenuItem>
                 </Link>
                 <Link href={`/namespace/${namespaceIndex}/settings?tab=servers`} prefetch style={{display: "contents"}}>
                     <MenuItem>
-                        <IconSettings color={"transparent"} size={16}/>
+                        <IconServer size={16}/>
                         Servers
                     </MenuItem>
                 </Link>
+                {isOrganization ? <Link href={`/namespace/${namespaceIndex}/settings?tab=general`} prefetch
+                                        style={{display: "contents"}}>
+                    <MenuItem>
+                        <IconSettings2 size={16}/>
+                        General
+                    </MenuItem>
+                </Link> : null}
+                {isOrganization ? <Link href={`/namespace/${namespaceIndex}/settings?tab=delete`} prefetch
+                                        style={{display: "contents"}}>
+                    <MenuItem>
+                        <IconTrash size={16}/>
+                        Delete workspace
+                    </MenuItem>
+                </Link> : null}
+                <NamespaceSubscriptionsMenuItemComponent namespaceId={namespaceIndex}/>
                 <MenuSeparator/>
                 <MenuSub>
                     <MenuSubTrigger>

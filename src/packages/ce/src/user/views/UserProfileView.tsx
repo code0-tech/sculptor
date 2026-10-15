@@ -3,11 +3,11 @@
 import React from "react";
 import {useParams} from "next/navigation";
 import Link from "next/link";
-import {Avatar, Badge, Button, Flex, Text, useService, useStore} from "@code0-tech/pictor";
+import {Avatar, Button, Flex, Text, useService, useStore} from "@code0-tech/pictor";
 import {UserService} from "@edition/user/services/User.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {User} from "@code0-tech/sagittarius-graphql-types";
-import {IconMail, IconSparkles, IconUser} from "@tabler/icons-react";
+import {IconMail, IconUser} from "@tabler/icons-react";
 
 export const UserProfileView: React.FC = () => {
 
@@ -59,10 +59,6 @@ export const UserProfileView: React.FC = () => {
                 <span style={{overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"}}>
                     {user?.email}
                 </span>
-            </Text>
-            <Text display={"flex"} align={"center"} size={"sm"} style={{gap: "0.6rem"}}>
-                <IconSparkles size={15}/>
-                <Badge color={"primary"}>BASIC</Badge>
             </Text>
             <Text display={"flex"} align={"center"} size={"sm"} style={{gap: "0.6rem"}}>
                 <IconUser size={15}/>

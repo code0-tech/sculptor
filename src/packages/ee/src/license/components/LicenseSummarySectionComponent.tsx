@@ -40,7 +40,7 @@ export const LicenseSummarySectionComponent: React.FC<LicenseSummarySectionCompo
                     </Text> and active until <Text size={"md"} hierarchy={"primary"} display={"inline"} style={{verticalAlign: "baseline"}}>
                         {license.endDate ? formatDistanceToNow(license.endDate, {addSuffix: true}) : "further notice"}
                     </Text>.
-                    </> : "No license connected yet."}
+                    </> : "No subscription connected yet."}
                     {paymentPeriod ? <>
                         {" "}Billed <Text size={"md"} hierarchy={"primary"} display={"inline"} style={{verticalAlign: "baseline"}}>
                         {(licensePaymentPeriodNames[paymentPeriod] ?? paymentPeriod).toLowerCase()}

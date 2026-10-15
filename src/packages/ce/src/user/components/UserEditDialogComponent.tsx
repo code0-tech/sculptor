@@ -40,6 +40,7 @@ import {UserSessionsDataTableComponent} from "@edition/user/components/UserSessi
 import {useMfa} from "@edition/user/components/MfaProviderComponent";
 import {UserMfaView} from "@edition/user/views/UserMfaView";
 import {UserIdentitiesView} from "@edition/user/views/UserIdentitiesView";
+import {UserSubscriptionsTab} from "@edition/user/views/UserSubscriptionsTabTriggerView";
 import {SettingDialog} from "@core/components/SettingDialog";
 import {ApplicationService} from "@edition/application/services/Application.service";
 
@@ -314,6 +315,7 @@ export const UserEditDialogComponent: React.FC<UserEditDialogComponentProps> = (
                                       <Spacing spacing={"md"}/>
                                       <UserSessionsDataTableComponent userId={userId}/>
                                   </>
-                              }
+                              },
+                              isSelf ? UserSubscriptionsTab : undefined
                           ]}/>
 }

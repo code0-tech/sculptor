@@ -13,7 +13,7 @@ export const AIUsageComponent: React.FC = () => {
 
     const used = overallUsage?.aiValue ?? 0
     const limit = limits.ai
-    const plan = licenseLevel === "namespace" ? "plan" : "license"
+    const plan = licenseLevel === "namespace" ? "plan" : "subscription"
 
     return <Flex align={"center"} justify={"space-between"} px={0.35} style={{gap: "0.35rem"}}>
         <Text>

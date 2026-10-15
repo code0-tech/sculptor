@@ -63,7 +63,7 @@ export const ApplicationLicensesView: React.FC = () => {
     return <>
         <Flex justify={"space-between"} align={"center"}>
             <Flex align={"center"} style={{gap: "0.5rem"}}>
-                <Text size={"lg"} hierarchy={"primary"} display={"block"}>Licenses</Text>
+                <Text size={"lg"} hierarchy={"primary"} display={"block"}>Subscriptions</Text>
                 <Badge color={"secondary"}>{licenseCount}</Badge>
             </Flex>
             <ButtonGroup>
@@ -104,19 +104,19 @@ export const ApplicationLicensesView: React.FC = () => {
         </Flex>
         <Spacing spacing={"xs"}/>
         <Text size={"md"} hierarchy={"tertiary"}>
-            Manage the licenses of this instance. Your active license decides which features and which workflow and AI
-            entitlements are unlocked.
+            Manage the subscriptions of this instance. Your active subscription decides which features and which
+            workflow and AI entitlements are unlocked.
         </Text>
         <Spacing spacing={"md"}/>
         <Text size={"md"} hierarchy={"secondary"}>Current plan</Text>
         <Spacing spacing={"lg"}/>
         <Card color={"secondary"}>
             <LicenseSummarySectionComponent license={license}
-                                            fallbackName={"Enterprise Edition license"}
+                                            fallbackName={"Enterprise Edition subscription"}
                                             warning={licensed ? undefined : getUsageRiskDescription(atRisk, afterDate, beforeDate)}
                                             action={<Link href={"/licenses/add"}>
                                                 <Button color={"tertiary"} paddingSize={"xxs"}>
-                                                    Connect a license
+                                                    Connect a subscription
                                                 </Button>
                                             </Link>}/>
             {licensed ? <LicenseLimitsSectionComponent afterDate={afterDate}
@@ -137,7 +137,7 @@ export const ApplicationLicensesView: React.FC = () => {
                                           beforeDate={beforeDate}/>
         </Card>
         <Spacing spacing={"lg"}/>
-        <Text size={"md"} hierarchy={"secondary"}>All used or future licenses</Text>
+        <Text size={"md"} hierarchy={"secondary"}>All used or future subscriptions</Text>
         <Spacing spacing={"lg"}/>
         <ApplicationLicensesListComponent/>
     </>

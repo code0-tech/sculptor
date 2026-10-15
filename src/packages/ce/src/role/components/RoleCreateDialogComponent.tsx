@@ -35,7 +35,7 @@ export const RoleCreateDialogComponent: React.FC<RoleCreateDialogComponentProps>
             startTransition(() => {
                 if (!namespaceId) {
                     toast({
-                        title: "The current user does not have a personal namespace.",
+                        title: "The current user does not have a personal workspace.",
                         color: "error",
                     })
                     return
@@ -55,7 +55,7 @@ export const RoleCreateDialogComponent: React.FC<RoleCreateDialogComponentProps>
 
     return <InputDialog
         title={"Create new role"}
-        description={"Roles bundle a set of permissions that you can assign to members of this namespace."}
+        description={"Roles bundle a set of permissions that you can assign to members of this workspace."}
         open={open}
         onOpenChange={(open) => onOpenChange?.(open)}>
         <TextInput required
