@@ -4,7 +4,7 @@ import {SettingDialogTab} from "@core/components/SettingDialog";
 import {ApplicationLicensesView} from "@edition/application/views/ApplicationLicensesView";
 
 export const ApplicationLicensesTab: SettingDialogTab | undefined = {
-    value: "license",
+    value: "subscriptions",
     label: "Subscriptions",
     icon: IconSparkles,
     content: <ApplicationLicensesView/>

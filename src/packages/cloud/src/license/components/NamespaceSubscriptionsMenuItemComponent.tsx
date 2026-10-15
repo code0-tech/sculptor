@@ -13,7 +13,7 @@ export const NamespaceSubscriptionsMenuItemComponent: React.FC<NamespaceSubscrip
 
     const {namespaceId} = props
 
-    return <Link href={`/namespace/${namespaceId}/settings?tab=licenses`} prefetch style={{display: "contents"}}>
+    return <Link href={`/namespace/${namespaceId}/settings?tab=subscriptions`} prefetch style={{display: "contents"}}>
         <MenuItem>
             <IconSparkles size={16}/>
             Subscriptions

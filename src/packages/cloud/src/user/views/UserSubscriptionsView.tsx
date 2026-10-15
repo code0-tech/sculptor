@@ -87,7 +87,7 @@ export const UserSubscriptionsView: React.FC = () => {
                             </Text>
                         </Flex>
                         <Flex align={"center"} style={{flexShrink: 0}}>
-                            <Link href={`/namespace/${namespaceIndex}/settings?tab=licenses`} prefetch>
+                            <Link href={`/namespace/${namespaceIndex}/settings?tab=subscriptions`} prefetch>
                                 <Button color={"tertiary"} paddingSize={"xxs"}>
                                     Subscription
                                 </Button>
