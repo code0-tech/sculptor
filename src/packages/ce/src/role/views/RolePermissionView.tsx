@@ -89,11 +89,11 @@ const permissions: PermissionGroup[] = [
         ]
     },
     {
-        title: "License permissions",
+        title: "Subscription permissions",
         permissions: [
-            {label: "Create license", ability: "CREATE_NAMESPACE_LICENSE"},
-            {label: "Read license", ability: "READ_NAMESPACE_LICENSE"},
-            {label: "Delete license", ability: "DELETE_NAMESPACE_LICENSE"},
+            {label: "Create subscription", ability: "CREATE_NAMESPACE_LICENSE"},
+            {label: "Read subscription", ability: "READ_NAMESPACE_LICENSE"},
+            {label: "Delete subscription", ability: "DELETE_NAMESPACE_LICENSE"},
         ]
     },
     {

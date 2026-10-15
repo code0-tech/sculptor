@@ -55,7 +55,7 @@ export const LicenseAddPage: React.FC = () => {
                     data: fileContent ?? ""
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
-                        toast({title: "Added license", color: "success"})
+                        toast({title: "Added subscription", color: "success"})
                         router.push("/")
                     }
                 })
@@ -65,7 +65,7 @@ export const LicenseAddPage: React.FC = () => {
 
     return <>
         <Text size={"lg"} hierarchy={"primary"}>
-            Add a license
+            Add a subscription
         </Text>
         <Spacing spacing={"xs"}/>
         <Text size={"md"} hierarchy={"tertiary"}>
@@ -144,11 +144,11 @@ export const LicenseAddPage: React.FC = () => {
         </FileInput>
         <Spacing spacing={"xl"}/>
         <Button color={"success"} w={"100%"} onClick={() => validate()}>
-            Add license
+            Add subscription
         </Button>
         <Spacing spacing={"xl"}/>
         <Text display={"flex"} hierarchy={"tertiary"} size={"md"} mb={0.7}>
-            Already bought a license?
+            Already bought a subscription?
             <Link href={"https://cloud.codezero.app"} target={"_blank"}>
                 <Text ml={0.35} hierarchy={"primary"} display={"flex"} size={"md"}>
                     Download it here
@@ -156,10 +156,10 @@ export const LicenseAddPage: React.FC = () => {
             </Link>
         </Text>
         <Text display={"flex"} hierarchy={"tertiary"} size={"md"}>
-            Don't have a license yet?
+            Don't have a subscription yet?
             <Link href={"https://codezero.build/subscription"} target={"_blank"}>
                 <Text ml={0.35} hierarchy={"primary"} display={"flex"} size={"md"}>
-                    Buy a license
+                    Buy a subscription
                 </Text>
             </Link>
         </Text>

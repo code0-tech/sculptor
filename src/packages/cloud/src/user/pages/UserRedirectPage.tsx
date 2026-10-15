@@ -138,7 +138,7 @@ export const UserRedirectPage: React.FC = () => {
             <CardSection border>
                 <Flex style={{gap: "0.7rem"}} align={"center"}>
                     <IconCheck size={16}/>
-                    <Text>Can access, manage and edit licenses</Text>
+                    <Text>Can access, manage and edit subscriptions</Text>
                 </Flex>
             </CardSection>
         </Card>

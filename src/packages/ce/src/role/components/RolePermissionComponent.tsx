@@ -53,7 +53,7 @@ const abilityCategoryLabels: Record<AbilityCategory, string> = {
     roles: "roles",
     runtimes: "runtimes",
     flows: "flows",
-    license: "licenses",
+    license: "subscriptions",
     organization: "the organization",
     admin: "everything",
 }

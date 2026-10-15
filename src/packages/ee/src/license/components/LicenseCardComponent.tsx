@@ -86,7 +86,7 @@ export const LicenseCardComponent: React.FC<LicenseCardComponentProps> = (props)
                         <TooltipPortal>
                             <TooltipContent sideOffset={8} color={"secondary"}>
                                 <Text size={"sm"}>
-                                    Remove this license
+                                    Remove this subscription
                                 </Text>
                             </TooltipContent>
                         </TooltipPortal>
