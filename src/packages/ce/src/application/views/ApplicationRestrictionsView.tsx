@@ -1,7 +1,6 @@
 import React, {startTransition} from "react";
 import {Button, Card, Flex, Spacing, SwitchInput, Text, useForm, useService, useStore} from "@code0-tech/pictor";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
-import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {ApplicationService} from "@edition/application/services/Application.service";
 import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
@@ -43,7 +42,7 @@ export const ApplicationRestrictionsView: React.FC = () => {
         }
     })
 
-    return <TabContent value={"restrictions"}>
+    return <>
         <Flex justify={"space-between"} align={"center"}>
             <Text size={"lg"} hierarchy={"primary"} display={"block"}>Restrictions</Text>
             <Button paddingSize={"xxs"} color={"success"} variant={"none"} onClick={validate}>Save changes</Button>
@@ -90,6 +89,6 @@ export const ApplicationRestrictionsView: React.FC = () => {
             </CardSection>
         </Card>
 
-    </TabContent>
+    </>
 
 }

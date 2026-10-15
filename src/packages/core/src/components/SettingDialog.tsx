@@ -2,21 +2,33 @@
 
 import React from "react";
 import {
-    Button,
     Card,
     Dialog,
-    DialogClose,
     DialogContent,
     DialogOverlay,
-    DialogPortal, ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport,
-    Spacing,
-    Text
+    DialogPortal,
+    ScrollArea,
+    ScrollAreaScrollbar,
+    ScrollAreaThumb,
+    ScrollAreaViewport,
+    SegmentedControl,
+    SegmentedControlItem,
+    Text,
+    Tooltip,
+    TooltipContent,
+    TooltipPortal,
+    TooltipTrigger
 } from "@code0-tech/pictor";
-import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
-import {IconArrowLeft} from "@tabler/icons-react";
-import {Tab} from "@code0-tech/pictor/dist/components/tab/Tab";
+import {Tab, TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {markDialogPathname} from "@core/util/Navigation.lastPage.util";
+
+export interface SettingDialogTab {
+    value: string
+    label: string
+    icon: React.FC<{ size?: number, style?: React.CSSProperties }>
+    content: React.ReactNode
+}
 
 export interface SettingDialogProps {
     open?: boolean
@@ -24,13 +36,12 @@ export interface SettingDialogProps {
     title?: string
     description?: string
     defaultValue?: string
-    trigger?: React.ReactElement[] | React.ReactElement
-    children?: React.ReactElement[] | React.ReactElement
+    tabs: (SettingDialogTab | undefined)[]
 }
 
 export const SettingDialog: React.FC<SettingDialogProps> = (props) => {
 
-    const {open, onOpenChange, title, description, defaultValue = "general", trigger, children} = props
+    const {open, onOpenChange, title, description, defaultValue, tabs} = props
 
     const router = useRouter()
     const pathname = usePathname()
@@ -38,7 +49,8 @@ export const SettingDialog: React.FC<SettingDialogProps> = (props) => {
     const [closing, setClosing] = React.useState(false)
     const route = React.useRef(pathname)
 
-    const activeTab = searchParams.get("tab") || defaultValue
+    const visibleTabs = tabs.filter((tab) => !!tab)
+    const activeTab = searchParams.get("tab") || defaultValue || visibleTabs[0]?.value
 
     const onTabChange = (value: string) => {
         const next = new URLSearchParams(searchParams)
@@ -60,43 +72,78 @@ export const SettingDialog: React.FC<SettingDialogProps> = (props) => {
     }}>
         <DialogPortal>
             <DialogOverlay/>
-            <DialogContent style={{padding: "2px"}}
-                           w={"75%"} h={"75%"}
+            <DialogContent style={{padding: "2px", overflow: "unset"}}
+                           w={"75%"}
+                           h={"75%"}
+                           maw={"1000px"}
                            autoFocus
                            showCloseButton={false}>
-                <Tab orientation={"vertical"} value={activeTab} onValueChange={onTabChange} w={"100%"} h={"100%"}>
-                    <Layout layoutGap={0} showLayoutSplitter={false} leftContent={
+                <div style={{
+                    position: "relative",
+                    width: "100%",
+                    height: "100%",
+                }}>
+                    <Tab orientation={"vertical"} value={activeTab} onValueChange={onTabChange} w={"100%"} h={"100%"}>
                         <div style={{
                             padding: "2.6rem",
-                            height: "100%",
+                            left: "0",
+                            top: "50%",
+                            transform: "translate(-100%, -50%)",
                             maxWidth: "300px",
+                            position: "absolute",
                             display: "flex",
-                            flexDirection: "column"
+                            flexDirection: "column",
+                            alignItems: "flex-end"
                         }}>
-                            <Text fz={2} hierarchy={"primary"}>
-                                {title}
-                            </Text>
-                            <Spacing spacing={"xs"}/>
-                            <Text maw={"250px"} hierarchy={"tertiary"} style={{textWrap: "wrap"}}>
-                                {description}
-                            </Text>
-                            <Spacing spacing={"xl"}/>
-                            {trigger}
-                            <DialogClose asChild style={{marginTop: "auto"}}>
-                                <Button paddingSize={"xxs"} w={"100%"} variant={"none"} justify={"start"}>
-                                    <IconArrowLeft size={16}/>
-                                    <Text size={"md"}>
-                                        Go back
-                                    </Text>
-                                </Button>
-                            </DialogClose>
+                            {/*<Text fz={2} hierarchy={"primary"}>
+                            {title}
+                        </Text>
+                        <Spacing spacing={"xs"}/>
+                        <Text maw={"250px"} hierarchy={"tertiary"} style={{textWrap: "wrap"}}>
+                            {description}
+                        </Text>
+                        <Spacing spacing={"xl"}/>*/}
+                            <SegmentedControl type={"single"}
+                                              color={"secondary"}
+                                              style={{
+                                                  flexDirection: "column"
+                                              }}
+                                              value={activeTab}
+                                              onValueChange={(value) => value && onTabChange(value)}>
+                                {visibleTabs.map((tab) => (
+                                    <Tooltip key={tab.value}>
+                                        <TooltipTrigger asChild>
+                                            <SegmentedControlItem value={tab.value}>
+                                                <tab.icon style={{minWidth: "16px", minHeight: "16px"}} size={16}/>
+                                            </SegmentedControlItem>
+                                        </TooltipTrigger>
+                                        <TooltipPortal>
+                                            <TooltipContent side={"left"} sideOffset={8} color={"secondary"}>
+                                                <Text size={"sm"}>{tab.label}</Text>
+                                            </TooltipContent>
+                                        </TooltipPortal>
+                                    </Tooltip>
+                                ))}
+                            </SegmentedControl>
+                            {/*<DialogClose asChild style={{marginTop: "auto"}}>
+                            <Button paddingSize={"xxs"} w={"100%"} variant={"none"} justify={"start"}>
+                                <IconArrowLeft size={16}/>
+                                <Text size={"md"}>
+                                    Go back
+                                </Text>
+                            </Button>
+                        </DialogClose>*/}
                         </div>
-                    }>
                         <Card color={"primary"} p={"0"} paddingSize={"md"} h={"100%"} w={"100%"}>
                             <ScrollArea h={"100%"} type={"scroll"}>
                                 <ScrollAreaViewport>
                                     <div style={{maxWidth: "75%", margin: "0 auto", padding: "4rem 1rem"}}>
-                                        {children!}
+                                        {visibleTabs.map((tab) => (
+                                            <TabContent key={tab.value} tabIndex={-1} value={tab.value} pl={"0.7"}
+                                                        style={{overflow: "hidden"}}>
+                                                {tab.content}
+                                            </TabContent>
+                                        ))}
                                     </div>
                                 </ScrollAreaViewport>
                                 <ScrollAreaScrollbar orientation={"vertical"}>
@@ -104,8 +151,9 @@ export const SettingDialog: React.FC<SettingDialogProps> = (props) => {
                                 </ScrollAreaScrollbar>
                             </ScrollArea>
                         </Card>
-                    </Layout>
-                </Tab>
+                    </Tab>
+                </div>
+
             </DialogContent>
         </DialogPortal>
     </Dialog>

@@ -17,7 +17,6 @@ import {
     useService,
     useStore
 } from "@code0-tech/pictor";
-import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {DataTableSortProps} from "@code0-tech/pictor/dist/components/data-table/DataTable";
 import {IconAdjustmentsHorizontal, IconArrowsSort, IconCheck, IconPlus} from "@tabler/icons-react";
 import Link from "next/link";
@@ -63,7 +62,7 @@ export const ApplicationServersView: React.FC = () => {
 
     const sortProps: DataTableSortProps = {[sort]: "asc"}
 
-    return <TabContent value={"servers"}>
+    return <>
         <Flex justify={"space-between"} align={"center"}>
             <Flex align={"center"} style={{gap: "0.5rem"}}>
                 <Text size={"lg"} hierarchy={"primary"} display={"block"}>Servers</Text>
@@ -129,5 +128,5 @@ export const ApplicationServersView: React.FC = () => {
                                        const number = runtime?.id?.match(/Runtime\/(\d+)$/)?.[1]
                                        if (number) router.push(`/runtimes/${number}/settings`)
                                    }}/>
-    </TabContent>
+    </>
 }

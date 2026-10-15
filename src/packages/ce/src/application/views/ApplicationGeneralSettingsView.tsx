@@ -14,7 +14,6 @@ import {
     useStore
 } from "@code0-tech/pictor";
 import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
-import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {ApplicationService} from "@edition/application/services/Application.service";
 import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
@@ -63,7 +62,7 @@ export const ApplicationGeneralSettingsView: React.FC = () => {
         }
     })
 
-    return <TabContent value={"general"}>
+    return <>
         <Flex justify={"space-between"} align={"center"}>
             <Text size={"lg"} hierarchy={"primary"} display={"block"}>Settings</Text>
             <Button paddingSize={"xxs"} color={"success"} variant={"none"} onClick={validate}>Save changes</Button>
@@ -162,5 +161,5 @@ export const ApplicationGeneralSettingsView: React.FC = () => {
                     {...inputs.getInputProps("runtimeMaxHeartbeatIntervalMinutes")}/>
             </CardSection>
         </Card>
-    </TabContent>
+    </>
 }

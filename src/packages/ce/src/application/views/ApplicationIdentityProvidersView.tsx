@@ -18,7 +18,6 @@ import {
     useService,
     useStore
 } from "@code0-tech/pictor";
-import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 import {
     IconBrandDiscord,
@@ -103,7 +102,7 @@ export const ApplicationIdentityProvidersView: React.FC = () => {
         })
     }, [providers, applicationService])
 
-    return <TabContent value={"identityProviders"}>
+    return <>
         <Flex justify={"space-between"} align={"center"}>
             <Flex align={"center"} style={{gap: "0.5rem"}}>
                 <Text size={"lg"} hierarchy={"primary"} display={"block"}>Identity providers</Text>
@@ -167,5 +166,5 @@ export const ApplicationIdentityProvidersView: React.FC = () => {
                 </>
             }}
         </DataTable>
-    </TabContent>
+    </>
 }

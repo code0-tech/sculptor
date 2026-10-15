@@ -1,8 +1,6 @@
 "use client"
 
 import React from "react";
-import {Button, Text} from "@code0-tech/pictor";
-import {TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {IconServer, IconSettings2, IconTrash} from "@tabler/icons-react";
 import {SettingDialog} from "@core/components/SettingDialog";
 import {ProjectSettingsGeneralView} from "@edition/project/views/ProjectSettingsGeneralView";
@@ -22,28 +20,24 @@ export const ProjectSettingsDialogComponent: React.FC<ProjectSettingsDialogCompo
                           onOpenChange={(open) => onOpenChange?.(open)}
                           title={"Project settings"}
                           description={"General settings, assigned servers and restrictions for this project. These settings affect everyone who has access to this project."}
-                          trigger={<TabList>
-                              <TabTrigger value={"general"} w={"100%"} asChild>
-                                  <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                      <IconSettings2 size={13}/>
-                                      <Text size={"md"}>General</Text>
-                                  </Button>
-                              </TabTrigger>
-                              <TabTrigger value={"servers"} w={"100%"} asChild>
-                                  <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                      <IconServer size={13}/>
-                                      <Text size={"md"}>Assigned servers</Text>
-                                  </Button>
-                              </TabTrigger>
-                              <TabTrigger value={"delete"} w={"100%"} asChild>
-                                  <Button paddingSize={"xxs"} variant={"none"} justify={"start"}>
-                                      <IconTrash size={13}/>
-                                      <Text size={"md"}>Delete project</Text>
-                                  </Button>
-                              </TabTrigger>
-                          </TabList>}>
-        <ProjectSettingsGeneralView/>
-        <ProjectSettingsAssignedServersView/>
-        <ProjectSettingsDeleteView/>
-    </SettingDialog>
+                          tabs={[
+                              {
+                                  value: "general",
+                                  label: "General",
+                                  icon: IconSettings2,
+                                  content: <ProjectSettingsGeneralView/>
+                              },
+                              {
+                                  value: "servers",
+                                  label: "Assigned servers",
+                                  icon: IconServer,
+                                  content: <ProjectSettingsAssignedServersView/>
+                              },
+                              {
+                                  value: "delete",
+                                  label: "Delete project",
+                                  icon: IconTrash,
+                                  content: <ProjectSettingsDeleteView/>
+                              }
+                          ]}/>
 }

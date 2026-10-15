@@ -6,7 +6,6 @@ import {Button, DialogClose, Spacing, Text, useService} from "@code0-tech/pictor
 import {RoleService} from "@edition/role/services/Role.service";
 import {MemberService} from "@edition/member/services/Member.service";
 import type {NamespaceRole} from "@code0-tech/sagittarius-graphql-types";
-import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 
 export const RoleDeleteView: React.FC = () => {
@@ -35,7 +34,7 @@ export const RoleDeleteView: React.FC = () => {
         })
     }, [])
 
-    return <TabContent pl={"0.7"} value={"delete"} style={{overflow: "hidden"}}>
+    return <>
         <Text size={"lg"} hierarchy={"primary"} display={"block"}>Delete role</Text>
         <Spacing spacing={"xs"}/>
         <Text size={"md"} hierarchy={"tertiary"}>
@@ -45,6 +44,6 @@ export const RoleDeleteView: React.FC = () => {
         <DialogClose asChild>
             <Button color={"error"} w={"100%"} onClick={deleteRole}>Delete role</Button>
         </DialogClose>
-    </TabContent>
+    </>
 
 }

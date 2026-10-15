@@ -1,3 +1,3 @@
-import {ApplicationLicensesTabTriggerView as CEApplicationLicensesTabTriggerView} from "@ce-internal/application/views/ApplicationLicensesTabTriggerView"
+import {ApplicationLicensesTab as CEApplicationLicensesTab} from "@ce-internal/application/views/ApplicationLicensesTabTriggerView"
 
-export const ApplicationLicensesTabTriggerView = CEApplicationLicensesTabTriggerView
+export const ApplicationLicensesTab = CEApplicationLicensesTab

@@ -20,7 +20,6 @@ import {
     useStore
 } from "@code0-tech/pictor";
 import {DataTableSortProps} from "@code0-tech/pictor/dist/components/data-table/DataTable";
-import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import React from "react";
 import {useParams} from "next/navigation";
 import {RoleService} from "@edition/role/services/Role.service";
@@ -114,7 +113,7 @@ export const RoleProjectView: React.FC = () => {
         [assignedProjects, nameFilter]
     )
 
-    return <TabContent pl={"0.7"} value={"project"} style={{overflow: "hidden"}}>
+    return <>
         <Flex align={"center"} justify={"space-between"}>
             <Flex align={"center"} style={{gap: "0.5rem"}}>
                 <Text size={"lg"} hierarchy={"primary"} display={"block"}>Assigned projects</Text>
@@ -207,5 +206,5 @@ export const RoleProjectView: React.FC = () => {
                                            ]
                                        }} namespaceId={namespaceId} preFilter={filterAssignedProjects}/>
         )}
-    </TabContent>
+    </>
 }

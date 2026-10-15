@@ -2,7 +2,6 @@
 
 import React from "react";
 import {Flex, Spacing, Text, useService, useStore} from "@code0-tech/pictor";
-import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {UserIdentity} from "@code0-tech/sagittarius-graphql-types";
 import {UserService} from "@edition/user/services/User.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
@@ -33,13 +32,7 @@ export const UserIdentitiesView: React.FC = () => {
         ? window.location.pathname + window.location.search
         : undefined
 
-    return <TabContent value={"connections"}
-                       style={{
-                           overflow: "hidden",
-                           height: "100%",
-                           display: "flex",
-                           flexDirection: "column"
-                       }}>
+    return <>
         <Flex justify={"space-between"} align={"center"}>
             <Text size={"lg"} hierarchy={"primary"} display={"block"}>Connected accounts</Text>
         </Flex>
@@ -59,5 +52,5 @@ export const UserIdentitiesView: React.FC = () => {
         <IdentityProviderButtonsComponent intent={"link"}
                                           returnTo={returnTo}
                                           excludeProviderIds={linkedProviderIds}/>
-    </TabContent>
+    </>
 }

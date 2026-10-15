@@ -2,7 +2,6 @@
 
 import React, {startTransition} from "react";
 import {Button, DialogClose, Spacing, Text, useService} from "@code0-tech/pictor";
-import {TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {useParams, useRouter} from "next/navigation";
 import {ProjectService} from "@edition/project/services/Project.service";
 import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
@@ -30,7 +29,7 @@ export const ProjectSettingsDeleteView: React.FC = () => {
     }, [projectId])
 
 
-    return <TabContent value={"delete"} style={{overflow: "hidden"}}>
+    return <>
         <Text size={"lg"} hierarchy={"primary"} display={"block"}>Delete project</Text>
         <Spacing spacing={"xs"}/>
         <Text size={"md"} hierarchy={"tertiary"}>
@@ -41,5 +40,5 @@ export const ProjectSettingsDeleteView: React.FC = () => {
             <Button color={"error"} w={"100%"} onClick={deleteProject}>Delete project</Button>
         </DialogClose>
 
-    </TabContent>
+    </>
 }

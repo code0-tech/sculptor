@@ -6,7 +6,6 @@ import {
     Card,
     Flex,
     Spacing,
-    TabContent,
     Text,
     TextInput,
     useForm,
@@ -84,7 +83,7 @@ export const ProjectSettingsGeneralView: React.FC = () => {
         }
     })
 
-    return <TabContent value={"general"} style={{overflow: "hidden"}}>
+    return <>
         <Flex justify={"space-between"} align={"center"}>
             <Text size={"lg"} hierarchy={"primary"} display={"block"}>General</Text>
             <Button paddingSize={"xxs"} color={"success"} variant={"none"} onClick={validate}>
@@ -131,6 +130,6 @@ export const ProjectSettingsGeneralView: React.FC = () => {
                            {...inputs.getInputProps("slug")}/>
             </CardSection>
         </Card>
-    </TabContent>
+    </>
 
 }
