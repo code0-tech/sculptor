@@ -19,3 +19,14 @@ export const isValidRedirect = (url: string | null): boolean => {
         return false;
     }
 };
+
+export const isRedirectTarget = (url: string | null): boolean => {
+    if (!url) return false;
+
+    try {
+        const { protocol } = new URL(url);
+        return protocol === 'https:' || protocol === 'http:';
+    } catch {
+        return false;
+    }
+};

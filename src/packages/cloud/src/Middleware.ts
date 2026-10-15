@@ -1,6 +1,6 @@
 import type {NextRequest} from 'next/server'
 import {NextResponse} from 'next/server'
-import {isValidRedirect} from "@core/util/redirect";
+import {isRedirectTarget, isValidRedirect} from "@core/util/redirect";
 
 export function middleware(request: NextRequest) {
 
@@ -19,9 +19,23 @@ export function middleware(request: NextRequest) {
         maxAge: 60 * 5,
     }
 
-    if (callbackUrl && isValidRedirect(callbackUrl)) {
+    if (callbackUrl && isRedirectTarget(callbackUrl)) {
 
-        if (isRedirectPath) return NextResponse.next()
+        if (isRedirectPath) {
+            // Consent screen itself: keep the params in the URL, but persist them so
+            // they survive a login redirect away from here.
+            const response = NextResponse.next()
+            response.cookies.set('codezero_callback', callbackUrl, cookieOptions)
+            if (selectNamespace) response.cookies.set('codezero_selectNamespace', selectNamespace, cookieOptions)
+            if (cancelUrl) response.cookies.set('codezero_cancel', cancelUrl, cookieOptions)
+            return response
+        }
+        if (!isAuthPath && !isValidRedirect(callbackUrl)) {
+            // Any other page, but an untrusted target: ignore the param instead of
+            // hijacking the navigation. Deliberately persists nothing, so the cookie
+            // branch below cannot pull the user onto the consent screen either.
+            return NextResponse.next()
+        }
         if (!isAuthPath) {
             // Any other page: send the user on to the consent screen.
             const redirectUrl = new URL('/redirect', request.url)
