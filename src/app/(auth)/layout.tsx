@@ -25,7 +25,8 @@ import {FullScreen} from "@code0-tech/pictor/dist/components/fullscreen/FullScre
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {OrganizationView} from "@edition/organization/services/Organization.view";
 import {OrganizationService} from "@edition/organization/services/Organization.service";
-import {User} from "@code0-tech/sagittarius-graphql-types";
+import {NamespaceService} from "@edition/namespace/services/Namespace.service";
+import {Namespace, User} from "@code0-tech/sagittarius-graphql-types";
 
 export default function AuthLayout({children}: Readonly<{ children: React.ReactNode }>) {
 
@@ -36,6 +37,7 @@ export default function AuthLayout({children}: Readonly<{ children: React.ReactN
     const [store, service] = usePersistentReactiveArrayService<User, UserService>("auth-users", (store) => new UserService(graphqlClient, store))
     const organization = usePersistentReactiveArrayService<OrganizationView, OrganizationService>(`dashboard::organizations::${currentSession?.id}`, (store) => new OrganizationService(graphqlClient, store))
     const [applicationStore, applicationService] = usePersistentReactiveArrayService<Application, ApplicationService>(`auth::application::${currentSession?.id}`, (store) => new ApplicationService(graphqlClient, store))
+    const namespace = usePersistentReactiveArrayService<Namespace, NamespaceService>(`dashboard::namespaces::${currentSession?.id}`, (store) => new NamespaceService(graphqlClient, store))
 
     const legalUrls = React.useMemo(
         () => {
@@ -55,7 +57,7 @@ export default function AuthLayout({children}: Readonly<{ children: React.ReactN
                 <ScrollAreaViewport>
                     <AuroraBackground/>
                     <ContextStoreProvider
-                        services={[[store, service], organization, [applicationStore, applicationService]]}>
+                        services={[[store, service], organization, namespace, [applicationStore, applicationService]]}>
                         <Container h={"100%"} w={"100%"} display={"flex"} justify={"center"}>
                             <Col xs={4} py={5} style={{marginTop: "auto", marginBottom: "auto"}}>
                                 <Image src={"/CodeZero_Logo.png"} alt={"CodeZero Logo"}

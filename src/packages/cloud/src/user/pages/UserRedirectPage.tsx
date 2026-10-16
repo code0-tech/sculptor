@@ -3,9 +3,11 @@
 import React from "react";
 import {
     Alert,
+    Avatar,
     Button,
     Card,
     Flex,
+    hashToColor,
     InputDescription,
     InputLabel,
     SelectContent,
@@ -31,6 +33,10 @@ import CardSection from "@code0-tech/pictor/dist/components/card/CardSection";
 import {OrganizationService} from "@ce-internal/organization/services/Organization.service";
 import {UserService} from "@cloud-internal/user/services/User.service";
 import {OrganizationView} from "@ce-internal/organization/services/Organization.view";
+import {NamespaceService} from "@cloud-internal/namespace/services/Namespace.service";
+import {getNamespaceName} from "@edition/namespace/util/Namespace.name.util";
+import {Namespace} from "@code0-tech/sagittarius-graphql-types";
+import {LicensePlanBadgeComponent} from "@cloud-internal/license/components/LicensePlanBadgeComponent";
 
 export const UserRedirectPage: React.FC = () => {
 
@@ -44,6 +50,9 @@ export const UserRedirectPage: React.FC = () => {
     const organizationService = useService(OrganizationService)
     const organizationStore = useStore(OrganizationService)
     const userService = useService(UserService)
+    const userStore = useStore(UserService)
+    const namespaceService = useService(NamespaceService)
+    const namespaceStore = useStore(NamespaceService)
 
     const initialValues = React.useMemo(
         () => ({namespaceId: ""}),
@@ -57,7 +66,7 @@ export const UserRedirectPage: React.FC = () => {
         initialValues,
         validate: {
             namespaceId: (value) => {
-                if (selectNamespace && !value) return "Please select an organization to continue"
+                if (selectNamespace && !value) return "Please select a workspace to continue"
                 return null
             }
         },
@@ -76,18 +85,31 @@ export const UserRedirectPage: React.FC = () => {
         }
     })
 
-    const namespaces: ({
-        title?: string
-        id?: string
-    })[] = React.useMemo(
-        () => [{
-            title: `Personal organization of user @${userSession?.user?.username}`,
-            id: userSession?.user?.namespace?.id!
-        }, ...organizationService.values().filter((organization: OrganizationView) => organization.userAbilities).map((organization: OrganizationView) => ({
-            id: organization.namespace?.id!,
-            title: `Organization with name @${organization.name}`
-        }))],
-        [organizationStore.length, userSession]
+    const namespaces = React.useMemo(
+        () => [
+            userSession?.user?.namespace?.id,
+            ...organizationService.values()
+                .filter((organization: OrganizationView) => organization.userAbilities)
+                .map((organization: OrganizationView) => organization.namespace?.id)
+        ]
+            .filter((id): id is Namespace["id"] => !!id)
+            .map(id => namespaceService.getById(id))
+            .filter((namespace): namespace is Namespace => !!namespace)
+            .map(namespace => {
+                const name = getNamespaceName(namespace, organizationService, userService) ?? ""
+                const user = namespace.parent?.__typename === "User"
+                    ? userService.getById(namespace.parent.id) : undefined
+                return {
+                    id: namespace.id,
+                    name,
+                    title: user
+                        ? `Personal organization of user @${user.username}`
+                        : `Workspace with name @${name}`,
+                    user,
+                    license: namespace.currentLicense
+                }
+            }),
+        [organizationStore, namespaceStore, userStore, userSession]
     )
 
     if (userSession === null) router.push("/login")
@@ -119,13 +141,13 @@ export const UserRedirectPage: React.FC = () => {
         {
             selectNamespace && (
                 <>
-                    <InputLabel>Organization</InputLabel>
-                    <InputDescription>Choose the organization this application can access.</InputDescription>
+                    <InputLabel>Workspace</InputLabel>
+                    <InputDescription>Choose the workspace this application can access.</InputDescription>
                     <SelectInput {...inputs.getInputProps("namespaceId")}>
                         <SelectTrigger asChild>
                             <Flex justify={"space-between"} align={"center"} px={0.7} py={0.7}>
                                 <Text hierarchy={"secondary"}>
-                                    <SelectValue placeholder={"Select an organization"}/>
+                                    <SelectValue placeholder={"Select a workspace"}/>
                                 </Text>
                                 <IconChevronDown size={13}/>
                             </Flex>
@@ -135,10 +157,22 @@ export const UserRedirectPage: React.FC = () => {
                                 <SelectViewport key={namespaces.length}>
                                     {
                                         namespaces.map(namespace => (
-                                            <SelectItem value={namespace.id ?? ""}>
+                                            <SelectItem value={namespace.id ?? ""} key={namespace.id}>
                                                 <SelectItemText>
-                                                    <Text>{namespace.title}</Text>
+                                                    <Flex align={"center"} style={{gap: "0.5rem"}}>
+                                                        {namespace.user
+                                                            ? <Avatar type={"character"}
+                                                                      identifier={namespace.user.username ?? ""}
+                                                                      size={16}/>
+                                                            : <Avatar bg={"transparent"}
+                                                                      color={hashToColor(namespace.name, 200, 360)}
+                                                                      identifier={namespace.name} size={16}/>}
+                                                        <Text>{namespace.title}</Text>
+                                                    </Flex>
                                                 </SelectItemText>
+                                                <Flex align={"center"} style={{marginLeft: "auto"}}>
+                                                    <LicensePlanBadgeComponent license={namespace.license}/>
+                                                </Flex>
                                             </SelectItem>
                                         ))
                                     }
@@ -163,7 +197,7 @@ export const UserRedirectPage: React.FC = () => {
             <CardSection border>
                 <Flex style={{gap: "0.7rem"}} align={"center"}>
                     <IconCheck size={16}/>
-                    <Text>Can access, manage and edit organizations</Text>
+                    <Text>Can access, manage and edit workspaces</Text>
                 </Flex>
             </CardSection>
             <CardSection border>

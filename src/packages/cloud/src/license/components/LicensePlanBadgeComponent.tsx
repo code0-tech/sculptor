@@ -23,8 +23,8 @@ export const LicensePlanBadgeComponent: React.FC<LicensePlanBadgeComponentProps>
     const plan = isLicenseActive(license) ? license?.options?.plan ?? "CUSTOM" : undefined
     const beamVariant = plan ? planBeamVariants[plan] : undefined
 
-    const badge = <Badge color={plan ? "primary" : "secondary"}>
-        <Text c={"inherit"} size={"sm"} style={{fontWeight: "bold"}}>
+    const badge = <Badge bg={"transparent"}>
+        <Text c={"inherit"} size={"sm"} style={{fontWeight: plan ? "bold" : "unset"}}>
             {plan ?? "FREE"}
         </Text>
     </Badge>
