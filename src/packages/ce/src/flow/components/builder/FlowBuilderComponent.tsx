@@ -19,14 +19,15 @@ import 'ldrs/react/LineWobble.css'
 import {useFlowNodes} from "@edition/flow/hooks/Flow.nodes.hook";
 import {ComponentProps, mergeComponentProps, Spacing, Text} from "@code0-tech/pictor";
 import {FunctionNodeDefaultComponent} from "@edition/function/components/nodes/FunctionNodeDefaultComponent";
+import {FunctionNodeControlComponent} from "@edition/function/components/nodes/FunctionNodeControlComponent";
+import {FunctionNodeEndComponent} from "@edition/function/components/nodes/FunctionNodeEndComponent";
+import {FunctionNodeRoundComponent} from "@edition/function/components/nodes/FunctionNodeRoundComponent";
 import {FunctionNodeGroupComponent} from "@edition/function/components/nodes/FunctionNodeGroupComponent";
 import {FunctionNodeTriggerComponent} from "@edition/function/components/nodes/FunctionNodeTriggerComponent";
 import {useEdges} from "@edition/flow/hooks/Flow.edges.hook";
 import {FlowPanelSizeComponent} from "@edition/flow/components/panels/FlowPanelSizeComponent";
 import {FlowPanelLayoutComponent} from "@edition/flow/components/panels/FlowPanelLayoutComponent";
 import {FlowPanelControlComponent} from "@edition/flow/components/panels/FlowPanelControlComponent";
-import {FunctionNodeSquareComponent} from "@edition/function/components/nodes/FunctionNodeSquareComponent";
-import {FunctionNodeRoundComponent} from "@edition/function/components/nodes/FunctionNodeRoundComponent";
 
 /**
  * Dynamically layouts a tree of nodes and their parameter nodes for a flow-based editor.
@@ -42,8 +43,8 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
     if (!dirtyIds || dirtyIds.size === 0) return {nodes}
 
     /* Konstanten */
-    const V = 50;          // vertical gap Node ↕ Node
-    const H = 75;          // horizontal gap Parent → Param
+    const V = 35;          // vertical gap Node ↕ Node
+    const H = 50;          // horizontal gap Parent → Param
     const PAD = 16;        // inner padding einer Group (links+rechts / oben+unten)
     const EPS = 0.25;      // Toleranz gegen Rundungsdrift
 
@@ -659,7 +660,8 @@ const InternalFlowBuilder: React.FC<FlowBuilderProps> = (props) => {
 
     const nodeTypes = React.useMemo(() => ({
         default: FunctionNodeDefaultComponent,
-        square: FunctionNodeSquareComponent,
+        control: FunctionNodeControlComponent,
+        end: FunctionNodeEndComponent,
         round: FunctionNodeRoundComponent,
         group: FunctionNodeGroupComponent,
         trigger: FunctionNodeTriggerComponent,
