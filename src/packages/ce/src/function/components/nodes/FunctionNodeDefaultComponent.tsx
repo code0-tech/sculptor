@@ -247,8 +247,9 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
 
             <Flex align={"center"} style={{gap: "0.7rem", ...nodeValidationStyle}}>
                 <DisplayIcon color={iconColor} size={16}/>
-                <Text
-                    size={"md"}>{node ? displayMessage : definition?.names?.[0].content ?? FALLBACK_FUNCTION_NAME}</Text>
+                <Text size={"md"}>
+                    {node ? displayMessage : definition?.names?.[0].content ?? FALLBACK_FUNCTION_NAME}
+                </Text>
             </Flex>
         </Card>
     );

@@ -2,7 +2,7 @@ import {Handle, Node, NodeProps, Position, useStore} from "@xyflow/react";
 import React, {CSSProperties, memo} from "react";
 import "./FunctionNodeComponent.style.scss";
 import {FunctionNodeComponentProps} from "./FunctionNodeComponent";
-import {Card, Flex, getSize, Text, useService, useStore as usePictorStore} from "@code0-tech/pictor";
+import {Badge, Card, Flex, getSize, Text, useService, useStore as usePictorStore} from "@code0-tech/pictor";
 import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
 import {IconVariable} from "@tabler/icons-react";
 import {FlowService} from "@edition/flow/services/Flow.service";
@@ -10,10 +10,13 @@ import {FunctionService} from "@edition/function/services/Function.service";
 import {NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {underlineBySeverity} from "@core/util/inspection";
 import {icon, IconString} from "@core/util/icons";
-import {FALLBACK_FUNCTION_NAME} from "@core/util/fallback-translations";
+import {FALLBACK_FUNCTION_DISPLAY_MESSAGE, FALLBACK_FUNCTION_NAME} from "@core/util/fallback-translations";
 import {useSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
 import {useReferencedNodeIds} from "@edition/flow/hooks/Flow.references.hook";
 import {useFlowReferenceHoverStore} from "@edition/flow/hooks/Flow.reference.hover.hook";
+import {LiteralBadgeComponent} from "@edition/datatype/components/badges/LiteralBadgeComponent";
+import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
+import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeComponent";
 
 export type FunctionNodeSquareComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
 
@@ -67,6 +70,60 @@ export const FunctionNodeSquareComponent: React.FC<FunctionNodeSquareComponentPr
         });
         return start;
     })
+
+    const splitTemplate = (str: string) =>
+        str
+            .split(/(\$\{[^}]+\})/)
+            .filter(Boolean)
+            .flatMap(part =>
+                part.startsWith("${")
+                    ? [part.slice(2, -1)]          // variable name ohne ${}
+                    : part.split(/(\s*,\s*)/)      // Kommas einzeln extrahieren
+                        .filter(Boolean)
+                        .flatMap(p => p.trim() === "," ? [","] : p.trim() ? [p.trim()] : [])
+            );
+
+    const displayMessage = React.useMemo(() => splitTemplate(definition?.displayMessages?.[0]?.content ?? FALLBACK_FUNCTION_DISPLAY_MESSAGE).map(item => {
+        const nodeParameter = node?.parameters?.nodes?.find((_, index) => {
+            const parameterDefinition = definition?.parameterDefinitions?.nodes?.[index]
+            return parameterDefinition?.identifier == item
+        })
+
+        const parameterDefinition = definition?.parameterDefinitions?.nodes?.find(pd => pd?.identifier == item)
+        const parameterIndex = parameterDefinition ? definition?.parameterDefinitions?.nodes?.findIndex(p => p?.id === parameterDefinition.id) : undefined
+        const parameterValidation = validation?.filter(v => v.parameterIndex === parameterIndex && v.nodeId === node?.id)
+        const decorationStyle: CSSProperties =
+            parameterValidation?.length
+                ? underlineBySeverity[parameterValidation[0].type]
+                : {};
+
+        if (parameterDefinition) {
+            switch (nodeParameter?.value?.__typename) {
+                case "LiteralValue":
+                    return <div style={{...decorationStyle, display: "inline-block"}}>
+                        <LiteralBadgeComponent value={nodeParameter.value}
+                                               size={"xs"}
+                                               schema={data.schema?.[parameterIndex!]?.schema}/>
+                    </div>
+                case "ReferenceValue":
+                    return <div style={{...decorationStyle, display: "inline-block"}}>
+                        <ReferenceBadgeComponent value={nodeParameter.value}/>
+                    </div>
+                case "SubFlowValue":
+                    return <div style={{...decorationStyle, display: "inline-block"}}>
+                        <NodeBadgeComponent value={nodeParameter.value}/>
+                    </div>
+            }
+            return <div style={{...decorationStyle, display: "inline-block"}}>
+                <Badge style={{verticalAlign: "middle"}} border>
+                    <Text size={"sm"}>
+                        {item}
+                    </Text>
+                </Badge>
+            </div>
+        }
+        return " " + String(item) + " "
+    }), [flowStore, functionStore, data, definition, validation])
 
     const isReferenced = React.useMemo(() => {
 
@@ -149,14 +206,16 @@ export const FunctionNodeSquareComponent: React.FC<FunctionNodeSquareComponentPr
                     <DisplayIcon color={iconColor} size={16} style={{width: "16px", height: "16px"}}/>
                 </Flex>
             </Card>
-            <Text size={"xs"} style={{
+            <Text size={"sm"} style={{
                 position: "absolute",
                 bottom: `calc(-1 * ${getSize("xxs")})`,
                 width: "150%",
                 left: "50%",
                 transform: "translate(-50%, 100%)",
                 textAlign: "center"
-            }}>{definition?.names?.[0]?.content ?? FALLBACK_FUNCTION_NAME}</Text>
+            }}>
+                {node ? displayMessage : definition?.names?.[0].content ?? FALLBACK_FUNCTION_NAME}
+            </Text>
         </Flex>
     );
 })

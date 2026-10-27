@@ -150,14 +150,16 @@ export const FunctionNodeRoundComponent: React.FC<FunctionNodeRoundComponentProp
                     <DisplayIcon color={iconColor} size={16} style={{width: "16px", height: "16px"}}/>
                 </Flex>
             </Card>
-            <Text size={"xs"} style={{
+            <Text size={"sm"} style={{
                 position: "absolute",
                 bottom: `calc(-1 * ${getSize("xxs")})`,
                 width: "150%",
                 left: "50%",
                 transform: "translate(-50%, 100%)",
                 textAlign: "center"
-            }}>{definition?.names?.[0]?.content ?? FALLBACK_FUNCTION_NAME}</Text>
+            }}>
+                {definition?.names?.[0]?.content ?? FALLBACK_FUNCTION_NAME}
+            </Text>
         </Flex>
     );
 })
