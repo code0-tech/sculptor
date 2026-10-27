@@ -30,7 +30,6 @@ import {
     IconChevronLeft,
     IconChevronRight,
     IconCornerDownLeft,
-    IconPlus,
     IconSearch
 } from "@tabler/icons-react";
 import {Flow, LiteralValue, NodeFunction, ReferenceValue, SubFlowValue} from "@code0-tech/sagittarius-graphql-types";
@@ -43,13 +42,12 @@ export interface SuggestionDialogComponentProps {
     open?: boolean
     onOpenChange?: (open: boolean) => void
     onSuggestionSelect?: (suggestion: (NodeFunction | SubFlowValue | ReferenceValue | LiteralValue)) => void
-    onCustomLogicGroupSelect?: () => void
     onBackSelect?: () => void
 }
 
 export const SuggestionDialogComponent: React.FC<SuggestionDialogComponentProps> = (props) => {
 
-    const {open, onOpenChange, onSuggestionSelect, onCustomLogicGroupSelect, onBackSelect} = props
+    const {open, onOpenChange, onSuggestionSelect, onBackSelect} = props
 
     const [suggestionDialogOpen, setSuggestionDialogOpen] = React.useState(open)
     const [variantSuggestion, setVariantSuggestion] = React.useState<Suggestion | null>(null)
@@ -157,26 +155,6 @@ export const SuggestionDialogComponent: React.FC<SuggestionDialogComponentProps>
                                                 <Spacing spacing={"xxs"}/>
                                                 <Text hierarchy={"tertiary"} size={"sm"}>
                                                     Return to the suggestions for this parameter.
-                                                </Text>
-                                            </CommandItem>
-                                            <CommandSeparator/>
-                                        </> : null}
-                                        {onCustomLogicGroupSelect ? <>
-                                            <CommandItem keywords={["custom logic group", "starting node"]}
-                                                         display={"block"}
-                                                         my={0.7}
-                                                         style={{boxSizing: "border-box", overflow: "hidden"}}
-                                                         value={"custom-logic-group"} onSelect={() => {
-                                                onCustomLogicGroupSelect()
-                                                props.onOpenChange?.(false)
-                                            }}>
-                                                <Flex style={{gap: "0.35rem"}} align={"center"}>
-                                                    <IconPlus size={16}/>
-                                                    <Text size={"sm"}>Add custom logic group</Text>
-                                                </Flex>
-                                                <Spacing spacing={"xxs"}/>
-                                                <Text hierarchy={"tertiary"} size={"sm"}>
-                                                    Build this sub flow yourself by choosing the function it starts with.
                                                 </Text>
                                             </CommandItem>
                                             <CommandSeparator/>
