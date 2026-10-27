@@ -39,6 +39,9 @@ import {
 } from "@edition/datatype/components/inputs/list-sub-flow/DataTypeListSubFlowInputComponent";
 import {DataTypeListInputComponent} from "@edition/datatype/components/inputs/list/DataTypeListInputComponent";
 import {
+    DataTypeUnionInputComponent
+} from "@edition/datatype/components/inputs/union/DataTypeUnionInputComponent";
+import {
     DataTypeProducerInputComponent
 } from "@edition/datatype/components/inputs/producer/DataTypeProducerInputComponent";
 import {exactProducers} from "@edition/datatype/utils/DataType.exactProducers.util";
@@ -160,6 +163,11 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
                             {...rest}/>
                 case "type":
                     return <DataTypeTypeInputComponent
+                        schema={schema}
+                        suggestions={suggestions}
+                        {...rest}/>
+                case "union":
+                    return <DataTypeUnionInputComponent
                         schema={schema}
                         suggestions={suggestions}
                         {...rest}/>
