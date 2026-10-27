@@ -86,6 +86,7 @@ export const DataTypeListInputComponent: React.FC<DataTypeListInputComponentProp
         const unique = (inner.declaredItems ?? []).filter(item => {
             const shape = `${item.input ?? "generic"}/${item.type ?? ""}`
             if (shapes.has(shape)) return false
+            if (item.input === "text") return false
             shapes.add(shape)
             return true
         })
