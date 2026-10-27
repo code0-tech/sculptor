@@ -1,19 +1,9 @@
 import React, {CSSProperties, memo} from "react";
-import {Handle, Node, NodeProps, NodeToolbar, Position} from "@xyflow/react";
-import {
-    Button,
-    ButtonGroup,
-    Card,
-    Flex,
-    Text,
-    useService,
-    useStore,
-    useStore as usePictorStore
-} from "@code0-tech/pictor";
+import {Handle, Node, NodeProps, Position} from "@xyflow/react";
+import {Card, Flex, Text, useService, useStore, useStore as usePictorStore, withAlpha} from "@code0-tech/pictor";
 import {FunctionNodeComponentProps} from "@edition/function/components/nodes/FunctionNodeComponent";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import {IconPencil, IconSparkles, IconVariable} from "@tabler/icons-react";
 import {Namespace, NamespaceProject, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {icon, IconString} from "@core/util/icons";
 import {FALLBACK_FLOW_TYPE_DISPLAY_MESSAGE, FALLBACK_FLOW_TYPE_NAME} from "@core/util/fallback-translations";
@@ -23,9 +13,12 @@ import {useSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.sele
 import {LiteralBadgeComponent} from "@edition/datatype/components/badges/LiteralBadgeComponent";
 import {useParams} from "next/navigation";
 import {ProjectService} from "@edition/project/services/Project.service";
-import {ModuleService} from "@edition/module/services/Module.service";
 import {useReferencedNodeIds} from "@edition/flow/hooks/Flow.references.hook";
 import {useFlowReferenceHoverStore} from "@edition/flow/hooks/Flow.reference.hover.hook";
+import {FunctionNodeToolbarComponent} from "@edition/function/components/nodes/FunctionNodeToolbarComponent";
+import {
+    FunctionNodeReferenceIndicatorComponent
+} from "@edition/function/components/nodes/FunctionNodeReferenceIndicatorComponent";
 
 
 export type FunctionNodeTriggerComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
@@ -41,8 +34,6 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
     const flowStore = usePictorStore(FlowService)
     const projectService = useService(ProjectService)
     const projectStore = useStore(ProjectService)
-    const moduleService = useService(ModuleService)
-    const moduleStore = useStore(ModuleService)
 
     const namespaceIndex = params.namespaceId as any as number
     const projectIndex = params.projectId as any as number
@@ -73,22 +64,6 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
         [flow?.type?.id, namespaceId, projectId, project?.primaryRuntime?.id, flowTypeStore]
     )
 
-    const module = React.useMemo(
-        () => moduleService.getById(flowType?.runtimeModule?.id, {
-            namespaceId: namespaceId,
-            projectId: projectId,
-            runtimeId: project?.primaryRuntime?.id
-        }),
-        [flowType?.runtimeModule?.id, namespaceId, projectId, project?.primaryRuntime?.id, moduleStore]
-    )
-
-    let endpoint = `http://${module?.definitions?.nodes?.[0]?.host}:${module?.definitions?.nodes?.[0]?.port}${module?.definitions?.nodes?.[0]?.endpoint}`
-        .replace("${{project_slug}}", project?.slug ?? "${{project_slug}}")
-
-    flow?.settings?.nodes?.forEach(setting => {
-        endpoint = endpoint.replace(`\${{${setting?.flowSettingIdentifier}}}`, setting?.value)
-    })
-
     const DisplayIcon = icon(flowType?.displayIcon as IconString)
 
     const referencedNodeIds = useReferencedNodeIds(data.flowId)
@@ -109,17 +84,17 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
 
     const selectedNode = useSelectedFunctionNode()
 
-    const splitTemplate = (str: string) =>
+    const splitTemplate = React.useCallback((str: string) =>
         str
             .split(/(\$\{[^}]+\})/)
             .filter(Boolean)
             .flatMap(part =>
                 part.startsWith("${")
-                    ? [part.slice(2, -1)]          // variable name ohne ${}
-                    : part.split(/(\s*,\s*)/)      // Kommas einzeln extrahieren
+                    ? [part.slice(2, -1)]
+                    : part.split(/(\s*,\s*)/)
                         .filter(Boolean)
                         .flatMap(p => p.trim() === "," ? [","] : p.trim() ? [p.trim()] : [])
-            )
+            ), [])
 
     const displayMessage = React.useMemo(() => splitTemplate(flowType?.displayMessages?.[0]?.content ?? FALLBACK_FLOW_TYPE_DISPLAY_MESSAGE).map(item => {
 
@@ -152,14 +127,11 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
     const isReferenced = React.useMemo(() => {
 
         const activeNode = flowService.getNodeById(data.flowId, selectedNode?.id as NodeFunction['id'])
-        const isActiveNodeReferencingCurrentNode = activeNode?.parameters?.nodes?.some(p => p?.value?.__typename === "ReferenceValue" && !p.value.nodeFunctionId)
-        const hasReferences = activeNode?.parameters?.nodes?.some(p => p?.value?.__typename === "ReferenceValue")
+        const isActiveNodeReferencingCurrentNode = activeNode?.parameters?.nodes?.some(parameter => parameter?.value?.__typename === "ReferenceValue" && !parameter.value.nodeFunctionId)
+        const hasReferences = activeNode?.parameters?.nodes?.some(parameter => parameter?.value?.__typename === "ReferenceValue")
 
-        if (isActiveNodeReferencingCurrentNode) {
-            return true
-        } else if (hasReferences && !isActiveNodeReferencingCurrentNode && selectedNode?.id !== data.nodeId) {
-            return false
-        }
+        if (isActiveNodeReferencingCurrentNode) return true
+        if (hasReferences && selectedNode?.id !== data.nodeId) return false
 
         return undefined
 
@@ -188,41 +160,7 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
                     } : {}),
                 }}>
 
-                <NodeToolbar align={"center"} offset={16} position={Position.Top}>
-                    <ButtonGroup color={"secondary"}>
-                        <Button variant={"none"} color={"tertiary"} paddingSize={"xxs"} onClick={(e) => {
-                            const event = new KeyboardEvent('keydown', {
-                                key: '1',
-                                code: 'Key1',
-                                shiftKey: true,
-                                bubbles: true,
-                                cancelable: true,
-                            });
-
-                            document.dispatchEvent(event);
-                            e.stopPropagation();
-                            e.preventDefault();
-                        }}>
-                            <IconPencil size={13}/>
-                        </Button>
-                        <Button variant={"none"} color={"tertiary"} paddingSize={"xxs"} onClick={(e) => {
-                            const event = new KeyboardEvent('keydown', {
-                                key: 'Q',
-                                code: 'KeyQ',
-                                shiftKey: true,
-                                bubbles: true,
-                                cancelable: true,
-                            });
-
-                            document.dispatchEvent(event);
-                            e.stopPropagation();
-                            e.preventDefault();
-                        }}>
-                            <IconSparkles size={13}/>
-                            <Text size={"xs"}>Edit with AI</Text>
-                        </Button>
-                    </ButtonGroup>
-                </NodeToolbar>
+                <FunctionNodeToolbarComponent offset={16} removable={false}/>
 
                 <div style={{
                     transform: "rotate(-45deg)",
@@ -232,19 +170,9 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
                         <DisplayIcon color={iconColor} size={16} style={{width: "16px", height: "16px"}}/>
                     </Flex>
 
-                    {
-                        isReferenced === true || hoveredNodeId === id ? (
-                            <div className={"d-flow-node__isReferenced"} style={{
-                                position: "absolute",
-                                top: "50%",
-                                left: "-0.5rem",
-                                transform: "translate(-100%, -50%)",
-                                display: "flex"
-                            }}>
-                                <IconVariable className={"d-flow-node__isReferenced-icon"} color={data.color} size={13}/>
-                            </div>
-                        ) : null
-                    }
+                    {isReferenced === true || hoveredNodeId === id ? (
+                        <FunctionNodeReferenceIndicatorComponent color={data.color}/>
+                    ) : null}
 
                     <Handle
                         isConnectable={false}
@@ -260,48 +188,4 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
             </Text>
         </Flex>
     )
-
-
 })
-
-type RGBA = {
-    r: number
-    g: number
-    b: number
-    a: number
-}
-
-const clamp01 = (v: number) => Math.min(Math.max(v, 0), 1)
-
-const parseCssColorToRgba = (color: string): RGBA => {
-    if (typeof document === "undefined") {
-        return {r: 0, g: 0, b: 0, a: 1}
-    }
-
-    const el = document.createElement("span")
-    el.style.color = color
-    document.body.appendChild(el)
-
-    const computed = getComputedStyle(el).color
-    document.body.removeChild(el)
-
-    const match = computed.match(
-        /rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/
-    )
-
-    if (!match) {
-        return {r: 0, g: 0, b: 0, a: 1}
-    }
-
-    return {
-        r: Math.round(Number(match[1])),
-        g: Math.round(Number(match[2])),
-        b: Math.round(Number(match[3])),
-        a: match[4] !== undefined ? Number(match[4]) : 1,
-    }
-}
-
-const withAlpha = (color: string, alpha: number) => {
-    const c = parseCssColorToRgba(color)
-    return `rgba(${c.r}, ${c.g}, ${c.b}, ${clamp01(alpha)})`
-}

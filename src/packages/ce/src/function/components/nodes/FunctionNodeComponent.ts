@@ -14,5 +14,4 @@ export interface FunctionNodeComponentProps extends Record<string, unknown>, Com
     referenceSignature?: string
     isParameter?: boolean
     isInlinedReference?: boolean
-    index?: number
 }

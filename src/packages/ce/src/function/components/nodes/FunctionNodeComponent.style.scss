@@ -2,6 +2,8 @@
 @use "@core/style/box";
 @use "@core/style/variables";
 
+$octagon: polygon(29% 0, 71% 0, 100% 29%, 100% 71%, 71% 100%, 29% 100%, 0 71%, 0 29%);
+
 .d-flow-node {
   border: 1px solid helpers.borderColor() !important;
   box-shadow: none;
@@ -33,7 +35,48 @@
     opacity: 0.5 !important;
   }
 
+  &--end {
+    border: none !important;
+    border-radius: 0 !important;
+    background: rgba(variables.$secondary, .15) !important;
+    clip-path: $octagon;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      background: variables.$primary;
+      clip-path: $octagon;
+    }
+  }
+
+  &__outline {
+    position: absolute;
+    inset: 3px;
+    background: helpers.borderColor();
+    clip-path: $octagon;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      background: variables.$primary;
+      clip-path: $octagon;
+    }
+  }
+
+  &__shape {
+    position: relative;
+    z-index: 1;
+  }
+
   &--active {
     border: 1px solid rgba(variables.$info, .5) !important;
   }
+
+  &--end#{&}--active {
+    border: none !important;
+    background: rgba(variables.$info, .5) !important;
+  }
+
 }
