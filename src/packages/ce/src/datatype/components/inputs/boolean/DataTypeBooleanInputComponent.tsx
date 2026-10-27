@@ -1,4 +1,5 @@
 import React from "react";
+import "./DataTypeBooleanInputComponent.style.scss"
 import {DataTypeInputComponentProps} from "@edition/datatype/components/inputs/DataTypeInputComponent";
 import {InputDescription, InputLabel, SegmentedControl, SegmentedControlItem} from "@code0-tech/pictor";
 import {useDebouncedCallback} from "use-debounce";
@@ -37,7 +38,9 @@ export const DataTypeBooleanInputComponent: React.FC<DataTypeBooleanInputCompone
         }}
                                      suggestions={suggestions} formValidation={formValidation}>
             <SegmentedControl type={"single"}
+                              className={"data-type-boolean-input"}
                               h={"100%"}
+                              w={"calc(100% + 0.35rem)"}
                               ml={-0.35}
                               bg={"transparent"}
                               style={{boxShadow: "none"}}
