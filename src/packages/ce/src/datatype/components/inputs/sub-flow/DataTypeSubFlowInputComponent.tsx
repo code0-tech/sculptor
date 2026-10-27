@@ -9,6 +9,8 @@ import {SuggestionDialogComponent} from "@edition/function/components/suggestion
 import {Flow, LiteralValue, NodeFunction, ReferenceValue, SubFlowValue} from "@code0-tech/sagittarius-graphql-types";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {useParams} from "next/navigation";
+import {exactSuggestions} from "@edition/datatype/utils/DataType.exactSuggestions.util";
+import {ownSuggestionCertainties} from "@edition/datatype/utils/DataType.suggestionCertainties.util";
 
 
 export type DataTypeSubFlowInputComponentProps = DataTypeInputComponentProps
@@ -16,7 +18,7 @@ export type DataTypeSubFlowInputComponentProps = DataTypeInputComponentProps
 
 export const DataTypeSubFlowInputComponent: React.FC<DataTypeSubFlowInputComponentProps> = (props) => {
 
-    const {formValidation, title, initialValue, description, suggestions, onChange} = props
+    const {schema, formValidation, title, initialValue, description, suggestions, onChange} = props
 
     const params = useParams()
     const flowService = useService(FlowService)
@@ -24,9 +26,16 @@ export const DataTypeSubFlowInputComponent: React.FC<DataTypeSubFlowInputCompone
     const flowIndex = Number(params.flowId) || 1
     const flowId: Flow['id'] = `gid://sagittarius/Flow/${flowIndex}`
 
-    const defaultValue: number = React.useMemo(() => suggestions?.findIndex(suggest => {
+    const exactMatches = React.useMemo(
+        () => exactSuggestions(suggestions ?? [], ownSuggestionCertainties(schema)),
+        [schema, suggestions]
+    )
+
+    const hasExactMatches = exactMatches.length > 0
+
+    const defaultValue: number = React.useMemo(() => exactMatches.findIndex(suggest => {
         return initialValue && lodash.isMatch(initialValue, suggest)
-    }), [suggestions])!
+    }), [exactMatches])!
 
     const [suggestionDialogOpen, setSuggestionDialogOpen] = React.useState(false)
     const [customLogicDialogOpen, setCustomLogicDialogOpen] = React.useState(false)
@@ -36,10 +45,8 @@ export const DataTypeSubFlowInputComponent: React.FC<DataTypeSubFlowInputCompone
         onChange?.(value ?? null)
     }, 200)
 
-    const referenceSuggestions = React.useMemo(() => suggestions ?? [], [suggestions])
-
     return <>
-        <SuggestionDialogComponent suggestions={suggestions}
+        <SuggestionDialogComponent suggestions={exactMatches}
                                    flowId={flowId}
                                    nodeId={props.nodeId}
                                    parameterIndex={props.parameterIndex}
@@ -48,14 +55,13 @@ export const DataTypeSubFlowInputComponent: React.FC<DataTypeSubFlowInputCompone
                                        formValidation?.setValue?.(value ?? null)
                                        onChangeDebounced(value ?? null)
                                    }}
-                                   onCustomLogicGroupSelect={() => setCustomLogicDialogOpen(true)}
                                    onOpenChange={setSuggestionDialogOpen}/>
         <SuggestionDialogComponent suggestions={functionSuggestions}
                                    flowId={flowId}
                                    nodeId={props.nodeId}
                                    parameterIndex={props.parameterIndex}
                                    open={customLogicDialogOpen}
-                                   onBackSelect={() => setSuggestionDialogOpen(true)}
+                                   onBackSelect={hasExactMatches ? () => setSuggestionDialogOpen(true) : undefined}
                                    onSuggestionSelect={value => {
                                        if (value?.__typename === "NodeFunction") {
                                            const nodeId = flowService.addNodeById(flowId, value)
@@ -72,14 +78,15 @@ export const DataTypeSubFlowInputComponent: React.FC<DataTypeSubFlowInputCompone
         {description && <InputDescription>{description}</InputDescription>}
         <DataTypeInputValueComponent inside
                                      onClick={() => {
-                                         setSuggestionDialogOpen(true)
+                                         if (hasExactMatches) setSuggestionDialogOpen(true)
+                                         else setCustomLogicDialogOpen(true)
                                      }}
                                      initialValue={initialValue}
                                      onChange={(value) => {
                                          formValidation?.setValue?.(value ?? null)
                                          onChangeDebounced(value ?? null)
                                      }}
-                                     suggestions={referenceSuggestions}
+                                     suggestions={exactMatches}
                                      nodeId={props.nodeId}
                                      parameterIndex={props.parameterIndex}
                                      onCustomLogicGroupSelect={() => setCustomLogicDialogOpen(true)}

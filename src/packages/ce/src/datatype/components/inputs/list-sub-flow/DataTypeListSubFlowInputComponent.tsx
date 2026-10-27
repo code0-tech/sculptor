@@ -20,8 +20,8 @@ import {
     SubFlowValue
 } from "@code0-tech/sagittarius-graphql-types";
 import {ListInput, NodeSchema, Schema} from "@code0-tech/triangulum";
-import {sortSuggestions} from "@edition/datatype/utils/DataType.sortSuggestions.util";
-import {suggestionCertainties} from "@edition/datatype/utils/DataType.suggestionCertainties.util";
+import {ownSuggestionCertainties} from "@edition/datatype/utils/DataType.suggestionCertainties.util";
+import {exactSuggestions} from "@edition/datatype/utils/DataType.exactSuggestions.util";
 import {IconPlus} from "@tabler/icons-react";
 import {useParams} from "next/navigation";
 import {FlowService} from "@edition/flow/services/Flow.service";
@@ -49,6 +49,8 @@ export const DataTypeListSubFlowInputComponent: React.FC<DataTypeListSubFlowInpu
 
     const params = useParams()
     const flowService = useService(FlowService)
+
+    console.log(schema)
 
     const flowId: Flow['id'] = props.flowId ?? `gid://sagittarius/Flow/${Number(params.flowId) || 1}`
 
@@ -79,34 +81,48 @@ export const DataTypeListSubFlowInputComponent: React.FC<DataTypeListSubFlowInpu
     const declaredSuggestions = React.useMemo(() => {
         const inner = schema && "schema" in schema ? (schema as NodeSchema).schema : (schema as Schema | undefined)
         const declared = (inner as ListInput | undefined)?.declaredItems ?? []
+        const certainties = new Map(declared.flatMap(item => [...ownSuggestionCertainties(item)]))
         const seen = new Set<string>()
-        return sortSuggestions([...declared.flatMap(item => item.suggestions ?? []), ...(suggestions ?? [])], suggestionCertainties(schema))
-            .filter((suggest): suggest is SubFlowValue | NodeFunction =>
-                suggest.__typename === "SubFlowValue" || suggest.__typename === "NodeFunction")
+        return exactSuggestions(declared.flatMap(item => item.suggestions ?? []), certainties)
+            .filter((suggest): suggest is SubFlowValue | NodeFunction | ReferenceValue =>
+                suggest.__typename === "SubFlowValue"
+                || suggest.__typename === "NodeFunction"
+                || suggest.__typename === "ReferenceValue")
             .filter(suggest => {
-                const key = `${suggest.__typename}/${suggest.functionDefinition?.id
-                ?? ("signature" in suggest ? suggest.signature : undefined)
-                ?? ""}`
+                const key = suggest.__typename === "ReferenceValue"
+                    ? `ReferenceValue/${suggest.nodeFunctionId}`
+                    : suggest.__typename === "SubFlowValue"
+                        ? `SubFlowValue/${suggest.functionDefinition?.id ?? suggest.signature ?? ""}`
+                        : suggest.__typename === "NodeFunction"
+                            ? `NodeFunction/${suggest.functionDefinition?.id ?? ""}`
+                            : ""
                 if (seen.has(key)) return false
                 seen.add(key)
                 return true
             })
-    }, [schema, suggestions])
+    }, [schema])
 
-    const referenceSuggestions = React.useMemo(() => suggestions ?? [], [suggestions])
+    const exactMatches = React.useMemo(
+        () => exactSuggestions(suggestions ?? [], ownSuggestionCertainties(schema)),
+        [schema, suggestions]
+    )
+
+    const hasDeclaredSuggestions = declaredSuggestions.length > 0
 
     const onChangeDebounced = useDebouncedCallback((value: LiteralValue | SubFlowValue | NodeFunction | ReferenceValue | null) => {
         onChange?.(value)
     }, 200)
 
     const tagKeys: string[] = React.useMemo(() => declaredSuggestions.map((suggest, index) =>
-        suggest.__typename === "SubFlowValue" ? keyOf(suggest) : `\${reference_${index}}`
+        suggest.__typename === "SubFlowValue" || suggest.__typename === "ReferenceValue"
+            ? keyOf(suggest)
+            : `\${reference_${index}}`
     ), [declaredSuggestions])
 
     const menuReferences = React.useMemo(() => {
         const map = new Map<string, SubFlowValue | ReferenceValue | NodeFunction>()
         declaredSuggestions.forEach((suggest, index) => {
-            if (suggest.__typename === "SubFlowValue") {
+            if (suggest.__typename === "SubFlowValue" || suggest.__typename === "ReferenceValue") {
                 map.set(keyOf(suggest), suggest)
                 return
             }
@@ -157,7 +173,6 @@ export const DataTypeListSubFlowInputComponent: React.FC<DataTypeListSubFlowInpu
                                    parameterIndex={props.parameterIndex}
                                    open={dialogOpen}
                                    onOpenChange={setDialogOpen}
-                                   onCustomLogicGroupSelect={() => setCustomLogicDialogOpen(true)}
                                    onSuggestionSelect={value => {
                                        if (value?.__typename === "NodeFunction") {
                                            const addedNodeId = flowService.addPreviousNodeById(flowId, props.nodeId ?? null, value)
@@ -178,7 +193,7 @@ export const DataTypeListSubFlowInputComponent: React.FC<DataTypeListSubFlowInpu
                                    parameterIndex={props.parameterIndex}
                                    open={customLogicDialogOpen}
                                    onOpenChange={setCustomLogicDialogOpen}
-                                   onBackSelect={() => setDialogOpen(true)}
+                                   onBackSelect={hasDeclaredSuggestions ? () => setDialogOpen(true) : undefined}
                                    onSuggestionSelect={value => {
                                        if (value?.__typename === "NodeFunction") {
                                            const nodeId = flowService.addNodeById(flowId, value)
@@ -194,7 +209,7 @@ export const DataTypeListSubFlowInputComponent: React.FC<DataTypeListSubFlowInpu
                                          formValidation?.setValue?.(value)
                                          onChangeDebounced(value)
                                      }}
-                                     suggestions={suggestions}
+                                     suggestions={exactMatches}
                                      formValidation={formValidation}>
             <TagInput allowCustomValues={false}
                       placeholder={typeof title === "string" ? title : undefined}
@@ -265,10 +280,8 @@ export const DataTypeListSubFlowInputComponent: React.FC<DataTypeListSubFlowInpu
                           commit(next)
                       }}
                       right={
-                          <DataTypeInputControlsComponent suggestions={referenceSuggestions}
-                                                          nodeId={props.nodeId}
+                          <DataTypeInputControlsComponent nodeId={props.nodeId}
                                                           parameterIndex={props.parameterIndex}
-                                                          onCustomLogicGroupSelect={() => setCustomLogicDialogOpen(true)}
                                                           onSelect={value => {
                                                               if (value?.__typename === "SubFlowValue") {
                                                                   commit([...items, {key: keyOf(value), value}])
@@ -282,7 +295,11 @@ export const DataTypeListSubFlowInputComponent: React.FC<DataTypeListSubFlowInpu
                                                               formValidation?.setValue?.(value)
                                                               onChangeDebounced(value)
                                                           }}>
-                              <Button paddingSize={"xxs"} onClick={() => setDialogOpen(true)}>
+                              <Button paddingSize={"xxs"}
+                                      onClick={() => {
+                                          if (hasDeclaredSuggestions) setDialogOpen(true)
+                                          else setCustomLogicDialogOpen(true)
+                                      }}>
                                   <IconPlus size={13}/>
                               </Button>
                           </DataTypeInputControlsComponent>
