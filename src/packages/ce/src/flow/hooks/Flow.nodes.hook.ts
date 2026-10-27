@@ -23,7 +23,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
     )
 
     const flowSchema = useFlowSchema(flowId, namespaceId, projectId)
-    const inlinedNodes = useInlinedReferenceNodes(flowId)
+    const inlinedNodes = useInlinedReferenceNodes(flowId, flowSchema)
 
     return React.useMemo<Node<FunctionNodeComponentProps>[]>(() => {
         if (!flow) return []
@@ -33,7 +33,6 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
         const visited = new Set<string>()
 
         let groupCounter = 0;
-        let globalIndex = 0;
 
         // Trigger node (ID == flow.id -> edge compatible)
         nodes.push({
@@ -54,7 +53,6 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
             parentGroup?: string
         ) => {
 
-            globalIndex++
             if (!node?.id) return
 
             const functionDefinition = functionService.getById(node.functionDefinition?.id)
@@ -66,7 +64,9 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
 
                 nodes.push({
                     id: nodeId,
-                    type: functionDefinition && "design" in functionDefinition ? functionDefinition?.design as string : inlinedReference ? "square" : "default",
+                    type: functionDefinition && "design" in functionDefinition && functionDefinition?.design
+                        ? functionDefinition.design as string
+                        : "default",
                     position: {x: 0, y: 0},
                     draggable: false,
                     parentId: parentGroup,
@@ -74,7 +74,6 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                     data: {
                         nodeId: nodeId,
                         flowId: flowId,
-                        index: globalIndex,
                         isParameter: !!inlinedReference,
                         isInlinedReference: !!inlinedReference,
                         parentNodeId: inlinedReference?.hostNodeId,
@@ -116,7 +115,6 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                                 parameterIndex: parameterIndex,
                                 referenceSignature: signature,
                                 parentNodeId: nodeId,
-                                index: globalIndex,
                                 functionId: subFlow.functionDefinition?.id,
                                 flowId: flowId,
                                 color: hashToColor(subFlow?.startingNodeId ?? subFlow?.functionDefinition?.id ?? ""),

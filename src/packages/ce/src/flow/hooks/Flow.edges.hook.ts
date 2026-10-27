@@ -7,6 +7,7 @@ import {FunctionService} from "@edition/function/services/Function.service";
 import {FALLBACK_FUNCTION_PARAMETER_NAME} from "@core/util/fallback-translations";
 import {FlowBuilderEdgeDataProps} from "@edition/flow/components/builder/FlowBuilderEdgeComponent";
 import {useFlowCompareStore} from "@edition/flow/hooks/Flow.compare.hook";
+import {useFlowSchema} from "@edition/flow/hooks/Flow.schema.hook";
 import {useInlinedReferenceNodes} from "@edition/flow/hooks/Flow.references.hook";
 
 // @ts-ignore
@@ -17,7 +18,8 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
     const functionService = useService(FunctionService);
     const functionStore = useStore(FunctionService)
     const flowToCompare = useFlowCompareStore(state => state.flow)
-    const inlinedNodes = useInlinedReferenceNodes(flowId)
+    const flowSchema = useFlowSchema(flowId, namespaceId, projectId)
+    const inlinedNodes = useInlinedReferenceNodes(flowId, flowSchema)
 
     const flow = React.useMemo(
         () => flowService.getById(flowId, {namespaceId, projectId}),

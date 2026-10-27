@@ -1,4 +1,5 @@
 import {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
+import {ListInput, Schema, SignatureSchema} from "@code0-tech/triangulum";
 import React from "react";
 import {useService, useStore} from "@code0-tech/pictor";
 import {FlowService} from "@edition/flow/services/Flow.service";
@@ -45,7 +46,16 @@ export interface InlinedReference {
     parameterIndex: number
 }
 
-export const useInlinedReferenceNodes = (flowId: Flow["id"]): Map<string, InlinedReference> => {
+const isSubFlowSchema = (schema?: Schema): boolean => {
+    if (!schema) return false
+    if (schema.input === "sub-flow" || schema.input === "list-sub-flow") return true
+    if (schema.input !== "list") return false
+
+    const list = schema as ListInput
+    return [...(list.items ?? []), ...(list.declaredItems ?? [])].some(isSubFlowSchema)
+}
+
+export const useInlinedReferenceNodes = (flowId: Flow["id"], schema?: SignatureSchema[]): Map<string, InlinedReference> => {
 
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
@@ -105,6 +115,12 @@ export const useInlinedReferenceNodes = (flowId: Flow["id"]): Map<string, Inline
 
             if (!node?.nextNodeId) return
 
+            const hostParameterSchema = schema
+                ?.find(signatureSchema => signatureSchema?.nodeId === hostNodeId)
+                ?.parameters?.[parameterIndex]?.schema
+
+            if (!isSubFlowSchema(hostParameterSchema)) return
+
             const hasSubFlow = node.parameters?.nodes?.some(parameter => {
                 const value = parameter?.value
                 if (value?.__typename === "SubFlowValue") return true
@@ -134,5 +150,5 @@ export const useInlinedReferenceNodes = (flowId: Flow["id"]): Map<string, Inline
         })
 
         return inlined
-    }, [flow, flow?.editedAt, flowStore, flowId])
+    }, [flow, flow?.editedAt, flowStore, flowId, schema])
 }
