@@ -176,7 +176,6 @@ export const DataTypeInputComponent: React.FC<DataTypeInputComponentProps> = (pr
                 case "list-sub-flow":
                     return <DataTypeListSubFlowInputComponent
                         schema={schema}
-                        suggestions={suggestions}
                         {...rest}/>
                 default:
                     return <DataTypeTextInputComponent
