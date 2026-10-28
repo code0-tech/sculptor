@@ -19,6 +19,9 @@ import {FunctionNodeToolbarComponent} from "@edition/function/components/nodes/F
 import {
     FunctionNodeReferenceIndicatorComponent
 } from "@edition/function/components/nodes/FunctionNodeReferenceIndicatorComponent";
+import {
+    FunctionNodeExecutionIndicatorComponent
+} from "@edition/function/components/nodes/FunctionNodeExecutionIndicatorComponent";
 
 
 export type FunctionNodeTriggerComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
@@ -139,50 +142,53 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
 
     return (
         <Flex align={"center"} style={{flexDirection: "column", gap: "0.7rem"}}>
-            <Card
-                data-qa-selector={"flow-builder-trigger"}
-                variant={"normal"}
-                color={"secondary"}
-                paddingSize={"xs"}
-                display={"flex"}
-                align={"center"}
-                justify={"center"}
-                key={id}
-                data-flow-refernce={id}
-                miw={"60px"}
-                mah={"60px"}
-                className={`d-flow-node ${selected ? "d-flow-node--active" : undefined}`}
-                style={{
-                    transform: "rotate(45deg)",
-                    aspectRatio: "50/50",
-                    ...(isReferenced === true || hoveredNodeId === id ? {
-                        boxShadow: `0 0 5rem 0 ${withAlpha(data.color, 0.25)}`,
-                    } : {}),
-                }}>
+            <div className={"d-flow-node-execution"}>
+                <Card
+                    data-qa-selector={"flow-builder-trigger"}
+                    variant={"normal"}
+                    color={"secondary"}
+                    paddingSize={"xs"}
+                    display={"flex"}
+                    align={"center"}
+                    justify={"center"}
+                    key={id}
+                    data-flow-refernce={id}
+                    miw={"60px"}
+                    mah={"60px"}
+                    className={`d-flow-node d-flow-node--rotated ${selected ? "d-flow-node--active" : ""}`}
+                    style={{
+                        transform: "rotate(45deg)",
+                        aspectRatio: "50/50",
+                        ...(isReferenced === true || hoveredNodeId === id ? {
+                            boxShadow: `0 0 5rem 0 ${withAlpha(data.color, 0.25)}`,
+                        } : {}),
+                    }}>
 
-                <FunctionNodeToolbarComponent offset={16} removable={false}/>
+                    <FunctionNodeToolbarComponent offset={16} removable={false}/>
 
-                <div style={{
-                    transform: "rotate(-45deg)",
-                }}>
+                    <div style={{
+                        transform: "rotate(-45deg)",
+                    }}>
 
-                    <Flex align={"center"} style={{flexDirection: "column", gap: "0.35rem", ...triggerValidationStyle}}>
-                        <DisplayIcon color={iconColor} size={16} style={{width: "16px", height: "16px"}}/>
-                    </Flex>
+                        <Flex align={"center"} style={{flexDirection: "column", gap: "0.35rem", ...triggerValidationStyle}}>
+                            <DisplayIcon color={iconColor} size={16} style={{width: "16px", height: "16px"}}/>
+                        </Flex>
 
-                    {isReferenced === true || hoveredNodeId === id ? (
-                        <FunctionNodeReferenceIndicatorComponent color={data.color}/>
-                    ) : null}
+                        {isReferenced === true || hoveredNodeId === id ? (
+                            <FunctionNodeReferenceIndicatorComponent color={data.color}/>
+                        ) : null}
 
-                    <Handle
-                        isConnectable={false}
-                        type="source"
-                        style={{bottom: "2px"}}
-                        className={"d-flow-node__handle d-flow-node__handle--source"}
-                        position={Position.Bottom}
-                    />
-                </div>
-            </Card>
+                        <Handle
+                            isConnectable={false}
+                            type="source"
+                            style={{bottom: "2px"}}
+                            className={"d-flow-node__handle d-flow-node__handle--source"}
+                            position={Position.Bottom}
+                        />
+                    </div>
+                </Card>
+                <FunctionNodeExecutionIndicatorComponent nodeId={id}/>
+            </div>
             <Text size={"xs"} w={"200px"} style={{textAlign: "center"}}>
                 {flow ? displayMessage : flowType?.names?.[0].content ?? FALLBACK_FLOW_TYPE_NAME}
             </Text>

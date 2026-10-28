@@ -15,6 +15,7 @@ import {
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 import {FlowExecutionResultView} from "@edition/flow/views/FlowExecutionResultView";
 import {FlowExecutionWatcherComponent} from "@edition/flow/components/FlowExecutionWatcherComponent";
+import {FlowExecutionAnimationView} from "@edition/flow/views/FlowExecutionAnimationView";
 import {useFlowViewStore} from "@edition/flow/hooks/Flow.view.hook";
 import {useHotkeys} from "react-hotkeys-hook";
 import {Node, useReactFlow} from "@xyflow/react";
@@ -77,6 +78,7 @@ export default function Page() {
 
     return <ResizablePanel id={"2"}>
         <FlowExecutionWatcherComponent flowId={flowId}/>
+        <FlowExecutionAnimationView/>
         <Layout layoutGap={16} showLayoutSplitter={false} rightContent={
             <Flex data-qa-selector={"flow-builder-tabs"} style={{flexDirection: "column", gap: "0.7rem"}}>
                 <Button aria-selected={tab === "file"}

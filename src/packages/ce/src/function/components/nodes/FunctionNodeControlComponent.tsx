@@ -10,6 +10,9 @@ import {FunctionNodeLabelComponent} from "@edition/function/components/nodes/Fun
 import {
     FunctionNodeReferenceIndicatorComponent
 } from "@edition/function/components/nodes/FunctionNodeReferenceIndicatorComponent";
+import {
+    FunctionNodeExecutionIndicatorComponent
+} from "@edition/function/components/nodes/FunctionNodeExecutionIndicatorComponent";
 
 export type FunctionNodeControlComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
 
@@ -30,7 +33,7 @@ export const FunctionNodeControlComponent: React.FC<FunctionNodeControlComponent
 
     return (
         <Flex align={"center"} style={{flexDirection: "column", gap: "0.35rem"}}>
-            <div style={{position: "relative", display: "flex", alignItems: "center"}}>
+            <div className={"d-flow-node-execution"}>
                 <Card
                     data-qa-selector={"flow-builder-node"}
                     key={id}
@@ -44,7 +47,7 @@ export const FunctionNodeControlComponent: React.FC<FunctionNodeControlComponent
                     w={"50px"}
                     h={"50px"}
                         borderColor={isActive ? "info" : undefined}
-                    className={`d-flow-node ${isActive ? "d-flow-node--active" : ""} ${isDimmed ? "d-flow-node--notReferenced" : ""}`}
+                    className={`d-flow-node d-flow-node--rotated ${isActive ? "d-flow-node--active" : ""} ${isDimmed ? "d-flow-node--notReferenced" : ""}`}
                     color={"primary"} style={{
                     aspectRatio: "50/50",
                     transform: "rotate(45deg)",
@@ -74,6 +77,7 @@ export const FunctionNodeControlComponent: React.FC<FunctionNodeControlComponent
                 {isHighlighted ? (
                     <FunctionNodeReferenceIndicatorComponent color={data.color}/>
                 ) : null}
+                <FunctionNodeExecutionIndicatorComponent nodeId={id}/>
             </div>
             <FunctionNodeLabelComponent name={name} moduleName={moduleName}/>
         </Flex>

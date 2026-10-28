@@ -10,6 +10,9 @@ import {FunctionNodeLabelComponent} from "@edition/function/components/nodes/Fun
 import {
     FunctionNodeReferenceIndicatorComponent
 } from "@edition/function/components/nodes/FunctionNodeReferenceIndicatorComponent";
+import {
+    FunctionNodeExecutionIndicatorComponent
+} from "@edition/function/components/nodes/FunctionNodeExecutionIndicatorComponent";
 
 export type FunctionNodeEndComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
 
@@ -30,7 +33,7 @@ export const FunctionNodeEndComponent: React.FC<FunctionNodeEndComponentProps> =
 
     return (
         <Flex align={"center"} style={{flexDirection: "column", gap: "0.35rem"}}>
-            <div style={{position: "relative", display: "flex", alignItems: "center"}}>
+            <div className={"d-flow-node-execution"}>
                 <Card
                     data-qa-selector={"flow-builder-node"}
                     key={id}
@@ -65,6 +68,7 @@ export const FunctionNodeEndComponent: React.FC<FunctionNodeEndComponentProps> =
                 {isHighlighted ? (
                     <FunctionNodeReferenceIndicatorComponent color={data.color}/>
                 ) : null}
+                <FunctionNodeExecutionIndicatorComponent nodeId={id}/>
             </div>
             <FunctionNodeLabelComponent name={name} moduleName={moduleName}/>
         </Flex>

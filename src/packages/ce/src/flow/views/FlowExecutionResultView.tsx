@@ -87,7 +87,8 @@ export const FlowExecutionResultView: React.FC = () => {
     const projectService = useService(ProjectService)
     const projectStore = useStore(ProjectService)
 
-    const [activeTab, setActiveTab] = React.useState<string>()
+    const activeTab = useFlowExecutionStore(state => state.selectedExecutionId)
+    const setActiveTab = useFlowExecutionStore(state => state.setSelectedExecutionId)
     const [openGanttItemId, setOpenGanttItemId] = React.useState<string>()
     const [hoveredGanttItemId, setHoveredGanttItemId] = React.useState<string>()
     const previousPendingRef = React.useRef<string[]>([])
@@ -150,13 +151,14 @@ export const FlowExecutionResultView: React.FC = () => {
     }, [pendingExecutions])
 
     React.useEffect(() => {
-        if (!activeTab) return
         const stillPending = pendingExecutions.some(execution => execution.executionIdentifier === activeTab)
         const isResult = flowExecutionResults.some(result => result?.id === activeTab)
         if (!stillPending && !isResult) {
             setActiveTab(flowExecutionResults[0]?.id ?? undefined)
         }
-    }, [pendingExecutions, flowExecutionResults, activeTab])
+    }, [pendingExecutions, flowExecutionResults, activeTab, setActiveTab])
+
+    React.useEffect(() => () => setActiveTab(undefined), [setActiveTab])
 
     const ganttItems = React.useMemo<Map<ExecutionResult['id'], NodeGanttItem[]>>(
         () => {
