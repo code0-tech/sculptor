@@ -8,7 +8,7 @@ interface FlowLayoutState {
 }
 
 export const useFlowLayoutStore = create<FlowLayoutState>((setState) => ({
-    direction: "vertical",
+    direction: "horizontal",
     setDirection: (direction: FlowLayoutDirection) => setState({direction}),
 }))
 
