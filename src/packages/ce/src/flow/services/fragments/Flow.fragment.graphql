@@ -156,7 +156,7 @@ fragment Flow on Flow {
     type {
         id
     }
-    executionResults {
+    executionResults (last: 50) {
         __typename
         count
         nodes {
