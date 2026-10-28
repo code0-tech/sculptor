@@ -1,35 +1,19 @@
 import React from "react";
 import {
-    Button,
     Dialog,
     DialogContent,
     DialogOverlay,
     DialogPortal,
-    Flex,
     Spacing,
-    Text,
-    useForm,
     useService,
     useStore
 } from "@code0-tech/pictor";
-import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
-import {InputWrapper} from "@code0-tech/pictor/dist/components/form/InputWrapper";
-import {IconCheck, IconCopy} from "@tabler/icons-react";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {ProjectService} from "@edition/project/services/Project.service";
-import {ModuleService} from "@edition/module/services/Module.service";
-import {DatatypeService} from "@edition/datatype/services/Datatype.service";
-import {FunctionService} from "@edition/function/services/Function.service";
-import {useCopyToClipboard} from "@uidotdev/usehooks";
-import {Flow, LiteralValue, Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
-import {useSchemaAction} from "@edition/flow/components/FlowWorkerProvider";
-import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent";
-import {useFlowExecutionStore} from "@edition/flow/hooks/Flow.execution.hook";
-import {useFlowViewStore} from "@edition/flow/hooks/Flow.view.hook";
-import {Schema} from "@code0-tech/triangulum";
-import {useDefaultValue} from "@edition/datatype/hooks/DataType.defaultValue.hook";
-import {isVoidType} from "@edition/datatype/utils/DataType.isVoidType.util";
+import {Flow, Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
+import {FlowExecuteDefaultView} from "@edition/flow/views/FlowExecuteDefaultView";
+import {FlowExecuteWebhookView} from "@edition/flow/views/FlowExecuteWebhookView";
 
 export interface FlowExecuteDialogComponentProps {
     flowId: Flow['id']
@@ -37,10 +21,6 @@ export interface FlowExecuteDialogComponentProps {
     projectId: NamespaceProject['id']
     open?: boolean
     onOpenChange?: (open: boolean) => void
-}
-
-interface ManualExecutionForm {
-    input?: LiteralValue
 }
 
 export const FlowExecuteDialogComponent: React.FC<FlowExecuteDialogComponentProps> = (props) => {
@@ -53,49 +33,14 @@ export const FlowExecuteDialogComponent: React.FC<FlowExecuteDialogComponentProp
     const flowTypeStore = useStore(FlowTypeService)
     const projectService = useService(ProjectService)
     const projectStore = useStore(ProjectService)
-    const moduleService = useService(ModuleService)
-    const moduleStore = useStore(ModuleService)
-    const dataTypeService = useService(DatatypeService)
-    const dataTypeStore = useStore(DatatypeService)
-    const functionService = useService(FunctionService)
-    const functionStore = useStore(FunctionService)
-
-    const {execute} = useSchemaAction()
-    const addExecution = useFlowExecutionStore(s => s.addExecution)
-    const openTab = useFlowViewStore(s => s.setTab)
-
-    const [copiedText, copyToClipboard] = useCopyToClipboard();
-    const hasCopiedText = Boolean(copiedText);
-
-    const [triggerSchema, setTriggerSchema] = React.useState<Schema | undefined>(undefined)
-    const [executing, setExecuting] = React.useState(false)
-    // Bumping the seed produces a fresh initialValues reference which resets the form
-    // (there is no explicit reset API on useForm).
-    const [formSeed, setFormSeed] = React.useState(0)
-
-    const defaultInput = useDefaultValue(triggerSchema?.type)
-
-    const initialValues = React.useMemo<ManualExecutionForm>(
-        () => ({input: defaultInput ?? undefined}),
-        [formSeed, defaultInput]
-    )
-
-    const [inputs, validate, values] = useForm<ManualExecutionForm>({
-        initialValues,
-    })
 
     const flow = React.useMemo(
-        () => flowService.getById(flowId, {
-            namespaceId,
-            projectId
-        }),
+        () => flowService.getById(flowId, {namespaceId, projectId}),
         [flowId, flowStore, namespaceId, projectId]
     )
 
     const project = React.useMemo(
-        () => projectService.getById(projectId, {
-            namespaceId
-        }),
+        () => projectService.getById(projectId, {namespaceId}),
         [projectId, namespaceId, projectStore]
     )
 
@@ -108,175 +53,19 @@ export const FlowExecuteDialogComponent: React.FC<FlowExecuteDialogComponentProp
         [flow?.type?.id, namespaceId, projectId, project?.primaryRuntime?.id, flowTypeStore]
     )
 
-    const module = React.useMemo(
-        () => moduleService.getById(flowType?.runtimeFlowType?.runtimeModule?.id, {
-            namespaceId: namespaceId,
-            projectId: projectId,
-            runtimeId: project?.primaryRuntime?.id
-        }),
-        [flowType?.runtimeFlowType?.runtimeModule?.id, namespaceId, projectId, project?.primaryRuntime?.id, moduleStore]
-    )
-
-    const dataTypes = React.useMemo(
-        () => dataTypeService.values(),
-        [dataTypeStore, dataTypeService]
-    )
-
-    const functions = React.useMemo(
-        () => functionService.values(),
-        [functionStore, functionService]
-    )
-
-    // The manual execution input is derived from the trigger's return schema (the shape of
-    // the data the trigger hands to the flow). Resolve it whenever the dialog opens, and
-    // drop it on close so a reopen never renders the schema of the previous open.
-    React.useEffect(() => {
-        if (!open) {
-            setTriggerSchema(undefined)
-            return
-        }
-        if (!flow) return
-        if (dataTypes.length <= 0 || functions.length <= 0) return
-
-        let cancelled = false
-        execute({flow, dataTypes, functions}).then(signatureSchema => {
-            if (cancelled) return
-            setTriggerSchema(signatureSchema?.return)
-        })
-
-        return () => {
-            cancelled = true
-        }
-    }, [open, flow, dataTypes.length, functions.length, flow?.editedAt])
-
-    const definition = module?.definitions?.nodes?.[0]
-    let endpoint = `${definition?.protocol ?? "http"}://${definition?.host}:${definition?.port}${definition?.endpoint}`
-        .replace("${{project_slug}}", project?.slug ?? "${{project_slug}}")
-
-    flow?.settings?.nodes?.forEach(setting => {
-        endpoint = endpoint.replace(`\${{${setting?.flowSettingIdentifier}}}`, setting?.value)
-    })
-
-    const copyEndpoint = (event: React.MouseEvent<HTMLElement>) => {
-        if (!navigator?.clipboard?.writeText) {
-            // Without a secure context there is no Clipboard API and the hook falls back to a
-            // textarea on document.body, which the modal dialog's focus trap keeps unfocusable,
-            // so Firefox copies nothing. Run the same fallback inside the dialog instead; the
-            // copyToClipboard call below still records the copied state.
-            const dialog = event.currentTarget.closest("[role='dialog']")
-            if (dialog) {
-                const textArea = document.createElement("textarea")
-                textArea.value = endpoint
-                textArea.style.position = "fixed"
-                textArea.style.opacity = "0"
-                dialog.appendChild(textArea)
-                textArea.select()
-                document.execCommand("copy")
-                dialog.removeChild(textArea)
-            }
-        }
-        copyToClipboard(endpoint)
+    const contentViews: Record<string, React.FC> = {
+        default: FlowExecuteDefaultView,
+        REST: FlowExecuteWebhookView,
     }
 
-    const onExecute = React.useCallback(async () => {
-        const runtimeId = project?.primaryRuntime?.id
-        if (!runtimeId || executing) return
+    const ContentView = contentViews[flowType?.identifier ?? "default"] ?? contentViews.default
 
-        setExecuting(true)
-
-        const edited = !!flow?.editedAt && new Date(flow.updatedAt ?? Date.now()).getTime() != new Date(flow.editedAt).getTime()
-        if (edited) {
-            const flowInput = flowService.getPayloadById(flowId)
-            if (flowInput) await flowService.flowUpdate({flowInput, flowId: flowId!})
-        }
-
-        flowService.triggerExecution({
-            flowId: flowId!,
-            runtimeId,
-            input: (values.input?.value ?? defaultInput?.value ?? null) as any,
-        }).then(payload => {
-            setExecuting(false)
-            if ((payload?.errors?.length ?? 0) > 0 || !payload?.executionIdentifier) return
-
-            addExecution({
-                executionIdentifier: payload.executionIdentifier,
-                flowId,
-                namespaceId,
-                projectId,
-            })
-
-            setFormSeed(seed => seed + 1)
-            onOpenChange?.(false)
-            openTab("execution")
-        }).catch(() => setExecuting(false))
-    }, [project?.primaryRuntime?.id, executing, flow?.editedAt, flow?.updatedAt, flowService, flowId, values.input, defaultInput, addExecution, namespaceId, projectId, openTab, onOpenChange])
-
-    return <Dialog open={open} onOpenChange={(open) => onOpenChange?.(open)}>
+    return <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogPortal>
             <DialogOverlay/>
             <DialogContent showCloseButton title={"Manually execute / test your workflow"}>
                 <Spacing spacing={"xl"}/>
-                {module?.definitions?.nodes?.[0] && (
-                    <>
-                        <InputWrapper title={"Endpoint"}
-                                      description={"The url endpoint to execute this workflow."}
-                                      left={flow?.settings?.nodes?.find(setting => setting?.flowSettingIdentifier === "httpMethod")?.value ? (
-                                          <Text size={"xs"}>
-                                              {flow?.settings?.nodes?.find(setting => setting?.flowSettingIdentifier === "httpMethod")?.value}
-                                          </Text>
-                                      ) : undefined}
-                                      right={
-                                          <ButtonGroup color={"primary"}>
-                                              <Button onClick={copyEndpoint}
-                                                      paddingSize={"xxs"} variant={"none"} color={"secondary"}>
-                                                  {hasCopiedText ? <IconCheck size={13}/> :
-                                                      <IconCopy size={13}/>}
-                                              </Button>
-                                          </ButtonGroup>
-                                      }>
-                            <div style={{
-                                alignSelf: "center",
-                                flex: "1 1 auto"
-                            }}>
-                                <Text>
-                                    {endpoint}
-                                </Text>
-                            </div>
-
-                        </InputWrapper>
-                        <Spacing spacing={"xl"}/>
-                    </>
-                )}
-                <hr style={{width: "100%"}} color={"#201e2c"}/>
-                <Spacing spacing={"xl"}/>
-                <div data-qa-selector={"flow-builder-manual-execution-form"}>
-                    {triggerSchema && !isVoidType(triggerSchema.type) && (
-                        <>
-                            <DataTypeInputComponent
-                                data-qa-selector={"flow-builder-manual-execution-input"}
-                                title={"Input for manual execution"}
-                                description={"The input passed to the trigger for this manual execution."}
-                                schema={triggerSchema}
-                                clearable
-                                key={"flow-builder-manual-execution-input"}
-                                {...inputs.getInputProps("input")}
-                                onChange={() => validate("input")}
-                            />
-                            <Spacing spacing={"xl"}/>
-                        </>
-                    )}
-                    <Flex justify={"flex-end"}>
-                        <Button onClick={onExecute}
-                                w={"100%"}
-                                disabled={executing || !project?.primaryRuntime?.id}
-                                color={"tertiary"}
-                                data-qa-selector={"flow-builder-manual-execution-trigger"}>
-                            <Text>
-                                Manually execute workflow
-                            </Text>
-                        </Button>
-                    </Flex>
-                </div>
+                <ContentView/>
             </DialogContent>
         </DialogPortal>
     </Dialog>
