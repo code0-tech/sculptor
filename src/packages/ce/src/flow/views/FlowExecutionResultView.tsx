@@ -294,7 +294,12 @@ export const FlowExecutionResultView: React.FC = () => {
                                     </Flex>
                                 </FileTabsTrigger>
                             ))}
-                            {Array.from(ganttItems)?.map(([id, items]) => {
+                            {Array.from(ganttItems).sort(([idA], [idB]) => {
+                                const createdAtA = flowExecutionResults.find(execution => execution?.id === idA)?.createdAt
+                                const createdAtB = flowExecutionResults.find(execution => execution?.id === idB)?.createdAt
+
+                                return new Date(createdAtB ?? 0).getTime() - new Date(createdAtA ?? 0).getTime()
+                            })?.map(([id, items]) => {
 
                                 const execution = flowExecutionResults.find(execution => execution?.id === id)
 
