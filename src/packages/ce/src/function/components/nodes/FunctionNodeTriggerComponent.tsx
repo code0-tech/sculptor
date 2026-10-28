@@ -15,6 +15,7 @@ import {useParams} from "next/navigation";
 import {ProjectService} from "@edition/project/services/Project.service";
 import {useReferencedNodeIds} from "@edition/flow/hooks/Flow.references.hook";
 import {useFlowReferenceHoverStore} from "@edition/flow/hooks/Flow.reference.hover.hook";
+import {useFlowLayoutHorizontal} from "@edition/flow/hooks/Flow.layout.hook";
 import {FunctionNodeToolbarComponent} from "@edition/function/components/nodes/FunctionNodeToolbarComponent";
 import {
     FunctionNodeReferenceIndicatorComponent
@@ -29,6 +30,8 @@ export type FunctionNodeTriggerComponentProps = NodeProps<Node<FunctionNodeCompo
 export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponentProps> = memo((props) => {
 
     const {data, id, selected} = props
+
+    const isHorizontal = useFlowLayoutHorizontal()
 
     const params = useParams()
     const flowTypeService = useService(FlowTypeService)
@@ -181,9 +184,9 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
                         <Handle
                             isConnectable={false}
                             type="source"
-                            style={{bottom: "2px"}}
+                            style={isHorizontal ? {right: "2px"} : {bottom: "2px"}}
                             className={"d-flow-node__handle d-flow-node__handle--source"}
-                            position={Position.Bottom}
+                            position={isHorizontal ? Position.Right : Position.Bottom}
                         />
                     </div>
                 </Card>

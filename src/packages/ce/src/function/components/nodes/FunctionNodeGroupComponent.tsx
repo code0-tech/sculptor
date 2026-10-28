@@ -2,12 +2,23 @@ import React, {memo} from "react";
 import {Handle, Node, NodeProps, Position} from "@xyflow/react";
 import {FunctionNodeComponentProps} from "./FunctionNodeComponent";
 import {Card, withAlpha} from "@code0-tech/pictor";
+import {useFlowLayoutHorizontal} from "@edition/flow/hooks/Flow.layout.hook";
 
 export type FunctionNodeGroupComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
 
 export const FunctionNodeGroupComponent: React.FC<FunctionNodeGroupComponentProps> = memo((props) => {
 
     const {data, id} = props
+
+    const isHorizontal = useFlowLayoutHorizontal()
+
+    const targetStyle = React.useMemo(() => isHorizontal
+        ? {left: "0px", top: "50%", transform: "translateY(-50%)"}
+        : {top: "0px", left: "50%", transform: "translateX(-50%)"}, [isHorizontal])
+
+    const sourceStyle = React.useMemo(() => isHorizontal
+        ? {right: "0px", top: "50%", transform: "translateY(-50%)"}
+        : {bottom: "0px", left: "50%", transform: "translateX(-50%)"}, [isHorizontal])
 
     return (
         <Card key={id}
@@ -19,19 +30,19 @@ export const FunctionNodeGroupComponent: React.FC<FunctionNodeGroupComponentProp
               }}>
             <Handle
                 type="target"
-                position={Position.Top}
+                position={isHorizontal ? Position.Left : Position.Top}
                 className={"d-flow-node__handle d-flow-node__handle--target"}
                 isConnectable={false}
                 draggable={false}
-                style={{top: "0px", left: "50%", transform: "translateX(-50%)"}}
+                style={targetStyle}
             />
             <Handle
                 type="source"
-                position={Position.Bottom}
+                position={isHorizontal ? Position.Right : Position.Bottom}
                 className={"d-flow-node__handle d-flow-node__handle--source"}
                 isConnectable={false}
                 draggable={false}
-                style={{bottom: "0px", left: "50%", transform: "translateX(-50%)"}}
+                style={sourceStyle}
             />
         </Card>
     );

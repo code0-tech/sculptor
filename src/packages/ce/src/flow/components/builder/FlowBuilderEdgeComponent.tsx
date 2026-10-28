@@ -2,6 +2,7 @@ import {BaseEdge, Edge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath, Positio
 import React, {memo} from "react";
 import {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {Badge, Component} from "@code0-tech/pictor";
+import {useFlowLayoutHorizontal} from "@edition/flow/hooks/Flow.layout.hook";
 
 export interface FlowBuilderEdgeDataProps extends Component<HTMLDivElement> {
     //some data we will use
@@ -27,13 +28,26 @@ export const FlowBuilderEdgeComponent: React.FC<FlowBuilderEdgeProps> = memo((pr
         ...rest
     } = props
 
+    const isHorizontal = useFlowLayoutHorizontal()
+    const isParameter = data?.type === "parameter"
+
+    const sourcePosition = React.useMemo(() => {
+        if (isParameter) return isHorizontal ? Position.Top : Position.Left
+        return isHorizontal ? Position.Right : Position.Bottom
+    }, [isParameter, isHorizontal])
+
+    const targetPosition = React.useMemo(() => {
+        if (isParameter) return isHorizontal ? Position.Bottom : Position.Right
+        return isHorizontal ? Position.Left : Position.Top
+    }, [isParameter, isHorizontal])
+
     const [edgePath, labelX, labelY] = getSmoothStepPath({
         sourceX,
         sourceY,
-        sourcePosition: data?.type === "parameter" ? Position.Left : Position.Bottom,
+        sourcePosition,
         targetX,
         targetY,
-        targetPosition: data?.type === "parameter" ? Position.Right : Position.Top,
+        targetPosition,
         borderRadius: 16,
         stepPosition: 0.5,
     })
@@ -42,7 +56,7 @@ export const FlowBuilderEdgeComponent: React.FC<FlowBuilderEdgeProps> = memo((pr
 
     return (
         <>
-            {/* Gradient-Definition für genau diese Edge */}
+            {/* gradient definition for exactly this edge */}
             <defs>
                 <linearGradient
                     id={gradientId}

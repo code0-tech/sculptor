@@ -27,6 +27,19 @@
     }
   }
 
+  .react-flow__panel.bottom.left .button-group {
+    flex-direction: column;
+
+    .button-group__first:after, .button-group__item:after {
+      top: unset;
+      right: 25%;
+      left: 25%;
+      bottom: -.211rem;
+      height: 1px;
+      width: unset;
+    }
+  }
+
   .react-flow__node {
     background: transparent;
     padding: unset;
