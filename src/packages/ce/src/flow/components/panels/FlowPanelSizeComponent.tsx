@@ -1,7 +1,16 @@
 import React from "react";
 import {Panel, useOnViewportChange, useReactFlow} from "@xyflow/react";
 import {IconFocusCentered, IconMinus, IconPlus} from "@tabler/icons-react";
-import {Badge, Button, Flex, Text} from "@code0-tech/pictor";
+import {
+    Button,
+    Flex,
+    getSize,
+    Text,
+    Tooltip,
+    TooltipContent,
+    TooltipPortal,
+    TooltipTrigger
+} from "@code0-tech/pictor";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import {useThrottledCallback} from "use-debounce";
 
@@ -35,18 +44,43 @@ export const FlowPanelSizeComponent: React.FC = () => {
     }, [reactFlow])
 
     return <Panel position="bottom-left">
-        <Flex align="center" style={{gap: ".35rem"}}>
+        <Flex align="center" style={{flexDirection: "column", gap: ".35rem"}}>
+            <Text>{zoomDisplay}</Text>
             <ButtonGroup>
-                <Button style={{border: "none"}} variant={"filled"} paddingSize={"xxs"} color={"secondary"}
-                        onClick={() => zoomIn()}><IconPlus size={13}/></Button>
-                <Button style={{border: "none"}} variant={"filled"} paddingSize={"xxs"} color={"secondary"}
-                        onClick={() => zoomOut()}><IconMinus size={13}/></Button>
-                <Button style={{border: "none"}} variant={"filled"} paddingSize={"xxs"} color={"secondary"}
-                        onClick={() => center()}><IconFocusCentered size={13}/></Button>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button style={{border: "none", padding: getSize("xs")}} variant={"none"} color={"secondary"}
+                                onClick={() => zoomIn()}><IconPlus size={13}/></Button>
+                    </TooltipTrigger>
+                    <TooltipPortal>
+                        <TooltipContent side={"right"} sideOffset={8}>
+                            <Text>Zoom in</Text>
+                        </TooltipContent>
+                    </TooltipPortal>
+                </Tooltip>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button style={{border: "none", padding: getSize("xs")}} variant={"none"} color={"secondary"}
+                                onClick={() => zoomOut()}><IconMinus size={13}/></Button>
+                    </TooltipTrigger>
+                    <TooltipPortal>
+                        <TooltipContent side={"right"} sideOffset={8}>
+                            <Text>Zoom out</Text>
+                        </TooltipContent>
+                    </TooltipPortal>
+                </Tooltip>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button style={{border: "none", padding: getSize("xs")}} variant={"none"} color={"secondary"}
+                                onClick={() => center()}><IconFocusCentered size={13}/></Button>
+                    </TooltipTrigger>
+                    <TooltipPortal>
+                        <TooltipContent side={"right"} sideOffset={8}>
+                            <Text>Center flow</Text>
+                        </TooltipContent>
+                    </TooltipPortal>
+                </Tooltip>
             </ButtonGroup>
-            <Badge color={"primary"} style={{boxShadow: "none"}}>
-                <Text>{zoomDisplay}</Text>
-            </Badge>
         </Flex>
     </Panel>
 
