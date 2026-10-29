@@ -50,7 +50,8 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
 
         const traverse = (
             node: NodeFunction,
-            parentGroup?: string
+            parentGroup?: string,
+            depth = 0
         ) => {
 
             if (!node?.id) return
@@ -85,6 +86,8 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
             }
 
             node.parameters?.nodes?.forEach((param, parameterIndex) => {
+                if (depth >= 1) return
+
                 const value = param?.value
                 if (!value) return
 
@@ -149,13 +152,13 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                     }
 
                     const child = flowService.getNodeById(flowId, subFlow.startingNodeId)
-                    if (child) traverse(child, groupId)
+                    if (child) traverse(child, groupId, depth + 1)
                 })
             })
 
             if (node.nextNodeId) {
                 const next = flowService.getNodeById(flow.id, node.nextNodeId);
-                if (next) traverse(next, parentGroup);
+                if (next) traverse(next, parentGroup, depth);
             }
         };
 

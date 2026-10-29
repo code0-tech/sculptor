@@ -46,7 +46,8 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
         const traverse = (
             node: NodeFunction,
             parentNode?: NodeFunction,
-            isParameter = false
+            isParameter = false,
+            depth = 0
         ): string => {
             if (!node) return ""
 
@@ -127,6 +128,8 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
             }
 
             node.parameters?.nodes?.forEach((param, index) => {
+                if (depth >= 1) return
+
                 const parameterValue = param?.value;
                 const parameterDefinition = functionService.getById(node.functionDefinition?.id!!)?.parameterDefinitions?.nodes?.[index];
                 if (!parameterValue) return
@@ -195,7 +198,8 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                         traverse(
                             flowService.getNodeById(flowId, subFlow.startingNodeId)!,
                             node,
-                            true
+                            true,
+                            depth + 1
                         );
                     }
                 })
@@ -205,7 +209,8 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                 traverse(
                     flowService.getNodeById(flow.id!!, node.nextNodeId!!)!!,
                     inlinedReference ? parentNode : node,
-                    inlinedReference ? isParameter : false
+                    inlinedReference ? isParameter : false,
+                    depth
                 );
             }
 
@@ -213,7 +218,7 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
         };
 
         if (flow.startingNodeId) {
-            traverse(flowService.getNodeById(flow.id!!, flow.startingNodeId!!)!!, undefined, false);
+            traverse(flowService.getNodeById(flow.id!!, flow.startingNodeId!!)!!, undefined, false, 0);
         }
 
         return edges

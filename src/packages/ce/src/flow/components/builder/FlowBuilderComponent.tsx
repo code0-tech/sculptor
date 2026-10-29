@@ -144,7 +144,7 @@ export const FlowBuilderComponent: React.FC<FlowBuilderProps> = (props) => {
 
         revalidateHandles((layouted.nodes as Node[]).map(n => n.id))
 
-    }, [initialNodes, initialEdges.length, revalidateHandles, getLayoutElements])
+    }, [initialNodes, initialEdges, revalidateHandles, getLayoutElements])
 
     React.useEffect(() => {
         if (didFitViewRef.current) return

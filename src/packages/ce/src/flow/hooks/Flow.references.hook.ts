@@ -149,6 +149,12 @@ export const useInlinedReferenceNodes = (flowId: Flow["id"], schema?: SignatureS
             inlined.delete(target)
         })
 
+        const hostNodeIds = new Set<string>(Array.from(inlined.values(), ({hostNodeId}) => hostNodeId))
+        inlined.forEach((_, target) => {
+            if (!hostNodeIds.has(target)) return
+            inlined.delete(target)
+        })
+
         return inlined
     }, [flow, flow?.editedAt, flowStore, flowId, schema])
 }
