@@ -18,7 +18,7 @@
     "@apollo/client": "^4.0.9",
     "@code0-tech/pictor": "^1.0.0",
     "@code0-tech/triangulum": "^0.39",
-    "@code0-tech/tucana": "^0.0.82",
+    "@code0-tech/tucana": "^0.0.83",
     "@codemirror/lang-javascript": "^6.2.5",
     "@codemirror/lint": "^6.9.5",
     "@icons-pack/react-simple-icons": "^13.13.0",
