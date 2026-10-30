@@ -5,20 +5,6 @@ const EDITION = process.env.EDITION ?? "ce";
 const SAGITTARIUS_GRAPHQL_URL = process.env.SAGITTARIUS_GRAPHQL_URL ?? 'http://localhost:3010/graphql';
 const SAGITTARIUS_CABLE_URL = process.env.SAGITTARIUS_CABLE_URL ?? 'http://localhost:3010/cable';
 
-const csp = (frameAncestors: string) => `
-    default-src 'self';
-    script-src 'self' 'unsafe-eval' 'unsafe-inline';
-    style-src 'self' 'unsafe-inline';
-    img-src 'self';
-    font-src 'self';
-    object-src 'none';
-    base-uri 'self';
-    form-action 'self';
-    frame-ancestors ${frameAncestors};
-    worker-src 'self' blob: data: *;
-    connect-src 'self' ${SAGITTARIUS_GRAPHQL_URL} ${SAGITTARIUS_CABLE_URL.replace("http", "ws")} ${process.env.NEXT_PUBLIC_OTEL_LOGS_ENDPOINT} ${process.env.NEXT_PUBLIC_OTEL_TRACES_ENDPOINT};
-`.replace(/\n/g, '')
-
 const nextConfig: NextConfig = {
     output: "standalone",
     devIndicators: false,
@@ -29,12 +15,11 @@ const nextConfig: NextConfig = {
     async headers() {
         return [
             {
+                // The Content-Security-Policy is set in src/middleware.ts so that
+                // runtime configured origins are honoured. Headers declared here are
+                // baked in at build time and cannot reflect them.
                 source: '/((?!playground(?:/|$)).*)',
                 headers: [
-                    {
-                        key: 'Content-Security-Policy',
-                        value: csp("'none'"),
-                    },
                     {
                         key: "X-Frame-Options",
                         value: "DENY"
