@@ -26,6 +26,7 @@ import {supportChatService} from "@cloud-internal/support/services/Support.chat.
 import {SupportChatHomeView} from "@cloud-internal/support/views/SupportChatHomeView";
 import {SupportChatConversationView} from "@cloud-internal/support/views/SupportChatConversationView";
 import {SupportChatConversationsView} from "@cloud-internal/support/views/SupportChatConversationsView";
+import {USAGE_WARNING_COLOR} from "@core/util/usage";
 
 export const SupportChatPanelView: React.FC = () => {
 
@@ -137,7 +138,7 @@ export const SupportChatPanelView: React.FC = () => {
             ? <Flex align={"center"} style={{
                 gap: getSize("xs"),
                 padding: `${getSize("xs")} ${getSize("sm")}`,
-                background: "rgba(191, 191, 191, 0.06)"
+                background: "rgba(191, 191, 191, 0.08)"
             }}>
                 <IconInfoCircle size={13} style={{minWidth: "13px"}}/>
                 <Text size={"sm"}>{notice.text}</Text>
@@ -147,9 +148,9 @@ export const SupportChatPanelView: React.FC = () => {
         {chat.connection === "online" ? null : <Flex align={"center"} style={{
             gap: getSize("xs"),
             padding: `${getSize("xs")} ${getSize("sm")}`,
-            background: "rgba(255, 180, 84, 0.1)"
+            background: "#201813"
         }}>
-            <IconWifiOff size={13} style={{minWidth: "13px"}}/>
+            <IconWifiOff size={13} color={USAGE_WARNING_COLOR} style={{minWidth: "13px"}}/>
             <Text size={"sm"}>
                 {chat.connection === "connecting" ? "Connecting…" : "Reconnecting, messages may be delayed"}
             </Text>
