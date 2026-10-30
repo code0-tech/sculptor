@@ -4,8 +4,7 @@ import React from "react";
 import {usePathname} from "next/navigation";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {supportChatService} from "@cloud-internal/support/services/Support.chat.service";
-import {useSupportChat} from "@cloud-internal/support/hooks/Support.chat.hook";
-import {SupportConnection} from "@cloud-internal/support/services/Support.chat.types";
+import {SupportConnection, useSupportChat} from "@cloud-internal/support/hooks/Support.chat.hook";
 
 export const useSupportConnection = (): boolean => {
 

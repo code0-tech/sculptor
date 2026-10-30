@@ -1,16 +1,17 @@
 "use client"
 
 import {create} from "zustand"
-import {supportChatService} from "@cloud-internal/support/services/Support.chat.service"
 import {
-    SupportConnection,
+    supportChatService,
     SupportConversation,
     SupportMessage,
     SupportSession,
     SupportSettings
-} from "@cloud-internal/support/services/Support.chat.types"
+} from "@cloud-internal/support/services/Support.chat.service"
 
 export type SupportChatView = "home" | "conversations" | "conversation"
+
+export type SupportConnection = "connecting" | "online" | "offline"
 
 export interface SupportChatState {
     session?: SupportSession

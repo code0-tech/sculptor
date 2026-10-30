@@ -10,7 +10,7 @@ import {
     IconFileTypePdf,
     IconPhoto
 } from "@tabler/icons-react";
-import {SupportMessage} from "@cloud-internal/support/services/Support.chat.types";
+import {SupportMessage} from "@cloud-internal/support/services/Support.chat.service";
 
 export interface SupportChatMessageComponentProps {
     message: SupportMessage

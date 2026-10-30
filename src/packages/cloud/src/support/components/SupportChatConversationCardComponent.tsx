@@ -3,7 +3,7 @@
 import React from "react";
 import {Avatar, Badge, Card, Flex, getSize, Icon, Text} from "@code0-tech/pictor";
 import {IconChevronRight} from "@tabler/icons-react";
-import {SupportConversation} from "@cloud-internal/support/services/Support.chat.types";
+import {SupportConversation} from "@cloud-internal/support/services/Support.chat.service";
 
 export interface SupportChatConversationCardComponentProps {
     conversation: SupportConversation
