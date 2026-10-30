@@ -4,19 +4,13 @@ import React from "react";
 import {Button, getSize, Text, Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from "@code0-tech/pictor";
 import {IconHelp} from "@tabler/icons-react";
 import {useTutorial} from "@edition/tutorial/hooks/Tutorial.tour.hook";
+import {getTutorialLabel} from "@edition/tutorial/utils/Tutorial.label.util";
 import "driver.js/dist/driver.css";
 import "./TutorialButtonComponent.style.scss";
 
 export const TutorialButtonComponent: React.FC = () => {
 
     const {level, hasSteps, start} = useTutorial()
-
-    const label = React.useMemo(() => {
-        if (level === "application") return "Explore the overview"
-        if (level === "namespace") return "Explore this workspace"
-        if (level === "project") return "Explore this project"
-        return "Explore the flow builder"
-    }, [level])
 
     if (!hasSteps) return null
 
@@ -37,7 +31,7 @@ export const TutorialButtonComponent: React.FC = () => {
             <TooltipPortal>
                 <TooltipContent color={"primary"} side={"left"} sideOffset={8}>
                     <Text>
-                        {label}
+                        {getTutorialLabel(level)}
                     </Text>
                 </TooltipContent>
             </TooltipPortal>
