@@ -1,10 +1,10 @@
 import React from "react";
 import {ResizablePanel} from "@code0-tech/pictor/dist/components/resizable/Resizable";
 import {
-    AuroraBackground,
     Card,
     Col,
-    Flex, getSize,
+    Flex,
+    getSize,
     ScrollArea,
     ScrollAreaScrollbar,
     ScrollAreaThumb,
@@ -18,11 +18,7 @@ import {Panel} from "@xyflow/react";
 import {icon, IconString} from "@core/util/icons";
 import {AIChatComponent} from "@edition/ai/components/AIChatComponent";
 import {useParams} from "next/navigation";
-import {
-    AiGenerateFlowSubscriptionPayload,
-    Namespace,
-    NamespaceProject
-} from "@code0-tech/sagittarius-graphql-types";
+import {AiGenerateFlowSubscriptionPayload, Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {mapAiGenerationFlowToFlowInput} from "@edition/ai/util/AI.flow.mapper";
 import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
@@ -99,66 +95,68 @@ export const ProjectOverviewPage: React.FC = () => {
     }, [flowService, flowStore, namespaceId, projectId])
 
     return <ResizablePanel id={"2"}>
-        <Flex align={"center"} justify={"center"} style={{flexDirection: "column", gap: "1.3rem"}} w={"100%"}
-              h={"100%"}>
-            <Text hierarchy={"primary"} style={{fontWeight: "bold", textAlign: "center", fontSize: "2rem"}}>
-                {greeting}, @{currentUser?.username ?? "unknown"} <br/>
-                Let's automate something.
-            </Text>
-            {/*@ts-ignore*/}
-            <ScrollArea data-qa-selector={"dashboard-project-templates"} type={"none"} w={"100%"}>
-                <ScrollAreaViewport>
-                    <Flex style={{gap: "0.7rem"}}>
-                        <style>
-                            {`
+        <div style={{maxWidth: "52rem", margin: "0 auto", padding: "1rem 1rem", height: "100%", position: "relative"}}>
+            <Flex align={"center"} justify={"center"} style={{flexDirection: "column", gap: "1.3rem"}} w={"100%"}
+                  h={"100%"}>
+                <Text hierarchy={"primary"} style={{fontWeight: "bold", textAlign: "center", fontSize: "2rem"}}>
+                    {greeting}, @{currentUser?.username ?? "unknown"} <br/>
+                    Let's automate something.
+                </Text>
+                {/*@ts-ignore*/}
+                <ScrollArea data-qa-selector={"dashboard-project-templates"} type={"none"} w={"100%"}>
+                    <ScrollAreaViewport>
+                        <Flex style={{gap: "0.7rem"}}>
+                            <style>
+                                {`
                                 .hover-card:hover {
                                     cursor: pointer;
                                     box-shadow: inset 0 1px 1px #70ffb2;
                                 }
                             `}
-                        </style>
-                        <Col xs={3} children={undefined}/>
-                        {flowTemplates.map(flowTemplate => {
+                            </style>
+                            <Col xs={3} children={undefined}/>
+                            {flowTemplates.map(flowTemplate => {
 
-                            const displayIcons = flowTemplate.icons.map(i => icon(i as IconString))
+                                const displayIcons = flowTemplate.icons.map(i => icon(i as IconString))
 
-                            return <Col xs={3} onClick={() => setPrompt(flowTemplate.prompt)}>
-                                <Card className={"hover-card"} paddingSize={"xs"} color={"secondary"}>
-                                    <Flex align={"center"} justify={"space-between"} style={{gap: "0.35rem"}}>
-                                        <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                            {displayIcons.map((DisplayIcon) => (
-                                                /* @ts-ignore*/
-                                                <DisplayIcon color={"white"} size={13}/>
-                                            ))}
+                                return <Col xs={3} onClick={() => setPrompt(flowTemplate.prompt)}>
+                                    <Card className={"hover-card"} paddingSize={"xs"} color={"secondary"}>
+                                        <Flex align={"center"} justify={"space-between"} style={{gap: "0.35rem"}}>
+                                            <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                                {displayIcons.map((DisplayIcon) => (
+                                                    /* @ts-ignore*/
+                                                    <DisplayIcon color={"white"} size={13}/>
+                                                ))}
+                                            </Flex>
+                                            <Text>
+                                                {flowTemplate.description}
+                                            </Text>
                                         </Flex>
-                                        <Text>
-                                            {flowTemplate.description}
-                                        </Text>
-                                    </Flex>
-                                    <Spacing spacing={"xs"}/>
-                                    <Card color={"primary"} style={{
-                                        marginLeft: `calc(-1 * (${getSize("xs")} - 0.1rem))`,
-                                        marginRight: `calc(-1 * (${getSize("xs")} - 0.1rem))`,
-                                        marginBottom: `calc(-1 * (${getSize("xs")} - 0.1rem))`,
-                                    }}>
-                                        <Text>
-                                            {flowTemplate.prompt}
-                                        </Text>
+                                        <Spacing spacing={"xs"}/>
+                                        <Card color={"primary"} style={{
+                                            marginLeft: `calc(-1 * (${getSize("xs")} - 0.1rem))`,
+                                            marginRight: `calc(-1 * (${getSize("xs")} - 0.1rem))`,
+                                            marginBottom: `calc(-1 * (${getSize("xs")} - 0.1rem))`,
+                                        }}>
+                                            <Text>
+                                                {flowTemplate.prompt}
+                                            </Text>
+                                        </Card>
                                     </Card>
-                                </Card>
-                            </Col>
-                        })}
-                        <Col xs={3} children={undefined}/>
-                    </Flex>
-                </ScrollAreaViewport>
-                <ScrollAreaScrollbar orientation={"horizontal"}>
-                    <ScrollAreaThumb/>
-                </ScrollAreaScrollbar>
-            </ScrollArea>
+                                </Col>
+                            })}
+                            <Col xs={3} children={undefined}/>
+                        </Flex>
+                    </ScrollAreaViewport>
+                    <ScrollAreaScrollbar orientation={"horizontal"}>
+                        <ScrollAreaThumb/>
+                    </ScrollAreaScrollbar>
+                </ScrollArea>
 
-        </Flex>
-        <Panel position={"bottom-center"} data-qa-selector={"dashboard-project-ai-chat"} style={{width: "60%"}}>
-            <AIChatComponent projectId={projectId} prompt={prompt} onData={onAIData}/>
-        </Panel>
+            </Flex>
+            <Panel position={"bottom-center"} data-qa-selector={"dashboard-project-ai-chat"} style={{width: "100%"}}>
+                <AIChatComponent projectId={projectId} prompt={prompt} onData={onAIData}/>
+            </Panel>
+        </div>
     </ResizablePanel>
 }
