@@ -45,21 +45,96 @@ fragment Flow on Flow {
                                     ... on LiteralValue {
                                         __typename
                                         value
+                                        references {
+                                            __typename
+                                            id
+                                            createdAt
+                                            updatedAt
+                                            signature
+                                            value {
+                                                __typename
+                                                ... on LiteralValue {
+                                                    __typename
+                                                    value
+                                                }
+                                                ... on SubFlowValue {
+                                                    __typename
+                                                    startingNodeId
+                                                    signature
+                                                    name
+                                                    description
+                                                    functionDefinition {
+                                                        id
+                                                        identifier
+                                                    }
+                                                }
+                                                ... on ReferenceValue {
+                                                    __typename
+                                                    updatedAt
+                                                    createdAt
+                                                    nodeFunctionId
+                                                    inputIndex
+                                                    parameterIndex
+                                                    referencePath {
+                                                        __typename
+                                                        id
+                                                        createdAt
+                                                        updatedAt
+                                                        arrayIndex
+                                                        path
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                     ... on SubFlowValue {
                                         __typename
                                         startingNodeId
                                         signature
+                                        name
+                                        description
                                         functionDefinition {
                                             id
                                             identifier
                                         }
-                                        settings {
+                                        parameters {
                                             __typename
                                             identifier
-                                            defaultValue
-                                            optional
-                                            hidden
+                                            cast
+                                            value {
+                                                __typename
+                                                ... on LiteralValue {
+                                                    __typename
+                                                    value
+                                                }
+                                                ... on SubFlowValue {
+                                                    __typename
+                                                    startingNodeId
+                                                    signature
+                                                    name
+                                                    description
+                                                    functionDefinition {
+                                                        id
+                                                        identifier
+                                                    }
+                                                }
+                                                ... on ReferenceValue {
+                                                    __typename
+                                                    updatedAt
+                                                    createdAt
+                                                    nodeFunctionId
+                                                    inputIndex
+                                                    parameterIndex
+                                                    referencePath {
+                                                        __typename
+                                                        id
+                                                        createdAt
+                                                        updatedAt
+                                                        arrayIndex
+                                                        path
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                     ... on ReferenceValue {
@@ -85,16 +160,130 @@ fragment Flow on Flow {
                             __typename
                             startingNodeId
                             signature
+                            name
+                            description
                             functionDefinition {
                                 id
                                 identifier
                             }
-                            settings {
+                            parameters {
                                 __typename
                                 identifier
-                                defaultValue
-                                optional
-                                hidden
+                                cast
+                                value {
+                                    __typename
+                                    ... on LiteralValue {
+                                        __typename
+                                        value
+                                        references {
+                                            __typename
+                                            id
+                                            createdAt
+                                            updatedAt
+                                            signature
+                                            value {
+                                                __typename
+                                                ... on LiteralValue {
+                                                    __typename
+                                                    value
+                                                }
+                                                ... on SubFlowValue {
+                                                    __typename
+                                                    startingNodeId
+                                                    signature
+                                                    name
+                                                    description
+                                                    functionDefinition {
+                                                        id
+                                                        identifier
+                                                    }
+                                                }
+                                                ... on ReferenceValue {
+                                                    __typename
+                                                    updatedAt
+                                                    createdAt
+                                                    nodeFunctionId
+                                                    inputIndex
+                                                    parameterIndex
+                                                    referencePath {
+                                                        __typename
+                                                        id
+                                                        createdAt
+                                                        updatedAt
+                                                        arrayIndex
+                                                        path
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    ... on SubFlowValue {
+                                        __typename
+                                        startingNodeId
+                                        signature
+                                        name
+                                        description
+                                        functionDefinition {
+                                            id
+                                            identifier
+                                        }
+                                        parameters {
+                                            __typename
+                                            identifier
+                                            cast
+                                            value {
+                                                __typename
+                                                ... on LiteralValue {
+                                                    __typename
+                                                    value
+                                                }
+                                                ... on SubFlowValue {
+                                                    __typename
+                                                    startingNodeId
+                                                    signature
+                                                    name
+                                                    description
+                                                    functionDefinition {
+                                                        id
+                                                        identifier
+                                                    }
+                                                }
+                                                ... on ReferenceValue {
+                                                    __typename
+                                                    updatedAt
+                                                    createdAt
+                                                    nodeFunctionId
+                                                    inputIndex
+                                                    parameterIndex
+                                                    referencePath {
+                                                        __typename
+                                                        id
+                                                        createdAt
+                                                        updatedAt
+                                                        arrayIndex
+                                                        path
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    ... on ReferenceValue {
+                                        __typename
+                                        updatedAt
+                                        createdAt
+                                        nodeFunctionId
+                                        inputIndex
+                                        parameterIndex
+                                        referencePath {
+                                            __typename
+                                            id
+                                            createdAt
+                                            updatedAt
+                                            arrayIndex
+                                            path
+                                        }
+                                    }
+                                }
                             }
                         }
                         ... on ReferenceValue {
