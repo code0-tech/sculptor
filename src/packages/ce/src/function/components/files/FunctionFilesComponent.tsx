@@ -1,5 +1,4 @@
 import React from "react";
-import {Flow, Namespace, NamespaceProject, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {
     Button,
     Flex,
@@ -12,8 +11,6 @@ import {
     MenuSeparator,
     MenuTrigger,
     ScrollArea,
-    ScrollAreaScrollbar,
-    ScrollAreaThumb,
     ScrollAreaViewport,
     Spacing,
     Text,
@@ -31,13 +28,21 @@ import {FlowService} from "@edition/flow/services/Flow.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 import {setSelectedFunctionNode, useSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
-import {useReactFlow} from "@xyflow/react";
+import {useNodes, useReactFlow} from "@xyflow/react";
 import {FunctionFileDefaultComponent} from "@edition/function/components/files/FunctionFileDefaultComponent";
 import {FunctionFileTriggerComponent} from "@edition/function/components/files/FunctionFileTriggerComponent";
+import {FunctionFileSubFlowComponent} from "@edition/function/components/files/FunctionFileSubFlowComponent";
 import {FALLBACK_FLOW_TYPE_NAME, FALLBACK_FUNCTION_NAME} from "@core/util/fallback-translations";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowView} from "@edition/flow/services/Flow.view";
 import {icon, IconString} from "@core/util/icons";
+import {
+    Flow,
+    FunctionDefinition,
+    Namespace,
+    NamespaceProject,
+    NodeFunction
+} from "@code0-tech/sagittarius-graphql-types";
 
 export interface FunctionFilesComponentProps {
     flowId: Flow['id']
@@ -86,6 +91,8 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
         [flow, functionStore]
     )
 
+    const subFlowNodes = useNodes().filter(node => !!node.data?.functionId && !!node.data?.parentNodeId)
+
     React.useEffect(() => {
         setActiveTab(selectedNode?.id ?? undefined)
     }, [selectedNode?.id])
@@ -131,6 +138,20 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
                                         </MenuItem>
                                     })
                                 }
+                                {
+                                    subFlowNodes?.map(node => {
+
+                                        const DisplayIcon = icon(functionService.getById(node?.data?.functionId as FunctionDefinition['id'])?.displayIcon as IconString)
+
+                                        return <MenuItem key={node?.id} onSelect={() => {
+                                            setActiveTab(node?.id)
+                                        }}>
+                                            <DisplayIcon color={hashToColor(node?.id)} size={13}/>
+                                            <Text
+                                                size={"sm"}>{functionService.getById(node?.data?.functionId as FunctionDefinition['id'])?.names?.[0]?.content || FALLBACK_FUNCTION_NAME}</Text>
+                                        </MenuItem>
+                                    })
+                                }
                             </MenuContent>
                         </MenuPortal>
                     </Menu>
@@ -145,68 +166,93 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
                                 <Text
                                     size={"sm"}>{flow?.type?.names?.[0]?.content || FALLBACK_FLOW_TYPE_NAME}</Text>
                             </FileTabsTrigger>
-                            {
-                                nodes?.map(node => {
+                                {
+                                    nodes?.map(node => {
 
-                                    const DisplayIcon = icon(node?.functionDefinition?.displayIcon as IconString)
+                                        const DisplayIcon = icon(node?.functionDefinition?.displayIcon as IconString)
 
-                                    return <FileTabsTrigger value={node?.id!}
-                                                            key={node?.id!}>
-                                        <DisplayIcon color={hashToColor(node?.id!)} size={13}/>
-                                        <Text
-                                            size={"sm"}>{node?.functionDefinition?.names?.[0]?.content || FALLBACK_FUNCTION_NAME}</Text>
-                                    </FileTabsTrigger>
-                                })
-                            }
+                                        return <FileTabsTrigger value={node?.id!}
+                                                                key={node?.id!}>
+                                            <DisplayIcon color={hashToColor(node?.id!)} size={13}/>
+                                            <Text
+                                                size={"sm"}>{node?.functionDefinition?.names?.[0]?.content || FALLBACK_FUNCTION_NAME}</Text>
+                                        </FileTabsTrigger>
+                                    })
+                                }
+                                {
+                                    subFlowNodes?.map(node => {
+
+                                        const DisplayIcon = icon(functionService.getById(node?.data?.functionId as FunctionDefinition['id'])?.displayIcon as IconString)
+
+                                        return <FileTabsTrigger value={node?.id}
+                                                                key={node?.id}>
+                                            <DisplayIcon color={hashToColor(node?.id)} size={13}/>
+                                            <Text
+                                                size={"sm"}>{functionService.getById(node?.data?.functionId as FunctionDefinition['id'])?.names?.[0]?.content || FALLBACK_FUNCTION_NAME}</Text>
+                                        </FileTabsTrigger>
+                                    })
+                                }
                         </Flex>
                     </ScrollAreaViewport>
-                    <ScrollAreaScrollbar orientation={"horizontal"}>
-                        <ScrollAreaThumb/>
-                    </ScrollAreaScrollbar>
                 </ScrollArea>
             </FileTabsList>}>
-                <>
-                    {
-                        !activeTab ? (
-                            <Flex align={"center"} justify={"center"} p={1} h={"100%"}
+            <>
+                {
+                    !activeTab ? (
+                        <Flex align={"center"} justify={"center"} p={1} h={"100%"}
+                              style={{textAlign: "center", flexDirection: "column"}}>
+                            <Flex align={"center"} justify={"center"}
                                   style={{textAlign: "center", flexDirection: "column"}}>
-                                <Flex align={"center"} justify={"center"}
-                                      style={{textAlign: "center", flexDirection: "column"}}>
-                                    <Text size={"lg"} hierarchy={"primary"}>
-                                        Select a node for editing
-                                    </Text>
-                                    <Spacing spacing={"xl"}/>
-                                    <Text>
-                                        To edit the properties of a node, select the node in the flow editor or select
-                                        it from the list of nodes in the dropdown above.
-                                    </Text>
-                                </Flex>
+                                <Text size={"lg"} hierarchy={"primary"}>
+                                    Select a node for editing
+                                </Text>
+                                <Spacing spacing={"xl"}/>
+                                <Text>
+                                    To edit the properties of a node, select the node in the flow editor or select
+                                    it from the list of nodes in the dropdown above.
+                                </Text>
                             </Flex>
-                        ) : null
-                    }
-                    <FileTabsContent data-qa-selector={"flow-builder-file-content"}
-                                     value={flowId!}
-                                     p={"0"}
-                                     h={"100%"}
-                                     key={flowId!}>
-                        <FunctionFileTriggerComponent flowId={flowId}
-                                                      namespaceId={namespaceId}
-                                                      projectId={projectId}/>
-                    </FileTabsContent>
-                    {
-                        nodes?.map(node => {
-                            return <FileTabsContent data-qa-selector={"flow-builder-file-content"}
-                                                    p={"0"}
-                                                    h={"100%"}
-                                                    value={node?.id!}
-                                                    key={node?.id!}>
-                                <FunctionFileDefaultComponent nodeId={node?.id!} flowId={flowId}/>
-                            </FileTabsContent>
-                        })
-                    }
-                </>
-            </Layout>
-        </FileTabs>
-    );
+                        </Flex>
+                    ) : null
+                }
+                <FileTabsContent data-qa-selector={"flow-builder-file-content"}
+                                 value={flowId!}
+                                 p={"0"}
+                                 h={"100%"}
+                                 key={flowId!}>
+                    <FunctionFileTriggerComponent flowId={flowId}
+                                                  namespaceId={namespaceId}
+                                                  projectId={projectId}/>
+                </FileTabsContent>
+                {
+                    nodes?.map(node => {
+                        return <FileTabsContent data-qa-selector={"flow-builder-file-content"}
+                                                p={"0"}
+                                                h={"100%"}
+                                                value={node?.id!}
+                                                key={node?.id!}>
+                            <FunctionFileDefaultComponent nodeId={node?.id!} flowId={flowId}/>
+                        </FileTabsContent>
+                    })
+                }
+                {
+                    subFlowNodes?.map(node => {
+                        return <FileTabsContent data-qa-selector={"flow-builder-file-content"}
+                                                p={"0"}
+                                                h={"100%"}
+                                                value={node?.id}
+                                                key={node?.id}>
+                            <FunctionFileSubFlowComponent flowId={flowId}
+                                                          nodeId={node?.data?.parentNodeId as NodeFunction['id']}
+                                                          functionId={node?.data?.functionId as FunctionDefinition['id']}
+                                                          parameterIndex={node?.data?.parameterIndex as number}
+                                                          referenceSignature={node?.data?.referenceSignature as string | undefined}/>
+                        </FileTabsContent>
+                    })
+                }
+            </>
+        </Layout>
+</FileTabs>
+);
 
 }

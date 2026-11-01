@@ -93,8 +93,7 @@ const mapValue = (value: FlowTemplateValue | null): NodeParameterValueInput => {
             ...(value.startingNodeId !== null
                 ? {startingNodeId: nodeFunctionId(value.startingNodeId)}
                 : value.functionIdentifier ? {functionIdentifier: value.functionIdentifier} : {}),
-            signature: value.signature,
-            settings: []
+            signature: value.signature
         }
     }
 

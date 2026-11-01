@@ -15,8 +15,20 @@ const FALLBACK_FLOW_NAME = "Untitled flow"
 
 const mapValue = (value?: AiGenerationNodeValue | null): NodeParameterValueInput => {
     switch (value?.__typename) {
-        case "AiGenerationLiteralValue":
-            return {literalValue: {value: (value as AiGenerationLiteralValue).value ?? null}}
+        case "AiGenerationLiteralValue": {
+            const literal = value as AiGenerationLiteralValue
+            return {
+                literalValue: {
+                    value: literal.value ?? null,
+                    ...((literal.references?.length ?? 0) > 0 ? {
+                        references: literal.references!.map(reference => ({
+                            signature: reference.signature ?? "",
+                            value: mapValue(reference.value),
+                        })),
+                    } : {}),
+                },
+            }
+        }
         case "AiGenerationReferenceValue": {
             const v = value as AiGenerationReferenceValue
             return {
@@ -42,33 +54,21 @@ const mapValue = (value?: AiGenerationNodeValue | null): NodeParameterValueInput
                             ? {functionIdentifier: v.functionDefinition.identifier}
                             : {}),
                     signature: v.signature ?? "",
-                    settings: v.settings?.map(s => ({
-                        defaultValue: s.defaultValue,
-                        hidden: s.hidden,
-                        identifier: s.identifier!,
-                        optional: s.optional,
-                    })),
+                    ...(v.name ? {name: v.name} : {}),
+                    ...(v.description ? {description: v.description} : {}),
+                    parameters: (v.parameters ?? [])
+                        .filter(parameter => !!parameter.identifier && !!parameter.value)
+                        .map(parameter => ({
+                            identifier: parameter.identifier!,
+                            ...(parameter.cast ? {cast: parameter.cast} : {}),
+                            value: mapValue(parameter.value),
+                        })),
                 },
             }
         }
         default:
             return {literalValue: null}
     }
-}
-
-const mapParameterValue = (value?: AiGenerationNodeValue | null): NodeParameterValueInput => {
-    if (value?.__typename === "AiGenerationLiteralValue" && value.references && value.references.length > 0) {
-        return {
-            literalValue: {
-                value: value.value ?? null,
-                references: value.references.map(ref => ({
-                    signature: ref.signature ?? "",
-                    value: mapValue(ref.value),
-                })),
-            },
-        }
-    }
-    return mapValue(value)
 }
 
 export const ensureUniqueFlowName = (name: string, existingNames: string[]): string => {
@@ -98,7 +98,7 @@ export const mapAiGenerationFlowToFlowInput = (
         functionDefinitionId: node?.functionDefinition?.id!,
         parameters: (node?.parameters ?? []).map<NodeParameterInput>(p => ({
             cast: p?.cast ?? undefined,
-            value: mapParameterValue(p?.value),
+            value: mapValue(p?.value),
         })),
     }))
 

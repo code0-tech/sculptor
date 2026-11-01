@@ -181,29 +181,10 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
                 id: node?.id!,
                 nextNodeId: node?.nextNodeId!,
                 functionDefinitionId: node?.functionDefinition?.id!,
-                parameters: (node?.parameters?.nodes ?? []).map(parameter => {
-                    const parameterValue = parameter?.value
-
-                    if (parameterValue?.__typename === "LiteralValue" && parameterValue.references && parameterValue.references.length > 0) {
-                        return {
-                            ...(parameter?.cast ? {cast: parameter.cast} : {}),
-                            value: {
-                                literalValue: {
-                                    value: parameterValue.value!,
-                                    references: parameterValue.references.map(reference => ({
-                                        signature: reference?.signature ?? "",
-                                        value: this.mapParameterValue(reference?.value),
-                                    })),
-                                },
-                            },
-                        }
-                    }
-
-                    return {
-                        ...(parameter?.cast ? {cast: parameter.cast} : {}),
-                        value: this.mapParameterValue(parameterValue),
-                    }
-                }),
+                parameters: (node?.parameters?.nodes ?? []).map(parameter => ({
+                    ...(parameter?.cast ? {cast: parameter.cast} : {}),
+                    value: this.mapParameterValue(parameter?.value),
+                })),
             })),
             startingNodeId: flow?.startingNodeId!,
         }
@@ -224,17 +205,30 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
                             } : {}
                         ),
                         signature: value.signature ?? "",
-                        settings: value.settings?.map(setting => ({
-                            defaultValue: setting?.defaultValue,
-                            hidden: setting?.hidden,
-                            identifier: setting.identifier!,
-                            optional: setting?.optional,
-                        }))
+                        ...(value.name ? {name: value.name} : {}),
+                        ...(value.description ? {description: value.description} : {}),
+                        parameters: (value.parameters ?? [])
+                            .filter(parameter => !!parameter?.identifier && !!parameter?.value)
+                            .map(parameter => ({
+                                identifier: parameter.identifier!,
+                                ...(parameter.cast ? {cast: parameter.cast} : {}),
+                                value: this.mapParameterValue(parameter.value),
+                            })),
                     }
                 }
 
             case "LiteralValue":
-                return {literalValue: {value: value.value!}}
+                return {
+                    literalValue: {
+                        value: value.value!,
+                        ...((value.references?.length ?? 0) > 0 ? {
+                            references: value.references!.map(reference => ({
+                                signature: reference?.signature ?? "",
+                                value: this.mapParameterValue(reference?.value),
+                            })),
+                        } : {}),
+                    },
+                }
 
             case "ReferenceValue": {
                 const v = value as ReferenceValue
@@ -557,6 +551,43 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
             flow.editedAt = new Date().toISOString()
         }
 
+
+        this.set(index, new View(flow))
+        await this.syncFlow(flowId)
+    }
+
+    getSubFlowValue(flowId: FlowView['id'], nodeId: NodeFunction['id'], parameterIndex: number, referenceSignature?: string): SubFlowValue | undefined {
+        const value = this.getNodeById(flowId, nodeId)?.parameters?.nodes?.[parameterIndex]?.value
+        if (value?.__typename === "SubFlowValue") return value
+        if (value?.__typename !== "LiteralValue") return undefined
+        const reference = value.references?.find(candidate =>
+            candidate?.value?.__typename === "SubFlowValue"
+            && (referenceSignature === undefined || candidate.signature === referenceSignature))
+        return reference?.value as SubFlowValue | undefined
+    }
+
+    async setSubFlowParameterValue(flowId: FlowView['id'], nodeId: NodeFunction['id'], parameterIndex: number, referenceSignature: string | undefined, identifier: string, value?: Maybe<NodeParameterValue>, cast?: string | null): Promise<void> {
+
+        const flow = this.getById(flowId)
+        const index = this.values().findIndex(candidate => candidate.id === flowId)
+        const subFlow = this.getSubFlowValue(flowId, nodeId, parameterIndex, referenceSignature)
+        if (!flow || !subFlow || index < 0) return
+
+        const parameter = subFlow.parameters?.find(candidate => candidate?.identifier === identifier)
+
+        if (!parameter) {
+            subFlow.parameters = [...(subFlow.parameters ?? []), {
+                __typename: "SubFlowValueParameter",
+                identifier: identifier,
+                cast: cast ?? null,
+                value: value ?? null,
+            }]
+        } else {
+            parameter.value = value ?? null
+            if (cast !== undefined) parameter.cast = cast
+        }
+
+        flow.editedAt = new Date().toISOString()
 
         this.set(index, new View(flow))
         await this.syncFlow(flowId)

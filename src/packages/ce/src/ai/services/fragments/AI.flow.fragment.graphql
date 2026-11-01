@@ -35,6 +35,91 @@ fragment AIFlow on AiGenerationFlow {
                             ... on AiGenerationLiteralValue {
                                 __typename
                                 value
+                                references {
+                                    __typename
+                                    signature
+                                    value {
+                                        __typename
+                                        ... on AiGenerationLiteralValue {
+                                            __typename
+                                            value
+                                        }
+                                        ... on AiGenerationSubFlowValue {
+                                            __typename
+                                            startingNodeId
+                                            signature
+                                            name
+                                            description
+                                            functionDefinition {
+                                                __typename
+                                                id
+                                                identifier
+                                            }
+                                        }
+                                        ... on AiGenerationReferenceValue {
+                                            __typename
+                                            id
+                                            nodeFunctionId
+                                            inputIndex
+                                            inputTypeIdentifier
+                                            parameterIndex
+                                            referencePath {
+                                                __typename
+                                                path
+                                                arrayIndex
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            ... on AiGenerationSubFlowValue {
+                                __typename
+                                startingNodeId
+                                signature
+                                name
+                                description
+                                functionDefinition {
+                                    __typename
+                                    id
+                                    identifier
+                                }
+                                parameters {
+                                    __typename
+                                    identifier
+                                    cast
+                                    value {
+                                        __typename
+                                        ... on AiGenerationLiteralValue {
+                                            __typename
+                                            value
+                                        }
+                                        ... on AiGenerationSubFlowValue {
+                                            __typename
+                                            startingNodeId
+                                            signature
+                                            name
+                                            description
+                                            functionDefinition {
+                                                __typename
+                                                id
+                                                identifier
+                                            }
+                                        }
+                                        ... on AiGenerationReferenceValue {
+                                            __typename
+                                            id
+                                            nodeFunctionId
+                                            inputIndex
+                                            inputTypeIdentifier
+                                            parameterIndex
+                                            referencePath {
+                                                __typename
+                                                path
+                                                arrayIndex
+                                            }
+                                        }
+                                    }
+                                }
                             }
                             ... on AiGenerationReferenceValue {
                                 __typename
@@ -49,21 +134,126 @@ fragment AIFlow on AiGenerationFlow {
                                     arrayIndex
                                 }
                             }
+                        }
+                    }
+                }
+                ... on AiGenerationSubFlowValue {
+                    __typename
+                    startingNodeId
+                    signature
+                    name
+                    description
+                    functionDefinition {
+                        __typename
+                        id
+                        identifier
+                    }
+                    parameters {
+                        __typename
+                        identifier
+                        cast
+                        value {
+                            __typename
+                            ... on AiGenerationLiteralValue {
+                                __typename
+                                value
+                                references {
+                                    __typename
+                                    signature
+                                    value {
+                                        __typename
+                                        ... on AiGenerationLiteralValue {
+                                            __typename
+                                            value
+                                        }
+                                        ... on AiGenerationSubFlowValue {
+                                            __typename
+                                            startingNodeId
+                                            signature
+                                            name
+                                            description
+                                            functionDefinition {
+                                                __typename
+                                                id
+                                                identifier
+                                            }
+                                        }
+                                        ... on AiGenerationReferenceValue {
+                                            __typename
+                                            id
+                                            nodeFunctionId
+                                            inputIndex
+                                            inputTypeIdentifier
+                                            parameterIndex
+                                            referencePath {
+                                                __typename
+                                                path
+                                                arrayIndex
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                             ... on AiGenerationSubFlowValue {
                                 __typename
                                 startingNodeId
                                 signature
-                                settings {
-                                    __typename
-                                    identifier
-                                    defaultValue
-                                    hidden
-                                    optional
-                                }
+                                name
+                                description
                                 functionDefinition {
                                     __typename
                                     id
                                     identifier
+                                }
+                                parameters {
+                                    __typename
+                                    identifier
+                                    cast
+                                    value {
+                                        __typename
+                                        ... on AiGenerationLiteralValue {
+                                            __typename
+                                            value
+                                        }
+                                        ... on AiGenerationSubFlowValue {
+                                            __typename
+                                            startingNodeId
+                                            signature
+                                            name
+                                            description
+                                            functionDefinition {
+                                                __typename
+                                                id
+                                                identifier
+                                            }
+                                        }
+                                        ... on AiGenerationReferenceValue {
+                                            __typename
+                                            id
+                                            nodeFunctionId
+                                            inputIndex
+                                            inputTypeIdentifier
+                                            parameterIndex
+                                            referencePath {
+                                                __typename
+                                                path
+                                                arrayIndex
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            ... on AiGenerationReferenceValue {
+                                __typename
+                                id
+                                nodeFunctionId
+                                inputIndex
+                                inputTypeIdentifier
+                                parameterIndex
+                                referencePath {
+                                    __typename
+                                    path
+                                    arrayIndex
                                 }
                             }
                         }
@@ -80,23 +270,6 @@ fragment AIFlow on AiGenerationFlow {
                         __typename
                         path
                         arrayIndex
-                    }
-                }
-                ... on AiGenerationSubFlowValue {
-                    __typename
-                    startingNodeId
-                    signature
-                    settings {
-                        __typename
-                        identifier
-                        defaultValue
-                        hidden
-                        optional
-                    }
-                    functionDefinition {
-                        __typename
-                        id
-                        identifier
                     }
                 }
             }

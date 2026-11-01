@@ -5,6 +5,7 @@ fragment Function on FunctionDefinition {
     signature
     identifier
     displayIcon
+    design
 
     aliases {
         code
