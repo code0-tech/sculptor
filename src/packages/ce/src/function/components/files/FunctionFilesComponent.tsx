@@ -244,7 +244,9 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
                                                 key={node?.id}>
                             <FunctionFileSubFlowComponent flowId={flowId}
                                                           nodeId={node?.data?.parentNodeId as NodeFunction['id']}
-                                                          functionId={node?.data?.functionId as FunctionDefinition['id']}/>
+                                                          functionId={node?.data?.functionId as FunctionDefinition['id']}
+                                                          parameterIndex={node?.data?.parameterIndex as number}
+                                                          referenceSignature={node?.data?.referenceSignature as string | undefined}/>
                         </FileTabsContent>
                     })
                 }

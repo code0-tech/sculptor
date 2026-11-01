@@ -17,7 +17,6 @@ import {
 import {Flow, FunctionDefinition, NodeFunction, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
-import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent";
 import {
     FALLBACK_FUNCTION_DESCRIPTION,
@@ -25,7 +24,7 @@ import {
     FALLBACK_FUNCTION_PARAMETER_DESCRIPTION,
     FALLBACK_FUNCTION_PARAMETER_NAME
 } from "@core/util/fallback-translations";
-import {getTypeSchema} from "@code0-tech/triangulum";
+import {useSubFlowSchema} from "@edition/flow/hooks/Flow.subFlowSchema.hook";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import {IconChevronDown, IconLink, IconLinkOff} from "@tabler/icons-react";
 
@@ -33,20 +32,26 @@ export interface FunctionFileSubFlowComponentProps {
     flowId: Flow['id']
     nodeId: NodeFunction['id']
     functionId: FunctionDefinition['id']
+    parameterIndex: number
+    referenceSignature?: string
 }
 
 export const FunctionFileSubFlowComponent: React.FC<FunctionFileSubFlowComponentProps> = (props) => {
 
-    const {flowId, nodeId, functionId} = props
+    const {flowId, nodeId, functionId, parameterIndex, referenceSignature} = props
 
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
     const functionService = useService(FunctionService)
     const functionStore = useStore(FunctionService)
-    const dataTypeService = useService(DatatypeService)
-    const dataTypeStore = useStore(DatatypeService)
+    const [uncontrolledParameters, setUncontrolledParameters] = React.useState<Record<string, boolean | undefined>>({})
+    const changedParameter = React.useRef<Set<string>>(new Set())
+    const castByParameter = React.useRef<Map<string, string | null>>(new Map())
 
-    const [uncontrolledParameters, setUncontrolledParameters] = React.useState<Record<string, boolean>>({})
+    const subFlow = React.useMemo(
+        () => flowService.getSubFlowValue(flowId, nodeId, parameterIndex, referenceSignature),
+        [flowService, flowStore, flowId, nodeId, parameterIndex, referenceSignature]
+    )
 
     const parentNode = React.useMemo(
         () => flowService.getNodeById(flowId, nodeId),
@@ -63,48 +68,26 @@ export const FunctionFileSubFlowComponent: React.FC<FunctionFileSubFlowComponent
         [functionService, functionStore, functionId]
     )
 
-    const parameterSchemas = React.useMemo(() => {
-        const signature = definition?.signature
-        if (!signature) return []
+    const schemas = useSubFlowSchema(flowId, nodeId, parameterIndex, referenceSignature)
 
-        const open = signature.indexOf("(")
-        if (open < 0) return []
+    const initialValues = React.useMemo(() => Object.fromEntries((definition?.parameterDefinitions?.nodes ?? []).map(parameter =>
+        [parameter!.id!, subFlow?.parameters?.find(candidate => candidate?.identifier === parameter?.identifier)?.value ?? undefined]
+    )), [definition, subFlow])
 
-        const close = signature.slice(open).split("").reduce<{ depth: number, index: number }>((found, character, index) => {
-            if (found.index >= 0) return found
-            const depth = found.depth + (character === "(" ? 1 : character === ")" ? -1 : 0)
-            return {depth, index: depth === 0 && character === ")" ? open + index : -1}
-        }, {depth: 0, index: -1}).index
-        if (close <= open) return []
-
-        const inner = signature.slice(open + 1, close)
-        const parameters = inner.split("").reduce<{ depth: number, parts: string[] }>((split, character, index) => {
-            const opens = ["<", "(", "[", "{"].includes(character)
-            const closes = [">", ")", "]", "}"].includes(character) && inner[index - 1] !== "="
-            const depth = split.depth + (opens ? 1 : closes ? -1 : 0)
-            if (character === "," && split.depth === 0) return {depth, parts: [...split.parts, ""]}
-            return {depth, parts: [...split.parts.slice(0, -1), split.parts[split.parts.length - 1] + character]}
-        }, {depth: 0, parts: [""]}).parts
-
-        const dataTypes = dataTypeService.values()
-
-        return parameters.map(parameter => {
-            const colon = parameter.indexOf(":")
-            if (colon < 0) return undefined
-            return getTypeSchema(parameter.slice(colon + 1).trim(), dataTypes)
+    const onSubmit = React.useCallback((values: Record<string, NodeParameterValue | undefined>) => {
+        (definition?.parameterDefinitions?.nodes ?? []).forEach(parameterDefinition => {
+            if (!changedParameter.current.has(parameterDefinition?.id!)) return
+            changedParameter.current.delete(parameterDefinition?.id!)
+            const cast = castByParameter.current.get(parameterDefinition!.id!)
+            flowService.setSubFlowParameterValue(flowId, nodeId, parameterIndex, referenceSignature, parameterDefinition!.identifier!, values[parameterDefinition!.id!], cast)
         })
-    }, [definition?.signature, dataTypeService, dataTypeStore])
+    }, [flowService, definition, flowId, nodeId, parameterIndex, referenceSignature])
 
-    const initialValues = React.useMemo(
-        () => Object.fromEntries((definition?.parameterDefinitions?.nodes ?? []).map(parameter => [parameter!.id!, undefined])),
-        [definition]
-    )
-
-    const [inputs] = useForm<Record<string, NodeParameterValue | undefined>>({
+    const [inputs, validate] = useForm<Record<string, NodeParameterValue | undefined>>({
         useInitialValidation: true,
         truthyValidationBeforeSubmit: false,
         initialValues: initialValues,
-        onSubmit: () => undefined
+        onSubmit: onSubmit
     })
 
     const parentName = parentDefinition?.names?.[0]?.content ?? FALLBACK_FUNCTION_NAME
@@ -129,7 +112,9 @@ export const FunctionFileSubFlowComponent: React.FC<FunctionFileSubFlowComponent
             const renderParameter = (parameterDefinition: NonNullable<typeof indexedParameters[number]['parameterDefinition']>, index: number) => {
                 const title = parameterDefinition?.names?.[0]?.content ?? FALLBACK_FUNCTION_PARAMETER_NAME
                 const description = parameterDefinition?.descriptions?.[0]?.content ?? FALLBACK_FUNCTION_PARAMETER_DESCRIPTION
-                const isControlled = !uncontrolledParameters[parameterDefinition.id!]
+                const parameter = subFlow?.parameters?.find(candidate => candidate?.identifier === parameterDefinition.identifier)
+                const isControlled = !(uncontrolledParameters[parameterDefinition.id!] ?? !!parameter?.value)
+                const inputProps = inputs.getInputProps(parameterDefinition.id!)
 
                 return <div key={parameterDefinition.id}>
                     <Text size={"md"}>{title}</Text>
@@ -154,10 +139,15 @@ export const FunctionFileSubFlowComponent: React.FC<FunctionFileSubFlowComponent
                                                       backdropFilter: "blur(0.25rem)",
                                                       WebkitBackdropFilter: "blur(0.25rem)"
                                                   }}
-                                                  onClick={() => setUncontrolledParameters(current => ({
-                                                      ...current,
-                                                      [parameterDefinition.id!]: false
-                                                  }))}>
+                                                  onClick={() => {
+                                                      setUncontrolledParameters(current => ({
+                                                          ...current,
+                                                          [parameterDefinition.id!]: false
+                                                      }))
+                                                      inputProps.formValidation?.setValue?.(null)
+                                                      changedParameter.current.add(parameterDefinition.id!)
+                                                      validate()
+                                                  }}>
                                                 <IconLinkOff size={13}/>
                                             </Card>
                                         </div>
@@ -173,10 +163,31 @@ export const FunctionFileSubFlowComponent: React.FC<FunctionFileSubFlowComponent
                         <div style={{position: "relative", flex: 1, minWidth: 0}}>
                             <div inert={isControlled}>
                                 <DataTypeInputComponent data-qa-selector={"flow-builder-sub-flow-parameter"}
-                                                        schema={parameterSchemas[index]!}
+                                                        schema={schemas[index]!}
                                                         clearable
                                                         flowId={flowId}
-                                                        {...inputs.getInputProps(parameterDefinition.id!)}/>
+                                                        cast={parameter?.cast ?? null}
+                                                        onChange={() => {
+                                                            changedParameter.current.add(parameterDefinition.id!)
+                                                            validate()
+                                                        }}
+                                                        onCastChange={changedCast => {
+                                                            castByParameter.current.set(parameterDefinition.id!, changedCast)
+                                                            changedParameter.current.add(parameterDefinition.id!)
+                                                            validate()
+                                                        }}
+                                                        {...inputProps}
+                                                        formValidation={{
+                                                            ...inputProps.formValidation,
+                                                            setValue: (value: NodeParameterValue | NodeFunction | null) => {
+                                                                if (value?.__typename !== "NodeFunction") return inputProps.formValidation?.setValue?.(value)
+                                                                const addedNodeId = flowService.addPreviousNodeById(flowId, nodeId, value)
+                                                                if (addedNodeId) inputProps.formValidation?.setValue?.({
+                                                                    __typename: "ReferenceValue",
+                                                                    nodeFunctionId: addedNodeId
+                                                                })
+                                                            }
+                                                        }}/>
                             </div>
                             {
                                 isControlled ? (
