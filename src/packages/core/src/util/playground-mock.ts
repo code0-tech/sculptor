@@ -201,14 +201,26 @@ const mapNodeValue = (value?: NodeValue, functionId: Map<string, string> = new M
     }
     if (inner?.oneofKind === "subFlow") {
         const executionReference = inner.subFlow.executionReference
-        if (executionReference.oneofKind === "startingNodeId") return {
+        const subFlow = {
             __typename: "SubFlowValue",
+            signature: inner.subFlow.signature,
+            name: inner.subFlow.name ?? null,
+            description: inner.subFlow.description ?? null,
+            parameters: (inner.subFlow.parameters ?? []).map(parameter => ({
+                __typename: "SubFlowValueParameter",
+                identifier: parameter.identifier,
+                cast: parameter.cast ?? null,
+                value: mapNodeValue(parameter.value, functionId)
+            }))
+        }
+        if (executionReference.oneofKind === "startingNodeId") return {
+            ...subFlow,
             startingNodeId: gid("NodeFunction", executionReference.startingNodeId)
         }
         if (executionReference.oneofKind === "function") {
             const identifier = executionReference.function.functionIdentifier
             return {
-                __typename: "SubFlowValue",
+                ...subFlow,
                 functionDefinition: {
                     __typename: "FunctionDefinition",
                     id: functionId.get(identifier) ?? null,
@@ -216,7 +228,7 @@ const mapNodeValue = (value?: NodeValue, functionId: Map<string, string> = new M
                 }
             }
         }
-        return {__typename: "SubFlowValue"}
+        return subFlow
     }
     return null
 }
