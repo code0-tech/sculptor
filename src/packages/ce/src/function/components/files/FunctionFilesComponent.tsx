@@ -1,5 +1,4 @@
 import React from "react";
-import {Flow, Namespace, NamespaceProject, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {
     Button,
     Flex,
@@ -193,6 +192,9 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
                                         </FileTabsTrigger>
                                     })
                                 }
+                        </Flex>
+                    </ScrollAreaViewport>
+                </ScrollArea>
             </FileTabsList>}>
             <>
                 {
