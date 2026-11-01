@@ -17,6 +17,27 @@ const errorResult = (
     }]
 })
 
+// A sub-flow that carries only a functionIdentifier has no NodeFunction of its own, so
+// the generated source references it bare (`fn_std_text_concat`) instead of calling it --
+// there is no argument position for getSignatureSchema to analyse. Promoting it to a real
+// starting node emits a lambda at the argument position it belongs to, so its parameters
+// are analysed in context: they resolve against the enclosing call and offer the lambda's
+// own parameters (a loop's item/index) as references.
+const subFlowOf = (node, parameterIndex, referenceSignature) => {
+    const value = node?.parameters?.nodes?.[parameterIndex]?.value
+    if (value?.__typename === "SubFlowValue") return value
+    if (value?.__typename !== "LiteralValue") return undefined
+    return (value.references ?? []).find(reference =>
+        reference?.value?.__typename === "SubFlowValue"
+        && (referenceSignature === undefined || reference.signature === referenceSignature))?.value
+}
+
+const freeNodeId = (flow) => {
+    const indices = (flow?.nodes?.nodes ?? [])
+        .map(node => Number(node?.id?.match(/NodeFunction\/(\d+)$/)?.[1] ?? 0))
+    return `gid://sagittarius/NodeFunction/${Math.max(0, ...indices) + 1}`
+}
+
 addEventListener("message", (event) => {
     const {id, action, payload} = event.data;
     let result;
@@ -52,6 +73,28 @@ addEventListener("message", (event) => {
             case 'type_variant':
                 result = 0;
                 break;
+            case 'sub_flow_schema': {
+                const flow = structuredClone(payload.flow);
+                const parentNode = flow?.nodes?.nodes?.find(node => node?.id === payload.nodeId);
+                const subFlow = subFlowOf(parentNode, payload.parameterIndex, payload.referenceSignature);
+
+                if (!subFlow?.functionDefinition) {
+                    result = undefined;
+                    break;
+                }
+
+                const startingNodeId = freeNodeId(flow);
+                subFlow.startingNodeId = startingNodeId;
+                flow.nodes.nodes.push({
+                    __typename: "NodeFunction",
+                    id: startingNodeId,
+                    functionDefinition: subFlow.functionDefinition,
+                    parameters: {nodes: []}
+                });
+
+                result = getSignatureSchema(flow, payload.dataTypes, payload.functions, startingNodeId);
+                break;
+            }
             case 'schema':
                 // getSignatureSchema now returns a SignatureSchema ({nodeId, parameters, return}).
                 // We forward the whole object so callers can associate parameters by nodeId;

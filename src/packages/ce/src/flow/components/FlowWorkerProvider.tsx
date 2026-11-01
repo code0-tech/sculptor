@@ -19,6 +19,7 @@ type FlowWorkerActions =
     | "type_variant"
     | "schema"
     | "json_schema"
+    | "sub_flow_schema"
 
 interface FlowWorkerValidationPayload {
     flow: Flow
@@ -71,6 +72,15 @@ interface FlowWorkerTypeExtractionPayload {
     dataTypes: DataType[]
 }
 
+interface FlowWorkerSubFlowSchemaPayload {
+    flow: Flow
+    dataTypes: DataType[]
+    functions: FunctionDefinition[]
+    nodeId: NodeFunction['id']
+    parameterIndex: number
+    referenceSignature?: string
+}
+
 interface FlowWorkerSchemaPayload {
     flow: Flow
     dataTypes: DataType[]
@@ -87,6 +97,7 @@ type FlowWorkerPayload =
     | FlowWorkerValueExtractionPayload
     | FlowWorkerJsonSchemaPayload
     | FlowWorkerTypeVariantPayload
+    | FlowWorkerSubFlowSchemaPayload
 
 interface WorkerContextType {
     calculate: (action: FlowWorkerActions, payload: FlowWorkerPayload) => Promise<any>
@@ -209,3 +220,6 @@ export const useJsonSchemaAction = () =>
 
 export const useSchemaAction = () =>
     useWorkerAction<SignatureSchema, FlowWorkerSchemaPayload>("schema");
+
+export const useSubFlowSchemaAction = () =>
+    useWorkerAction<SignatureSchema | undefined, FlowWorkerSubFlowSchemaPayload>("sub_flow_schema");
