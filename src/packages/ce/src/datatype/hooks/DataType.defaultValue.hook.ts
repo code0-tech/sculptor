@@ -1,31 +1,23 @@
 import type {LiteralValue} from "@code0-tech/sagittarius-graphql-types";
-import {useService, useStore} from "@code0-tech/pictor";
-import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {useValueExtractionAction} from "@edition/flow/components/FlowWorkerProvider";
 import {isVoidType} from "@edition/datatype/utils/DataType.isVoidType.util";
 import React from "react";
 
 export const useDefaultValue = (type?: string): LiteralValue | null => {
-    const dataTypeService = useService(DatatypeService)
-    const dataTypeStore = useStore(DatatypeService)
-    const {execute} = useValueExtractionAction()
+    const {execute, hydrated} = useValueExtractionAction()
 
     const [value, setValue] = React.useState<LiteralValue | null>(null)
-
-    const dataTypes = React.useMemo(
-        () => dataTypeService.values(),
-        [dataTypeStore, dataTypeService]
-    )
 
     React.useEffect(() => {
         if (!type || isVoidType(type)) {
             setValue(null)
             return
         }
+        if (!hydrated) return
 
         let cancelled = false
 
-        execute({type, dataTypes}).then(result => {
+        execute({type}).then(result => {
             if (cancelled) return
             setValue(result ?? null)
         })
@@ -33,7 +25,7 @@ export const useDefaultValue = (type?: string): LiteralValue | null => {
         return () => {
             cancelled = true
         }
-    }, [type, dataTypes.length])
+    }, [type, hydrated, execute])
 
     return value
 }
