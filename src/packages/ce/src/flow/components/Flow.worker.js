@@ -38,14 +38,27 @@ const freeNodeId = (flow) => {
     return `gid://sagittarius/NodeFunction/${Math.max(0, ...indices) + 1}`
 }
 
+const hydration = {
+    dataTypes: [],
+    functions: []
+}
+
 addEventListener("message", (event) => {
     const {id, action, payload} = event.data;
     let result;
 
+    if (action === 'hydrate') {
+        hydration.dataTypes = payload.dataTypes ?? [];
+        hydration.functions = payload.functions ?? [];
+        return;
+    }
+
+    const {dataTypes, functions} = hydration;
+
     try {
         switch (action) {
             case 'validation':
-                result = getFlowValidation(payload.flow, payload.functions, payload.dataTypes)
+                result = getFlowValidation(payload.flow, functions, dataTypes)
                     .diagnostics.map(diagnostic =>
                         errorResult(diagnostic.nodeId, diagnostic.parameterIndex, diagnostic.message, diagnostic.severity));
                 break;
@@ -62,13 +75,13 @@ addEventListener("message", (event) => {
                 result = {};
                 break;
             case 'type_extraction':
-                result = getTypeFromValue(payload.value, payload.dataTypes);
+                result = getTypeFromValue(payload.value, dataTypes);
                 break;
             case 'value_extraction':
-                result = getValueFromType(payload.type, payload.dataTypes);
+                result = getValueFromType(payload.type, dataTypes);
                 break;
             case 'json_schema':
-                result = getJsonSchemaFromType(payload.type, payload.dataTypes);
+                result = getJsonSchemaFromType(payload.type, dataTypes);
                 break;
             case 'type_variant':
                 result = 0;
@@ -92,14 +105,21 @@ addEventListener("message", (event) => {
                     parameters: {nodes: []}
                 });
 
-                result = getSignatureSchema(flow, payload.dataTypes, payload.functions, startingNodeId);
+                result = getSignatureSchema(flow, dataTypes, functions, startingNodeId);
                 break;
             }
+            case 'flow_schemas':
+                result = [
+                    getSignatureSchema(payload.flow, dataTypes, functions),
+                    ...(payload.flow?.nodes?.nodes ?? []).map(node =>
+                        getSignatureSchema(payload.flow, dataTypes, functions, node?.id))
+                ];
+                break;
             case 'schema':
                 // getSignatureSchema now returns a SignatureSchema ({nodeId, parameters, return}).
                 // We forward the whole object so callers can associate parameters by nodeId;
                 // the return schema is unused for now.
-                result = getSignatureSchema(payload.flow, payload.dataTypes, payload.functions, payload.nodeId);
+                result = getSignatureSchema(payload.flow, dataTypes, functions, payload.nodeId);
                 break;
         }
 
