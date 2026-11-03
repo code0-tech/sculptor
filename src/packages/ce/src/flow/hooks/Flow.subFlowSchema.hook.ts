@@ -3,8 +3,6 @@ import {useService, useStore} from "@code0-tech/pictor";
 import React from "react";
 import {NodeSchema} from "@code0-tech/triangulum";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import {DatatypeService} from "@edition/datatype/services/Datatype.service";
-import {FunctionService} from "@edition/function/services/Function.service";
 import {useSubFlowSchemaAction} from "@edition/flow/components/FlowWorkerProvider";
 
 export const useSubFlowSchema = (
@@ -15,11 +13,7 @@ export const useSubFlowSchema = (
 ): NodeSchema[] => {
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
-    const dataTypeService = useService(DatatypeService)
-    const dataTypeStore = useStore(DatatypeService)
-    const functionService = useService(FunctionService)
-    const functionStore = useStore(FunctionService)
-    const {execute} = useSubFlowSchemaAction()
+    const {execute, hydrated} = useSubFlowSchemaAction()
 
     const [schema, setSchema] = React.useState<NodeSchema[]>([])
 
@@ -28,24 +22,13 @@ export const useSubFlowSchema = (
         [flowId, flowService, flowStore]
     )
 
-    const dataTypes = React.useMemo(
-        () => dataTypeService.values(),
-        [dataTypeStore, dataTypeService]
-    )
-
-    const functions = React.useMemo(
-        () => functionService.values(),
-        [functionStore, functionService]
-    )
-
     React.useEffect(() => {
         if (!flow) return
-        if (dataTypes.length <= 0) return
-        if (functions.length <= 0) return
+        if (!hydrated) return
 
         let cancelled = false
 
-        execute({flow, dataTypes, functions, nodeId, parameterIndex, referenceSignature}).then(resolved => {
+        execute({flow, nodeId, parameterIndex, referenceSignature}).then(resolved => {
             if (cancelled) return
             setSchema(resolved?.parameters ?? [])
         })
@@ -53,7 +36,7 @@ export const useSubFlowSchema = (
         return () => {
             cancelled = true
         }
-    }, [functions.length, dataTypes.length, flow?.editedAt, nodeId, parameterIndex, referenceSignature])
+    }, [flow, flow?.editedAt, hydrated, execute, nodeId, parameterIndex, referenceSignature])
 
     return schema
 }
