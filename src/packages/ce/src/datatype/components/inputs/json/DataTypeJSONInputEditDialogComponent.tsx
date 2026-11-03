@@ -10,8 +10,6 @@ import {
     DataTypeJSONInputBreadcrumbComponent
 } from "@edition/datatype/components/inputs/json/DataTypeJSONInputBreadcrumbComponent";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import {FunctionService} from "@edition/function/services/Function.service";
-import {DatatypeService} from "@edition/datatype/services/Datatype.service";
 import {useSchemaAction} from "@edition/flow/components/FlowWorkerProvider";
 import {
     Button,
@@ -32,8 +30,7 @@ import {
     TooltipContent,
     TooltipPortal,
     TooltipTrigger,
-    useService,
-    useStore
+    useService
 } from "@code0-tech/pictor";
 import {IconArrowsMaximize, IconArrowsMinimize, IconCircleDot, IconX} from "@tabler/icons-react";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
@@ -80,17 +77,10 @@ export const DataTypeJSONInputEditDialogComponent: React.FC<DataTypeJSONInputEdi
     const latestSchemaRequest = React.useRef(0)
 
     const flowService = useService(FlowService)
-    const functionService = useService(FunctionService)
-    const dataTypeService = useService(DatatypeService)
-    const dataTypeStore = useStore(DatatypeService)
-    const functionStore = useStore(FunctionService)
-    const {execute} = useSchemaAction()
-
-    const dataTypes = React.useMemo(() => dataTypeService.values(), [dataTypeStore])
-    const functions = React.useMemo(() => functionService.values(), [functionStore])
+    const {execute, hydrated} = useSchemaAction()
 
     React.useEffect(() => {
-        if (flowId === undefined || parameterIndex === undefined || dataTypes.length <= 0 || functions.length <= 0) return
+        if (flowId === undefined || parameterIndex === undefined || !hydrated) return
         const timeout = setTimeout(() => {
             const flow = flowService.getById(flowId)
             if (!flow) return
@@ -106,14 +96,14 @@ export const DataTypeJSONInputEditDialogComponent: React.FC<DataTypeJSONInputEdi
                 parameterNode.value = editedObject
             }
             const requestId = ++latestSchemaRequest.current
-            execute({flow: snapshot, dataTypes, functions, nodeId}).then(signatureSchema => {
+            execute({flow: snapshot, nodeId}).then(signatureSchema => {
                 if (requestId !== latestSchemaRequest.current) return
                 const live = signatureSchema?.parameters?.[parameterIndex]?.schema
                 setLiveSchema(live?.input === schema?.input ? live : undefined)
             })
         }, 200)
         return () => clearTimeout(timeout)
-    }, [editedObject, flowId, nodeId, parameterIndex, dataTypes, functions])
+    }, [editedObject, flowId, nodeId, parameterIndex, hydrated, execute])
 
     React.useEffect(() => {
         setActivePath(entry?.path ?? [])

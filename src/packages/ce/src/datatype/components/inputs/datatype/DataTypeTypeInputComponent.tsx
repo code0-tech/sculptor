@@ -68,13 +68,13 @@ export const DataTypeTypeInputComponent: React.FC<DataTypeTypeInputComponentProp
 
         emittedCast.current = next
         onCastChange?.(next)
-        const schema = await jsonSchemaAction.execute({type: next, dataTypes})
+        const schema = await jsonSchemaAction.execute({type: next})
         if (emittedCast.current !== next) return
 
         const literal = {__typename: "LiteralValue", value: schema ?? {}} as LiteralValue
         formValidation?.setValue?.(literal)
         onChange?.(literal)
-    }, [dataTypes])
+    }, [jsonSchemaAction])
 
     return (
         <>
