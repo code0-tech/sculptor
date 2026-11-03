@@ -2,10 +2,10 @@ import type {Flow, Namespace, NamespaceProject} from "@code0-tech/sagittarius-gr
 import {useService, useStore} from "@code0-tech/pictor";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import React from "react";
-import {useSchemaAction} from "@edition/flow/components/FlowWorkerProvider";
-import {DatatypeService} from "@edition/datatype/services/Datatype.service";
-import {FunctionService} from "@edition/function/services/Function.service";
+import {useFlowSchemasAction} from "@edition/flow/components/FlowWorkerProvider";
 import {SignatureSchema} from "@code0-tech/triangulum";
+
+const globalPendingSchemas = new Map<string, Promise<SignatureSchema[] | undefined>>()
 
 export const useFlowSchema = (
     flowId: Flow['id'],
@@ -14,60 +14,36 @@ export const useFlowSchema = (
 ): SignatureSchema[] | undefined => {
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
-    const dataTypeStore = useStore(DatatypeService)
-    const dataTypeService = useService(DatatypeService)
-    const functionService = useService(FunctionService)
-    const functionStore = useStore(FunctionService)
-    const {execute} = useSchemaAction()
+    const {execute, hydrated} = useFlowSchemasAction()
 
     const [schema, setSchema] = React.useState<SignatureSchema[] | undefined>([]);
 
     const flow = React.useMemo(
         () => flowService.getById(flowId, {namespaceId, projectId}),
-        [flowId, flowService, flowStore]
-    )
-
-    const dataTypes = React.useMemo(
-        () => dataTypeService.values(),
-        [dataTypeStore, dataTypeService]
-    )
-
-    const functions = React.useMemo(
-        () => functionService.values(),
-        [functionStore, functionService]
+        [flowId, namespaceId, projectId, flowService, flowStore]
     )
 
     React.useEffect(() => {
         if (!flow) return
-        if (dataTypes.length <= 0) return
-        if (functions.length <= 0) return
+        if (!hydrated) return
+
+        const key = `${flowId}-${flow.editedAt}-${flow.nodes?.nodes?.length}`
+        const pending = globalPendingSchemas.get(key) ?? execute({flow})
+
+        globalPendingSchemas.set(key, pending)
 
         let cancelled = false
 
-        const triggerSchema = execute({
-            flow,
-            dataTypes,
-            functions
-        })
-
-        const schemas = flow.nodes?.nodes?.map(node => {
-            return execute({
-                flow,
-                dataTypes,
-                functions,
-                nodeId: node?.id
-            })
-        })
-
-        Promise.all([triggerSchema!, ...schemas!]).then((value) => {
+        pending.then(value => {
+            globalPendingSchemas.delete(key)
             if (cancelled) return
-            setSchema(value as SignatureSchema[])
+            setSchema(value)
         })
 
         return () => {
             cancelled = true
         }
-    }, [functions.length, dataTypes.length, flowStore, flow?.editedAt, flow?.nodes?.nodes?.length])
+    }, [flow, flow?.editedAt, flow?.nodes?.nodes?.length, flowId, hydrated, execute])
 
     return schema
 }

@@ -115,7 +115,7 @@ export const DataTypeTypeInputEditDialogComponent: React.FC<DataTypeTypeInputEdi
             setMode(next)
             return
         }
-        valueFromTypeAction.execute({type, dataTypes}).then(extracted => {
+        valueFromTypeAction.execute({type}).then(extracted => {
             setJson((extracted as LiteralValue | undefined)?.value ?? null)
             setMode(next)
         })

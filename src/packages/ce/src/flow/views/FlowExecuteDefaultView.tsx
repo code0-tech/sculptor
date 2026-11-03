@@ -4,8 +4,6 @@ import {Flow, LiteralValue, Namespace, NamespaceProject} from "@code0-tech/sagit
 import {useParams} from "next/navigation";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {ProjectService} from "@edition/project/services/Project.service";
-import {DatatypeService} from "@edition/datatype/services/Datatype.service";
-import {FunctionService} from "@edition/function/services/Function.service";
 import {useSchemaAction} from "@edition/flow/components/FlowWorkerProvider";
 import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent";
 import {useFlowExecutionStore} from "@edition/flow/hooks/Flow.execution.hook";
@@ -22,12 +20,7 @@ export const FlowExecuteDefaultView: React.FC = () => {
     const flowStore = useStore(FlowService)
     const projectService = useService(ProjectService)
     const projectStore = useStore(ProjectService)
-    const dataTypeService = useService(DatatypeService)
-    const dataTypeStore = useStore(DatatypeService)
-    const functionService = useService(FunctionService)
-    const functionStore = useStore(FunctionService)
-
-    const {execute} = useSchemaAction()
+    const {execute, hydrated} = useSchemaAction()
     const addExecution = useFlowExecutionStore(s => s.addExecution)
     const openTab = useFlowViewStore(s => s.setTab)
 
@@ -61,22 +54,12 @@ export const FlowExecuteDefaultView: React.FC = () => {
         [projectId, namespaceId, projectStore]
     )
 
-    const dataTypes = React.useMemo(
-        () => dataTypeService.values(),
-        [dataTypeStore, dataTypeService]
-    )
-
-    const functions = React.useMemo(
-        () => functionService.values(),
-        [functionStore, functionService]
-    )
-
     React.useEffect(() => {
         if (!flow) return
-        if (dataTypes.length <= 0 || functions.length <= 0) return
+        if (!hydrated) return
 
         let cancelled = false
-        execute({flow, dataTypes, functions}).then(signatureSchema => {
+        execute({flow}).then(signatureSchema => {
             if (cancelled) return
             setTriggerSchema(signatureSchema?.return)
         })
@@ -84,7 +67,7 @@ export const FlowExecuteDefaultView: React.FC = () => {
         return () => {
             cancelled = true
         }
-    }, [flow, dataTypes.length, functions.length, flow?.editedAt])
+    }, [flow, flow?.editedAt, hydrated, execute])
 
     const onExecute = React.useCallback(async () => {
         const runtimeId = project?.primaryRuntime?.id
