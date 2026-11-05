@@ -20,7 +20,7 @@ export const useFlowValidation = (
 
     const flow = React.useMemo(
         () => flowService.getById(flowId),
-        [flowStore, flowId, flowService]
+        [flowStore, flowId]
     )
 
     React.useEffect(() => {

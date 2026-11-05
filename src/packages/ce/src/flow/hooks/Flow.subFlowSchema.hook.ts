@@ -19,7 +19,7 @@ export const useSubFlowSchema = (
 
     const flow = React.useMemo(
         () => flowService.getById(flowId),
-        [flowId, flowService, flowStore]
+        [flowId, flowStore]
     )
 
     React.useEffect(() => {

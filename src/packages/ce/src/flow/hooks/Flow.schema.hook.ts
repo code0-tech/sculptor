@@ -20,7 +20,7 @@ export const useFlowSchema = (
 
     const flow = React.useMemo(
         () => flowService.getById(flowId, {namespaceId, projectId}),
-        [flowId, namespaceId, projectId, flowService, flowStore]
+        [flowId, namespaceId, projectId, flowStore]
     )
 
     React.useEffect(() => {
@@ -43,7 +43,7 @@ export const useFlowSchema = (
         return () => {
             cancelled = true
         }
-    }, [flow, flow?.editedAt, flow?.nodes?.nodes?.length, flowId, hydrated, execute])
+    }, [flowStore, flowService, flow, flow?.editedAt, flow?.nodes?.nodes?.length ?? 0, flowId, hydrated, execute])
 
     return schema
 }

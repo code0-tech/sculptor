@@ -32,7 +32,7 @@ const nextConfig: NextConfig = {
     // Enable React Compiler in production builds only. In dev it forces a
     // per-file Babel pass (the compiler is a Babel plugin) which is the
     // dominant cost of Turbopack dev compile time and memory here.
-    reactCompiler: process.env.NODE_ENV === "production",
+    reactCompiler: true,
     // Rewrite barrel imports from the code0 UI packages into direct submodule
     // imports. Without this, each of the ~186 files importing from
     // "@code0-tech/pictor" pulls the entire dist/index.js barrel (~364 modules)
