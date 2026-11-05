@@ -108,7 +108,9 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                     if (!subFlow.startingNodeId && subFlow.functionDefinition?.id) {
                         nodes.push({
                             id: `${nodeId}-${key}`,
-                            type: functionDefinition && "design" in functionDefinition ? functionDefinition?.design as string : "round",
+                            type: functionDefinition && "design" in functionDefinition && functionDefinition?.design
+                                ? functionDefinition.design as string
+                                : "round",
                             position: {x: 0, y: 0},
                             draggable: false,
                             parentId: parentGroup,
