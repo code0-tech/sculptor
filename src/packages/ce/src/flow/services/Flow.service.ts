@@ -194,7 +194,9 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
 
     private mapParameterValue(value?: Maybe<NodeParameterValue>): NodeParameterValueInput {
         switch (value?.__typename) {
-            case "SubFlowValue":
+            case "SubFlowValue": {
+                const subFlowName = value.functionDefinition?.names?.[0]?.content ?? value.name
+                const subFlowDescription = value.functionDefinition?.descriptions?.[0]?.content ?? value.description
                 return {
                     subFlowValue: {
                         ...(
@@ -205,8 +207,8 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
                             } : {}
                         ),
                         signature: value.signature ?? "",
-                        ...(value.name ? {name: value.name} : {}),
-                        ...(value.description ? {description: value.description} : {}),
+                        ...(subFlowName ? {name: subFlowName} : {}),
+                        ...(subFlowDescription ? {description: subFlowDescription} : {}),
                         parameters: (value.parameters ?? [])
                             .filter(parameter => !!parameter?.identifier && !!parameter?.value)
                             .map(parameter => ({
@@ -216,6 +218,7 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
                             })),
                     }
                 }
+            }
 
             case "LiteralValue":
                 return {
