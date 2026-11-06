@@ -22,14 +22,10 @@
       "minimumReleaseAge": "0 days"
     },
     {
-      "matchPackageNames": [
-        "*",
-        "!@code0-tech/**"
-      ],
+      "matchPackageNames": ["!@code0-tech/**"],
       "matchConfidence": [
         "low",
-        "neutral",
-        "unknown"
+        "neutral"
       ],
       "dependencyDashboardApproval": true
     }
