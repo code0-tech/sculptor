@@ -29,6 +29,7 @@ import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {usePathname, useRouter} from "next/navigation";
 import {ApplicationUsageView} from "@edition/application/views/ApplicationUsageView";
 import {OnboardingButtonView} from "@edition/onboarding/views/OnboardingButtonView";
+import {BotAvatar} from "bot-avatars";
 
 export const ApplicationNavigationView: React.FC = () => {
 
@@ -37,6 +38,7 @@ export const ApplicationNavigationView: React.FC = () => {
     const userService = useService(UserService)
     const userStore = useStore(UserService)
     const currentSession = useUserSession()
+    const [logoHovered, setLogoHovered] = React.useState(false)
 
     const isAddLicensePage = pathname === '/licenses/add';
 
@@ -68,9 +70,12 @@ export const ApplicationNavigationView: React.FC = () => {
                  style={{boxSizing: "border-box", flexDirection: 'column', gap: "0.7rem"}}>
         <Tooltip>
             <TooltipTrigger asChild>
-                <Link href={"/"} prefetch>
+                <Link href={"/"} prefetch
+                      onMouseEnter={() => setLogoHovered(true)}
+                      onMouseLeave={() => setLogoHovered(false)}>
                     <Button variant={"none"} style={{padding: getSize("xs")}}>
-                        <Icon icon={"codezero:codezero"} color={"#fff"} size={16}/>
+                        {logoHovered ? <BotAvatar style={{position: "absolute"}} type={"flower"} shading={"fabric"} color={"#ffffff"} size={32}/> : null}
+                        <Icon icon={"codezero:codezero"} color={logoHovered ? "transparent" : "#fff"} size={16}/>
                     </Button>
                 </Link>
             </TooltipTrigger>

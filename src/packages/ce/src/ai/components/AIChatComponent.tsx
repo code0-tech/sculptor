@@ -30,6 +30,7 @@ import {useAIGenerationStore} from "@edition/ai/hooks/AI.generation.hook";
 import {AIUsageComponent} from "@edition/ai/components/AIUsageComponent";
 import {AIGeneratingMessageComponent} from "@edition/ai/components/AIGeneratingMessageComponent";
 import BorderBeam from "border-beam";
+import {BotAvatar} from "bot-avatars";
 
 const EMPTY_TOKEN_RULES: EditorTokenRule[] = []
 
@@ -178,6 +179,16 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
                             </Card>
                         )
                     }
+                    <Flex align={"self-start"}>
+                        <div style={{flexShrink: 0, lineHeight: 0, paddingLeft: "0.35rem"}}>
+                            <BotAvatar type={"flower"}
+                                       shading={"fabric"}
+                                       color={!aiLoading && aiErrorMessage ? "#D90429" : "#ffffff"}
+                                       saturation={1}
+                                       size={28}
+                                       state={models.length <= 0 ? "sleeping" : aiLoading ? "working" : "default"}/>
+                        </div>
+                        <div style={{flex: 1, minWidth: 0}}>
                     {
                         aiLoading ? (
                             <div
@@ -209,6 +220,8 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
                             </EditorInput>
                         )
                     }
+                        </div>
+                    </Flex>
                     <Spacing spacing={"xxs"}/>
                     <CardSection>
                         <Flex justify={"space-between"} align={"center"}>

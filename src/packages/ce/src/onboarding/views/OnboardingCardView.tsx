@@ -6,10 +6,18 @@ import {IconRocket} from "@tabler/icons-react";
 import {useOnboarding} from "@edition/onboarding/hooks/Onboarding.tour.hook";
 import "driver.js/dist/driver.css";
 import "./OnboardingCardView.style.scss";
+import {BotAvatar} from "bot-avatars";
 
 export const OnboardingCardView: React.FC = () => {
 
     const {running, step, index, total, finish} = useOnboarding()
+    const [hopping, setHopping] = React.useState(false)
+
+    React.useEffect(() => {
+        setHopping(true)
+        const id = window.setTimeout(() => setHopping(false), 2000)
+        return () => window.clearTimeout(id)
+    }, [index])
 
     if (!running) return null
 
@@ -21,6 +29,19 @@ export const OnboardingCardView: React.FC = () => {
         maxWidth: "calc(100vw - 2rem)",
         zIndex: 1000000001
     }}>
+        <div style={{
+            position: "absolute",
+            top: 0,
+            left: "2.5rem",
+            lineHeight: 0,
+            transform: "translate(-50%, -75%)"
+        }}>
+            <BotAvatar type={"flower"}
+                       shading={"fabric"}
+                       color={"#ffffff"}
+                       size={44}
+                       state={step.key === "done" ? "sleeping" : hopping ? "working" : "default"}/>
+        </div>
         <Card color={"secondary"} paddingSize={"lg"}>
             <Flex align={"center"} justify={"space-between"} style={{gap: getSize("sm")}}>
                 <Flex align={"center"} style={{gap: getSize("xxs")}}>
