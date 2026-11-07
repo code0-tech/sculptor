@@ -2,6 +2,8 @@ import React from "react"
 import {
     Button,
     Flex,
+    Icon,
+    IconString,
     Menu,
     MenuContent,
     MenuItem,
@@ -14,7 +16,6 @@ import {
     Text
 } from "@code0-tech/pictor"
 import {IconChevronDown, IconChevronRight} from "@tabler/icons-react"
-import {icon, IconString} from "@core/util/icons"
 import {createTypeNode, DataTypeOption, TypeNode} from "@edition/datatype/components/inputs/datatype/DataTypeType.node.util"
 
 export interface DataTypeTypeBuilderPickerComponentProps {
@@ -136,13 +137,12 @@ export const DataTypeTypeBuilderPickerComponent: React.FC<DataTypeTypeBuilderPic
                     ))}
                     <MenuSeparator/>
                     {groups.map(group => {
-                        const DisplayIcon = icon(group.icon as IconString)
                         return (
                             <MenuSub key={group.id}>
                                 <MenuSubTrigger style={itemStyle}>
                                     <Flex align={"center"} justify={"space-between"} style={{gap: "0.7rem"}} w={"100%"}>
                                         <Flex align={"center"} style={{gap: "0.5rem"}}>
-                                            <DisplayIcon size={15}/>
+                                            <Icon icon={group.icon as IconString} size={15}/>
                                             <Text>{group.name}</Text>
                                         </Flex>
                                         <IconChevronRight size={12}/>

@@ -1,14 +1,13 @@
 "use client"
 
 import React from "react";
-import {Badge, Button, Flex, hashToColor, Spacing, Text, useService, useStore} from "@code0-tech/pictor";
+import {Badge, Button, Flex, hashToColor, Icon, IconString, Spacing, Text, useService, useStore} from "@code0-tech/pictor";
 import Link from "next/link";
 import {useParams} from "next/navigation";
 import {Flow, Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {ProjectService} from "@edition/project/services/Project.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
-import {icon, IconString} from "@core/util/icons";
 
 const RECENT_FLOWS_LIMIT = 10
 
@@ -88,7 +87,5 @@ const FlowRecentListIcon: React.FC<{flow: Flow, project: NamespaceProject}> = ({
         return flowTypeService.getById(flow.type?.id)
     }, [flowTypeStore, flow, project])
 
-    const DisplayIcon = icon(flowType?.displayIcon as IconString)
-
-    return <DisplayIcon color={hashToColor(flow?.id ?? "")} size={13}/>
+    return <Icon icon={flowType?.displayIcon as IconString} color={hashToColor(flow?.id ?? "")} size={13}/>
 }

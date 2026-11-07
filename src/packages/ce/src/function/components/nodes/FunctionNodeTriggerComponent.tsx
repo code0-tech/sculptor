@@ -1,11 +1,20 @@
 import React, {CSSProperties, memo} from "react";
 import {Handle, Node, NodeProps, Position} from "@xyflow/react";
-import {Card, Flex, Text, useService, useStore, useStore as usePictorStore, withAlpha} from "@code0-tech/pictor";
+import {
+    Card,
+    Flex,
+    Icon,
+    IconString,
+    Text,
+    useService,
+    useStore,
+    useStore as usePictorStore,
+    withAlpha
+} from "@code0-tech/pictor";
 import {FunctionNodeComponentProps} from "@edition/function/components/nodes/FunctionNodeComponent";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {Namespace, NamespaceProject, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
-import {icon, IconString} from "@core/util/icons";
 import {FALLBACK_FLOW_TYPE_DISPLAY_MESSAGE, FALLBACK_FLOW_TYPE_NAME} from "@core/util/fallback-translations";
 import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
 import {underlineBySeverity} from "@core/util/inspection";
@@ -69,8 +78,6 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
         }),
         [flow?.type?.id, namespaceId, projectId, project?.primaryRuntime?.id, flowTypeStore]
     )
-
-    const DisplayIcon = icon(flowType?.displayIcon as IconString)
 
     const referencedNodeIds = useReferencedNodeIds(data.flowId)
     const hoveredNodeId = useFlowReferenceHoverStore(state => state.hoveredNodeId)
@@ -174,7 +181,7 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
                     }}>
 
                         <Flex align={"center"} style={{flexDirection: "column", gap: "0.35rem", ...triggerValidationStyle}}>
-                            <DisplayIcon color={iconColor} size={16} style={{width: "16px", height: "16px"}}/>
+                            <Icon icon={flowType?.displayIcon as IconString} color={iconColor} size={16}/>
                         </Flex>
 
                         {isReferenced === true || hoveredNodeId === id ? (

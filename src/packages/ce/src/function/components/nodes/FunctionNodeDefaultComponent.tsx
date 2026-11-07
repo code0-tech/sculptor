@@ -2,7 +2,7 @@ import {Node, NodeProps} from "@xyflow/react";
 import React, {memo} from "react";
 import "./FunctionNodeComponent.style.scss";
 import {FunctionNodeComponentProps} from "./FunctionNodeComponent";
-import {Card, Flex, withAlpha} from "@code0-tech/pictor";
+import {Card, Flex, Icon, withAlpha} from "@code0-tech/pictor";
 import {useFunctionNodeState} from "@edition/function/hooks/FunctionNode.state.hook";
 import {FunctionNodeToolbarComponent} from "@edition/function/components/nodes/FunctionNodeToolbarComponent";
 import {FunctionNodeHandlesComponent} from "@edition/function/components/nodes/FunctionNodeHandlesComponent";
@@ -23,7 +23,7 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
     const {
         name,
         moduleName,
-        displayIcon: DisplayIcon,
+        displayIcon,
         iconColor,
         validationStyle,
         isActive,
@@ -60,7 +60,7 @@ export const FunctionNodeDefaultComponent: React.FC<FunctionNodeDefaultComponent
                     ) : null}
 
                     <Flex align={"center"} style={{flexDirection: "column", gap: "0.35rem", ...validationStyle}}>
-                        <DisplayIcon color={iconColor} size={16} style={{width: "16px", height: "16px"}}/>
+                        <Icon icon={displayIcon} color={iconColor} size={16}/>
                     </Flex>
                 </Card>
                 <FunctionNodeExecutionIndicatorComponent nodeId={id}/>

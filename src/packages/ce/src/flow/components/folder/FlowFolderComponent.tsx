@@ -14,6 +14,8 @@ import {
     Component,
     Flex,
     hashToColor,
+    Icon,
+    IconString,
     mergeComponentProps,
     ScrollArea,
     ScrollAreaScrollbar,
@@ -24,7 +26,6 @@ import {
     useStore
 } from "@code0-tech/pictor";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import {icon, IconString} from "@core/util/icons";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 
 
@@ -322,7 +323,6 @@ export const DFlowFolderItem: React.FC<FlowFolderComponentItemProps> = (props) =
 
 
     const contextMenuProps = {onCreate, onDelete, onRename, activeFlowId, namespaceId, projectId}
-    const DisplayIcon = icon(flowType?.displayIcon as IconString)
 
     return <FlowFolderContextMenuComponent contextData={{
         name: path,
@@ -336,7 +336,8 @@ export const DFlowFolderItem: React.FC<FlowFolderComponentItemProps> = (props) =
                         ref={wrapperRef} {...mergeComponentProps(`d-folder__item ${active ? "d-folder__item--active" : ""}`, code0Props)}
                         onClick={() => onSelect?.(flow)}>
                         <Flex align={"center"} style={{gap: "0.35rem"}}>
-                            <DisplayIcon color={hashToColor(flow?.id ?? "")} size={13}/>
+                            <Icon icon={flowType?.displayIcon as IconString} color={hashToColor(flow?.id ?? "")}
+                                  size={13}/>
                             <Text>{text}</Text>
                         </Flex>
                     </div>
@@ -346,7 +347,8 @@ export const DFlowFolderItem: React.FC<FlowFolderComponentItemProps> = (props) =
                         <div {...mergeComponentProps(`d-folder__item-hover-card`, code0Props)}
                              onClick={() => onSelect?.(flow)} style={{padding: "0.35rem 0.7rem"}}>
                             <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                <DisplayIcon color={hashToColor(flow?.id ?? "")} size={13}/>
+                                <Icon icon={flowType?.displayIcon as IconString} color={hashToColor(flow?.id ?? "")}
+                                      size={13}/>
                                 <Text>{props.name}</Text>
                             </Flex>
                         </div>

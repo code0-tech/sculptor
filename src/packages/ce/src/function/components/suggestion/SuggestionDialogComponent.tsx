@@ -15,6 +15,8 @@ import {
     CommandSeparator,
     Flex,
     hashToColor,
+    Icon,
+    IconString,
     ScrollArea,
     ScrollAreaScrollbar,
     ScrollAreaThumb,
@@ -24,7 +26,6 @@ import {
 } from "@code0-tech/pictor";
 import {Layout} from "@code0-tech/pictor/dist/components/layout/Layout";
 import {Tab, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/Tab";
-import {icon, IconString} from "@core/util/icons";
 import {
     IconArrowsUpDown,
     IconChevronLeft,
@@ -118,13 +119,11 @@ export const SuggestionDialogComponent: React.FC<SuggestionDialogComponentProps>
                                     <ScrollAreaViewport h={"100%"} w={"100%"}>
                                         <TabList>
                                             {suggestions.map((group, index) => {
-
-                                                const DisplayIcon = icon(group.icon as IconString)
-
                                                 return <TabTrigger value={`group-${index}`} asChild>
                                                     <Button w={"100%"} justify={"start"} paddingSize={"xxs"}
                                                             variant={"none"}>
-                                                        <DisplayIcon color={hashToColor(`group-${index}`)} size={16}/>
+                                                        <Icon icon={group.icon as IconString} color={hashToColor(`group-${index}`)}
+                                                              size={16}/>
                                                         <Text size={"sm"}>{group.displayMessage}</Text>
                                                     </Button>
                                                 </TabTrigger>
@@ -163,7 +162,6 @@ export const SuggestionDialogComponent: React.FC<SuggestionDialogComponentProps>
                                             return currentTab === `group-${index}` && <>
                                                 {group.suggestions.map((suggestion, suggestionIndex) => {
 
-                                                    const DisplayIcon = icon(suggestion.icon as IconString)
                                                     const directValue = suggestion.variants.find(variant => variant.__typename === "SubFlowValue")
                                                     const resultValue = suggestion.variants.find(variant => variant.__typename === "NodeFunction")
 
@@ -182,8 +180,9 @@ export const SuggestionDialogComponent: React.FC<SuggestionDialogComponentProps>
                                                             props.onOpenChange?.(false)
                                                         }}>
                                                             <Flex style={{gap: "0.35rem"}} align={"center"}>
-                                                                <DisplayIcon color={hashToColor(`group-${index}`)}
-                                                                             size={16}/>
+                                                                <Icon icon={suggestion.icon as IconString}
+                                                                      color={hashToColor(`group-${index}`)}
+                                                                      size={16}/>
                                                                 <Text size={"sm"}>{suggestion.displayMessage}</Text>
                                                                 {directValue && resultValue ?
                                                                     <IconChevronRight size={13}/> : null}

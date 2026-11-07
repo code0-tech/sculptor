@@ -3,6 +3,8 @@ import {Flow, NodeFunction, ReferenceValue, SubFlowValue} from "@code0-tech/sagi
 import {
     Flex,
     hashToColor,
+    Icon,
+    IconString,
     MenuItem,
     MenuSeparator,
     MenuSub,
@@ -29,7 +31,6 @@ import {
     SuggestionVariantDialogComponent
 } from "@edition/function/components/suggestion/SuggestionVariantDialogComponent";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import {icon, IconString} from "@core/util/icons";
 import {
     DataTypeInputMenuReferencePathComponent
 } from "@edition/datatype/components/inputs/DataTypeInputMenuReferencePathComponent";
@@ -221,12 +222,10 @@ export const DataTypeInputMenuSuggestionsComponent: React.FC<DataTypeInputMenuSu
         {entries.length > 0 && moduleGroups.length > 0 ? <MenuSeparator/> : null}
         {moduleGroups.map((group, index) => {
 
-            const ModuleIcon = icon(group.icon as IconString)
-
             const groupLabel = <Flex align={"center"} justify={"space-between"} style={{gap: "0.7rem"}} w={"100%"}
                                      onMouseEnter={() => setHoveredNodeId(null)}>
                 <Flex align={"center"} style={{gap: "0.35rem"}}>
-                    <ModuleIcon size={13} color={hashToColor(`group-${index}`)}/>
+                    <Icon icon={group.icon as IconString} size={13} color={hashToColor(`group-${index}`)}/>
                     <Text>{group.displayMessage}</Text>
                 </Flex>
                 <IconChevronRight size={12}/>
@@ -234,7 +233,6 @@ export const DataTypeInputMenuSuggestionsComponent: React.FC<DataTypeInputMenuSu
 
             const groupItems = group.suggestions.map((suggestion, suggestionIndex) => {
 
-                const FunctionIcon = icon(suggestion.icon as IconString)
                 const directValue = suggestion.variants.find(variant => variant.__typename === "SubFlowValue")
                 const resultValue = suggestion.variants.find(variant => variant.__typename === "NodeFunction")
                 const directIndex = directValue ? suggestions.indexOf(directValue) : -1
@@ -242,7 +240,7 @@ export const DataTypeInputMenuSuggestionsComponent: React.FC<DataTypeInputMenuSu
 
                 const content = <Flex align={"center"} style={{gap: "0.35rem"}}
                                       onMouseEnter={() => setHoveredNodeId(null)}>
-                    <FunctionIcon size={13} color={hashToColor(`group-${index}`)}/>
+                    <Icon icon={suggestion.icon as IconString} size={13} color={hashToColor(`group-${index}`)}/>
                     <Text>{suggestion.displayMessage}</Text>
                 </Flex>
 

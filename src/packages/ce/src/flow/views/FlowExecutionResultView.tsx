@@ -20,6 +20,8 @@ import {
     Gantt,
     getRelativeValue,
     hashToColor,
+    Icon,
+    IconString,
     JsonView,
     Menu,
     MenuContent,
@@ -55,7 +57,6 @@ import {FunctionService} from "@edition/function/services/Function.service";
 import {ProjectService} from "@edition/project/services/Project.service";
 import Link from "next/link";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
-import {icon} from "@core/util/icons";
 import {formatDistanceToNow} from "date-fns";
 import {useFlowExecutionStore} from "@edition/flow/hooks/Flow.execution.hook";
 import {IconLoader2} from "@tabler/icons-react";
@@ -382,9 +383,7 @@ export const FlowExecutionResultView: React.FC = () => {
                                             </Flex>
                                         } else {
 
-                                            const DisplayIcon = icon(
-                                                item.type === "node" ? item?.data?.payload?.functionDefinition?.displayIcon : item.type === "function" ? item?.data?.payload?.displayIcon : item?.data?.payload?.type?.displayIcon,
-                                            )
+                                            const displayIcon = (item.type === "node" ? item?.data?.payload?.functionDefinition?.displayIcon : item.type === "function" ? item?.data?.payload?.displayIcon : item?.data?.payload?.type?.displayIcon) as IconString
 
                                             return <Menu key={item.id}
                                                         modal={false}
@@ -412,12 +411,8 @@ export const FlowExecutionResultView: React.FC = () => {
                                                                         <Flex align={"center"} maw={"75%"} pos={"relative"}
                                                                               justify={"start"}
                                                                               style={{gap: "0.7rem"}}>
-                                                                            <DisplayIcon size={16}
-                                                                                         style={{
-                                                                                             minWidth: "16px",
-                                                                                             minHeight: "16px",
-                                                                                         }}
-                                                                                         color={hashToColor(item?.data?.payload?.id ?? "")}/>
+                                                                            <Icon icon={displayIcon} size={16}
+                                                                                  color={hashToColor(item?.data?.payload?.id ?? "")}/>
                                                                             <Text size={"md"}
                                                                                   style={{
                                                                                       overflow: "hidden",
@@ -449,12 +444,8 @@ export const FlowExecutionResultView: React.FC = () => {
                                                         <Flex align={"center"} justify={"space-between"}
                                                               style={{gap: "0.7rem"}}>
                                                             <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                                                <DisplayIcon size={16}
-                                                                             style={{
-                                                                                 minWidth: "16px",
-                                                                                 minHeight: "16px",
-                                                                             }}
-                                                                             color={hashToColor(item?.data?.payload?.id ?? "")}/>
+                                                                <Icon icon={displayIcon} size={16}
+                                                                      color={hashToColor(item?.data?.payload?.id ?? "")}/>
                                                                 <Text size={"md"}
                                                                       style={{
                                                                           overflow: "hidden",
