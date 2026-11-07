@@ -24,7 +24,7 @@
     "@icons-pack/react-simple-icons": "^13.13.0",
     "@internationalized/date": "^3.12.0",
     "@opentelemetry/api": "^1.9.1",
-    "@opentelemetry/context-zone": "^2.6.1",
+    "@opentelemetry/context-zone": "^3.0.0",
     "@opentelemetry/exporter-logs-otlp-http": "^0.218.0",
     "@opentelemetry/exporter-metrics-otlp-http": "^0.218.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.218.0",
