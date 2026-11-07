@@ -32,6 +32,7 @@ import {
 import {
     FunctionNodeExecutionIndicatorComponent
 } from "@edition/function/components/nodes/FunctionNodeExecutionIndicatorComponent";
+import {FunctionNodeFrameComponent} from "@edition/function/components/nodes/FunctionNodeFrameComponent";
 
 
 export type FunctionNodeTriggerComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
@@ -151,7 +152,11 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
     }, [flowStore, selectedNode, data.flowId])
 
     return (
-        <Flex align={"center"} style={{flexDirection: "column", gap: "0.7rem"}}>
+        <FunctionNodeFrameComponent gap={"0.7rem"} label={(
+            <Text size={"xs"} w={"200px"} style={{textAlign: "center"}}>
+                {flow ? displayMessage : flowType?.names?.[0].content ?? FALLBACK_FLOW_TYPE_NAME}
+            </Text>
+        )}>
             <div className={"d-flow-node-execution"}>
                 <Card
                     data-qa-selector={"flow-builder-trigger"}
@@ -199,9 +204,6 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
                 </Card>
                 <FunctionNodeExecutionIndicatorComponent nodeId={id}/>
             </div>
-            <Text size={"xs"} w={"200px"} style={{textAlign: "center"}}>
-                {flow ? displayMessage : flowType?.names?.[0].content ?? FALLBACK_FLOW_TYPE_NAME}
-            </Text>
-        </Flex>
+        </FunctionNodeFrameComponent>
     )
 })

@@ -7,6 +7,7 @@ import {useFunctionNodeState} from "@edition/function/hooks/FunctionNode.state.h
 import {FunctionNodeToolbarComponent} from "@edition/function/components/nodes/FunctionNodeToolbarComponent";
 import {FunctionNodeHandlesComponent} from "@edition/function/components/nodes/FunctionNodeHandlesComponent";
 import {FunctionNodeLabelComponent} from "@edition/function/components/nodes/FunctionNodeLabelComponent";
+import {FunctionNodeFrameComponent} from "@edition/function/components/nodes/FunctionNodeFrameComponent";
 import {
     FunctionNodeReferenceIndicatorComponent
 } from "@edition/function/components/nodes/FunctionNodeReferenceIndicatorComponent";
@@ -32,7 +33,7 @@ export const FunctionNodeEndComponent: React.FC<FunctionNodeEndComponentProps> =
     } = useFunctionNodeState(data, id)
 
     return (
-        <Flex align={"center"} style={{flexDirection: "column", gap: "0.35rem"}}>
+        <FunctionNodeFrameComponent label={<FunctionNodeLabelComponent name={name} moduleName={moduleName}/>}>
             <div className={"d-flow-node-execution"}>
                 <Card
                     data-qa-selector={"flow-builder-node"}
@@ -70,7 +71,6 @@ export const FunctionNodeEndComponent: React.FC<FunctionNodeEndComponentProps> =
                 ) : null}
                 <FunctionNodeExecutionIndicatorComponent nodeId={id}/>
             </div>
-            <FunctionNodeLabelComponent name={name} moduleName={moduleName}/>
-        </Flex>
+        </FunctionNodeFrameComponent>
     );
 })

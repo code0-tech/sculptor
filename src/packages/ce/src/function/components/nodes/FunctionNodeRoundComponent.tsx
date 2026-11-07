@@ -6,6 +6,7 @@ import {Card, Flex, Icon, withAlpha} from "@code0-tech/pictor";
 import {useFunctionNodeState} from "@edition/function/hooks/FunctionNode.state.hook";
 import {FunctionNodeHandlesComponent} from "@edition/function/components/nodes/FunctionNodeHandlesComponent";
 import {FunctionNodeLabelComponent} from "@edition/function/components/nodes/FunctionNodeLabelComponent";
+import {FunctionNodeFrameComponent} from "@edition/function/components/nodes/FunctionNodeFrameComponent";
 import {
     FunctionNodeReferenceIndicatorComponent
 } from "@edition/function/components/nodes/FunctionNodeReferenceIndicatorComponent";
@@ -31,7 +32,7 @@ export const FunctionNodeRoundComponent: React.FC<FunctionNodeRoundComponentProp
     } = useFunctionNodeState(data, id)
 
     return (
-        <Flex align={"center"} style={{flexDirection: "column", gap: "0.35rem"}}>
+        <FunctionNodeFrameComponent label={<FunctionNodeLabelComponent name={name} moduleName={moduleName}/>}>
             <div className={"d-flow-node-execution"}>
                 <Card
                     data-qa-selector={"flow-builder-node"}
@@ -63,7 +64,6 @@ export const FunctionNodeRoundComponent: React.FC<FunctionNodeRoundComponentProp
                 </Card>
                 <FunctionNodeExecutionIndicatorComponent nodeId={id}/>
             </div>
-            <FunctionNodeLabelComponent name={name} moduleName={moduleName}/>
-        </Flex>
+        </FunctionNodeFrameComponent>
     );
 })
