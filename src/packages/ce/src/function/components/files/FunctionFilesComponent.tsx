@@ -3,6 +3,8 @@ import {
     Button,
     Flex,
     hashToColor,
+    Icon,
+    IconString,
     Menu,
     MenuContent,
     MenuItem,
@@ -35,7 +37,6 @@ import {FunctionFileSubFlowComponent} from "@edition/function/components/files/F
 import {FALLBACK_FLOW_TYPE_NAME, FALLBACK_FUNCTION_NAME} from "@core/util/fallback-translations";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowView} from "@edition/flow/services/Flow.view";
-import {icon, IconString} from "@core/util/icons";
 import {
     Flow,
     FunctionDefinition,
@@ -78,11 +79,6 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
         [flowStore, flowTypeStore]
     )
 
-    const DisplayIcon = React.useMemo(
-        () => icon(flow?.type?.displayIcon as IconString),
-        [flow]
-    )
-
     const nodes: NodeFunction[] = React.useMemo(
         () => flow?.nodes?.nodes?.map(node => ({
             ...node,
@@ -118,7 +114,7 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
                             <MenuContent align="start" sideOffset={8}>
                                 <MenuLabel>Starting Node</MenuLabel>
                                 <MenuItem onSelect={() => setActiveTab(flowId!)}>
-                                    <DisplayIcon color={hashToColor(flowId!)} size={13}/>
+                                    <Icon icon={flow?.type?.displayIcon as IconString} color={hashToColor(flowId!)} size={13}/>
                                     <Text
                                         size={"sm"}>{flow?.type?.names?.[0]?.content || FALLBACK_FLOW_TYPE_NAME}</Text>
                                 </MenuItem>
@@ -126,13 +122,11 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
                                 <MenuLabel>Available Node</MenuLabel>
                                 {
                                     nodes?.map(node => {
-
-                                        const DisplayIcon = icon(node?.functionDefinition?.displayIcon as IconString)
-
                                         return <MenuItem key={node?.id} onSelect={() => {
                                             setActiveTab(node?.id!)
                                         }}>
-                                            <DisplayIcon color={hashToColor(node?.id!)} size={13}/>
+                                            <Icon icon={node?.functionDefinition?.displayIcon as IconString}
+                                                  color={hashToColor(node?.id!)} size={13}/>
                                             <Text
                                                 size={"sm"}>{node?.functionDefinition?.names?.[0]?.content || FALLBACK_FUNCTION_NAME}</Text>
                                         </MenuItem>
@@ -140,13 +134,11 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
                                 }
                                 {
                                     subFlowNodes?.map(node => {
-
-                                        const DisplayIcon = icon(functionService.getById(node?.data?.functionId as FunctionDefinition['id'])?.displayIcon as IconString)
-
                                         return <MenuItem key={node?.id} onSelect={() => {
                                             setActiveTab(node?.id)
                                         }}>
-                                            <DisplayIcon color={hashToColor(node?.id)} size={13}/>
+                                            <Icon icon={functionService.getById(node?.data?.functionId as FunctionDefinition['id'])?.displayIcon as IconString}
+                                                  color={hashToColor(node?.id)} size={13}/>
                                             <Text
                                                 size={"sm"}>{functionService.getById(node?.data?.functionId as FunctionDefinition['id'])?.names?.[0]?.content || FALLBACK_FUNCTION_NAME}</Text>
                                         </MenuItem>
@@ -162,18 +154,16 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
                         <Flex align={"center"} style={{gap: "0.422rem"}}>
                             <FileTabsTrigger value={flowId!}
                                              key={flowId!}>
-                                <DisplayIcon color={hashToColor(flowId!)} size={13}/>
+                                <Icon icon={flow?.type?.displayIcon as IconString} color={hashToColor(flowId!)} size={13}/>
                                 <Text
                                     size={"sm"}>{flow?.type?.names?.[0]?.content || FALLBACK_FLOW_TYPE_NAME}</Text>
                             </FileTabsTrigger>
                                 {
                                     nodes?.map(node => {
-
-                                        const DisplayIcon = icon(node?.functionDefinition?.displayIcon as IconString)
-
                                         return <FileTabsTrigger value={node?.id!}
                                                                 key={node?.id!}>
-                                            <DisplayIcon color={hashToColor(node?.id!)} size={13}/>
+                                            <Icon icon={node?.functionDefinition?.displayIcon as IconString}
+                                                  color={hashToColor(node?.id!)} size={13}/>
                                             <Text
                                                 size={"sm"}>{node?.functionDefinition?.names?.[0]?.content || FALLBACK_FUNCTION_NAME}</Text>
                                         </FileTabsTrigger>
@@ -181,12 +171,10 @@ export const FunctionFilesComponent: React.FC<FunctionFilesComponentProps> = (pr
                                 }
                                 {
                                     subFlowNodes?.map(node => {
-
-                                        const DisplayIcon = icon(functionService.getById(node?.data?.functionId as FunctionDefinition['id'])?.displayIcon as IconString)
-
                                         return <FileTabsTrigger value={node?.id}
                                                                 key={node?.id}>
-                                            <DisplayIcon color={hashToColor(node?.id)} size={13}/>
+                                            <Icon icon={functionService.getById(node?.data?.functionId as FunctionDefinition['id'])?.displayIcon as IconString}
+                                                  color={hashToColor(node?.id)} size={13}/>
                                             <Text
                                                 size={"sm"}>{functionService.getById(node?.data?.functionId as FunctionDefinition['id'])?.names?.[0]?.content || FALLBACK_FUNCTION_NAME}</Text>
                                         </FileTabsTrigger>

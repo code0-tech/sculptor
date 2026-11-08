@@ -18,6 +18,8 @@ import {
     DialogPortal,
     Flex,
     hashToColor,
+    Icon,
+    IconString,
     ScrollArea,
     ScrollAreaScrollbar,
     ScrollAreaThumb,
@@ -42,7 +44,6 @@ import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {ensureUniqueFlowName} from "@edition/ai/util/AI.flow.mapper";
 import Link from "next/link";
-import {icon, IconString} from "@core/util/icons";
 import {FALLBACK_FLOW_TYPE_NAME} from "@core/util/fallback-translations";
 import {toast} from "@code0-tech/pictor/dist/components/toast/Toast";
 import {
@@ -332,8 +333,6 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
         }
     })
 
-    const SelectedFlowTypeDisplayIcon = icon(selectedFlowType?.displayIcon as IconString)
-
     if (!primaryRuntime || flowTypes.length <= 0) {
         return <Dialog open={open} onOpenChange={(open) => onOpenChange?.(open)}>
             <DialogPortal>
@@ -440,13 +439,11 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                                     <ScrollAreaViewport h={"100%"} w={"100%"}>
                                         <TabList>
                                             {groups.map((group, index) => {
-
-                                                const DisplayIcon = icon(group.icon as IconString)
-
                                                 return <TabTrigger value={`group-${index}`} asChild>
                                                     <Button w={"100%"} justify={"start"} paddingSize={"xxs"}
                                                             variant={"none"}>
-                                                        <DisplayIcon color={hashToColor(`group-${index}`)} size={16}/>
+                                                        <Icon icon={group.icon as IconString} color={hashToColor(`group-${index}`)}
+                                                              size={16}/>
                                                         <Text size={"sm"}>{group.displayMessage}</Text>
                                                     </Button>
                                                 </TabTrigger>
@@ -466,7 +463,6 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                                                 {group.resolutions.map((resolution, resolutionIndex) => {
 
                                                     const template = resolution.template
-                                                    const DisplayIcon = icon(resolution.flowType?.displayIcon as IconString)
 
                                                     return <>
                                                         <CommandItem
@@ -481,8 +477,9 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                                                             setStep("name")
                                                         }}>
                                                             <Flex style={{gap: "0.35rem"}} align={"center"}>
-                                                                <DisplayIcon color={hashToColor(`group-${index}`)}
-                                                                             size={16}/>
+                                                                <Icon icon={resolution.flowType?.displayIcon as IconString}
+                                                                      color={hashToColor(`group-${index}`)}
+                                                                      size={16}/>
                                                                 <Text size={"sm"}>{template.name}</Text>
                                                             </Flex>
                                                             <Spacing spacing={"xxs"}/>
@@ -497,9 +494,6 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                                         }) : flowTypeGroups.map((group, index) => {
                                             return currentTab === `group-${index}` && <>
                                                 {group.flowTypes.map((flowType, flowTypeIndex) => {
-
-                                                    const DisplayIcon = icon(flowType.displayIcon as IconString)
-
                                                     return <>
                                                         <CommandItem
                                                             data-qa-selector={"flow-create-trigger-select-item"}
@@ -512,8 +506,9 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                                                             setStep("name")
                                                         }}>
                                                             <Flex style={{gap: "0.35rem"}} align={"center"}>
-                                                                <DisplayIcon color={hashToColor(`group-${index}`)}
-                                                                             size={16}/>
+                                                                <Icon icon={flowType.displayIcon as IconString}
+                                                                      color={hashToColor(`group-${index}`)}
+                                                                      size={16}/>
                                                                 <Text
                                                                     size={"sm"}>{flowType.names?.[0]?.content ?? FALLBACK_FLOW_TYPE_NAME}</Text>
                                                             </Flex>
@@ -547,8 +542,8 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                     <Flex align={"center"} style={{gap: "0.35rem"}}>
                         <Badge color={"tertiary"}>
                             {selectedFlowTypeId ?
-                                <SelectedFlowTypeDisplayIcon size={13}
-                                                             color={hashToColor(selectedFlowTypeId)}/> : null}
+                                <Icon icon={selectedFlowType?.displayIcon as IconString} size={13}
+                                      color={hashToColor(selectedFlowTypeId)}/> : null}
                             <Text size={"sm"} hierarchy={"primary"}>
                                 {selectedFlowType?.names?.[0]?.content ?? FALLBACK_FLOW_TYPE_NAME}
                             </Text>

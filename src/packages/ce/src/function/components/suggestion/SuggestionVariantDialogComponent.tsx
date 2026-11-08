@@ -9,6 +9,8 @@ import {
     DialogPortal,
     Flex,
     getSize,
+    Icon,
+    IconString,
     Spacing,
     Text,
     useService,
@@ -20,7 +22,6 @@ import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeComponent";
 import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
-import {icon, IconString} from "@core/util/icons";
 import {FALLBACK_FUNCTION_DISPLAY_MESSAGE} from "@core/util/fallback-translations";
 import {
     SuggestionVariantPreviewComponent
@@ -62,7 +63,7 @@ export const SuggestionVariantDialogComponent: React.FC<SuggestionVariantDialogC
         return functionService.getById(node?.functionDefinition?.id)
     }, [flowStore, functionStore, flowId, nodeId])
 
-    const TargetIcon = icon(target?.displayIcon as IconString)
+    const targetIcon = target?.displayIcon as IconString
     const targetParameter = target?.parameterDefinitions?.nodes?.[parameterIndex ?? -1]?.identifier
     const targetParts = (target?.displayMessages?.[0]?.content ?? FALLBACK_FUNCTION_DISPLAY_MESSAGE)
         .split(/(\$\{[^}]+\})/)
@@ -84,7 +85,7 @@ export const SuggestionVariantDialogComponent: React.FC<SuggestionVariantDialogC
     const measuredFits = [previewFits.direct, previewFits.result].filter((fit): fit is number => !!fit && fit > 0)
     const previewScale = measuredFits.length > 0 ? Math.min(...measuredFits) : undefined
 
-    const FunctionIcon = icon((definition?.displayIcon ?? suggestion?.icon) as IconString)
+    const functionIcon = (definition?.displayIcon ?? suggestion?.icon) as IconString
     const name = suggestion?.displayMessage ?? definition?.names?.[0]?.content ?? "This function"
     const directValue = suggestion?.variants.find(variant => variant.__typename === "SubFlowValue")
     const resultValue = suggestion?.variants.find(variant => variant.__typename === "NodeFunction")
@@ -119,7 +120,7 @@ export const SuggestionVariantDialogComponent: React.FC<SuggestionVariantDialogC
                                         <Card className={"d-flow-node"} color={"primary"} paddingSize={"xs"}
                                               py={"0.35"}>
                                             <Flex align={"center"} style={{gap: "0.7rem"}}>
-                                                <TargetIcon color={"rgba(255,255,255,0.75)"} size={16}/>
+                                                <Icon icon={targetIcon} color={"rgba(255,255,255,0.75)"} size={16}/>
                                                 <Text size={"md"}>
                                                     {targetParts.map((part, index) => {
                                                         if (part === targetParameter) {
@@ -157,8 +158,7 @@ export const SuggestionVariantDialogComponent: React.FC<SuggestionVariantDialogC
                                                   mah={"50px"} style={{aspectRatio: "50/50"}}>
                                                 <Flex align={"center"}
                                                       style={{flexDirection: "column", gap: "0.35rem"}}>
-                                                    <FunctionIcon color={"rgba(255,255,255,0.75)"} size={16}
-                                                                  style={{width: "16px", height: "16px"}}/>
+                                                    <Icon icon={functionIcon} color={"rgba(255,255,255,0.75)"} size={16}/>
                                                 </Flex>
                                             </Card>
                                             <Text size={"xs"} style={{
@@ -188,7 +188,7 @@ export const SuggestionVariantDialogComponent: React.FC<SuggestionVariantDialogC
                                         <Card className={"d-flow-node"} color={"primary"} paddingSize={"xs"}
                                               py={"0.35"}>
                                             <Flex align={"center"} style={{gap: "0.7rem"}}>
-                                                <FunctionIcon color={"rgba(255,255,255,0.75)"} size={16}/>
+                                                <Icon icon={functionIcon} color={"rgba(255,255,255,0.75)"} size={16}/>
                                                 <Text size={"md"}>{name}</Text>
                                             </Flex>
                                         </Card>
@@ -201,7 +201,7 @@ export const SuggestionVariantDialogComponent: React.FC<SuggestionVariantDialogC
                                         <Card className={"d-flow-node"} color={"primary"} paddingSize={"xs"}
                                               py={"0.35"}>
                                             <Flex align={"center"} style={{gap: "0.7rem"}}>
-                                                <TargetIcon color={"rgba(255,255,255,0.75)"} size={16}/>
+                                                <Icon icon={targetIcon} color={"rgba(255,255,255,0.75)"} size={16}/>
                                                 <Text size={"md"}>
                                                     {targetParts.map((part, index) => {
                                                         if (part === targetParameter) {

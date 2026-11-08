@@ -11,6 +11,8 @@ import {
     Col,
     Flex,
     hashToColor,
+    Icon,
+    IconString,
     Menu,
     MenuContent,
     MenuItem,
@@ -33,7 +35,6 @@ import {
 } from "@code0-tech/pictor";
 import {ModuleService} from "@ce-internal/module/services/Module.service";
 import {RuntimeService} from "@ce-internal/runtime/services/Runtime.service";
-import {icon, IconString} from "@core/util/icons";
 import {
     IconAdjustmentsHorizontal,
     IconAlertTriangle,
@@ -225,7 +226,6 @@ export const ModuleOverviewPage: React.FC = () => {
                     <Row>
                         {visibleModules.map(module => {
 
-                            const DisplayIcon = icon(module.icon as IconString)
                             const name = module.names?.[0]?.content ?? module.identifier ?? "Integration"
                             const flowTypes = module.flowTypes?.count ?? 0
                             const functions = module.functionDefinitions?.count ?? 0
@@ -242,7 +242,7 @@ export const ModuleOverviewPage: React.FC = () => {
 
                                         {/* identity: icon, name + version + author */}
                                         <Flex align={"center"} style={{gap: "0.8rem", minWidth: 0}}>
-                                            <DisplayIcon size={20} color={hashToColor(module.id!)}/>
+                                            <Icon icon={module.icon as IconString} size={20} color={hashToColor(module.id!)}/>
                                             <Flex style={{flexDirection: "column", gap: "0.35rem", minWidth: 0, flex: 1}}>
                                                 <Flex align={"center"} style={{gap: "0.35rem", minWidth: 0}}>
                                                     <Text size={"md"} hierarchy={"primary"} fw={500}>{name}</Text>

@@ -1,11 +1,10 @@
 import {Flow, FlowType, FunctionDefinition, NodeFunction, SubFlowValue,} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
-import {Badge, BadgeType, hashToColor, Text, useService, useStore} from "@code0-tech/pictor";
+import {Badge, BadgeType, hashToColor, Icon, IconString, Text, useService, useStore} from "@code0-tech/pictor";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {useParams} from "next/navigation";
-import {icon, IconString} from "@core/util/icons";
 import {FALLBACK_FLOW_TYPE_NAME, FALLBACK_FUNCTION_NAME} from "@core/util/fallback-translations";
 
 export interface NodeBadgeComponentProps extends Omit<BadgeType, 'value' | 'children'> {
@@ -53,13 +52,11 @@ export const NodeBadgeComponent: React.FC<NodeBadgeComponentProps> = (props) => 
         return lDefinition?.names?.[0].content ?? (lDefinition?.__typename === "FlowType" ? FALLBACK_FLOW_TYPE_NAME : FALLBACK_FUNCTION_NAME)
     }, [functionStore, lDefinition])
 
-    const DisplayIcon = icon(lDefinition?.displayIcon as IconString)
-
     return <Badge style={{verticalAlign: "middle", textWrap: "nowrap"}}
                   color={colored ? (isTrigger ? hashToColor(flowId) : hashToColor(value.startingNodeId || value.functionDefinition?.id || "")) : "rgba(255,255,255,0.75)"}
                   border
                   {...rest}>
-        <DisplayIcon size={12}/>
+        <Icon icon={lDefinition?.displayIcon as IconString} size={12}/>
         <Text size={"sm"} style={{color: "inherit"}}>
             {String(name)}
         </Text>

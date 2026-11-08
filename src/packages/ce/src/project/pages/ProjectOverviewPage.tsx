@@ -5,6 +5,8 @@ import {
     Col,
     Flex,
     getSize,
+    Icon,
+    IconString,
     ScrollArea,
     ScrollAreaScrollbar,
     ScrollAreaThumb,
@@ -15,7 +17,6 @@ import {
     useStore
 } from "@code0-tech/pictor";
 import {Panel} from "@xyflow/react";
-import {icon, IconString} from "@core/util/icons";
 import {AIChatComponent} from "@edition/ai/components/AIChatComponent";
 import {useParams} from "next/navigation";
 import {AiGenerateFlowSubscriptionPayload, Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
@@ -117,15 +118,13 @@ export const ProjectOverviewPage: React.FC = () => {
                             <Col xs={3} children={undefined}/>
                             {flowTemplates.map(flowTemplate => {
 
-                                const displayIcons = flowTemplate.icons.map(i => icon(i as IconString))
-
                                 return <Col xs={3} onClick={() => setPrompt(flowTemplate.prompt)}>
                                     <Card className={"hover-card"} paddingSize={"xs"} color={"secondary"}>
                                         <Flex align={"center"} justify={"space-between"} style={{gap: "0.35rem"}}>
                                             <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                                {displayIcons.map((DisplayIcon) => (
-                                                    /* @ts-ignore*/
-                                                    <DisplayIcon color={"white"} size={13}/>
+                                                {flowTemplate.icons.map(templateIcon => (
+                                                    <Icon key={templateIcon} icon={templateIcon as IconString}
+                                                          color={"white"} size={13}/>
                                                 ))}
                                             </Flex>
                                             <Text>

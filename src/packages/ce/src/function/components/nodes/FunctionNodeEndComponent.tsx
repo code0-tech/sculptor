@@ -2,11 +2,12 @@ import {Node, NodeProps} from "@xyflow/react";
 import React, {memo} from "react";
 import "./FunctionNodeComponent.style.scss";
 import {FunctionNodeComponentProps} from "./FunctionNodeComponent";
-import {Card, Flex, withAlpha} from "@code0-tech/pictor";
+import {Card, Flex, Icon, withAlpha} from "@code0-tech/pictor";
 import {useFunctionNodeState} from "@edition/function/hooks/FunctionNode.state.hook";
 import {FunctionNodeToolbarComponent} from "@edition/function/components/nodes/FunctionNodeToolbarComponent";
 import {FunctionNodeHandlesComponent} from "@edition/function/components/nodes/FunctionNodeHandlesComponent";
 import {FunctionNodeLabelComponent} from "@edition/function/components/nodes/FunctionNodeLabelComponent";
+import {FunctionNodeFrameComponent} from "@edition/function/components/nodes/FunctionNodeFrameComponent";
 import {
     FunctionNodeReferenceIndicatorComponent
 } from "@edition/function/components/nodes/FunctionNodeReferenceIndicatorComponent";
@@ -23,7 +24,7 @@ export const FunctionNodeEndComponent: React.FC<FunctionNodeEndComponentProps> =
     const {
         name,
         moduleName,
-        displayIcon: DisplayIcon,
+        displayIcon,
         iconColor,
         validationStyle,
         isActive,
@@ -32,7 +33,7 @@ export const FunctionNodeEndComponent: React.FC<FunctionNodeEndComponentProps> =
     } = useFunctionNodeState(data, id)
 
     return (
-        <Flex align={"center"} style={{flexDirection: "column", gap: "0.35rem"}}>
+        <FunctionNodeFrameComponent label={<FunctionNodeLabelComponent name={name} moduleName={moduleName}/>}>
             <div className={"d-flow-node-execution"}>
                 <Card
                     data-qa-selector={"flow-builder-node"}
@@ -61,7 +62,7 @@ export const FunctionNodeEndComponent: React.FC<FunctionNodeEndComponentProps> =
 
                     <Flex align={"center"} className={"d-flow-node__shape"}
                           style={{flexDirection: "column", gap: "0.35rem", ...validationStyle}}>
-                        <DisplayIcon color={iconColor} size={16} style={{width: "16px", height: "16px"}}/>
+                        <Icon icon={displayIcon} color={iconColor} size={16}/>
                     </Flex>
 
                 </Card>
@@ -70,7 +71,6 @@ export const FunctionNodeEndComponent: React.FC<FunctionNodeEndComponentProps> =
                 ) : null}
                 <FunctionNodeExecutionIndicatorComponent nodeId={id}/>
             </div>
-            <FunctionNodeLabelComponent name={name} moduleName={moduleName}/>
-        </Flex>
+        </FunctionNodeFrameComponent>
     );
 })

@@ -11,19 +11,22 @@ export const FunctionNodeLabelComponent: React.FC<FunctionNodeLabelComponentProp
     const {name, moduleName} = props
 
     return (
-        <Flex align={"center"} style={{
-            flexDirection: "column",
-            width: "150%",
-            textAlign: "center"
-        }}>
-            <Text size={"xs"} hierarchy={"primary"}>
-                {name}
-            </Text>
-            {moduleName ? (
-                <Text size={"xxs"} hierarchy={"tertiary"}>
-                    {moduleName}
+        <div style={{width: 0, minWidth: 0}}>
+            <Flex align={"center"} style={{
+                flexDirection: "column",
+                width: "75px",
+                textAlign: "center",
+                transform: "translateX(-50%)"
+            }}>
+                <Text size={"xs"} hierarchy={"primary"}>
+                    {name}
                 </Text>
-            ) : null}
-        </Flex>
+                {moduleName ? (
+                    <Text size={"xxs"} hierarchy={"tertiary"}>
+                        {moduleName}
+                    </Text>
+                ) : null}
+            </Flex>
+        </div>
     )
 }

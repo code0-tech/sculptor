@@ -1,12 +1,11 @@
 import React, {CSSProperties} from "react";
-import {useService, useStore as usePictorStore} from "@code0-tech/pictor";
+import {IconString, useService, useStore as usePictorStore} from "@code0-tech/pictor";
 import {NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {ModuleService} from "@edition/module/services/Module.service";
 import {useFlowValidation} from "@edition/flow/hooks/Flow.validation.hook";
 import {underlineBySeverity} from "@core/util/inspection";
-import {icon, IconString} from "@core/util/icons";
 import {FALLBACK_FUNCTION_NAME} from "@core/util/fallback-translations";
 import {useSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
 import {useReferencedNodeIds} from "@edition/flow/hooks/Flow.references.hook";
@@ -16,7 +15,7 @@ import {FunctionNodeComponentProps} from "@edition/function/components/nodes/Fun
 export interface FunctionNodeState {
     name: string
     moduleName?: string
-    displayIcon: ReturnType<typeof icon>
+    displayIcon: IconString
     iconColor: string
     validationStyle: CSSProperties
     isActive: boolean
@@ -74,7 +73,7 @@ export const useFunctionNodeState = (data: FunctionNodeComponentProps, id: strin
     return {
         name: definition?.names?.[0]?.content ?? FALLBACK_FUNCTION_NAME,
         moduleName: module?.names?.[0]?.content ?? module?.identifier ?? undefined,
-        displayIcon: icon(definition?.displayIcon as IconString),
+        displayIcon: definition?.displayIcon as IconString,
         iconColor: referencedNodeIds.has(id) || hoveredNodeId === id ? data.color : "rgba(255,255,255,0.75)",
         validationStyle: nodeValidations?.length ? underlineBySeverity[nodeValidations[0].type] : {},
         isActive: selectedNode?.id === id,
