@@ -35,6 +35,7 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
 
         const groupsWithValue = new Map<string, string[]>();
         const labeledParameters = new Set<string>();
+        const lastParameterNode = new Map<string, string>();
 
         let idCounter = 0;
 
@@ -74,11 +75,13 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                 const hostParameterDefinition = functionService.getById(hostNode?.functionDefinition?.id!!)?.parameterDefinitions?.nodes?.[inlinedReference.parameterIndex];
                 const hostLabelKey = `${inlinedReference.hostNodeId}-${inlinedReference.parameterIndex}`
 
+                const previousParameterNodeId = lastParameterNode.get(hostLabelKey)
+
                 edges.push({
-                    id: `${node.id}-${inlinedReference.hostNodeId}-reference`,
+                    id: `${node.id}-${previousParameterNodeId ?? inlinedReference.hostNodeId}-reference`,
                     source: node.id!,
-                    target: inlinedReference.hostNodeId,
-                    targetHandle: `param`,
+                    target: previousParameterNodeId ?? inlinedReference.hostNodeId,
+                    targetHandle: previousParameterNodeId ? undefined : `param`,
                     deletable: false,
                     selectable: false,
                     animated: true,
@@ -91,6 +94,7 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                 })
 
                 labeledParameters.add(hostLabelKey)
+                lastParameterNode.set(hostLabelKey, node.id!)
             }
 
             if (parentNode?.id && !isParameter && !inlinedReference) {
@@ -146,18 +150,18 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                                 }))
                             : []
 
-                let previousKey: string | undefined
-
                 subFlowValues.forEach(({subFlow, key}) => {
 
                     const labelKey = `${node.id}-${index}`
 
                     if (!subFlow.startingNodeId && subFlow.functionDefinition?.id) {
+                        const previousParameterNodeId = lastParameterNode.get(labelKey)
+
                         edges.push({
                             id: `${node.id}-${key}-next`,
                             source: `${node.id}-${key}`,
-                            target: previousKey ? `${node.id}-${previousKey}` : node.id!,
-                            targetHandle: previousKey ? undefined : `param`,
+                            target: previousParameterNodeId ?? node.id!,
+                            targetHandle: previousParameterNodeId ? undefined : `param`,
                             deletable: false,
                             selectable: false,
                             animated: true,
@@ -170,7 +174,7 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                         })
 
                         labeledParameters.add(labelKey)
-                        previousKey = key
+                        lastParameterNode.set(labelKey, `${node.id}-${key}`)
                         return
                     }
 
