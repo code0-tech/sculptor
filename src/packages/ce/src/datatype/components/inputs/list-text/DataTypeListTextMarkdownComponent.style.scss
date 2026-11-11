@@ -1,0 +1,25 @@
+@use "@core/style/helpers";
+@use "@core/style/variables";
+
+.data-type-markdown {
+  display: flex;
+  flex-direction: column;
+  gap: variables.$xxs;
+  width: 100%;
+}
+
+.data-type-markdown__reference {
+  gap: variables.$xs;
+  padding: variables.$xxs;
+  border: 1px solid helpers.borderColor(variables.$secondary);
+  border-radius: variables.$borderRadius;
+  background: helpers.backgroundColor(variables.$primary);
+}
+
+.data-type-markdown__reference-remove {
+  margin-left: auto;
+}
+
+.data-type-markdown__add {
+  gap: variables.$xxs;
+}

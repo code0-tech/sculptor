@@ -107,7 +107,8 @@ const isListReference = (entry: ListEntry): entry is ReferenceValue | SubFlowVal
 export const toListLiteral = (
     entries: ListEntry[],
     references: Map<string, ReferenceValue | SubFlowValue | NodeFunction>,
-    tokens?: string[]
+    tokens?: string[],
+    inline?: InlineReferenceValue[]
 ): LiteralValue => {
 
     const kept = entries.map((entry, index) =>
@@ -137,12 +138,17 @@ export const toListLiteral = (
     inlineReferences.forEach(reference =>
         references.set(`\${${reference.signature}}`, reference.value as ReferenceValue | SubFlowValue))
 
+    const keptInline = (inline ?? []).filter(reference => entries.some(entry =>
+        typeof entry === "string" && entry.includes(`\${${reference.signature}}`)))
+
+    const allReferences = [...inlineReferences, ...keptInline]
+
     return {
         __typename: "LiteralValue",
         value: entries.map((entry, index) => {
             const signature = signatures.get(index)
             return signature ? `\${${signature}}` : entry ?? null
         }),
-        ...(inlineReferences.length > 0 ? {references: inlineReferences} : {})
+        ...(allReferences.length > 0 ? {references: allReferences} : {})
     }
 }
