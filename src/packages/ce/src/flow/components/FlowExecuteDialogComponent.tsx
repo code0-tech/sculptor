@@ -1,19 +1,26 @@
 import React from "react";
 import {
+    Button,
     Dialog,
+    DialogClose,
     DialogContent,
     DialogOverlay,
     DialogPortal,
+    Flex,
+    getSize,
     Spacing,
+    Text,
     useService,
     useStore
 } from "@code0-tech/pictor";
+import {IconX} from "@tabler/icons-react";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {ProjectService} from "@edition/project/services/Project.service";
 import {Flow, Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {FlowExecuteDefaultView} from "@edition/flow/views/FlowExecuteDefaultView";
 import {FlowExecuteWebhookView} from "@edition/flow/views/FlowExecuteWebhookView";
+import {FlowExecuteOpenAiView} from "@edition/flow/views/FlowExecuteOpenAiView";
 
 export interface FlowExecuteDialogComponentProps {
     flowId: Flow['id']
@@ -56,6 +63,7 @@ export const FlowExecuteDialogComponent: React.FC<FlowExecuteDialogComponentProp
     const contentViews: Record<string, React.FC> = {
         default: FlowExecuteDefaultView,
         REST: FlowExecuteWebhookView,
+        "ai::openai::server": FlowExecuteOpenAiView,
     }
 
     const ContentView = contentViews[flowType?.identifier ?? "default"] ?? contentViews.default
