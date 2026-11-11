@@ -47,7 +47,6 @@ export interface FlowTemplate {
     name: string
     description: string
     flowTypeIdentifier: string
-    signature: string
     startingNodeId: number
     nodes: FlowTemplateNode[]
     settings: FlowTemplateSetting[]
@@ -199,7 +198,10 @@ export const buildFlowTemplateInput = (resolution: FlowTemplateResolution, name:
         input: {
             name,
             type: flowType.id!,
-            signature: template.signature,
+            // The signature is taken from the resolved flow type instead of the template, so a
+            // template keeps working when the runtime ships a new version of its trigger. A
+            // hard coded one shifts every setting against the runtime order once that changes.
+            signature: flowType.signature ?? "",
             startingNodeId: nodeFunctionId(template.startingNodeId),
             settings,
             nodes

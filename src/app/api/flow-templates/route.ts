@@ -30,7 +30,6 @@ export async function GET() {
             name: template.name,
             description: template.description ?? "",
             flowTypeIdentifier: template.flowTypeIdentifier,
-            signature: template.signature ?? "",
             startingNodeId: template.startingNodeId,
             nodes: template.nodes,
             settings: template.settings ?? []

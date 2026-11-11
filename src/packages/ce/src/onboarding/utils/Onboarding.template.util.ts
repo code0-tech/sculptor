@@ -1,4 +1,3 @@
-import {FlowType} from "@code0-tech/sagittarius-graphql-types";
 import {FlowTemplate} from "@core/util/flow-template";
 
 /**
@@ -6,16 +5,12 @@ import {FlowTemplate} from "@core/util/flow-template";
  * json message. It is defined here instead of coming from `/api/flow-templates`,
  * because that endpoint serves the playground mock and is empty in a real deployment,
  * while the guided first run has to end in a flow that can be executed right away.
- *
- * The signature is taken from the resolved flow type rather than hard coded, so the
- * template keeps working when the runtime ships a new version of the webhook trigger.
  */
-export const getOnboardingFlowTemplate = (flowTypes: FlowType[]): FlowTemplate => ({
+export const onboardingFlowTemplate: FlowTemplate = {
     slug: "onboarding-hello-world",
     name: "Hello World",
     description: "A webhook that answers every call with a fixed json message. The shortest way to see a flow run end to end.",
     flowTypeIdentifier: "REST",
-    signature: flowTypes.find(flowType => flowType.identifier === "REST")?.signature ?? "",
     startingNodeId: 1,
     settings: [
         {identifier: "http_schema", cast: null, value: "application/json"},
@@ -45,4 +40,4 @@ export const getOnboardingFlowTemplate = (flowTypes: FlowType[]): FlowTemplate =
             ]
         }
     ]
-})
+}

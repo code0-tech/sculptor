@@ -2,7 +2,6 @@
     "name": "Reply hello world to a webhook call",
     "description": "A single step that answers every call to the webhook with a fixed JSON message - the shortest way to see a flow run end to end.",
     "flowTypeIdentifier": "REST",
-    "signature": "<A extends REST_AUTH_TYPE, T extends TYPE>(http_schema: HTTP_SCHEMA, http_url: HTTP_URL, http_method: HTTP_METHOD, http_auth: A, http_auth_value: REST_AUTH_VALUE<A>, input_schema: T): REST_ADAPTER_INPUT<T>",
     "startingNodeId": 83,
     "settings": [
         {
@@ -33,7 +32,10 @@
         {
             "identifier": "input_schema",
             "cast": "{}",
-            "value": {"type": "object", "additionalProperties": false}
+            "value": {
+                "type": "object",
+                "additionalProperties": false
+            }
         }
     ],
     "nodes": [

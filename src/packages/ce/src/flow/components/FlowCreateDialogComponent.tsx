@@ -53,7 +53,7 @@ import {
     resolveFlowTemplate
 } from "@core/util/flow-template";
 import {useOnboardingStore} from "@edition/onboarding/hooks/Onboarding.state.hook";
-import {getOnboardingFlowTemplate} from "@edition/onboarding/utils/Onboarding.template.util";
+import {onboardingFlowTemplate} from "@edition/onboarding/utils/Onboarding.template.util";
 
 export interface FlowCreateDialogComponentProps {
     open?: boolean
@@ -148,7 +148,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
     )
 
     const onboardingResolution = React.useMemo(
-        () => resolveFlowTemplate(getOnboardingFlowTemplate(flowTypes), flowTypes, functions),
+        () => resolveFlowTemplate(onboardingFlowTemplate, flowTypes, functions),
         [flowTypes, functions]
     )
 
