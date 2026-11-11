@@ -187,7 +187,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                 {optionalParameters.length > 0 && (
                     <Collapsible.Root>
                         <Collapsible.Trigger asChild>
-                            <Flex justify={"space-between"} align={"center"} style={{gap: "0.7rem"}}>
+                            <Flex justify={"space-between"} align={"center"} style={{cursor: "pointer", gap: "0.7rem"}}>
                                 <Text size={"md"}>Optional parameters</Text>
                                 <Button variant={"none"} color={"primary"} paddingSize={"xxs"}>
                                     <IconChevronDown size={16}/>

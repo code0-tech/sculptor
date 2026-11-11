@@ -167,7 +167,7 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
                 {optionalSettings.length > 0 && (
                     <Collapsible.Root>
                         <Collapsible.Trigger asChild>
-                            <Flex justify={"space-between"} align={"center"} style={{gap: "0.7rem"}}>
+                            <Flex justify={"space-between"} align={"center"} style={{cursor: "pointer", gap: "0.7rem"}}>
                                 <Text size={"md"}>Optional settings</Text>
                                 <Button variant={"none"} color={"primary"} paddingSize={"xxs"}>
                                     <IconChevronDown size={16}/>
