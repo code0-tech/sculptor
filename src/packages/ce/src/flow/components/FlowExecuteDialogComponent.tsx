@@ -63,7 +63,17 @@ export const FlowExecuteDialogComponent: React.FC<FlowExecuteDialogComponentProp
     return <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogPortal>
             <DialogOverlay/>
-            <DialogContent showCloseButton title={"Manually execute / test your workflow"}>
+            <DialogContent>
+                <Flex align={"center"} justify={"space-between"} style={{gap: getSize("sm")}}>
+                    <Text size={"lg"} hierarchy={"primary"} ta={"left"}>
+                        Manually execute / test your workflow
+                    </Text>
+                    <DialogClose asChild>
+                        <Button variant={"none"} style={{padding: getSize("xs")}}>
+                            <IconX size={16}/>
+                        </Button>
+                    </DialogClose>
+                </Flex>
                 <Spacing spacing={"xl"}/>
                 <ContentView/>
             </DialogContent>
