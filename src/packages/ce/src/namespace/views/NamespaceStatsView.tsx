@@ -76,7 +76,7 @@ export const NamespaceStatsView: React.FC = () => {
     ]
 
     return <Card data-qa-selector={"dashboard-namespace-stats"} color={"secondary"}>
-        <Flex align={"center"}>
+        <Flex>
             {stats.map((stat, index) => (
                 <React.Fragment key={stat.label}>
                     <Flex style={{flexDirection: "column", gap: "0.7rem", flex: 1}}>
