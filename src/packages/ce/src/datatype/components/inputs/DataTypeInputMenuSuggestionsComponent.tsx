@@ -2,24 +2,23 @@ import React from "react";
 import {Flow, NodeFunction, ReferenceValue, SubFlowValue} from "@code0-tech/sagittarius-graphql-types";
 import {
     Flex,
-    hashToColor,
-    Icon,
-    IconString,
+    Menu,
+    MenuContent,
     MenuItem,
+    MenuPortal,
     MenuSeparator,
-    MenuSub,
-    MenuSubContent,
-    MenuSubTrigger,
+    MenuTrigger,
     TagInputMenu,
     TagInputMenuItem,
-    TagInputSubMenu,
     Text,
+    Tooltip,
+    TooltipContent,
+    TooltipPortal,
+    TooltipTrigger,
     useService
 } from "@code0-tech/pictor";
-import {IconChevronRight, IconPlus} from "@tabler/icons-react";
+import {IconPlus} from "@tabler/icons-react";
 import {useParams} from "next/navigation";
-import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
-import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeComponent";
 import {useFlowReferenceHoverStore} from "@edition/flow/hooks/Flow.reference.hover.hook";
 import {
     Suggestion,
@@ -31,9 +30,8 @@ import {
     SuggestionVariantDialogComponent
 } from "@edition/function/components/suggestion/SuggestionVariantDialogComponent";
 import {FlowService} from "@edition/flow/services/Flow.service";
-import {
-    DataTypeInputMenuReferencePathComponent
-} from "@edition/datatype/components/inputs/DataTypeInputMenuReferencePathComponent";
+import {DataTypeInputMenuEntriesComponent} from "@edition/datatype/components/inputs/DataTypeInputMenuEntriesComponent";
+import {DataTypeInputMenuModuleGroupsComponent} from "@edition/datatype/components/inputs/DataTypeInputMenuModuleGroupsComponent";
 
 export interface DataTypeInputMenuSuggestionsComponentProps {
     suggestions: SuggestionValue[]
@@ -44,8 +42,13 @@ export interface DataTypeInputMenuSuggestionsComponentProps {
     flowId?: Flow['id']
     nodeId?: NodeFunction['id']
     parameterIndex?: number
+    trigger?: React.ReactElement
+    tooltip?: React.ReactNode
+    anchor?: {top: number, left: number} | null
+    query?: string
+    open?: boolean
+    onOpenChange?: (open: boolean) => void
     onSelect?: (value: SuggestionValue) => void
-    onVariantRequest?: (suggestion: Suggestion) => void
     onVariantSelect?: (value: ReferenceValue | SubFlowValue) => void
     children?: React.ReactNode
 }
@@ -60,8 +63,13 @@ export const DataTypeInputMenuSuggestionsComponent: React.FC<DataTypeInputMenuSu
         onCustomLogicGroupSelect,
         nodeId,
         parameterIndex,
+        trigger,
+        tooltip,
+        anchor,
+        query,
+        open,
+        onOpenChange,
         onSelect,
-        onVariantRequest,
         onVariantSelect,
         children
     } = props
@@ -74,18 +82,106 @@ export const DataTypeInputMenuSuggestionsComponent: React.FC<DataTypeInputMenuSu
 
     const {entries, moduleGroups} = useSuggestionMenuEntries(suggestions, flowId)
 
-    const requestVariant = onVariantRequest ?? setVariantSuggestion
-
     const hasCustomLogicGroup = mode === "menu" ? !!onCustomLogicGroupSelect : customLogicGroupKey !== undefined
+    const needle = (query ?? "").trim().toLowerCase()
+    const anchored = mode === "menu" && !trigger && !!open
+
+    React.useEffect(() => {
+        if (!anchored) return
+
+        const content = () =>
+            document.querySelector<HTMLElement>('[data-suggestion-menu="true"][data-state="open"]')
+
+        const listener = (event: KeyboardEvent) => {
+            const element = content()
+            if (!element || (document.activeElement as HTMLElement | null)?.closest('[role="menu"]')) return
+
+            const items = Array.from(element.querySelectorAll<HTMLElement>('[role="menuitem"]:not([data-disabled])'))
+            if (items.length <= 0) return
+
+            const current = items.findIndex(item => item.dataset.focus === "true")
+
+            if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+                const next = event.key === "ArrowDown"
+                    ? (current + 1) % items.length
+                    : (current <= 0 ? items.length - 1 : current - 1)
+
+                event.preventDefault()
+                event.stopPropagation()
+                items.forEach(item => delete item.dataset.focus)
+                items[next].dataset.focus = "true"
+                items[next].scrollIntoView({block: "nearest"})
+                return
+            }
+
+            const opens = event.key === "ArrowRight"
+                && items[current]?.getAttribute("aria-haspopup") === "menu"
+
+            if (event.key === "Enter" || opens) {
+                event.preventDefault()
+                event.stopPropagation()
+                items[Math.max(current, 0)].click()
+            }
+        }
+
+        const frame = requestAnimationFrame(() => {
+            const first = content()?.querySelector<HTMLElement>('[role="menuitem"]:not([data-disabled])')
+
+            if (first) first.dataset.focus = "true"
+        })
+
+        document.addEventListener("keydown", listener, true)
+
+        return () => {
+            cancelAnimationFrame(frame)
+            document.removeEventListener("keydown", listener, true)
+            content()?.querySelectorAll<HTMLElement>('[role="menuitem"]')
+                .forEach(item => delete item.dataset.focus)
+        }
+    }, [anchored, needle])
 
     if (React.Children.count(children) <= 0
         && !hasCustomLogicGroup
         && entries.length <= 0
         && moduleGroups.length <= 0) return null
 
+    const matches = (terms: (string | null | undefined)[]): boolean =>
+        needle.length <= 0 || terms.some(term => (term ?? "").toLowerCase().includes(needle))
+
+    const matchedEntries = entries.filter(entry => {
+        if (entry.kind === "value") {
+            const value = entry.value
+
+            if (value.__typename === "LiteralValue") return matches([String(value.value ?? "")])
+
+            const definition = value.__typename === "SubFlowValue" || value.__typename === "NodeFunction"
+                ? value.functionDefinition
+                : undefined
+
+            return matches([definition?.names?.[0]?.content, definition?.identifier,
+                definition?.aliases?.[0]?.content])
+        }
+
+        return matches([
+            entry.group.displayName,
+            entry.group.root.inputTypeIdentifier,
+            ...entry.group.suggestions.flatMap(suggestion =>
+                (suggestion.value.referencePath ?? []).map(path => path.path))
+        ])
+    })
+
+    const matchedModuleGroups = moduleGroups.flatMap(group => {
+        if (matches([group.displayMessage])) return [group]
+
+        const matched = group.suggestions.filter(suggestion =>
+            matches([suggestion.displayMessage, suggestion.definitionSource, ...(suggestion.aliases ?? [])]))
+
+        return matched.length <= 0 ? [] : [{...group, suggestions: matched}]
+    })
+
     const items = <>
         {children}
-        {React.Children.count(children) > 0 && (hasCustomLogicGroup || entries.length > 0 || moduleGroups.length > 0) ?
+        {React.Children.count(children) > 0 && (hasCustomLogicGroup || matchedEntries.length > 0 || matchedModuleGroups.length > 0) ?
             <MenuSeparator/> : null}
         {hasCustomLogicGroup ? <>
             {mode === "menu" ?
@@ -103,210 +199,104 @@ export const DataTypeInputMenuSuggestionsComponent: React.FC<DataTypeInputMenuSu
                         <Text>Add custom logic group</Text>
                     </Flex>
                 </TagInputMenuItem>}
-            {entries.length > 0 || moduleGroups.length > 0 ? <MenuSeparator/> : null}
+            {matchedEntries.length > 0 || matchedModuleGroups.length > 0 ? <MenuSeparator/> : null}
         </> : null}
-        {entries.map((entry, index) => {
-
-            if (entry.kind === "value") {
-
-                const literal = entry.value.__typename === "LiteralValue" ? entry.value : undefined
-                const subFlow = entry.value.__typename === "SubFlowValue" ? entry.value : undefined
-                const node = entry.value.__typename === "NodeFunction" ? entry.value : undefined
-                const definition = subFlow?.functionDefinition ?? node?.functionDefinition
-
-                const badge = literal
-                    ? <Flex style={{gap: "0.35rem"}} align={"center"}>{String(literal.value)}</Flex>
-                    : subFlow
-                        ? <NodeBadgeComponent value={subFlow}/>
-                        : <NodeBadgeComponent value={{
-                            __typename: "SubFlowValue",
-                            functionDefinition: node?.functionDefinition
-                        }}/>
-
-                if (mode === "menu") return <MenuItem key={index} onMouseEnter={() => setHoveredNodeId(null)}
-                                                      onFocus={() => setHoveredNodeId(null)}
-                                                      onSelect={() => onSelect?.(entry.value)}>
-                    {badge}
-                </MenuItem>
-
-                return <TagInputMenuItem key={index} value={tagKeys?.[entry.index]} data={entry.value}
-                                         aliases={definition ? [definition.names?.[0]?.content ?? ""] : undefined}
-                                         onMouseEnter={() => setHoveredNodeId(null)}>
-                    {badge}
-                </TagInputMenuItem>
-            }
-
-            const group = entry.group
-
-            if (group.suggestions.length === 1) {
-                const only = group.suggestions[0]
-
-                const onlyLabel = <Flex align={"center"} w={"100%"}
-                                        onMouseEnter={() => setHoveredNodeId(group.targetNodeId)}
-                                        onMouseLeave={() => setHoveredNodeId(null)}>
-                    <ReferenceBadgeComponent value={only.value}/>
-                </Flex>
-
-                if (mode === "menu") return <MenuItem key={entry.key}
-                                                      onMouseEnter={() => setHoveredNodeId(group.targetNodeId)}
-                                                      onMouseLeave={() => setHoveredNodeId(null)}
-                                                      onFocus={() => setHoveredNodeId(group.targetNodeId)}
-                                                      onSelect={() => onSelect?.(only.value)}>
-                    {onlyLabel}
-                </MenuItem>
-
-                return <TagInputMenuItem key={entry.key} value={tagKeys?.[only.index]} data={only.value}
-                                         aliases={[only.value.inputTypeIdentifier ?? "", ...(only.value.referencePath ?? []).map(path => path.path ?? "")]}
-                                         onMouseEnter={() => setHoveredNodeId(group.targetNodeId)}
-                                         onMouseLeave={() => setHoveredNodeId(null)}>
-                    {onlyLabel}
-                </TagInputMenuItem>
-            }
-
-            const groupTagKey = group.index === undefined ? undefined : tagKeys?.[group.index]
-
-            const groupSelfLabel = group.value
-                ? <Flex align={"center"} w={"100%"}
-                        onMouseEnter={() => setHoveredNodeId(group.targetNodeId)}
-                        onMouseLeave={() => setHoveredNodeId(null)}>
-                    <ReferenceBadgeComponent value={group.value}/>
-                </Flex>
-                : null
-
-            const groupSelf = mode === "menu"
-                ? (group.value
-                    ? <MenuItem onMouseEnter={() => setHoveredNodeId(group.targetNodeId)}
-                                onMouseLeave={() => setHoveredNodeId(null)}
-                                onFocus={() => setHoveredNodeId(group.targetNodeId)}
-                                onSelect={() => onSelect?.(group.value!)}>
-                        {groupSelfLabel}
-                    </MenuItem>
-                    : null)
-                : (group.value && groupTagKey !== undefined
-                    ? <TagInputMenuItem value={groupTagKey} data={group.value}
-                                        aliases={[group.value.inputTypeIdentifier ?? ""]}
-                                        onMouseEnter={() => setHoveredNodeId(group.targetNodeId)}
-                                        onMouseLeave={() => setHoveredNodeId(null)}>
-                        {groupSelfLabel}
-                    </TagInputMenuItem>
-                    : null)
-
-            const groupLabel = <Flex align={"center"} justify={"space-between"} style={{gap: "0.7rem"}} w={"100%"}
-                                     onMouseEnter={() => setHoveredNodeId(group.targetNodeId)}
-                                     onMouseLeave={() => setHoveredNodeId(null)}>
-                <ReferenceBadgeComponent value={group.root}/>
-                <IconChevronRight size={12}/>
-            </Flex>
-
-            if (mode === "menu") return <MenuSub key={entry.key}>
-                <MenuSubTrigger onMouseEnter={() => setHoveredNodeId(group.targetNodeId)}
-                                onMouseLeave={() => setHoveredNodeId(null)}
-                                onFocus={() => setHoveredNodeId(group.targetNodeId)}>
-                    {groupLabel}
-                </MenuSubTrigger>
-                <MenuSubContent onMouseEnter={() => setHoveredNodeId(group.targetNodeId)}
-                                onMouseLeave={() => setHoveredNodeId(null)}>
-                    {groupSelf}
-                    <DataTypeInputMenuReferencePathComponent nodes={group.children}
-                                                             targetNodeId={group.targetNodeId} mode={mode}
-                                                             onSelect={onSelect}/>
-                </MenuSubContent>
-            </MenuSub>
-
-            return <TagInputSubMenu key={entry.key} label={groupLabel}>
-                {groupSelf}
-                <DataTypeInputMenuReferencePathComponent nodes={group.children} targetNodeId={group.targetNodeId}
-                                                         mode={mode} tagKeys={tagKeys}/>
-            </TagInputSubMenu>
-        })}
-        {entries.length > 0 && moduleGroups.length > 0 ? <MenuSeparator/> : null}
-        {moduleGroups.map((group, index) => {
-
-            const groupLabel = <Flex align={"center"} justify={"space-between"} style={{gap: "0.7rem"}} w={"100%"}
-                                     onMouseEnter={() => setHoveredNodeId(null)}>
-                <Flex align={"center"} style={{gap: "0.35rem"}}>
-                    <Icon icon={group.icon as IconString} size={13} color={hashToColor(`group-${index}`)}/>
-                    <Text>{group.displayMessage}</Text>
-                </Flex>
-                <IconChevronRight size={12}/>
-            </Flex>
-
-            const groupItems = group.suggestions.map((suggestion, suggestionIndex) => {
-
-                const directValue = suggestion.variants.find(variant => variant.__typename === "SubFlowValue")
-                const resultValue = suggestion.variants.find(variant => variant.__typename === "NodeFunction")
-                const directIndex = directValue ? suggestions.indexOf(directValue) : -1
-                const resultIndex = resultValue ? suggestions.indexOf(resultValue) : -1
-
-                const content = <Flex align={"center"} style={{gap: "0.35rem"}}
-                                      onMouseEnter={() => setHoveredNodeId(null)}>
-                    <Icon icon={suggestion.icon as IconString} size={13} color={hashToColor(`group-${index}`)}/>
-                    <Text>{suggestion.displayMessage}</Text>
-                </Flex>
-
-                if (directIndex >= 0 && resultIndex >= 0) return <MenuItem key={suggestionIndex}
-                                                                           title={suggestion.description}
-                                                                           onFocus={() => setHoveredNodeId(null)}
-                                                                           onSelect={() => requestVariant(suggestion)}>
-                    {content}
-                </MenuItem>
-
-                if (mode === "menu") return <MenuItem key={suggestionIndex} title={suggestion.description}
-                                                      onFocus={() => setHoveredNodeId(null)}
-                                                      onSelect={() => onSelect?.(suggestion.value)}>
-                    {content}
-                </MenuItem>
-
-                const valueIndex = suggestions.indexOf(suggestion.value)
-                if (valueIndex < 0) return null
-
-                return <TagInputMenuItem key={suggestionIndex} value={tagKeys?.[valueIndex]} data={suggestion.value}
-                                         aliases={[suggestion.displayMessage, ...(suggestion.aliases ?? [])]}
-                                         title={suggestion.description}>
-                    {content}
-                </TagInputMenuItem>
-            })
-
-            if (mode === "menu") return <MenuSub key={`group-${index}`}>
-                <MenuSubTrigger onMouseEnter={() => setHoveredNodeId(null)}
-                                onFocus={() => setHoveredNodeId(null)}>{groupLabel}</MenuSubTrigger>
-                <MenuSubContent align={"start"} collisionPadding={16} alignOffset={0} sideOffset={0}>
-                    {groupItems}
-                </MenuSubContent>
-            </MenuSub>
-
-            return <TagInputSubMenu key={`group-${index}`} label={groupLabel}>
-                {groupItems}
-            </TagInputSubMenu>
-        })}
+        <DataTypeInputMenuEntriesComponent entries={matchedEntries}
+                                           mode={mode}
+                                           tagKeys={tagKeys}
+                                           onSelect={onSelect}/>
+        {matchedEntries.length > 0 && matchedModuleGroups.length > 0 ? <MenuSeparator/> : null}
+        <DataTypeInputMenuModuleGroupsComponent moduleGroups={matchedModuleGroups}
+                                                suggestions={suggestions}
+                                                mode={mode}
+                                                tagKeys={tagKeys}
+                                                onSelect={onSelect}
+                                                onVariantRequest={setVariantSuggestion}/>
     </>
 
-    if (mode === "menu") return onVariantRequest ? items : null
+    const variantDialog = <SuggestionVariantDialogComponent suggestion={variantSuggestion}
+                                                            flowId={flowId}
+                                                            nodeId={nodeId}
+                                                            parameterIndex={parameterIndex}
+                                                            open={!!variantSuggestion}
+                                                            onOpenChange={opened => {
+                                                                if (!opened) setVariantSuggestion(null)
+                                                            }}
+                                                            onVariantSelect={picked => {
+                                                                setVariantSuggestion(null)
+
+                                                                if (mode === "menu") {
+                                                                    onSelect?.(picked)
+                                                                    return
+                                                                }
+
+                                                                if (picked.__typename === "NodeFunction") {
+                                                                    const addedNodeId = flowService.addPreviousNodeById(flowId, nodeId ?? null, picked)
+                                                                    if (!addedNodeId) return
+                                                                    onVariantSelect?.({
+                                                                        __typename: "ReferenceValue",
+                                                                        nodeFunctionId: addedNodeId
+                                                                    })
+                                                                    return
+                                                                }
+
+                                                                if (picked.__typename === "SubFlowValue" || picked.__typename === "ReferenceValue") onVariantSelect?.(picked)
+                                                            }}/>
+
+    if (mode === "menu") {
+        const menuTrigger = <MenuTrigger asChild>
+            {trigger ?? <span aria-hidden={true}
+                              style={{position: "fixed", width: 0, height: 0, pointerEvents: "none",
+                                  top: anchor?.top ?? 0, left: anchor?.left ?? 0}}/>}
+        </MenuTrigger>
+
+        return <>
+            {variantDialog}
+            <Menu modal={false} open={open} onOpenChange={opened => {
+                if (!opened) setHoveredNodeId(null)
+                onOpenChange?.(opened)
+            }}>
+                {tooltip ? <Tooltip>
+                    <TooltipTrigger asChild>
+                        {menuTrigger}
+                    </TooltipTrigger>
+                    <TooltipPortal>
+                        <TooltipContent color={"primary"} side={"top"} sideOffset={8} style={{zIndex: 51}}>
+                            {tooltip}
+                        </TooltipContent>
+                    </TooltipPortal>
+                </Tooltip> : menuTrigger}
+                <MenuPortal>
+                    <MenuContent color={"primary"}
+                                 data-suggestion-menu={"true"}
+                                 align={"start"}
+                                 sideOffset={4}
+                                 style={{zIndex: 51}}
+                                 miw={"220px"}
+                                 onKeyDown={event => event.stopPropagation()}
+                                 onFocusOutside={event => {
+                                     if (!trigger) event.preventDefault()
+                                 }}
+                                 onInteractOutside={event => {
+                                     if (!trigger && event.detail.originalEvent.type === "focusin")
+                                         event.preventDefault()
+                                 }}
+                                 onCloseAutoFocus={event => {
+                                     if (!trigger) event.preventDefault()
+                                 }}
+                                 onMouseLeave={() => setHoveredNodeId(null)}>
+                        {needle.length > 0 && matchedEntries.length <= 0 && matchedModuleGroups.length <= 0 ?
+                            <MenuItem disabled>
+                                <Text hierarchy={"tertiary"}>No matching suggestions</Text>
+                            </MenuItem> : items}
+                    </MenuContent>
+                </MenuPortal>
+            </Menu>
+        </>
+    }
 
     return <>
-        <SuggestionVariantDialogComponent suggestion={variantSuggestion}
-                                          flowId={flowId}
-                                          nodeId={nodeId}
-                                          parameterIndex={parameterIndex}
-                                          open={!!variantSuggestion}
-                                          onOpenChange={open => {
-                                              if (!open) setVariantSuggestion(null)
-                                          }}
-                                          onVariantSelect={picked => {
-                                              setVariantSuggestion(null)
-
-                                              if (picked.__typename === "NodeFunction") {
-                                                  const addedNodeId = flowService.addPreviousNodeById(flowId, nodeId ?? null, picked)
-                                                  if (!addedNodeId) return
-                                                  onVariantSelect?.({
-                                                      __typename: "ReferenceValue",
-                                                      nodeFunctionId: addedNodeId
-                                                  })
-                                                  return
-                                              }
-
-                                              if (picked.__typename === "SubFlowValue" || picked.__typename === "ReferenceValue") onVariantSelect?.(picked)
-                                          }}/>
+        {variantDialog}
         <TagInputMenu openOn={"focus"} onMouseLeave={() => setHoveredNodeId(null)}>{items}</TagInputMenu>
     </>
 }

@@ -9,6 +9,8 @@ import {
 import {useService, useStore} from "@code0-tech/pictor";
 import {ModuleService} from "@edition/module/services/Module.service";
 import {FunctionService} from "@edition/function/services/Function.service";
+import {FlowService} from "@edition/flow/services/Flow.service";
+import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import React from "react";
 
 export type SuggestionValue = LiteralValue | ReferenceValue | NodeFunction | SubFlowValue
@@ -171,6 +173,7 @@ export interface SuggestionPathNode {
 export interface SuggestionReferenceGroup {
     root: ReferenceValue
     targetNodeId: string
+    displayName?: string
     value?: ReferenceValue
     index?: number
     children: Map<string, SuggestionPathNode>
@@ -187,15 +190,30 @@ const referenceGroupKey = (value: ReferenceValue): string =>
 const referencePathLabel = (segment: ReferencePath): string =>
     `${segment.path ?? ""}${segment.arrayIndex != null ? `[${segment.arrayIndex}]` : ""}`
 
-const newReferenceGroup = (root: ReferenceValue, flowId: Flow['id']): SuggestionReferenceGroup => {
+const newReferenceGroup = (root: ReferenceValue, flowId: Flow['id'],
+                           displayName?: string): SuggestionReferenceGroup => {
     const nodeFunctionId = root.nodeFunctionId as string | null | undefined
 
     return {
         root: {...root, referencePath: undefined},
         targetNodeId: (!nodeFunctionId || nodeFunctionId === "undefined" ? flowId : nodeFunctionId) as string,
+        displayName,
         children: new Map(),
         suggestions: []
     }
+}
+
+const referenceDisplayName = (root: ReferenceValue, flowId: Flow['id'], flowService: FlowService,
+                              functionService: FunctionService,
+                              flowTypeService: FlowTypeService): string | undefined => {
+    const nodeFunctionId = root.nodeFunctionId as string | null | undefined
+
+    if (!nodeFunctionId || nodeFunctionId === "undefined")
+        return flowTypeService.getById(flowService.getById(flowId)?.type?.id)?.names?.[0]?.content ?? undefined
+
+    const node = flowService.getNodeById(flowId, nodeFunctionId as NodeFunction['id'])
+
+    return functionService.getById(node?.functionDefinition?.id)?.names?.[0]?.content ?? undefined
 }
 
 const childPathNode = (children: Map<string, SuggestionPathNode>, label: string): SuggestionPathNode => {
@@ -217,6 +235,13 @@ export const useSuggestionMenuEntries = (suggestions: SuggestionValue[], flowId:
 
     const moduleGroups = useMappedSuggestions(suggestions, ["SubFlowValue", "NodeFunction"])
 
+    const flowService = useService(FlowService)
+    const flowStore = useStore(FlowService)
+    const functionService = useService(FunctionService)
+    const functionStore = useStore(FunctionService)
+    const flowTypeService = useService(FlowTypeService)
+    const flowTypeStore = useStore(FlowTypeService)
+
     const groupedValues = React.useMemo(
         () => new Set(moduleGroups.flatMap(group => group.suggestions.flatMap(suggestion => suggestion.variants))),
         [moduleGroups]
@@ -237,7 +262,8 @@ export const useSuggestionMenuEntries = (suggestions: SuggestionValue[], flowId:
 
             const key = referenceGroupKey(suggest)
             const known = groups.get(key)
-            const group = known ?? newReferenceGroup(suggest, flowId)
+            const group = known ?? newReferenceGroup(suggest, flowId,
+                referenceDisplayName(suggest, flowId, flowService, functionService, flowTypeService))
             const segments = suggest.referencePath ?? []
 
             groups.set(key, group)
@@ -249,7 +275,7 @@ export const useSuggestionMenuEntries = (suggestions: SuggestionValue[], flowId:
 
             return known ? [] : [{kind: "reference-group", key, group}]
         })
-    }, [suggestions, groupedValues, flowId])
+    }, [suggestions, groupedValues, flowId, flowStore, functionStore, flowTypeStore])
 
     return {entries, moduleGroups}
 }
