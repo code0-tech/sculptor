@@ -307,7 +307,7 @@ export const DataTypeListSubFlowInputComponent: React.FC<DataTypeListSubFlowInpu
                       rightType={"action"}>
                 <DataTypeInputMenuSuggestionsComponent suggestions={declaredSuggestions}
                                                        tagKeys={tagKeys}
-                                                       customLogicGroupKey={customLogicGroupKey}
+                                                       customLogicGroupKey={hasDeclaredSuggestions ? undefined : customLogicGroupKey}
                                                        flowId={flowId}
                                                        nodeId={props.nodeId}
                                                        parameterIndex={props.parameterIndex}
