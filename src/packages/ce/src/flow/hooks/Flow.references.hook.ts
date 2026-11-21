@@ -1,8 +1,9 @@
 import {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
-import {ListInput, Schema, SignatureSchema} from "@code0-tech/triangulum";
+import {SignatureSchema} from "@code0-tech/triangulum";
 import React from "react";
 import {useService, useStore} from "@code0-tech/pictor";
 import {FlowService} from "@edition/flow/services/Flow.service";
+import {isSubFlowSchema} from "@edition/flow/utils/Flow.subFlowSchema.util";
 
 export const useReferencedNodeIds = (flowId: Flow["id"]): Set<string> => {
 
@@ -44,15 +45,6 @@ export const useReferencedNodeIds = (flowId: Flow["id"]): Set<string> => {
 export interface InlinedReference {
     hostNodeId: NonNullable<NodeFunction["id"]>
     parameterIndex: number
-}
-
-const isSubFlowSchema = (schema?: Schema): boolean => {
-    if (!schema) return false
-    if (schema.input === "sub-flow" || schema.input === "list-sub-flow") return true
-    if (schema.input !== "list") return false
-
-    const list = schema as ListInput
-    return [...(list.items ?? []), ...(list.declaredItems ?? [])].some(isSubFlowSchema)
 }
 
 export const useInlinedReferenceNodes = (flowId: Flow["id"], schema?: SignatureSchema[]): Map<string, InlinedReference> => {

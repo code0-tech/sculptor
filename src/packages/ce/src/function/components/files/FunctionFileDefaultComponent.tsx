@@ -1,5 +1,5 @@
 import React from "react";
-import {Alert, Button, Flex, Spacing, Text, useForm, useService, useStore} from "@code0-tech/pictor";
+import {Alert, Spacing, Text, useForm, useService, useStore} from "@code0-tech/pictor";
 import {
     Flow,
     LiteralValue,
@@ -20,8 +20,11 @@ import {
 } from "@core/util/fallback-translations";
 import {useNodes} from "@xyflow/react";
 import {NodeSchema} from "@code0-tech/triangulum";
-import * as Collapsible from "@radix-ui/react-collapsible";
-import {IconChevronDown} from "@tabler/icons-react";
+import {
+    FunctionFileOptionalInputMenuComponent
+} from "@edition/function/components/files/FunctionFileOptionalInputMenuComponent";
+import {isSubFlowSchema} from "@edition/flow/utils/Flow.subFlowSchema.util";
+import {useShownOptionalInputs} from "@edition/function/hooks/Function.optionalInputs.hook";
 
 export interface FunctionFileDefaultComponentProps {
     nodeId: NodeFunction['id']
@@ -80,6 +83,12 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
         return values
     }, [validation?.length, node.id, definition])
 
+    const parametersWithValue = React.useMemo(() => (definition?.parameterDefinitions?.nodes ?? [])
+        .filter((parameterDefinition, index) => parameterDefinition?.optional && node.parameters?.nodes?.[index]?.value != null)
+        .map(parameterDefinition => parameterDefinition!.id!), [definition, node])
+
+    const [shownParameters, showParameter] = useShownOptionalInputs(parametersWithValue)
+
     const onSubmit = React.useCallback((values: Record<string, NodeParameterValue | undefined>) => {
         for (const parameterDefinition of definition?.parameterDefinitions?.nodes ?? []) {
 
@@ -90,11 +99,12 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
 
             const value = values[parameterDefinition!.id!]
             const cast = castByParameter.current.has(parameterDefinition!.id!) ? castByParameter.current.get(parameterDefinition!.id!) : undefined
-            flowService.setParameterValue(flowId, node.id!!, parameterIndex, (value ?? undefined) as SubFlowValue | ReferenceValue | LiteralValue | undefined, definition, cast);
+            const parameterSchema = (flowNode?.data?.schema as NodeSchema[])?.[parameterIndex]?.schema
+            flowService.setParameterValue(flowId, node.id!!, parameterIndex, (value ?? undefined) as SubFlowValue | ReferenceValue | LiteralValue | undefined, definition, cast, isSubFlowSchema(parameterSchema));
 
             changedParameter.current.delete(parameterDefinition?.id!)
         }
-    }, [flowService, definition])
+    }, [flowService, definition, flowNode, flowId, node.id])
 
     const [inputs, validate] = useForm<Record<string, NodeParameterValue | undefined>>({
         useInitialValidation: true,
@@ -184,22 +194,19 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
 
             return <>
                 {requiredParameters.map(({parameterDefinition, index}) => renderParameter(parameterDefinition!, index))}
-                {optionalParameters.length > 0 && (
-                    <Collapsible.Root>
-                        <Collapsible.Trigger asChild>
-                            <Flex justify={"space-between"} align={"center"} style={{cursor: "pointer", gap: "0.7rem"}}>
-                                <Text size={"md"}>Optional parameters</Text>
-                                <Button variant={"none"} color={"primary"} paddingSize={"xxs"}>
-                                    <IconChevronDown size={16}/>
-                                </Button>
-                            </Flex>
-                        </Collapsible.Trigger>
-                        <Spacing spacing={"md"}/>
-                        <Collapsible.Content>
-                            {optionalParameters.map(({parameterDefinition, index}) => renderParameter(parameterDefinition!, index))}
-                        </Collapsible.Content>
-                    </Collapsible.Root>
-                )}
+                {optionalParameters
+                    .filter(({parameterDefinition}) => shownParameters.has(parameterDefinition!.id!))
+                    .map(({parameterDefinition, index}) => renderParameter(parameterDefinition!, index))}
+                <FunctionFileOptionalInputMenuComponent
+                    label={"Add optional parameter"}
+                    items={optionalParameters
+                        .filter(({parameterDefinition}) => !shownParameters.has(parameterDefinition!.id!))
+                        .map(({parameterDefinition}) => ({
+                            id: parameterDefinition!.id!,
+                            title: parameterDefinition!.names?.[0]?.content ?? FALLBACK_FUNCTION_PARAMETER_NAME,
+                            description: parameterDefinition!.descriptions?.[0]?.content ?? FALLBACK_FUNCTION_PARAMETER_DESCRIPTION
+                        }))}
+                    onAdd={showParameter}/>
             </>
         })()}
     </div>

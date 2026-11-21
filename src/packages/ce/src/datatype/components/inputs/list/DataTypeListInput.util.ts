@@ -38,6 +38,17 @@ export const listElementSuggestions = (
     return sortSuggestions(unique, suggestionCertainties(schema))
 }
 
+export const listNodeSuggestions = (
+    schema: DataTypeInputComponentProps['schema'],
+    suggestions: DataTypeInputComponentProps['suggestions']
+): (SubFlowValue | NodeFunction | ReferenceValue)[] =>
+    listElementSuggestions(schema, suggestions)
+        .filter((suggest): suggest is SubFlowValue | NodeFunction | ReferenceValue =>
+            suggest.__typename === "SubFlowValue"
+            || suggest.__typename === "NodeFunction"
+            || suggest.__typename === "ReferenceValue")
+        .filter(suggest => suggest.__typename !== "ReferenceValue" || !!suggest.nodeFunctionId)
+
 export const listTagKeys = (elementSuggestions: SuggestionValue[]): SuggestionTagKey[] =>
     elementSuggestions.map((suggest, index) =>
         suggest.__typename === "LiteralValue" ? suggest.value as SuggestionTagKey : `\${reference_${index}}`)

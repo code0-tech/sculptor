@@ -47,6 +47,7 @@ import {
 import {ReferenceBadgeComponent} from "@edition/datatype/components/badges/ReferenceBadgeComponent";
 import {NodeBadgeComponent} from "@edition/datatype/components/badges/NodeBadgeComponent";
 import {LiteralBadgeComponent} from "@edition/datatype/components/badges/LiteralBadgeComponent";
+import {exactProducers} from "@edition/datatype/utils/DataType.exactProducers.util";
 
 export type DataTypeListInputComponentProps = DataTypeInputComponentProps
 
@@ -87,6 +88,8 @@ export const DataTypeListInputComponent: React.FC<DataTypeListInputComponentProp
             const shape = `${item.input ?? "generic"}/${item.type ?? ""}`
             if (shapes.has(shape)) return false
             if (item.input === "text") return false
+            if (item.input === "sub-flow") return false
+            if (item.input === "data" && exactProducers(item).length > 0) return false
             shapes.add(shape)
             return true
         })

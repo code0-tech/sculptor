@@ -9,6 +9,7 @@ import {FlowBuilderEdgeDataProps} from "@edition/flow/components/builder/FlowBui
 import {useFlowCompareStore} from "@edition/flow/hooks/Flow.compare.hook";
 import {useFlowSchema} from "@edition/flow/hooks/Flow.schema.hook";
 import {useInlinedReferenceNodes} from "@edition/flow/hooks/Flow.references.hook";
+import {subFlowSlotIndexes} from "@edition/flow/utils/Flow.subFlowSlots.util";
 
 // @ts-ignore
 export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], projectId?: NamespaceProject['id']): Edge<FlowBuilderEdgeDataProps>[] => {
@@ -36,6 +37,7 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
         const groupsWithValue = new Map<string, string[]>();
         const labeledParameters = new Set<string>();
         const lastParameterNode = new Map<string, string>();
+        const visited = new Set<string>();
 
         let idCounter = 0;
 
@@ -47,10 +49,11 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
         const traverse = (
             node: NodeFunction,
             parentNode?: NodeFunction,
-            isParameter = false,
-            depth = 0
+            isParameter = false
         ): string => {
             if (!node) return ""
+            if (visited.has(node.id!)) return node.id!
+            visited.add(node.id!)
 
             const inlinedReference = inlinedNodes.get(node.id!)
 
@@ -132,8 +135,6 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
             }
 
             node.parameters?.nodes?.forEach((param, index) => {
-                if (depth >= 1) return
-
                 const parameterValue = param?.value;
                 const parameterDefinition = functionService.getById(node.functionDefinition?.id!!)?.parameterDefinitions?.nodes?.[index];
                 if (!parameterValue) return
@@ -202,19 +203,46 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
                         traverse(
                             flowService.getNodeById(flowId, subFlow.startingNodeId)!,
                             node,
-                            true,
-                            depth + 1
+                            true
                         );
                     }
                 })
             });
 
+            const nodeSchema = flowSchema?.find(signatureSchema => signatureSchema?.nodeId === node.id)?.parameters ?? []
+
+            const definition = functionService.getById(node.functionDefinition?.id!!)
+
+            subFlowSlotIndexes(nodeSchema, node, definition).forEach(index => {
+
+                const labelKey = `${node.id}-${index}`
+                const previousParameterNodeId = lastParameterNode.get(labelKey)
+
+                edges.push({
+                    id: `${node.id}-slot-${index}-next`,
+                    source: `${node.id}-slot-${index}`,
+                    target: previousParameterNodeId ?? node.id!,
+                    targetHandle: previousParameterNodeId ? undefined : `param`,
+                    deletable: false,
+                    selectable: false,
+                    animated: true,
+                    label: labeledParameters.has(labelKey) ? undefined : definition?.parameterDefinitions?.nodes?.[index]?.names!![0]?.content ?? FALLBACK_FUNCTION_PARAMETER_NAME,
+                    data: {
+                        color: hashToColor(`${node.id}-slot-${index}`),
+                        type: 'parameter',
+                        flowId: flowId
+                    }
+                })
+
+                labeledParameters.add(labelKey)
+                lastParameterNode.set(labelKey, `${node.id}-slot-${index}`)
+            })
+
             if (node.nextNodeId) {
                 traverse(
                     flowService.getNodeById(flow.id!!, node.nextNodeId!!)!!,
                     inlinedReference ? parentNode : node,
-                    inlinedReference ? isParameter : false,
-                    depth
+                    inlinedReference ? isParameter : false
                 );
             }
 
@@ -222,7 +250,7 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
         };
 
         if (flow.startingNodeId) {
-            traverse(flowService.getNodeById(flow.id!!, flow.startingNodeId!!)!!, undefined, false, 0);
+            traverse(flowService.getNodeById(flow.id!!, flow.startingNodeId!!)!!, undefined, false);
         }
 
         return edges

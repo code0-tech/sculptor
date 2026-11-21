@@ -35,13 +35,16 @@ export interface SuggestionGroup {
 
 export const useMappedSuggestions = (
     suggestions: SuggestionValue[],
-    only?: SuggestionValue["__typename"] | SuggestionValue["__typename"][]
+    only?: SuggestionValue["__typename"] | SuggestionValue["__typename"][],
+    flowId?: Flow['id']
 ): SuggestionGroup[] => {
 
     const moduleService = useService(ModuleService)
     const moduleStore = useStore(ModuleService)
     const functionService = useService(FunctionService)
     const functionStore = useStore(FunctionService)
+    const flowService = useService(FlowService)
+    const flowStore = useStore(FlowService)
 
     const modules = React.useMemo(
         () => [...moduleService.values(), {
@@ -92,6 +95,26 @@ export const useMappedSuggestions = (
                     aliases: [""],
                     definitionSource: "literal-values",
                     description: "functionDefinition?.descriptions?.[0].content",
+                }
+            }
+
+            if (suggestion.__typename === "ReferenceValue") {
+                const nodeFunctionId = suggestion.nodeFunctionId as string | null | undefined
+                if (!flowId || !nodeFunctionId || nodeFunctionId === "undefined") return null
+                if ((suggestion.referencePath ?? []).length > 0) return null
+
+                const node = flowService.getNodeById(flowId, nodeFunctionId as NodeFunction['id'])
+                const functionDefinition = functions.find(f => f.id === node?.functionDefinition?.id)
+                if (!functionDefinition) return null
+                const module = modules.find(m => m.id === functionDefinition?.runtimeModule?.id)
+
+                return {
+                    value: suggestion,
+                    icon: functionDefinition?.displayIcon,
+                    displayMessage: functionDefinition?.names?.[0].content,
+                    aliases: functionDefinition?.aliases?.[0]?.content?.split(";"),
+                    definitionSource: module?.identifier,
+                    description: functionDefinition?.descriptions?.[0]?.content,
                 }
             }
 
@@ -160,7 +183,7 @@ export const useMappedSuggestions = (
                 icon: group.module?.icon
             }))
         ]
-    }, [suggestions, onlyTypes, modules, functions])
+    }, [suggestions, onlyTypes, modules, functions, flowId, flowStore])
 }
 
 export interface SuggestionPathNode {

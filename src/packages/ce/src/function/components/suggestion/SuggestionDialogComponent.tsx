@@ -57,7 +57,7 @@ export const SuggestionDialogComponent: React.FC<SuggestionDialogComponentProps>
         setSuggestionDialogOpen(open)
     }, [open])
 
-    const suggestions = useMappedSuggestions(props.suggestions || [])
+    const suggestions = useMappedSuggestions(props.suggestions || [], undefined, props.flowId)
     const [currentTab, setCurrentTab] = React.useState<string>("group-0")
     const [holdCurrentTab, setHoldCurrentTab] = React.useState<string>("group-0")
 

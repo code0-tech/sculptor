@@ -206,7 +206,7 @@ export const getVerticalLayoutElements = (nodes: Node[], dirtyIds?: Set<string>)
 
                         f.rightX = f.cx + f.w! / 2 + H
                         f.rightTop = Number.POSITIVE_INFINITY
-                        f.rightBottom = f.cy + h / 2
+                        f.rightBottom = f.cy
                         f.rightMark = placed.length
                         f.rightIndex = 0
                         f.laneY = f.cy

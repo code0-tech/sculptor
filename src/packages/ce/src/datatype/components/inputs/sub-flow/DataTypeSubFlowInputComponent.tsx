@@ -89,7 +89,7 @@ export const DataTypeSubFlowInputComponent: React.FC<DataTypeSubFlowInputCompone
                                      suggestions={exactMatches}
                                      nodeId={props.nodeId}
                                      parameterIndex={props.parameterIndex}
-                                     onCustomLogicGroupSelect={() => setCustomLogicDialogOpen(true)}
+                                     onCustomLogicGroupSelect={hasExactMatches ? undefined : () => setCustomLogicDialogOpen(true)}
                                      formValidation={formValidation}>
             <Text>Select next node</Text>
         </DataTypeInputValueComponent>

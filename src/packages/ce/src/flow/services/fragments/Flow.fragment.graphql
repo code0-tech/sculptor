@@ -383,13 +383,29 @@ fragment Flow on Flow {
                     startedAt
                     finishedAt
                     position
-                    success
+                    subFlowIdentifier
+                    success {
+                        __typename
+                        ... on RawValue {
+                            __typename
+                            value
+                        }
+                        ... on SubFlowFunctionResult {
+                            __typename
+                            name
+                            description
+                            subflowIdentifier
+                            inputSchema
+                            outputSchema
+                        }
+                    }
                     parameterResults {
                         __typename
                         id
                         createdAt
                         updatedAt
                         value
+                        subFlowFunctionResult
                         position
                     }
                     functionDefinition {

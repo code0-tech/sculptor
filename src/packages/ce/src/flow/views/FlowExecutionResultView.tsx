@@ -9,8 +9,10 @@ import {
     Maybe,
     Namespace,
     NamespaceProject,
+    NodeExecutionSuccess,
     NodeFunction,
-    ParameterDefinition
+    ParameterDefinition,
+    SubFlowFunctionResult
 } from "@code0-tech/sagittarius-graphql-types";
 import {
     Button,
@@ -70,10 +72,17 @@ export interface NodeGanttItem extends GanttItem {
         color: string
         duration: number
         payload?: Maybe<NodeFunction> | Maybe<FunctionDefinition> | Maybe<Flow>
+        displayIcon?: Maybe<FunctionDefinition['displayIcon']>
         input?: ExecutionParameterResult[] | object
-        success?: object
+        success?: Maybe<NodeExecutionSuccess>
+        subFlow?: Maybe<SubFlowFunctionResult>
         error?: Maybe<ExecutionError>
     }
+}
+
+interface SubFlowProducer {
+    subFlow: SubFlowFunctionResult
+    displayIcon: FunctionDefinition['displayIcon'] | undefined
 }
 
 export const FlowExecutionResultView: React.FC = () => {
@@ -167,6 +176,14 @@ export const FlowExecutionResultView: React.FC = () => {
 
                 const duration = (result?.finishedAt ?? 0) - (result?.startedAt ?? 0)
 
+                const subFlowProducers = new Map((result?.nodeResults?.nodes ?? [])
+                    .map(nodeResult => ({
+                        subFlow: nodeResult?.success?.__typename === "SubFlowFunctionResult" ? nodeResult.success : undefined,
+                        displayIcon: functions.find(f => f.id === (nodeResult?.functionDefinition?.id ?? nodeResult?.nodeFunction?.functionDefinition?.id))?.displayIcon
+                    }))
+                    .filter((producer): producer is SubFlowProducer => !!producer.subFlow?.subflowIdentifier)
+                    .map((producer): [string, SubFlowProducer] => [producer.subFlow.subflowIdentifier as string, producer]))
+
                 return [result?.id, [
                     {
                         id: result?.id as string,
@@ -181,7 +198,7 @@ export const FlowExecutionResultView: React.FC = () => {
                                 ...flow,
                                 type: flowTypes.find(fT => fT.id === flow?.type?.id)
                             },
-                            success: result?.success,
+                            success: {__typename: "RawValue", value: result?.success},
                             input: result?.input,
                             error: result?.error,
                         }
@@ -190,6 +207,11 @@ export const FlowExecutionResultView: React.FC = () => {
 
                         const nodeStart = (nodeResult?.startedAt ?? 0) - (result?.startedAt ?? 0)
                         const nodeDuration = (nodeResult?.finishedAt ?? 0) - (nodeResult?.startedAt ?? 0)
+                        const producer = nodeResult?.subFlowIdentifier ? subFlowProducers.get(nodeResult.subFlowIdentifier) : undefined
+                        const subFlow = producer?.subFlow
+                        const subFlowLabel = subFlow?.name
+                            ?? (nodeResult?.success?.__typename === "SubFlowFunctionResult" ? nodeResult.success.name : undefined)
+                            ?? nodeResult?.subFlowIdentifier
 
                         if (nodeResult?.functionDefinition) {
                             const funktion = functions.find(f => f.id === nodeResult?.functionDefinition?.id)
@@ -200,11 +222,13 @@ export const FlowExecutionResultView: React.FC = () => {
                                 start: nodeStart,
                                 end: nodeStart + Math.max(nodeDuration, 1),
                                 data: {
-                                    displayMessage: funktion?.names?.[0].content ?? FALLBACK_FUNCTION_NAME,
-                                    color: hashToColor(funktion?.identifier ?? ""),
+                                    displayMessage: funktion?.names?.[0].content ?? subFlowLabel ?? FALLBACK_FUNCTION_NAME,
+                                    color: hashToColor(funktion?.identifier ?? nodeResult?.subFlowIdentifier ?? ""),
                                     duration: nodeDuration,
                                     payload: funktion,
+                                    displayIcon: funktion?.displayIcon ?? producer?.displayIcon,
                                     success: nodeResult?.success,
+                                    subFlow: subFlow,
                                     input: nodeResult?.parameterResults ?? [],
                                     error: nodeResult?.error,
                                 }
@@ -220,14 +244,16 @@ export const FlowExecutionResultView: React.FC = () => {
                             start: nodeStart,
                             end: nodeStart + Math.max(nodeDuration, 1),
                             data: {
-                                displayMessage: funktion?.names?.[0].content ?? FALLBACK_FUNCTION_NAME,
-                                color: hashToColor(nodeResult?.nodeFunction?.id ?? ""),
+                                displayMessage: funktion?.names?.[0].content ?? subFlowLabel ?? FALLBACK_FUNCTION_NAME,
+                                color: hashToColor(nodeResult?.nodeFunction?.id ?? nodeResult?.subFlowIdentifier ?? ""),
                                 duration: nodeDuration,
                                 payload: {
                                     ...node,
                                     functionDefinition: funktion
                                 },
+                                displayIcon: funktion?.displayIcon ?? producer?.displayIcon,
                                 success: nodeResult?.success,
+                                subFlow: subFlow,
                                 input: nodeResult?.parameterResults ?? [],
                                 error: nodeResult?.error,
                             }
@@ -383,7 +409,7 @@ export const FlowExecutionResultView: React.FC = () => {
                                             </Flex>
                                         } else {
 
-                                            const displayIcon = (item.type === "node" ? item?.data?.payload?.functionDefinition?.displayIcon : item.type === "function" ? item?.data?.payload?.displayIcon : item?.data?.payload?.type?.displayIcon) as IconString
+                                            const displayIcon = (item.type === "trigger" ? item?.data?.payload?.type?.displayIcon : item?.data?.displayIcon) as IconString
 
                                             return <Menu key={item.id}
                                                         modal={false}
@@ -414,6 +440,7 @@ export const FlowExecutionResultView: React.FC = () => {
                                                                             <Icon icon={displayIcon} size={16}
                                                                                   color={hashToColor(item?.data?.payload?.id ?? "")}/>
                                                                             <Text size={"md"}
+                                                                                  ta={"left"}
                                                                                   style={{
                                                                                       overflow: "hidden",
                                                                                       position: "relative"
@@ -447,6 +474,7 @@ export const FlowExecutionResultView: React.FC = () => {
                                                                 <Icon icon={displayIcon} size={16}
                                                                       color={hashToColor(item?.data?.payload?.id ?? "")}/>
                                                                 <Text size={"md"}
+                                                                      ta={"left"}
                                                                       style={{
                                                                           overflow: "hidden",
                                                                           position: "relative"
@@ -466,15 +494,16 @@ export const FlowExecutionResultView: React.FC = () => {
                                                             </Text>
                                                             {item.type === "node" || item.type === "function" ? item.data.input?.map((input: ExecutionParameterResult, index: number) => {
 
-                                                                //TODO: for item.type === function this is wrong
-                                                                const parameter: ParameterDefinition = item?.data?.payload?.functionDefinition?.parameterDefinitions?.nodes?.[index]
+                                                                const parameter: ParameterDefinition = item.type === "function"
+                                                                    ? item?.data?.payload?.parameterDefinitions?.nodes?.[index]
+                                                                    : item?.data?.payload?.functionDefinition?.parameterDefinitions?.nodes?.[index]
 
                                                                 return <div key={input.id}>
                                                                     <Text size={"sm"}
                                                                           hierarchy={"tertiary"}>
                                                                         {parameter?.names?.[0]?.content}
                                                                     </Text>
-                                                                    <JsonView collapsed  value={input.value ?? {}}/>
+                                                                    <JsonView collapsed  value={input.value ?? input.subFlowFunctionResult ?? {}}/>
                                                                 </div>
 
                                                             }) : item.type === "trigger" ? (
@@ -494,9 +523,22 @@ export const FlowExecutionResultView: React.FC = () => {
                                                                 ) : (
                                                                 <div>
                                                                     <Text size={"md"}>
-                                                                        Result
+                                                                        {item.data.success?.__typename === "SubFlowFunctionResult" ? "Sub flow function" : "Result"}
                                                                     </Text>
-                                                                    <JsonView collapsed  value={item.data.success ?? {}}/>
+                                                                    {item.data.success?.__typename === "SubFlowFunctionResult" ? (
+                                                                        <>
+                                                                            <Text size={"sm"} hierarchy={"tertiary"}>
+                                                                                {item.data.success.name ?? item.data.success.subflowIdentifier}
+                                                                            </Text>
+                                                                            <JsonView collapsed value={{
+                                                                                description: item.data.success.description,
+                                                                                inputSchema: item.data.success.inputSchema,
+                                                                                outputSchema: item.data.success.outputSchema
+                                                                            }}/>
+                                                                        </>
+                                                                    ) : (
+                                                                        <JsonView collapsed  value={item.data.success?.value ?? {}}/>
+                                                                    )}
                                                                 </div>
                                                             )
                                                         }
