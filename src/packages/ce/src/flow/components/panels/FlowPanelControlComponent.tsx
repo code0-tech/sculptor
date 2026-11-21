@@ -21,13 +21,13 @@ import {
     useService,
     useStore
 } from "@code0-tech/pictor";
-import {Panel} from "@xyflow/react";
+import {Panel, useReactFlow} from "@xyflow/react";
 import {ButtonGroup} from "@code0-tech/pictor/dist/components/button-group/ButtonGroup";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {SuggestionDialogComponent} from "@edition/function/components/suggestion/SuggestionDialogComponent";
 import {useHotkeys} from "react-hotkeys-hook";
 import {useParams} from "next/navigation";
-import {useSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
+import {setSelectedFunctionNode, useSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
 import {useFunctionSuggestions} from "@edition/function/hooks/Function.suggestion.hook";
 import {IconArrowBigUp, IconBackspace, IconLetterA, IconLetterQ, IconLetterX} from "@tabler/icons-react";
 import {HoverCard, HoverCardContent, HoverCardPortal, HoverCardTrigger} from "@radix-ui/react-hover-card";
@@ -60,6 +60,7 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
     const clearCompareFlow = useFlowCompareStore(state => state.clearFlow)
 
     const params = useParams()
+    const reactFlow = useReactFlow()
 
     const [, startTransition] = React.useTransition()
     const [suggestionDialogOpen, setSuggestionDialogOpen] = React.useState(false)
@@ -77,11 +78,13 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
         startTransition(async () => {
             if (data?.isParameter && !data?.isInlinedReference && data?.parentNodeId && data?.parameterIndex != null) {
                 await flowService.removeParameterMapping(flowId, data.parentNodeId, data.parameterIndex, data.referenceSignature)
+                setSelectedFunctionNode(data.parentNodeId, reactFlow)
             } else {
-                await flowService.deleteNodeById(flowId, selectedNode?.id as NodeFunction['id'])
+                const previousNodeId = await flowService.deleteNodeById(flowId, selectedNode?.id as NodeFunction['id'])
+                if (previousNodeId) setSelectedFunctionNode(previousNodeId, reactFlow)
             }
         })
-    }, [selectedNode, flowService, flowStore, flowId])
+    }, [selectedNode, flowService, flowStore, flowId, reactFlow])
 
     const onAIData = React.useCallback((payload: AiGenerateFlowSubscriptionPayload) => {
         const aiFlow = payload?.flow
@@ -131,14 +134,16 @@ export const FlowPanelControlComponent: React.FC<FlowPanelControlComponentProps>
     const addNodeToFlow = React.useCallback((suggestion: NodeFunction | ReferenceValue | LiteralValue | SubFlowValue) => {
         if (flowId && suggestion.__typename === "NodeFunction" && selectedNode?.id.includes("NodeFunction")) {
             startTransition(async () => {
-                await flowService.addNextNodeById(flowId, selectedNode?.id as NodeFunction['id'], suggestion as NodeFunction)
+                const addedNodeId = await flowService.addNextNodeById(flowId, selectedNode?.id as NodeFunction['id'], suggestion as NodeFunction)
+                if (addedNodeId) setSelectedFunctionNode(addedNodeId, reactFlow)
             })
         } else if (suggestion.__typename === "NodeFunction") {
             startTransition(async () => {
-                await flowService.addNextNodeById(flowId, null, suggestion as NodeFunction)
+                const addedNodeId = await flowService.addNextNodeById(flowId, null, suggestion as NodeFunction)
+                if (addedNodeId) setSelectedFunctionNode(addedNodeId, reactFlow)
             })
         }
-    }, [flowId, flowService, flowStore, selectedNode])
+    }, [flowId, flowService, flowStore, selectedNode, reactFlow])
 
     const [aiOpen, setAiOpen] = React.useState(false)
     const [executeDialogOpen, setExecuteDialogOpen] = React.useState(false)
