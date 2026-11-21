@@ -189,37 +189,37 @@ export const UserRedirectPage: React.FC = () => {
         <Card color={"secondary"}>
             <CardSection border>
                 <Flex style={{gap: "0.7rem"}} align={"center"}>
-                    <IconCheck style={{minWidth: "1rem"}} size={16}/>
+                    <IconCheck style={{flexShrink: 0}} size={16}/>
                     <Text>Can access your account information like email, username, and other stored information on your
                         account</Text>
                 </Flex>
             </CardSection>
             <CardSection border>
                 <Flex style={{gap: "0.7rem"}} align={"center"}>
-                    <IconCheck size={16}/>
+                    <IconCheck style={{flexShrink: 0}} size={16}/>
                     <Text>Can access, manage and edit workspaces</Text>
                 </Flex>
             </CardSection>
             <CardSection border>
                 <Flex style={{gap: "0.7rem"}} align={"center"}>
-                    <IconCheck size={16}/>
+                    <IconCheck style={{flexShrink: 0}} size={16}/>
                     <Text>Can access, manage and edit subscriptions</Text>
                 </Flex>
             </CardSection>
         </Card>
         <Spacing spacing={"xl"}/>
-        <Flex style={{gap: "0.7rem"}} align={"center"}>
+        <Flex style={{gap: "0.7rem", flexWrap: "wrap"}} align={"center"} mb={1.3}>
             <Button type={"submit"} onClick={() => {
                 document.cookie = "codezero_callback=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
                 document.cookie = "codezero_selectNamespace=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
                 document.cookie = "codezero_cancel=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
                 window.location.href = isValidRedirect(cancelUrl) ? cancelUrl! : "/"
-            }} data-qa-selector={"auth-login-send"} color={isValidCallback ? "secondary" : "success"} w={"100%"}
-                    mb={1.3}>
+            }} data-qa-selector={"auth-login-send"} color={isValidCallback ? "secondary" : "success"}
+                    style={{flex: "1 1 12rem"}}>
                 No, go back
             </Button>
             <Button type={"submit"} onClick={() => validate()} data-qa-selector={"auth-login-send"}
-                    color={isValidCallback ? "success" : "error"} w={"100%"} mb={1.3}>
+                    color={isValidCallback ? "success" : "error"} style={{flex: "1 1 12rem"}}>
                 {isValidCallback ? "Authorize" : "Authorize and ignore warning"}
             </Button>
         </Flex>
