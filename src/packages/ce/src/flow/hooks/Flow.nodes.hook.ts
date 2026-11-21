@@ -8,6 +8,7 @@ import {FunctionNodeComponentProps} from "@edition/function/components/nodes/Fun
 import {useFlowSchema} from "@edition/flow/hooks/Flow.schema.hook";
 import {useFlowCompareStore} from "@edition/flow/hooks/Flow.compare.hook";
 import {useInlinedReferenceNodes} from "@edition/flow/hooks/Flow.references.hook";
+import {subFlowSlotIndexes} from "@edition/flow/utils/Flow.subFlowSlots.util";
 
 export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], projectId?: NamespaceProject["id"]): Node<FunctionNodeComponentProps>[] => {
 
@@ -50,8 +51,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
 
         const traverse = (
             node: NodeFunction,
-            parentGroup?: string,
-            depth = 0
+            parentGroup?: string
         ) => {
 
             if (!node?.id) return
@@ -59,34 +59,33 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
             const functionDefinition = functionService.getById(node.functionDefinition?.id)
             const nodeId = node.id
             const inlinedReference = inlinedNodes.get(nodeId)
+            const nodeSchema = flowSchema?.find(signatureSchema => signatureSchema?.nodeId === node.id)?.parameters ?? []
 
-            if (!visited.has(nodeId)) {
-                visited.add(nodeId)
+            if (visited.has(nodeId)) return
+            visited.add(nodeId)
 
-                nodes.push({
-                    id: nodeId,
-                    type: functionDefinition && "design" in functionDefinition && functionDefinition?.design
-                        ? functionDefinition.design as string
-                        : "default",
-                    position: {x: 0, y: 0},
-                    draggable: false,
-                    parentId: parentGroup,
-                    extent: parentGroup ? "parent" : undefined,
-                    data: {
-                        nodeId: nodeId,
-                        flowId: flowId,
-                        isParameter: !!inlinedReference,
-                        isInlinedReference: !!inlinedReference,
-                        parentNodeId: inlinedReference?.hostNodeId,
-                        parameterIndex: inlinedReference?.parameterIndex,
-                        color: hashToColor(nodeId),
-                        schema: flowSchema?.find(signatureSchema => signatureSchema?.nodeId === node.id)?.parameters ?? []
-                    },
-                })
-            }
+            nodes.push({
+                id: nodeId,
+                type: functionDefinition && "design" in functionDefinition && functionDefinition?.design
+                    ? functionDefinition.design as string
+                    : "default",
+                position: {x: 0, y: 0},
+                draggable: false,
+                parentId: parentGroup,
+                extent: parentGroup ? "parent" : undefined,
+                data: {
+                    nodeId: nodeId,
+                    flowId: flowId,
+                    isParameter: !!inlinedReference,
+                    isInlinedReference: !!inlinedReference,
+                    parentNodeId: inlinedReference?.hostNodeId,
+                    parameterIndex: inlinedReference?.parameterIndex,
+                    color: hashToColor(nodeId),
+                    schema: nodeSchema
+                },
+            })
 
             node.parameters?.nodes?.forEach((param, parameterIndex) => {
-                if (depth >= 1) return
 
                 const value = param?.value
                 if (!value) return
@@ -154,13 +153,34 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                     }
 
                     const child = flowService.getNodeById(flowId, subFlow.startingNodeId)
-                    if (child) traverse(child, groupId, depth + 1)
+                    if (child) traverse(child, groupId)
+                })
+            })
+
+            subFlowSlotIndexes(nodeSchema, node, functionDefinition).forEach(parameterIndex => {
+                nodes.push({
+                    id: `${nodeId}-slot-${parameterIndex}`,
+                    type: "slot",
+                    position: {x: 0, y: 0},
+                    style: {width: 26, height: 26},
+                    draggable: false,
+                    selectable: false,
+                    parentId: parentGroup,
+                    extent: parentGroup ? "parent" : undefined,
+                    data: {
+                        isParameter: true,
+                        parameterIndex: parameterIndex,
+                        parentNodeId: nodeId,
+                        flowId: flowId,
+                        color: hashToColor(`${nodeId}-slot-${parameterIndex}`),
+                        schema: nodeSchema
+                    },
                 })
             })
 
             if (node.nextNodeId) {
                 const next = flowService.getNodeById(flow.id, node.nextNodeId);
-                if (next) traverse(next, parentGroup, depth);
+                if (next) traverse(next, parentGroup);
             }
         };
 

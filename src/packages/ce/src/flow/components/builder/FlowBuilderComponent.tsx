@@ -21,6 +21,9 @@ import {FunctionNodeEndComponent} from "@edition/function/components/nodes/Funct
 import {FunctionNodeRoundComponent} from "@edition/function/components/nodes/FunctionNodeRoundComponent";
 import {FunctionNodeGroupComponent} from "@edition/function/components/nodes/FunctionNodeGroupComponent";
 import {FunctionNodeTriggerComponent} from "@edition/function/components/nodes/FunctionNodeTriggerComponent";
+import {
+    FunctionNodeSubFlowSlotComponent
+} from "@edition/function/components/nodes/FunctionNodeSubFlowSlotComponent";
 import {useEdges} from "@edition/flow/hooks/Flow.edges.hook";
 import {FlowPanelSizeComponent} from "@edition/flow/components/panels/FlowPanelSizeComponent";
 import {FlowPanelLayoutComponent} from "@edition/flow/components/panels/FlowPanelLayoutComponent";
@@ -30,6 +33,7 @@ import {FlowBuilderLoadingComponent} from "@edition/flow/components/builder/Flow
 import {useFlowLayoutStore} from "@edition/flow/hooks/Flow.layout.hook";
 import {getVerticalLayoutElements} from "@edition/flow/utils/Flow.verticalLayout.util";
 import {getHorizontalLayoutElements} from "@edition/flow/utils/Flow.horizontalLayout.util";
+import {centerFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
 
 export interface FlowBuilderProps extends ComponentProps {
     flowId: Flow['id']
@@ -40,7 +44,8 @@ export interface FlowBuilderProps extends ComponentProps {
 export const FlowBuilderComponent: React.FC<FlowBuilderProps> = (props) => {
     const {flowId, namespaceId, projectId, ...rest} = props
 
-    const {getZoom, fitView} = useReactFlow();
+    const reactFlow = useReactFlow();
+    const {fitView} = reactFlow;
     const direction = useFlowLayoutStore(state => state.direction)
     const updateNodeInternals = useUpdateNodeInternals()
 
@@ -59,6 +64,7 @@ export const FlowBuilderComponent: React.FC<FlowBuilderProps> = (props) => {
         round: FunctionNodeRoundComponent,
         group: FunctionNodeGroupComponent,
         trigger: FunctionNodeTriggerComponent,
+        slot: FunctionNodeSubFlowSlotComponent,
     }), [])
 
     const edgeTypes = React.useMemo(() => ({
@@ -117,13 +123,9 @@ export const FlowBuilderComponent: React.FC<FlowBuilderProps> = (props) => {
     }, [revalidateHandles, getLayoutElements])
 
     const nodeClickEvent = React.useCallback((_: unknown, clickedNode: Node) => {
-        fitView({
-            nodes: [{id: clickedNode.id}],
-            duration: 250,
-            maxZoom: getZoom(),
-            minZoom: 1,
-        });
-    }, [fitView, getZoom])
+        if (clickedNode.type === "slot") return
+        centerFunctionNode(clickedNode.id, reactFlow)
+    }, [reactFlow])
 
     React.useEffect(() => {
         const localNodes = initialNodes.map(value => {
