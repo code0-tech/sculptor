@@ -56,55 +56,56 @@ export default function AuthLayout({children}: Readonly<{ children: React.ReactN
             <ScrollArea mah={"100%"} h={"100%"}>
                 <ScrollAreaViewport>
                     <AuroraBackground/>
-                    <ContextStoreProvider
-                        services={[[store, service], organization, namespace, [applicationStore, applicationService]]}>
-                        <Container h={"100%"} w={"100%"} display={"flex"} justify={"center"}>
-                            <Col xs={4} py={5} style={{marginTop: "auto", marginBottom: "auto"}}>
-                                <Image src={"/CodeZero_Logo.png"} alt={"CodeZero Logo"}
-                                       width={40}
-                                       height={40}/>
-                                <Spacing spacing={"xl"}/>
-                                <Text style={{fontSize: "2rem", fontWeight: "600"}}
-                                      hierarchy={"primary"}
-                                      display={"inline"}>
-                                    Every great idea starts at zero. {" "}
-                                </Text>
-                                <Text style={{fontSize: "2rem", fontWeight: "600"}}
-                                      hierarchy={"tertiary"} display={"inline"}>
-                                    Start with CodeZero.
-                                </Text>
-                                <Spacing spacing={"xl"}/>
-                                {children}
-                            </Col>
-                        </Container>
-                    </ContextStoreProvider>
-                    <div style={{
-                        position: "absolute",
-                        width: "100%",
-                        boxSizing: "border-box",
-                        padding: "1.3rem",
-                        bottom: 0,
-                        left: 0,
-                        zIndex: 2
-                    }}>
-                        <Flex justify={"center"} align={"center"} w={"100%"} style={{gap: "1.3rem"}}>
-                            <Text>All rights reserved &copy; Code0 UG (haftungsbeschränkt)</Text>
-                            {!!legalUrls.privacyUrl && (
-                                <Link href={legalUrls.privacyUrl} target={"_blank"}>
-                                    <Text>Privacy Policy</Text>
-                                </Link>
-                            )}
-                            {!!legalUrls.legalNoticeUrl && (
-                                <Link href={legalUrls.legalNoticeUrl} target={"_blank"}>
-                                    <Text>Legal Notice</Text>
-                                </Link>
-                            )}
-                            {!!legalUrls.termsAndConditionsUrl && (
-                                <Link href={legalUrls.termsAndConditionsUrl} target={"_blank"}>
-                                    <Text>Terms &amp; Conditions</Text>
-                                </Link>
-                            )}
-                        </Flex>
+                    <div style={{display: "flex", flexDirection: "column", minHeight: "100dvh"}}>
+                        <ContextStoreProvider
+                            services={[[store, service], organization, namespace, [applicationStore, applicationService]]}>
+                            <Container w={"100%"} display={"flex"} justify={"center"} style={{flex: 1}}>
+                                <Col xs={12} md={8} lg={6} xxl={4} py={5} style={{marginTop: "auto", marginBottom: "auto"}}>
+                                    <Image src={"/CodeZero_Logo.png"} alt={"CodeZero Logo"}
+                                           width={40}
+                                           height={40}/>
+                                    <Spacing spacing={"xl"}/>
+                                    <Text style={{fontSize: "2rem", fontWeight: "600"}}
+                                          hierarchy={"primary"}
+                                          display={"inline"}>
+                                        Every great idea starts at zero. {" "}
+                                    </Text>
+                                    <Text style={{fontSize: "2rem", fontWeight: "600"}}
+                                          hierarchy={"tertiary"} display={"inline"}>
+                                        Start with CodeZero.
+                                    </Text>
+                                    <Spacing spacing={"xl"}/>
+                                    {children}
+                                </Col>
+                            </Container>
+                        </ContextStoreProvider>
+                        <div style={{
+                            position: "relative",
+                            width: "100%",
+                            boxSizing: "border-box",
+                            padding: "1.3rem",
+                            zIndex: 2
+                        }}>
+                            <Flex justify={"center"} align={"center"} w={"100%"}
+                                  style={{gap: "0.7rem 1.3rem", flexWrap: "wrap", textAlign: "center"}}>
+                                <Text>All rights reserved &copy; Code0 UG (haftungsbeschränkt)</Text>
+                                {!!legalUrls.privacyUrl && (
+                                    <Link href={legalUrls.privacyUrl} target={"_blank"}>
+                                        <Text>Privacy Policy</Text>
+                                    </Link>
+                                )}
+                                {!!legalUrls.legalNoticeUrl && (
+                                    <Link href={legalUrls.legalNoticeUrl} target={"_blank"}>
+                                        <Text>Legal Notice</Text>
+                                    </Link>
+                                )}
+                                {!!legalUrls.termsAndConditionsUrl && (
+                                    <Link href={legalUrls.termsAndConditionsUrl} target={"_blank"}>
+                                        <Text>Terms &amp; Conditions</Text>
+                                    </Link>
+                                )}
+                            </Flex>
+                        </div>
                     </div>
                 </ScrollAreaViewport>
                 <ScrollAreaScrollbar orientation={"vertical"}>

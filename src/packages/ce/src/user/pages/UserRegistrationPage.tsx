@@ -106,12 +106,12 @@ export const UserRegistrationPage: React.FC = () => {
         <Text mb={1.3} size={"md"} hierarchy={"tertiary"} display={"block"}>
             Build high-class workflows, endpoints and software without coding
         </Text>
-        <Flex style={{gap: "1.3rem"}}>
+        <Flex style={{gap: "1.3rem", flexWrap: "wrap"}}>
             {/**@ts-ignore**/}
-            <EmailInput data-qa-selector={"auth-register-email"} wrapperComponent={{style: {flex: 1}}}
+            <EmailInput data-qa-selector={"auth-register-email"} wrapperComponent={{style: {flex: "1 1 12rem"}}}
                         placeholder={"Email"} {...inputs.getInputProps("email")}/>
             {/**@ts-ignore**/}
-            <TextInput data-qa-selector={"auth-register-username"} wrapperComponent={{style: {flex: 1}}}
+            <TextInput data-qa-selector={"auth-register-username"} wrapperComponent={{style: {flex: "1 1 12rem"}}}
                        placeholder={"Username"}
                        w={"100%"} {...inputs.getInputProps("username")}/>
         </Flex>
