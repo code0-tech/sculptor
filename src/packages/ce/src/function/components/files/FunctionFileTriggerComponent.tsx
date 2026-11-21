@@ -1,5 +1,5 @@
 import React from "react";
-import {Alert, Button, Flex, Spacing, Text, useForm, useService, useStore} from "@code0-tech/pictor";
+import {Alert, Spacing, Text, useForm, useService, useStore} from "@code0-tech/pictor";
 import {Flow, LiteralValue, Namespace, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
@@ -13,8 +13,10 @@ import {
 } from "@core/util/fallback-translations";
 import {useNodesData} from "@xyflow/react";
 import {NodeSchema} from "@code0-tech/triangulum";
-import * as Collapsible from "@radix-ui/react-collapsible";
-import {IconChevronDown} from "@tabler/icons-react";
+import {
+    FunctionFileOptionalInputMenuComponent
+} from "@edition/function/components/files/FunctionFileOptionalInputMenuComponent";
+import {useShownOptionalInputs} from "@edition/function/hooks/Function.optionalInputs.hook";
 
 export interface FunctionFileTriggerComponentProps {
     flowId: Flow['id']
@@ -75,6 +77,12 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
         })
         return values
     }, [validation?.length, definition])
+
+    const settingsWithValue = React.useMemo(() => (definition?.flowTypeSettings?.nodes ?? [])
+        .filter((settingDefinition, index) => settingDefinition?.optional && instance?.settings?.nodes?.[index]?.value != null)
+        .map(settingDefinition => settingDefinition!.id!), [definition, instance])
+
+    const [shownSettings, showSetting] = useShownOptionalInputs(settingsWithValue)
 
     const onSubmit = React.useCallback((values: Record<string, LiteralValue | undefined>) => {
         React.startTransition(async () => {
@@ -164,22 +172,19 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
 
             return <>
                 {requiredSettings.map(({settingDefinition, index}) => renderSetting(settingDefinition!, index))}
-                {optionalSettings.length > 0 && (
-                    <Collapsible.Root>
-                        <Collapsible.Trigger asChild>
-                            <Flex justify={"space-between"} align={"center"} style={{cursor: "pointer", gap: "0.7rem"}}>
-                                <Text size={"md"}>Optional settings</Text>
-                                <Button variant={"none"} color={"primary"} paddingSize={"xxs"}>
-                                    <IconChevronDown size={16}/>
-                                </Button>
-                            </Flex>
-                        </Collapsible.Trigger>
-                        <Spacing spacing={"md"}/>
-                        <Collapsible.Content>
-                            {optionalSettings.map(({settingDefinition, index}) => renderSetting(settingDefinition!, index))}
-                        </Collapsible.Content>
-                    </Collapsible.Root>
-                )}
+                {optionalSettings
+                    .filter(({settingDefinition}) => shownSettings.has(settingDefinition!.id!))
+                    .map(({settingDefinition, index}) => renderSetting(settingDefinition!, index))}
+                <FunctionFileOptionalInputMenuComponent
+                    label={"Add optional setting"}
+                    items={optionalSettings
+                        .filter(({settingDefinition}) => !shownSettings.has(settingDefinition!.id!))
+                        .map(({settingDefinition}) => ({
+                            id: settingDefinition!.id!,
+                            title: settingDefinition!.names?.[0]?.content ?? FALLBACK_FLOW_TYPE_SETTING_NAME,
+                            description: settingDefinition!.descriptions?.[0]?.content ?? FALLBACK_FLOW_TYPE_SETTING_DESCRIPTION
+                        }))}
+                    onAdd={showSetting}/>
             </>
         })()}
     </div>
