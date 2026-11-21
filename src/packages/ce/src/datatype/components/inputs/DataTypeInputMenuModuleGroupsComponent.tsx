@@ -1,5 +1,6 @@
 import React from "react";
 import {
+    EditorInputMenuItem,
     Flex,
     hashToColor,
     Icon,
@@ -61,18 +62,23 @@ export const DataTypeInputMenuModuleGroupsComponent: React.FC<DataTypeInputMenuM
                     <Text>{suggestion.displayMessage}</Text>
                 </Flex>
 
-                if (directIndex >= 0 && resultIndex >= 0) return <MenuItem key={suggestionIndex}
-                                                                           title={suggestion.description}
-                                                                           onFocus={() => setHoveredNodeId(null)}
-                                                                           onSelect={() => onVariantRequest(suggestion)}>
-                    {content}
-                </MenuItem>
+                const hasVariants = directIndex >= 0 && resultIndex >= 0
 
                 if (mode === "menu") return <MenuItem key={suggestionIndex} title={suggestion.description}
                                                       onFocus={() => setHoveredNodeId(null)}
-                                                      onSelect={() => onSelect?.(suggestion.value)}>
+                                                      onSelect={() => hasVariants
+                                                          ? onVariantRequest(suggestion)
+                                                          : onSelect?.(suggestion.value)}>
                     {content}
                 </MenuItem>
+
+                if (hasVariants) return <EditorInputMenuItem key={suggestionIndex}
+                                                             value={suggestion.displayMessage}
+                                                             aliases={suggestion.aliases}
+                                                             title={suggestion.description}
+                                                             onActivate={() => onVariantRequest(suggestion)}>
+                    {content}
+                </EditorInputMenuItem>
 
                 const valueIndex = suggestions.indexOf(suggestion.value)
                 if (valueIndex < 0) return null
