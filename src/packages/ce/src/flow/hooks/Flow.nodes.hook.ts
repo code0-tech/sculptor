@@ -8,7 +8,7 @@ import {FunctionNodeComponentProps} from "@edition/function/components/nodes/Fun
 import {useFlowSchema} from "@edition/flow/hooks/Flow.schema.hook";
 import {useFlowCompareStore} from "@edition/flow/hooks/Flow.compare.hook";
 import {useInlinedReferenceNodes} from "@edition/flow/hooks/Flow.references.hook";
-import {subFlowSlotIndexes} from "@edition/flow/utils/Flow.subFlowSlots.util";
+import {subFlowParameters} from "@edition/flow/utils/Flow.subFlowParameters.util";
 
 export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], projectId?: NamespaceProject["id"]): Node<FunctionNodeComponentProps>[] => {
 
@@ -157,26 +157,28 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                 })
             })
 
-            subFlowSlotIndexes(nodeSchema, node, functionDefinition).forEach(parameterIndex => {
-                nodes.push({
-                    id: `${nodeId}-slot-${parameterIndex}`,
-                    type: "slot",
-                    position: {x: 0, y: 0},
-                    style: {width: 26, height: 26},
-                    draggable: false,
-                    selectable: false,
-                    parentId: parentGroup,
-                    extent: parentGroup ? "parent" : undefined,
-                    data: {
-                        isParameter: true,
-                        parameterIndex: parameterIndex,
-                        parentNodeId: nodeId,
-                        flowId: flowId,
-                        color: hashToColor(`${nodeId}-slot-${parameterIndex}`),
-                        schema: nodeSchema
-                    },
+            subFlowParameters(nodeSchema, node, functionDefinition)
+                .filter(parameter => parameter.addable && parameter.empty)
+                .forEach(parameter => {
+                    nodes.push({
+                        id: `${nodeId}-slot-${parameter.index}`,
+                        type: "slot",
+                        position: {x: 0, y: 0},
+                        style: {width: 22, height: 22},
+                        draggable: false,
+                        selectable: false,
+                        parentId: parentGroup,
+                        extent: parentGroup ? "parent" : undefined,
+                        data: {
+                            isParameter: true,
+                            parameterIndex: parameter.index,
+                            parentNodeId: nodeId,
+                            flowId: flowId,
+                            color: hashToColor(`${nodeId}-slot-${parameter.index}`),
+                            schema: nodeSchema
+                        },
+                    })
                 })
-            })
 
             if (node.nextNodeId) {
                 const next = flowService.getNodeById(flow.id, node.nextNodeId);

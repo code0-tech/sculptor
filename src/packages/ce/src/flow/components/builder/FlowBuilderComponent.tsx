@@ -20,10 +20,8 @@ import {FunctionNodeControlComponent} from "@edition/function/components/nodes/F
 import {FunctionNodeEndComponent} from "@edition/function/components/nodes/FunctionNodeEndComponent";
 import {FunctionNodeRoundComponent} from "@edition/function/components/nodes/FunctionNodeRoundComponent";
 import {FunctionNodeGroupComponent} from "@edition/function/components/nodes/FunctionNodeGroupComponent";
+import {FunctionNodeSlotComponent} from "@edition/function/components/nodes/FunctionNodeSlotComponent";
 import {FunctionNodeTriggerComponent} from "@edition/function/components/nodes/FunctionNodeTriggerComponent";
-import {
-    FunctionNodeSubFlowSlotComponent
-} from "@edition/function/components/nodes/FunctionNodeSubFlowSlotComponent";
 import {useEdges} from "@edition/flow/hooks/Flow.edges.hook";
 import {FlowPanelSizeComponent} from "@edition/flow/components/panels/FlowPanelSizeComponent";
 import {FlowPanelLayoutComponent} from "@edition/flow/components/panels/FlowPanelLayoutComponent";
@@ -63,8 +61,8 @@ export const FlowBuilderComponent: React.FC<FlowBuilderProps> = (props) => {
         end: FunctionNodeEndComponent,
         round: FunctionNodeRoundComponent,
         group: FunctionNodeGroupComponent,
+        slot: FunctionNodeSlotComponent,
         trigger: FunctionNodeTriggerComponent,
-        slot: FunctionNodeSubFlowSlotComponent,
     }), [])
 
     const edgeTypes = React.useMemo(() => ({
@@ -123,7 +121,6 @@ export const FlowBuilderComponent: React.FC<FlowBuilderProps> = (props) => {
     }, [revalidateHandles, getLayoutElements])
 
     const nodeClickEvent = React.useCallback((_: unknown, clickedNode: Node) => {
-        if (clickedNode.type === "slot") return
         centerFunctionNode(clickedNode.id, reactFlow)
     }, [reactFlow])
 

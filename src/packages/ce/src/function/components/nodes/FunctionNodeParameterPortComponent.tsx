@@ -1,32 +1,40 @@
-import {Node, NodeProps, useReactFlow} from "@xyflow/react";
+import {useReactFlow} from "@xyflow/react";
 import React, {memo} from "react";
 import "./FunctionNodeComponent.style.scss";
-import {FunctionNodeComponentProps} from "./FunctionNodeComponent";
-import {Button, Flex, useService, useStore} from "@code0-tech/pictor";
+import {Button, useService, useStore} from "@code0-tech/pictor";
 import {IconPlus} from "@tabler/icons-react";
 import {
+    Flow,
     InlineReferenceValue,
     LiteralValue,
     NodeFunction,
     ReferenceValue,
     SubFlowValue
 } from "@code0-tech/sagittarius-graphql-types";
+import {SignatureSchema} from "@code0-tech/triangulum";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
-import {FunctionNodeHandlesComponent} from "@edition/function/components/nodes/FunctionNodeHandlesComponent";
 import {SuggestionDialogComponent} from "@edition/function/components/suggestion/SuggestionDialogComponent";
 import {useFunctionSuggestions} from "@edition/function/hooks/Function.suggestion.hook";
 import {exactSuggestions} from "@edition/datatype/utils/DataType.exactSuggestions.util";
 import {ownSuggestionCertainties} from "@edition/datatype/utils/DataType.suggestionCertainties.util";
-import {listNodeSuggestions} from "@edition/datatype/components/inputs/list/DataTypeListInput.util";
+import {
+    listElementSuggestions,
+    listNodeSuggestions
+} from "@edition/datatype/components/inputs/list/DataTypeListInput.util";
 import {setSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
 
-export type FunctionNodeSubFlowSlotComponentProps = NodeProps<Node<FunctionNodeComponentProps>>
+export interface FunctionNodeParameterPortComponentProps {
+    flowId: Flow["id"]
+    nodeId: NodeFunction["id"]
+    parameterIndex: number
+    schema: SignatureSchema["parameters"]
+    size: number
+}
 
-export const FunctionNodeSubFlowSlotComponent: React.FC<FunctionNodeSubFlowSlotComponentProps> = memo((props) => {
+export const FunctionNodeParameterPortComponent: React.FC<FunctionNodeParameterPortComponentProps> = memo((props) => {
 
-    const {data, id} = props
-    const {flowId, parentNodeId, parameterIndex, schema} = data
+    const {flowId, nodeId, parameterIndex, schema, size} = props
 
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
@@ -39,8 +47,8 @@ export const FunctionNodeSubFlowSlotComponent: React.FC<FunctionNodeSubFlowSlotC
     const functionSuggestions = useFunctionSuggestions()
 
     const node = React.useMemo(
-        () => flowService.getNodeById(flowId, parentNodeId),
-        [flowService, flowStore, flowId, parentNodeId]
+        () => flowService.getNodeById(flowId, nodeId),
+        [flowService, flowStore, flowId, nodeId]
     )
 
     const definition = React.useMemo(
@@ -49,31 +57,31 @@ export const FunctionNodeSubFlowSlotComponent: React.FC<FunctionNodeSubFlowSlotC
     )
 
     const parameterSchema = React.useMemo(
-        () => schema?.[parameterIndex ?? 0],
+        () => schema?.[parameterIndex],
         [schema, parameterIndex]
     )
 
-    const isList = parameterSchema?.schema?.input !== "sub-flow"
-    const signaturePrefix = parameterSchema?.schema?.input === "list-sub-flow" ? "sub_flow" : "item"
+    const input = parameterSchema?.schema?.input
+    const isList = input !== "sub-flow"
+    const signaturePrefix = input === "list-sub-flow" ? "sub_flow" : "item"
 
     const suggestions = React.useMemo(() => {
         const parameterSuggestions = (parameterSchema?.schema?.suggestions ?? []) as (NodeFunction | SubFlowValue | ReferenceValue | LiteralValue)[]
 
-        const available = isList
-            ? listNodeSuggestions(parameterSchema, parameterSuggestions)
-            : exactSuggestions(parameterSuggestions, ownSuggestionCertainties(parameterSchema))
-                .filter(suggestion => suggestion.__typename === "SubFlowValue"
-                    || suggestion.__typename === "NodeFunction"
-                    || suggestion.__typename === "ReferenceValue")
+        const available = (input === "sub-flow"
+            ? exactSuggestions(parameterSuggestions, ownSuggestionCertainties(parameterSchema))
+            : input === "list-sub-flow"
+                ? listNodeSuggestions(parameterSchema, parameterSuggestions)
+                : listElementSuggestions(parameterSchema, parameterSuggestions))
+            .filter(suggestion => suggestion.__typename === "SubFlowValue"
+                || suggestion.__typename === "NodeFunction")
 
         return available.length > 0 ? available : functionSuggestions
-    }, [parameterSchema, isList, functionSuggestions])
+    }, [parameterSchema, input, functionSuggestions])
 
     const onSuggestionSelect = React.useCallback(async (suggestion: NodeFunction | SubFlowValue | ReferenceValue | LiteralValue) => {
-        if (parameterIndex == null) return
-
         const addedNodeId = suggestion.__typename === "NodeFunction"
-            ? flowService.addPreviousNodeById(flowId, parentNodeId, suggestion)
+            ? flowService.addPreviousNodeById(flowId, nodeId, suggestion)
             : undefined
 
         if (suggestion.__typename === "NodeFunction" && !addedNodeId) return
@@ -85,8 +93,8 @@ export const FunctionNodeSubFlowSlotComponent: React.FC<FunctionNodeSubFlowSlotC
         const emptySubFlow = value.__typename === "SubFlowValue" && !value.startingNodeId
 
         if (!isList) {
-            await flowService.setParameterValue(flowId, parentNodeId, parameterIndex, value, definition)
-            const selectedNodeId = addedNodeId ?? (emptySubFlow ? `${parentNodeId}-${parameterIndex}` : undefined)
+            await flowService.setParameterValue(flowId, nodeId, parameterIndex, value, definition)
+            const selectedNodeId = addedNodeId ?? (emptySubFlow ? `${nodeId}-${parameterIndex}` : undefined)
             if (selectedNodeId) setSelectedFunctionNode(selectedNodeId, reactFlow)
             return
         }
@@ -100,7 +108,7 @@ export const FunctionNodeSubFlowSlotComponent: React.FC<FunctionNodeSubFlowSlotC
         const signature = Array.from({length: taken.size + 1}, (_, index) => `${signaturePrefix}_${index}`)
             .find(candidate => !taken.has(candidate))!
 
-        await flowService.setParameterValue(flowId, parentNodeId, parameterIndex, {
+        await flowService.setParameterValue(flowId, nodeId, parameterIndex, {
             __typename: "LiteralValue",
             value: [...currentEntries, `\${${signature}}`],
             references: [...currentReferences, {
@@ -110,29 +118,25 @@ export const FunctionNodeSubFlowSlotComponent: React.FC<FunctionNodeSubFlowSlotC
             } as InlineReferenceValue]
         } as LiteralValue, definition)
 
-        const selectedNodeId = addedNodeId ?? (emptySubFlow ? `${parentNodeId}-${parameterIndex}-${signature}` : undefined)
+        const selectedNodeId = addedNodeId ?? (emptySubFlow ? `${nodeId}-${parameterIndex}-${signature}` : undefined)
         if (selectedNodeId) setSelectedFunctionNode(selectedNodeId, reactFlow)
-    }, [flowService, flowId, parentNodeId, parameterIndex, definition, isList, signaturePrefix, node, reactFlow])
+    }, [flowService, flowId, nodeId, parameterIndex, definition, isList, signaturePrefix, node, reactFlow])
 
     return <>
         <SuggestionDialogComponent suggestions={suggestions}
                                    flowId={flowId}
-                                   nodeId={parentNodeId}
+                                   nodeId={nodeId}
                                    parameterIndex={parameterIndex}
                                    open={suggestionDialogOpen}
                                    onSuggestionSelect={onSuggestionSelect}
                                    onOpenChange={setSuggestionDialogOpen}/>
-        <Flex align={"center"} justify={"center"} w={"100%"} h={"100%"} style={{position: "relative"}}>
-            <FunctionNodeHandlesComponent isParameter/>
-            <Button data-qa-selector={"flow-builder-node-sub-flow-slot"}
-                    key={id}
-                    color={"secondary"}
-                    paddingSize={"xxs"}
-                    w={"100%"}
-                    h={"100%"}
-                    onClick={() => setSuggestionDialogOpen(true)}>
-                <IconPlus size={13}/>
-            </Button>
-        </Flex>
+
+        <Button data-qa-selector={"flow-builder-node-parameter-port"}
+                color={"secondary"}
+                paddingSize={"xxs"}
+                style={{borderRadius: "50%", lineHeight: 0, width: size, height: size, padding: 0}}
+                onClick={() => setSuggestionDialogOpen(true)}>
+            <IconPlus size={11}/>
+        </Button>
     </>
 })

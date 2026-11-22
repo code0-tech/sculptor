@@ -24,6 +24,7 @@ import {useParams} from "next/navigation";
 import {ProjectService} from "@edition/project/services/Project.service";
 import {useReferencedNodeIds} from "@edition/flow/hooks/Flow.references.hook";
 import {useFlowReferenceHoverStore} from "@edition/flow/hooks/Flow.reference.hover.hook";
+import {referenceTargetIdsOfNode} from "@edition/flow/utils/Flow.referenceTargetsOfNode.util";
 import {useFlowLayoutHorizontal} from "@edition/flow/hooks/Flow.layout.hook";
 import {FunctionNodeToolbarComponent} from "@edition/function/components/nodes/FunctionNodeToolbarComponent";
 import {
@@ -141,11 +142,10 @@ export const FunctionNodeTriggerComponent: React.FC<FunctionNodeTriggerComponent
     const isReferenced = React.useMemo(() => {
 
         const activeNode = flowService.getNodeById(data.flowId, selectedNode?.id as NodeFunction['id'])
-        const isActiveNodeReferencingCurrentNode = activeNode?.parameters?.nodes?.some(parameter => parameter?.value?.__typename === "ReferenceValue" && !parameter.value.nodeFunctionId)
-        const hasReferences = activeNode?.parameters?.nodes?.some(parameter => parameter?.value?.__typename === "ReferenceValue")
+        const targetIds = referenceTargetIdsOfNode(activeNode, data.flowId)
 
-        if (isActiveNodeReferencingCurrentNode) return true
-        if (hasReferences && selectedNode?.id !== data.nodeId) return false
+        if (targetIds.includes(data.flowId as string)) return true
+        if (targetIds.length > 0 && selectedNode?.id !== data.nodeId) return false
 
         return undefined
 
