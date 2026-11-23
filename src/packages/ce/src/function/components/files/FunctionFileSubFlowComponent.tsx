@@ -26,6 +26,7 @@ import {
 import {useSubFlowSchema} from "@edition/flow/hooks/Flow.subFlowSchema.hook";
 import {isSubFlowSchema} from "@edition/flow/utils/Flow.subFlowSchema.util";
 import {useShownOptionalInputs} from "@edition/function/hooks/Function.optionalInputs.hook";
+import {hasParameterValue} from "@edition/flow/utils/Flow.parameterValue.util";
 import {
     FunctionFileOptionalInputMenuComponent
 } from "@edition/function/components/files/FunctionFileOptionalInputMenuComponent";
@@ -79,7 +80,7 @@ export const FunctionFileSubFlowComponent: React.FC<FunctionFileSubFlowComponent
 
     const parametersWithValue = React.useMemo(() => (definition?.parameterDefinitions?.nodes ?? [])
         .filter(parameterDefinition => parameterDefinition?.optional
-            && subFlow?.parameters?.find(candidate => candidate?.identifier === parameterDefinition?.identifier)?.value != null)
+            && hasParameterValue(subFlow?.parameters?.find(candidate => candidate?.identifier === parameterDefinition?.identifier)?.value))
         .map(parameterDefinition => parameterDefinition!.id!), [definition, subFlow])
 
     const [shownParameters, showParameter] = useShownOptionalInputs(parametersWithValue)
@@ -179,6 +180,7 @@ export const FunctionFileSubFlowComponent: React.FC<FunctionFileSubFlowComponent
                                                         cast={parameter?.cast ?? null}
                                                         onChange={() => {
                                                             changedParameter.current.add(parameterDefinition.id!)
+                                                            showParameter(parameterDefinition.id!)
                                                             validate()
                                                         }}
                                                         onCastChange={changedCast => {

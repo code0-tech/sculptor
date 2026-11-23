@@ -24,6 +24,7 @@ import {
     FunctionFileOptionalInputMenuComponent
 } from "@edition/function/components/files/FunctionFileOptionalInputMenuComponent";
 import {isSubFlowSchema} from "@edition/flow/utils/Flow.subFlowSchema.util";
+import {hasParameterValue} from "@edition/flow/utils/Flow.parameterValue.util";
 import {useShownOptionalInputs} from "@edition/function/hooks/Function.optionalInputs.hook";
 
 export interface FunctionFileDefaultComponentProps {
@@ -84,7 +85,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
     }, [validation?.length, node.id, definition])
 
     const parametersWithValue = React.useMemo(() => (definition?.parameterDefinitions?.nodes ?? [])
-        .filter((parameterDefinition, index) => parameterDefinition?.optional && node.parameters?.nodes?.[index]?.value != null)
+        .filter((parameterDefinition, index) => parameterDefinition?.optional && hasParameterValue(node.parameters?.nodes?.[index]?.value))
         .map(parameterDefinition => parameterDefinition!.id!), [definition, node])
 
     const [shownParameters, showParameter] = useShownOptionalInputs(parametersWithValue)
@@ -164,6 +165,7 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                                             cast={cast}
                                             onChange={() => {
                                                 changedParameter.current.add(parameterDefinition.id!)
+                                                showParameter(parameterDefinition.id!)
                                                 validate()
                                             }}
                                             onCastChange={cast => {

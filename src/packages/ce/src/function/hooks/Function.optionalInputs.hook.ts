@@ -2,17 +2,17 @@ import React from "react";
 
 export const useShownOptionalInputs = (idsWithValue: string[]): [Set<string>, (id: string) => void] => {
 
-    const [shownIds, setShownIds] = React.useState<Set<string>>(new Set())
+    const [manualIds, setManualIds] = React.useState<Set<string>>(new Set())
 
     const showId = React.useCallback(
-        (id: string) => setShownIds(current => new Set([...current, id])),
+        (id: string) => setManualIds(current => current.has(id) ? current : new Set([...current, id])),
         []
     )
 
-    React.useEffect(() => {
-        if (idsWithValue.length === 0) return
-        setShownIds(current => idsWithValue.every(id => current.has(id)) ? current : new Set([...current, ...idsWithValue]))
-    }, [idsWithValue])
+    const shownIds = React.useMemo(
+        () => new Set([...manualIds, ...idsWithValue]),
+        [manualIds, idsWithValue]
+    )
 
     return [shownIds, showId]
 }

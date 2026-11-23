@@ -157,6 +157,7 @@ export const FunctionFileTriggerComponent: React.FC<FunctionFileTriggerComponent
                                             cast={cast}
                                             onChange={() => {
                                                 changedSettings.current.add(settingDefinition.id!)
+                                                showSetting(settingDefinition.id!)
                                                 validate()
                                             }}
                                             onCastChange={cast => {
