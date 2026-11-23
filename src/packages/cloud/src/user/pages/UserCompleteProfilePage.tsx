@@ -112,13 +112,13 @@ export const UserCompleteProfilePage: React.FC = () => {
         <TextInput data-qa-selector={"auth-complete-profile-claim-token"} placeholder={"Claim token"}
                    {...inputs.getInputProps("claimToken")}/>
         <div style={{marginBottom: "1.3rem"}}/>
-        <Flex style={{gap: "1.3rem"}}>
+        <Flex style={{gap: "1.3rem", flexWrap: "wrap"}}>
             {/**@ts-ignore**/}
-            <TextInput data-qa-selector={"auth-complete-profile-firstname"} wrapperComponent={{style: {flex: 1}}}
+            <TextInput data-qa-selector={"auth-complete-profile-firstname"} wrapperComponent={{style: {flex: "1 1 12rem"}}}
                        placeholder={"First name"}
                        w={"100%"} {...inputs.getInputProps("firstname")}/>
             {/**@ts-ignore**/}
-            <TextInput data-qa-selector={"auth-complete-profile-lastname"} wrapperComponent={{style: {flex: 1}}}
+            <TextInput data-qa-selector={"auth-complete-profile-lastname"} wrapperComponent={{style: {flex: "1 1 12rem"}}}
                        placeholder={"Last name"}
                        w={"100%"} {...inputs.getInputProps("lastname")}/>
         </Flex>
