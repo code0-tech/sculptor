@@ -6,6 +6,7 @@ import {
     Container,
     ContextStoreProvider,
     Flex,
+    Icon,
     ScrollArea,
     ScrollAreaScrollbar,
     ScrollAreaThumb,
@@ -17,7 +18,6 @@ import {UserService} from "@edition/user/services/User.service";
 import {Application, ApplicationService} from "@edition/application/services/Application.service";
 import {useApolloClient} from "@apollo/client/react";
 import {GraphqlClient} from "@core/util/graphql-client";
-import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import {usePersistentReactiveArrayService} from "@/hooks/usePersistentReactiveArrayService";
@@ -61,9 +61,7 @@ export default function AuthLayout({children}: Readonly<{ children: React.ReactN
                             services={[[store, service], organization, namespace, [applicationStore, applicationService]]}>
                             <Container w={"100%"} display={"flex"} justify={"center"} style={{flex: 1}}>
                                 <Col xs={12} md={8} lg={6} xxl={4} py={5} style={{marginTop: "auto", marginBottom: "auto"}}>
-                                    <Image src={"/CodeZero_Logo.png"} alt={"CodeZero Logo"}
-                                           width={40}
-                                           height={40}/>
+                                    <Icon icon={"codezero:codezero"} color={"#fff"} size={40}/>
                                     <Spacing spacing={"xl"}/>
                                     <Text style={{fontSize: "2rem", fontWeight: "600"}}
                                           hierarchy={"primary"}
