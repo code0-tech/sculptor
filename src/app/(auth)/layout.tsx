@@ -52,10 +52,43 @@ export default function AuthLayout({children}: Readonly<{ children: React.ReactN
     )
 
     return (
-        <FullScreen>
-            <ScrollArea mah={"100%"} h={"100%"}>
+        <FullScreen bg={"var(--primary)"}>
+            <div style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                transform: "scaleX(-1)",
+                height: "50%",
+                opacity: "0.25"
+            }}>
+                <div style={{
+                    position: "absolute",
+                    top: "0",
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    background: "radial-gradient(circle at top right,rgba(25, 24, 37, 0) 0%, var(--primary) 35%)",
+                    zIndex: "1",
+                    WebkitBackdropFilter: "blur(5rem)",
+                }}/>
+                <AuroraBackground/>
+            </div>
+
+            <div style={{
+                position: "absolute",
+                top: 0,
+                right: 0,
+                width: "100%",
+                transform: "",
+                height: "100%",
+                opacity: "0.25",
+                filter: "blur(5rem)",
+            }}>
+                <AuroraBackground/>
+            </div>
+            <ScrollArea mah={"100%"} h={"100%"} style={{position: "relative", zIndex: 2}}>
                 <ScrollAreaViewport>
-                    <AuroraBackground/>
                     <div style={{display: "flex", flexDirection: "column", minHeight: "100dvh"}}>
                         <ContextStoreProvider
                             services={[[store, service], organization, namespace, [applicationStore, applicationService]]}>
