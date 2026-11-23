@@ -1,5 +1,6 @@
 import React from "react";
 import {
+    EditorInputMenuItem,
     Flex,
     MenuItem,
     MenuSub,
@@ -17,7 +18,7 @@ import {DataTypeInputMenuReferencePathComponent} from "@edition/datatype/compone
 
 export interface DataTypeInputMenuEntriesComponentProps {
     entries: SuggestionMenuEntry[]
-    mode: "tag" | "menu"
+    mode: "tag" | "menu" | "editor"
     tagKeys?: SuggestionTagKey[]
     onSelect?: (value: SuggestionValue) => void
 }
@@ -27,6 +28,8 @@ export const DataTypeInputMenuEntriesComponent: React.FC<DataTypeInputMenuEntrie
     const {entries, mode, tagKeys, onSelect} = props
 
     const setHoveredNodeId = useFlowReferenceHoverStore(state => state.setHoveredNodeId)
+
+    const InputMenuItem = mode === "editor" ? EditorInputMenuItem : TagInputMenuItem
 
     return <>
         {entries.map((entry, index) => {
@@ -53,11 +56,11 @@ export const DataTypeInputMenuEntriesComponent: React.FC<DataTypeInputMenuEntrie
                     {badge}
                 </MenuItem>
 
-                return <TagInputMenuItem key={index} value={tagKeys?.[entry.index]} data={entry.value}
-                                         aliases={definition ? [definition.names?.[0]?.content ?? ""] : undefined}
-                                         onMouseEnter={() => setHoveredNodeId(null)}>
+                return <InputMenuItem key={index} value={tagKeys?.[entry.index]} data={entry.value}
+                                      aliases={definition ? [definition.names?.[0]?.content ?? ""] : undefined}
+                                      onMouseEnter={() => setHoveredNodeId(null)}>
                     {badge}
-                </TagInputMenuItem>
+                </InputMenuItem>
             }
 
             const group = entry.group
@@ -79,12 +82,12 @@ export const DataTypeInputMenuEntriesComponent: React.FC<DataTypeInputMenuEntrie
                     {onlyLabel}
                 </MenuItem>
 
-                return <TagInputMenuItem key={entry.key} value={tagKeys?.[only.index]} data={only.value}
-                                         aliases={[group.displayName ?? "", only.value.inputTypeIdentifier ?? "", ...(only.value.referencePath ?? []).map(path => path.path ?? "")]}
-                                         onMouseEnter={() => setHoveredNodeId(group.targetNodeId)}
-                                         onMouseLeave={() => setHoveredNodeId(null)}>
+                return <InputMenuItem key={entry.key} value={tagKeys?.[only.index]} data={only.value}
+                                      aliases={[group.displayName ?? "", only.value.inputTypeIdentifier ?? "", ...(only.value.referencePath ?? []).map(path => path.path ?? "")]}
+                                      onMouseEnter={() => setHoveredNodeId(group.targetNodeId)}
+                                      onMouseLeave={() => setHoveredNodeId(null)}>
                     {onlyLabel}
-                </TagInputMenuItem>
+                </InputMenuItem>
             }
 
             const groupTagKey = group.index === undefined ? undefined : tagKeys?.[group.index]
@@ -107,12 +110,12 @@ export const DataTypeInputMenuEntriesComponent: React.FC<DataTypeInputMenuEntrie
                     </MenuItem>
                     : null)
                 : (group.value && groupTagKey !== undefined
-                    ? <TagInputMenuItem value={groupTagKey} data={group.value}
-                                        aliases={[group.displayName ?? "", group.value.inputTypeIdentifier ?? ""]}
-                                        onMouseEnter={() => setHoveredNodeId(group.targetNodeId)}
-                                        onMouseLeave={() => setHoveredNodeId(null)}>
+                    ? <InputMenuItem value={groupTagKey} data={group.value}
+                                     aliases={[group.displayName ?? "", group.value.inputTypeIdentifier ?? ""]}
+                                     onMouseEnter={() => setHoveredNodeId(group.targetNodeId)}
+                                     onMouseLeave={() => setHoveredNodeId(null)}>
                         {groupSelfLabel}
-                    </TagInputMenuItem>
+                    </InputMenuItem>
                     : null)
 
             const groupLabel = <Flex align={"center"} justify={"space-between"} style={{gap: "0.7rem"}} w={"100%"}

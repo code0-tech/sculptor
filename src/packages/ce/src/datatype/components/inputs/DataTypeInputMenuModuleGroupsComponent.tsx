@@ -25,7 +25,7 @@ import {useFlowReferenceHoverStore} from "@edition/flow/hooks/Flow.reference.hov
 export interface DataTypeInputMenuModuleGroupsComponentProps {
     moduleGroups: SuggestionGroup[]
     suggestions: SuggestionValue[]
-    mode: "tag" | "menu"
+    mode: "tag" | "menu" | "editor"
     tagKeys?: SuggestionTagKey[]
     onSelect?: (value: SuggestionValue) => void
     onVariantRequest: (suggestion: Suggestion) => void
@@ -36,6 +36,8 @@ export const DataTypeInputMenuModuleGroupsComponent: React.FC<DataTypeInputMenuM
     const {moduleGroups, suggestions, mode, tagKeys, onSelect, onVariantRequest} = props
 
     const setHoveredNodeId = useFlowReferenceHoverStore(state => state.setHoveredNodeId)
+
+    const InputMenuItem = mode === "editor" ? EditorInputMenuItem : TagInputMenuItem
 
     return <>
         {moduleGroups.map((group, index) => {
@@ -83,11 +85,11 @@ export const DataTypeInputMenuModuleGroupsComponent: React.FC<DataTypeInputMenuM
                 const valueIndex = suggestions.indexOf(suggestion.value)
                 if (valueIndex < 0) return null
 
-                return <TagInputMenuItem key={suggestionIndex} value={tagKeys?.[valueIndex]} data={suggestion.value}
-                                         aliases={[suggestion.displayMessage, ...(suggestion.aliases ?? [])]}
-                                         title={suggestion.description}>
+                return <InputMenuItem key={suggestionIndex} value={tagKeys?.[valueIndex]} data={suggestion.value}
+                                      aliases={[suggestion.displayMessage, ...(suggestion.aliases ?? [])]}
+                                      title={suggestion.description}>
                     {content}
-                </TagInputMenuItem>
+                </InputMenuItem>
             })
 
             if (mode === "menu") return <MenuSub key={`group-${index}`}>
