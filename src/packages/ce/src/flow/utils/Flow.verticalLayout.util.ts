@@ -3,11 +3,13 @@ import {Node} from "@xyflow/react";
 export const getVerticalLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
     if (!dirtyIds || dirtyIds.size === 0) return {nodes}
 
-    /* Konstanten */
+    /* constants */
     const V = 35;          // vertical gap Node ↕ Node
     const H = 50;          // horizontal gap Parent → Param
-    const PAD = 16;        // inner padding einer Group (links+rechts / oben+unten)
-    const EPS = 0.25;      // Toleranz gegen Rundungsdrift
+    const LANE = 60;       // gap between two parameter lanes of the same node
+    const PARAM = 90;      // distance of the parameter row from its node
+    const PAD = 16;        // inner padding of a group (left+right / top+bottom)
+    const EPS = 0.25;      // tolerance against rounding drift
 
     // Wir iterieren, bis Group-Maße stabil sind
     let pass = 0
@@ -150,13 +152,14 @@ export const getVerticalLayoutElements = (nodes: Node[], dirtyIds?: Set<string>)
                 h?: number
                 right?: Node[]
                 rightIndex?: number
-                rightX?: number
                 rightTop?: number
                 rightBottom?: number
                 rightMark?: number
-                laneY?: number
-                laneBottom?: number
                 laneKey?: string
+                laneX?: number
+                laneCursorY?: number
+                itemTop?: number
+                itemMark?: number
                 childPs?: Size
                 lastChildTop?: number
                 lastChildBottom?: number
@@ -204,14 +207,13 @@ export const getVerticalLayoutElements = (nodes: Node[], dirtyIds?: Set<string>)
                         f.right = right
                         f.gParams = gParams
 
-                        f.rightX = f.cx + f.w! / 2 + H
+                        f.laneX = f.cx + f.w! / 2 + PARAM
                         f.rightTop = Number.POSITIVE_INFINITY
                         f.rightBottom = f.cy
                         f.rightMark = placed.length
                         f.rightIndex = 0
-                        f.laneY = f.cy
-                        f.laneBottom = f.cy + h / 2
                         f.laneKey = undefined
+                        f.laneCursorY = f.cy
                         f.phase = 1
                         break
                     }
@@ -222,21 +224,17 @@ export const getVerticalLayoutElements = (nodes: Node[], dirtyIds?: Set<string>)
                             const ps = size(p)
                             const laneKey = `${(p.data as any)?.parameterIndex}`
 
-                            if (f.laneKey !== undefined && laneKey !== f.laneKey) {
-                                f.laneY = f.laneBottom! + V + ps.h / 2
-                                f.laneBottom = f.laneY + ps.h / 2
-                                f.rightX = f.cx + f.w! / 2 + H
-                            }
+                            if (f.laneKey !== undefined && laneKey !== f.laneKey) f.laneCursorY! += LANE - V
 
                             f.laneKey = laneKey
 
-                            const pcx = f.rightX! + ps.w / 2
-                            const pcy = f.laneY!
+                            const pcx = f.laneX! + ps.w / 2
+                            const pcy = f.laneCursorY! + ps.h / 2
 
-                            f.rightX = f.rightX! + ps.w + H
-                            f.laneBottom = Math.max(f.laneBottom!, pcy + ps.h / 2)
                             f.rightTop = Math.min(f.rightTop!, pcy - ps.h / 2)
                             f.rightBottom = Math.max(f.rightBottom!, pcy + ps.h / 2)
+                            f.itemTop = pcy - ps.h / 2
+                            f.itemMark = placed.length
                             f.childPs = ps
                             stack.push({node: p, cx: pcx, cy: pcy, phase: 0})
                             f.phase = 10
@@ -256,10 +254,14 @@ export const getVerticalLayoutElements = (nodes: Node[], dirtyIds?: Set<string>)
                     }
 
                     case 10: {
-                        const subBottom = f.lastChildBottom!
-                        f.laneBottom = Math.max(f.laneBottom!, subBottom)
-                        f.rightTop = Math.min(f.rightTop!, f.lastChildTop!)
+                        const overhang = f.itemTop! - f.lastChildTop!
+                        const subBottom = overhang > 0 ? f.lastChildBottom! + overhang : f.lastChildBottom!
+
+                        if (overhang > 0) shiftPlaced(f.itemMark!, overhang)
+
+                        f.rightTop = Math.min(f.rightTop!, overhang > 0 ? f.itemTop! : f.lastChildTop!)
                         f.rightBottom = Math.max(f.rightBottom!, subBottom)
+                        f.laneCursorY = subBottom + V
                         f.rightIndex!++
                         f.phase = 1
                         break

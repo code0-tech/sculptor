@@ -13,6 +13,7 @@ import {DataTypeInputComponentProps} from "@edition/datatype/components/inputs/D
 import {SuggestionTagKey, SuggestionValue} from "@edition/function/components/suggestion/Suggestion.util";
 import {sortSuggestions} from "@edition/datatype/utils/DataType.sortSuggestions.util";
 import {suggestionCertainties} from "@edition/datatype/utils/DataType.suggestionCertainties.util";
+import {exactSuggestions} from "@edition/datatype/utils/DataType.exactSuggestions.util";
 
 export type ListEntry =
     | SuggestionTagKey
@@ -42,7 +43,7 @@ export const listNodeSuggestions = (
     schema: DataTypeInputComponentProps['schema'],
     suggestions: DataTypeInputComponentProps['suggestions']
 ): (SubFlowValue | NodeFunction | ReferenceValue)[] =>
-    listElementSuggestions(schema, suggestions)
+    exactSuggestions(listElementSuggestions(schema, suggestions), suggestionCertainties(schema))
         .filter((suggest): suggest is SubFlowValue | NodeFunction | ReferenceValue =>
             suggest.__typename === "SubFlowValue"
             || suggest.__typename === "NodeFunction"

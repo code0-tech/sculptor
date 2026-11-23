@@ -18,11 +18,11 @@ export const FunctionNodeLabelComponent: React.FC<FunctionNodeLabelComponentProp
                 textAlign: "center",
                 transform: "translateX(-50%)"
             }}>
-                <Text size={"xs"} hierarchy={"primary"}>
+                <Text size={"xs"} ta={"center"} hierarchy={"primary"}>
                     {name}
                 </Text>
                 {moduleName ? (
-                    <Text size={"xxs"} hierarchy={"tertiary"}>
+                    <Text size={"xxs"} ta={"center"} hierarchy={"tertiary"}>
                         {moduleName}
                     </Text>
                 ) : null}

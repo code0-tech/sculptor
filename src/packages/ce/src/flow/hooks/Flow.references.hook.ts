@@ -4,6 +4,8 @@ import React from "react";
 import {useService, useStore} from "@code0-tech/pictor";
 import {FlowService} from "@edition/flow/services/Flow.service";
 import {isSubFlowSchema} from "@edition/flow/utils/Flow.subFlowSchema.util";
+import {referenceTargetIdsOfNode} from "@edition/flow/utils/Flow.referenceTargetsOfNode.util";
+import {referenceTargetIdsOfValue} from "@edition/flow/utils/Flow.referenceTargetsOfValue.util";
 
 export const useReferencedNodeIds = (flowId: Flow["id"]): Set<string> => {
 
@@ -15,31 +17,9 @@ export const useReferencedNodeIds = (flowId: Flow["id"]): Set<string> => {
         [flowStore, flowId]
     )
 
-    return React.useMemo(() => {
-        const ids = new Set<string>()
-
-        const targetNodeId = (nodeFunctionId?: string | null) =>
-            !nodeFunctionId || nodeFunctionId === "undefined" ? flowId as string : nodeFunctionId
-
-        flow?.nodes?.nodes?.forEach(node => {
-            node?.parameters?.nodes?.forEach(parameter => {
-                const value = parameter?.value
-                if (!value) return
-
-                if (value.__typename === "ReferenceValue") {
-                    ids.add(targetNodeId(value.nodeFunctionId))
-                } else if (value.__typename === "LiteralValue") {
-                    (value.references ?? []).forEach(reference => {
-                        if (reference?.value?.__typename === "ReferenceValue") {
-                            ids.add(targetNodeId(reference.value.nodeFunctionId))
-                        }
-                    })
-                }
-            })
-        })
-
-        return ids
-    }, [flow, flow?.editedAt, flowStore, flowId])
+    return React.useMemo(() => new Set<string>(
+        (flow?.nodes?.nodes ?? []).flatMap(node => referenceTargetIdsOfNode(node, flowId))
+    ), [flow, flow?.editedAt, flowStore, flowId])
 }
 
 export interface InlinedReference {
@@ -62,9 +42,6 @@ export const useInlinedReferenceNodes = (flowId: Flow["id"], schema?: SignatureS
         const nodes = flow?.nodes?.nodes
         if (!nodes) return inlined
 
-        const targetNodeId = (nodeFunctionId?: string | null) =>
-            !nodeFunctionId || nodeFunctionId === "undefined" ? flowId as string : nodeFunctionId
-
         const referencedBy = new Map<string, Map<NonNullable<NodeFunction["id"]>, number>>()
         const nodeById = new Map<string, NodeFunction>()
 
@@ -76,22 +53,7 @@ export const useInlinedReferenceNodes = (flowId: Flow["id"], schema?: SignatureS
             if (!node?.id) return
 
             node.parameters?.nodes?.forEach((parameter, parameterIndex) => {
-                const value = parameter?.value
-                if (!value) return
-
-                const targets: string[] = []
-
-                if (value.__typename === "ReferenceValue") {
-                    targets.push(targetNodeId(value.nodeFunctionId))
-                } else if (value.__typename === "LiteralValue") {
-                    (value.references ?? []).forEach(reference => {
-                        if (reference?.value?.__typename === "ReferenceValue") {
-                            targets.push(targetNodeId(reference.value.nodeFunctionId))
-                        }
-                    })
-                }
-
-                targets.forEach(target => {
+                referenceTargetIdsOfValue(parameter?.value, flowId).forEach(target => {
                     const hosts = referencedBy.get(target) ?? new Map<NonNullable<NodeFunction["id"]>, number>()
                     if (!hosts.has(node.id!)) hosts.set(node.id!, parameterIndex)
                     referencedBy.set(target, hosts)

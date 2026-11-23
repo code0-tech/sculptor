@@ -1,6 +1,8 @@
 import React from "react";
 import {Flow, NodeFunction, ReferenceValue, SubFlowValue} from "@code0-tech/sagittarius-graphql-types";
 import {
+    EditorInputMenu,
+    EditorInputMenuItem,
     Flex,
     Menu,
     MenuContent,
@@ -35,7 +37,7 @@ import {DataTypeInputMenuModuleGroupsComponent} from "@edition/datatype/componen
 
 export interface DataTypeInputMenuSuggestionsComponentProps {
     suggestions: SuggestionValue[]
-    mode?: "tag" | "menu"
+    mode?: "tag" | "menu" | "editor"
     tagKeys?: SuggestionTagKey[]
     customLogicGroupKey?: SuggestionTagKey
     onCustomLogicGroupSelect?: () => void
@@ -79,6 +81,8 @@ export const DataTypeInputMenuSuggestionsComponent: React.FC<DataTypeInputMenuSu
     const flowId: Flow['id'] = props.flowId ?? `gid://sagittarius/Flow/${Number(params.flowId) || 1}`
     const setHoveredNodeId = useFlowReferenceHoverStore(state => state.setHoveredNodeId)
     const [variantSuggestion, setVariantSuggestion] = React.useState<Suggestion | null>(null)
+
+    const InputMenuItem = mode === "editor" ? EditorInputMenuItem : TagInputMenuItem
 
     const {entries, moduleGroups} = useSuggestionMenuEntries(suggestions, flowId)
 
@@ -192,13 +196,13 @@ export const DataTypeInputMenuSuggestionsComponent: React.FC<DataTypeInputMenuSu
                         <Text>Add custom logic group</Text>
                     </Flex>
                 </MenuItem> :
-                <TagInputMenuItem value={customLogicGroupKey} aliases={["add custom logic group"]}
-                                  onMouseEnter={() => setHoveredNodeId(null)}>
+                <InputMenuItem value={customLogicGroupKey} aliases={["add custom logic group"]}
+                               onMouseEnter={() => setHoveredNodeId(null)}>
                     <Flex align={"center"} style={{gap: "0.35rem"}}>
                         <IconPlus size={13}/>
                         <Text>Add custom logic group</Text>
                     </Flex>
-                </TagInputMenuItem>}
+                </InputMenuItem>}
             {matchedEntries.length > 0 || matchedModuleGroups.length > 0 ? <MenuSeparator/> : null}
         </> : null}
         <DataTypeInputMenuEntriesComponent entries={matchedEntries}
@@ -294,6 +298,11 @@ export const DataTypeInputMenuSuggestionsComponent: React.FC<DataTypeInputMenuSu
             </Menu>
         </>
     }
+
+    if (mode === "editor") return <>
+        {variantDialog}
+        <EditorInputMenu onMouseLeave={() => setHoveredNodeId(null)}>{items}</EditorInputMenu>
+    </>
 
     return <>
         {variantDialog}

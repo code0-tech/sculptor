@@ -1,6 +1,7 @@
 import React from "react";
 import {ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
 import {
+    EditorInputMenuItem,
     Flex,
     MenuItem,
     MenuSub,
@@ -17,7 +18,7 @@ import {useFlowReferenceHoverStore} from "@edition/flow/hooks/Flow.reference.hov
 export interface DataTypeInputMenuReferencePathComponentProps {
     nodes: Map<string, SuggestionPathNode>
     targetNodeId?: string
-    mode?: "tag" | "menu"
+    mode?: "tag" | "menu" | "editor"
     tagKeys?: SuggestionTagKey[]
     onSelect?: (value: ReferenceValue) => void
 }
@@ -27,6 +28,8 @@ export const DataTypeInputMenuReferencePathComponent: React.FC<DataTypeInputMenu
     const {nodes, targetNodeId, mode = "tag", tagKeys, onSelect} = props
 
     const setHoveredNodeId = useFlowReferenceHoverStore(state => state.setHoveredNodeId)
+
+    const InputMenuItem = mode === "editor" ? EditorInputMenuItem : TagInputMenuItem
 
     return <>
         {Array.from(nodes.values()).map(node => {
@@ -48,11 +51,11 @@ export const DataTypeInputMenuReferencePathComponent: React.FC<DataTypeInputMenu
                     : null)
                 : (tagKey === undefined
                     ? null
-                    : <TagInputMenuItem value={tagKey} data={node.value} aliases={[node.label]}
-                                        onMouseEnter={() => setHoveredNodeId(targetNodeId ?? null)}
-                                        onMouseLeave={() => setHoveredNodeId(null)}>
+                    : <InputMenuItem value={tagKey} data={node.value} aliases={[node.label]}
+                                     onMouseEnter={() => setHoveredNodeId(targetNodeId ?? null)}
+                                     onMouseLeave={() => setHoveredNodeId(null)}>
                         {content}
-                    </TagInputMenuItem>)
+                    </InputMenuItem>)
 
             if (node.children.size <= 0) return <React.Fragment key={node.label}>{self}</React.Fragment>
 
