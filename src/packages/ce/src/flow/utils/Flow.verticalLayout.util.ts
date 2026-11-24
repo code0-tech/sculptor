@@ -3,11 +3,19 @@ import {Node} from "@xyflow/react";
 export const getVerticalLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
     if (!dirtyIds || dirtyIds.size === 0) return {nodes}
 
+    // groups run with the flow and every other parameter hangs across it - an empty sub flow slot runs
+    // with the flow too, because that is where the group it stands for is going to be
+    const alongFlow = (node: Node) => node.type === "group" || !!(node.data as any)?.alongFlow
+
     /* constants */
+    // every node box already carries an invisible label spacer of its own, so each of these gaps is on
+    // top of roughly 35px of air on either side - they read far wider than they measure
     const V = 35;          // vertical gap Node ↕ Node
-    const H = 50;          // horizontal gap Parent → Param
-    const LANE = 60;       // gap between two parameter lanes of the same node
-    const PARAM = 90;      // distance of the parameter row from its node
+    const H = 40;          // horizontal gap Parent → Param
+    const LANE = 45;       // gap between two parameter lanes of the same node
+    const PARAM = 50;      // distance of the parameter row from its node
+    const SLOT = 100;      // distance of an empty sub flow slot, which is the + itself: just enough lane
+                           // for the parameter label to sit between the node and the button
     const PAD = 16;        // inner padding of a group (left+right / top+bottom)
     const EPS = 0.25;      // tolerance against rounding drift
 
@@ -65,6 +73,17 @@ export const getVerticalLayoutElements = (nodes: Node[], dirtyIds?: Set<string>)
     const styleWH = new Map<string, { width: number; height: number }>()
     const measuredWH = new Map<string, { width: number; height: number }>()
 
+    // a node the dom has not measured yet - anything just added - would be laid out as a made up 200x80
+    // box while the truth is closer to 50x166. that phantom moves everything downstream of it and whips
+    // the edges across the canvas for a frame, so it borrows the size of a node of its own type that is
+    // already on screen and only falls back to a guess when there is none
+    const typeSizes = new Map<string, Size>()
+    for (const n of nodes) {
+        const mw = n.measured?.width
+        const mh = n.measured?.height
+        if (n.type && mw && mh && mw > 0 && mh > 0) typeSizes.set(n.type, {w: mw, h: mh})
+    }
+
     // baseSizes als Startpunkt (non-group) + wird für groups nach Bounding aktualisiert
     const baseSizes = new Map<string, Size>()
     for (const n of nodes) {
@@ -72,7 +91,8 @@ export const getVerticalLayoutElements = (nodes: Node[], dirtyIds?: Set<string>)
         const styleH = typeof n.style?.height === "number" ? (n.style.height as number) : undefined
         const mw = n.measured?.width && n.measured.width > 0 ? n.measured.width : undefined
         const mh = n.measured?.height && n.measured.height > 0 ? n.measured.height : undefined
-        baseSizes.set(n.id, {w: styleW ?? mw ?? 200, h: styleH ?? mh ?? 80})
+        const guess = (n.type ? typeSizes.get(n.type) : undefined) ?? {w: 200, h: 80}
+        baseSizes.set(n.id, {w: styleW ?? mw ?? guess.w, h: styleH ?? mh ?? guess.h})
     }
 
     const getStyleW = (n: Node) => styleWH.get(n.id)?.width
@@ -198,7 +218,7 @@ export const getVerticalLayoutElements = (nodes: Node[], dirtyIds?: Set<string>)
                         const right: Node[] = []
                         const gParams: Node[] = []
                         for (const p of paramsOf) {
-                            if (p.type === "group") gParams.push(p)
+                            if (alongFlow(p)) gParams.push(p)
                             else right.push(p)
                         }
                         right.sort((a, b) => (+(a.data as any)?.parameterIndex) - (+(b.data as any)?.parameterIndex))
@@ -280,7 +300,7 @@ export const getVerticalLayoutElements = (nodes: Node[], dirtyIds?: Set<string>)
 
                             f.gSizes = gSizes
                             f.gx = f.cx - rowW / 2
-                            f.gy = f.bottom! + 2 * V
+                            f.gy = f.bottom!
                             f.rowBottom = f.bottom
                             f.gIndex = 0
                             f.phase = 3
@@ -295,7 +315,7 @@ export const getVerticalLayoutElements = (nodes: Node[], dirtyIds?: Set<string>)
                             const g = f.gParams![f.gIndex!]
                             const gs = f.gSizes![f.gIndex!]
                             const gcx = f.gx! + gs.w / 2
-                            const gcy = f.gy! + gs.h / 2
+                            const gcy = f.gy! + (g.type === "slot" ? SLOT : 2 * V) + gs.h / 2
                             f.gx! += gs.w + H
 
                             stack.push({node: g, cx: gcx, cy: gcy, phase: 0})
@@ -526,7 +546,7 @@ export const getVerticalLayoutElements = (nodes: Node[], dirtyIds?: Set<string>)
         for (const parent of nodes) {
             const pGroups: Node[] = []
             const paramList = params.get(parent.id) ?? []
-            for (const p of paramList) if (p.type === "group") pGroups.push(p)
+            for (const p of paramList) if (alongFlow(p)) pGroups.push(p)
             if (!pGroups.length) continue
 
             const ordered = pGroups.slice().sort((a, b) =>

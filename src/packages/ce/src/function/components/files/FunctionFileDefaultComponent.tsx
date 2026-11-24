@@ -24,6 +24,7 @@ import {
     FunctionFileOptionalInputMenuComponent
 } from "@edition/function/components/files/FunctionFileOptionalInputMenuComponent";
 import {isSubFlowSchema} from "@edition/flow/utils/Flow.subFlowSchema.util";
+import {parameterValueOfSuggestion} from "@edition/flow/utils/Flow.parameterValueOfSuggestion.util";
 import {hasParameterValue} from "@edition/flow/utils/Flow.parameterValue.util";
 import {useShownOptionalInputs} from "@edition/function/hooks/Function.optionalInputs.hook";
 
@@ -181,12 +182,8 @@ export const FunctionFileDefaultComponent: React.FC<FunctionFileDefaultComponent
                                                         inputProps.formValidation?.setValue?.(value)
                                                         return
                                                     }
-                                                    const addedNodeId = flowService.addPreviousNodeById(flowId, node.id!!, value)
-                                                    if (!addedNodeId) return
-                                                    inputProps.formValidation?.setValue?.({
-                                                        __typename: "ReferenceValue",
-                                                        nodeFunctionId: addedNodeId
-                                                    } as ReferenceValue)
+                                                    const created = parameterValueOfSuggestion(flowService, flowId, node.id!!, value, "parameter")
+                                                    if (created) inputProps.formValidation?.setValue?.(created.value)
                                                 }
                                             }}
                     />

@@ -26,6 +26,14 @@ export const FunctionNodeHandlesComponent: React.FC<FunctionNodeHandlesComponent
         return isHorizontal ? Position.Bottom : Position.Right
     }, [isHorizontal])
 
+    const paramFlowPosition = React.useMemo(() => {
+        return isHorizontal ? Position.Right : Position.Bottom
+    }, [isHorizontal])
+
+    const paramFlowStyle = React.useMemo(() => {
+        return isHorizontal ? {right: "5px"} : {bottom: "5px"}
+    }, [isHorizontal])
+
     const targetStyle = React.useMemo(() => {
         if (isParameter) return isHorizontal ? {bottom: "5px"} : {right: "5px"}
         return isHorizontal ? {left: "5px"} : {top: "5px"}
@@ -52,6 +60,15 @@ export const FunctionNodeHandlesComponent: React.FC<FunctionNodeHandlesComponent
                 position={paramPosition}
                 id={"param"}
                 isConnectable={false}
+                className={"d-flow-node__handle d-flow-node__handle--target"}
+            />
+
+            <Handle
+                type={"target"}
+                position={paramFlowPosition}
+                id={"param-flow"}
+                isConnectable={false}
+                style={paramFlowStyle}
                 className={"d-flow-node__handle d-flow-node__handle--target"}
             />
 

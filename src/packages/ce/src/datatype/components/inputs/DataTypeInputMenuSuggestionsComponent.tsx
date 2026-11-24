@@ -32,6 +32,7 @@ import {
     SuggestionVariantDialogComponent
 } from "@edition/function/components/suggestion/SuggestionVariantDialogComponent";
 import {FlowService} from "@edition/flow/services/Flow.service";
+import {parameterValueOfSuggestion} from "@edition/flow/utils/Flow.parameterValueOfSuggestion.util";
 import {DataTypeInputMenuEntriesComponent} from "@edition/datatype/components/inputs/DataTypeInputMenuEntriesComponent";
 import {DataTypeInputMenuModuleGroupsComponent} from "@edition/datatype/components/inputs/DataTypeInputMenuModuleGroupsComponent";
 
@@ -234,17 +235,8 @@ export const DataTypeInputMenuSuggestionsComponent: React.FC<DataTypeInputMenuSu
                                                                     return
                                                                 }
 
-                                                                if (picked.__typename === "NodeFunction") {
-                                                                    const addedNodeId = flowService.addPreviousNodeById(flowId, nodeId ?? null, picked)
-                                                                    if (!addedNodeId) return
-                                                                    onVariantSelect?.({
-                                                                        __typename: "ReferenceValue",
-                                                                        nodeFunctionId: addedNodeId
-                                                                    })
-                                                                    return
-                                                                }
-
-                                                                if (picked.__typename === "SubFlowValue" || picked.__typename === "ReferenceValue") onVariantSelect?.(picked)
+                                                                const created = parameterValueOfSuggestion(flowService, flowId, nodeId ?? null, picked, "parameter")
+                                                                if (created) onVariantSelect?.(created.value)
                                                             }}/>
 
     if (mode === "menu") {

@@ -24,6 +24,7 @@ import {exactSuggestions} from "@edition/datatype/utils/DataType.exactSuggestion
 import {IconPlus} from "@tabler/icons-react";
 import {useParams} from "next/navigation";
 import {FlowService} from "@edition/flow/services/Flow.service";
+import {parameterValueOfSuggestion} from "@edition/flow/utils/Flow.parameterValueOfSuggestion.util";
 import {useFunctionSuggestions} from "@edition/function/hooks/Function.suggestion.hook";
 import {SuggestionDialogComponent} from "@edition/function/components/suggestion/SuggestionDialogComponent";
 import {Suggestion} from "@edition/function/components/suggestion/Suggestion.util";
@@ -149,19 +150,10 @@ export const DataTypeListSubFlowInputComponent: React.FC<DataTypeListSubFlowInpu
                                    parameterIndex={props.parameterIndex}
                                    open={dialogOpen}
                                    onOpenChange={setDialogOpen}
-                                   onSuggestionSelect={value => {
-                                       if (value?.__typename === "NodeFunction") {
-                                           const addedNodeId = flowService.addPreviousNodeById(flowId, props.nodeId ?? null, value)
-                                           if (!addedNodeId) return
-                                           const reference: ReferenceValue = {
-                                               __typename: "ReferenceValue",
-                                               nodeFunctionId: addedNodeId
-                                           }
-                                           commit([...items, {key: keyOf(reference), value: reference}])
-                                           return
-                                       }
-                                       if (value?.__typename !== "SubFlowValue") return
-                                       commit([...items, {key: keyOf(value), value}])
+                                   onSuggestionSelect={suggestion => {
+                                       const created = parameterValueOfSuggestion(flowService, flowId, props.nodeId ?? null, suggestion, "parameter")
+                                       if (!created) return
+                                       commit([...items, {key: keyOf(created.value), value: created.value}])
                                    }}/>
         <SuggestionDialogComponent suggestions={functionSuggestions}
                                    flowId={flowId}
@@ -170,13 +162,10 @@ export const DataTypeListSubFlowInputComponent: React.FC<DataTypeListSubFlowInpu
                                    open={customLogicDialogOpen}
                                    onOpenChange={setCustomLogicDialogOpen}
                                    onBackSelect={hasNodeSuggestions ? () => setDialogOpen(true) : undefined}
-                                   onSuggestionSelect={value => {
-                                       if (value?.__typename === "NodeFunction") {
-                                           const nodeId = flowService.addNodeById(flowId, value)
-                                           value = {__typename: "SubFlowValue", startingNodeId: nodeId}
-                                       }
-                                       if (value?.__typename !== "SubFlowValue") return
-                                       commit([...items, {key: keyOf(value), value}])
+                                   onSuggestionSelect={suggestion => {
+                                       const created = parameterValueOfSuggestion(flowService, flowId, props.nodeId ?? null, suggestion, "catalogue")
+                                       if (!created) return
+                                       commit([...items, {key: keyOf(created.value), value: created.value}])
                                    }}/>
         {title && <InputLabel>{title}</InputLabel>}
         {description && <InputDescription>{description}</InputDescription>}
@@ -237,20 +226,11 @@ export const DataTypeListSubFlowInputComponent: React.FC<DataTypeListSubFlowInpu
                               const suggestion = menuReferences.get(key)
                               if (!suggestion) return
 
-                              if (suggestion.__typename === "NodeFunction") {
-                                  const addedNodeId = flowService.addPreviousNodeById(flowId, props.nodeId ?? null, suggestion)
-                                  if (!addedNodeId) return
+                              const created = parameterValueOfSuggestion(flowService, flowId, props.nodeId ?? null, suggestion, "parameter")
+                              if (!created) return
 
-                                  const created: ReferenceValue = {
-                                      __typename: "ReferenceValue",
-                                      nodeFunctionId: addedNodeId
-                                  }
-                                  menuReferences.set(key, created)
-                                  next.push({key, value: created})
-                                  return
-                              }
-
-                              next.push({key, value: suggestion as SubFlowValue | ReferenceValue})
+                              menuReferences.set(key, created.value)
+                              next.push({key, value: created.value})
                           })
 
                           commit(next)

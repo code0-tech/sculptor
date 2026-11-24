@@ -14,6 +14,7 @@ import {
     DataTypeInputMenuSuggestionsComponent
 } from "@edition/datatype/components/inputs/DataTypeInputMenuSuggestionsComponent";
 import {FlowService} from "@edition/flow/services/Flow.service";
+import {parameterValueOfSuggestion} from "@edition/flow/utils/Flow.parameterValueOfSuggestion.util";
 import {useMarkdownDocument} from "@edition/datatype/hooks/DataTypeMarkdown.document.hook";
 import {
     DataTypeMarkdownToolbarComponent
@@ -86,15 +87,10 @@ export const DataTypeMarkdownInputComponent: React.FC<DataTypeMarkdownInputCompo
 
         if (!selection || !range) return
 
-        const addedNodeId = suggestion.__typename === "NodeFunction"
-            ? flowService.addPreviousNodeById(flowId, nodeId ?? null, suggestion)
-            : undefined
+        const created = parameterValueOfSuggestion(flowService, flowId, nodeId ?? null, suggestion, "parameter")
+        if (!created) return
 
-        if (suggestion.__typename === "NodeFunction" && !addedNodeId) return
-
-        const reference: ReferenceValue | SubFlowValue = addedNodeId
-            ? {__typename: "ReferenceValue", nodeFunctionId: addedNodeId}
-            : suggestion as ReferenceValue | SubFlowValue
+        const reference: ReferenceValue | SubFlowValue = created.value
 
         const taken = new Set(markdown.referenced.current.keys())
         const signature = Array.from({length: taken.size + 1},

@@ -11,6 +11,7 @@ import {FlowService} from "@edition/flow/services/Flow.service";
 import {useParams} from "next/navigation";
 import {exactSuggestions} from "@edition/datatype/utils/DataType.exactSuggestions.util";
 import {ownSuggestionCertainties} from "@edition/datatype/utils/DataType.suggestionCertainties.util";
+import {parameterValueOfSuggestion} from "@edition/flow/utils/Flow.parameterValueOfSuggestion.util";
 
 
 export type DataTypeSubFlowInputComponentProps = DataTypeInputComponentProps
@@ -51,9 +52,11 @@ export const DataTypeSubFlowInputComponent: React.FC<DataTypeSubFlowInputCompone
                                    nodeId={props.nodeId}
                                    parameterIndex={props.parameterIndex}
                                    open={suggestionDialogOpen}
-                                   onSuggestionSelect={value => {
-                                       formValidation?.setValue?.(value ?? null)
-                                       onChangeDebounced(value ?? null)
+                                   onSuggestionSelect={suggestion => {
+                                       const created = parameterValueOfSuggestion(flowService, flowId, props.nodeId ?? null, suggestion, "parameter")
+                                       if (!created) return
+                                       formValidation?.setValue?.(created.value)
+                                       onChangeDebounced(created.value)
                                    }}
                                    onOpenChange={setSuggestionDialogOpen}/>
         <SuggestionDialogComponent suggestions={functionSuggestions}
@@ -62,16 +65,11 @@ export const DataTypeSubFlowInputComponent: React.FC<DataTypeSubFlowInputCompone
                                    parameterIndex={props.parameterIndex}
                                    open={customLogicDialogOpen}
                                    onBackSelect={hasExactMatches ? () => setSuggestionDialogOpen(true) : undefined}
-                                   onSuggestionSelect={value => {
-                                       if (value?.__typename === "NodeFunction") {
-                                           const nodeId = flowService.addNodeById(flowId, value)
-                                           value = {
-                                               __typename: "SubFlowValue",
-                                               startingNodeId: nodeId
-                                           }
-                                       }
-                                       formValidation?.setValue?.(value ?? null)
-                                       onChangeDebounced(value as SubFlowValue)
+                                   onSuggestionSelect={suggestion => {
+                                       const created = parameterValueOfSuggestion(flowService, flowId, props.nodeId ?? null, suggestion, "catalogue")
+                                       if (!created) return
+                                       formValidation?.setValue?.(created.value)
+                                       onChangeDebounced(created.value)
                                    }}
                                    onOpenChange={setCustomLogicDialogOpen}/>
         {title && <InputLabel>{title}</InputLabel>}

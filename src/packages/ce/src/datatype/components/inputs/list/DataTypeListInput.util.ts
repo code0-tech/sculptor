@@ -9,6 +9,7 @@ import {
 } from "@code0-tech/sagittarius-graphql-types";
 import {ListInput, NodeSchema, Schema} from "@code0-tech/triangulum";
 import {FlowService} from "@edition/flow/services/Flow.service";
+import {parameterValueOfSuggestion} from "@edition/flow/utils/Flow.parameterValueOfSuggestion.util";
 import {DataTypeInputComponentProps} from "@edition/datatype/components/inputs/DataTypeInputComponent";
 import {SuggestionTagKey, SuggestionValue} from "@edition/function/components/suggestion/Suggestion.util";
 import {sortSuggestions} from "@edition/datatype/utils/DataType.sortSuggestions.util";
@@ -104,12 +105,7 @@ export const toListEntry = (
     if (!value) return null
     if (value.__typename === "LiteralValue") return value.value as ListEntry
 
-    if (value.__typename === "NodeFunction") {
-        const addedNodeId = flowService.addPreviousNodeById(flowId, nodeId ?? null, value)
-        return addedNodeId ? {__typename: "ReferenceValue", nodeFunctionId: addedNodeId} : null
-    }
-
-    return value as ReferenceValue | SubFlowValue
+    return parameterValueOfSuggestion(flowService, flowId, nodeId ?? null, value, "parameter")?.value ?? null
 }
 
 const isListReference = (entry: ListEntry): entry is ReferenceValue | SubFlowValue =>

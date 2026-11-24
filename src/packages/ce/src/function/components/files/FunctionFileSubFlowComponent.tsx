@@ -15,6 +15,7 @@ import {
 } from "@code0-tech/pictor";
 import {Flow, FunctionDefinition, NodeFunction, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
 import {FlowService} from "@edition/flow/services/Flow.service";
+import {parameterValueOfSuggestion} from "@edition/flow/utils/Flow.parameterValueOfSuggestion.util";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent";
 import {
@@ -193,11 +194,8 @@ export const FunctionFileSubFlowComponent: React.FC<FunctionFileSubFlowComponent
                                                             ...inputProps.formValidation,
                                                             setValue: (value: NodeParameterValue | NodeFunction | null) => {
                                                                 if (value?.__typename !== "NodeFunction") return inputProps.formValidation?.setValue?.(value)
-                                                                const addedNodeId = flowService.addPreviousNodeById(flowId, nodeId, value)
-                                                                if (addedNodeId) inputProps.formValidation?.setValue?.({
-                                                                    __typename: "ReferenceValue",
-                                                                    nodeFunctionId: addedNodeId
-                                                                })
+                                                                const created = parameterValueOfSuggestion(flowService, flowId, nodeId, value, "parameter")
+                                                                if (created) inputProps.formValidation?.setValue?.(created.value)
                                                             }
                                                         }}/>
                             </div>

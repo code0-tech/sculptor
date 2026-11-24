@@ -30,6 +30,7 @@ export interface FlowBuilderEdgeDataProps extends Component<HTMLDivElement> {
     parameterName?: string
     addable?: boolean
     empty?: boolean
+    alongFlow?: boolean
     required?: boolean
 }
 
@@ -51,16 +52,18 @@ export const FlowBuilderEdgeComponent: React.FC<FlowBuilderEdgeProps> = memo((pr
 
     const isHorizontal = useFlowLayoutHorizontal()
     const isParameter = data?.type === "parameter"
+    // an along flow parameter sits where the flow runs, so its edge is the perpendicular one turned by 90°
+    const isAcross = isHorizontal !== !!data?.alongFlow
 
     const sourcePosition = React.useMemo(() => {
-        if (isParameter) return isHorizontal ? Position.Top : Position.Left
+        if (isParameter) return isAcross ? Position.Top : Position.Left
         return isHorizontal ? Position.Right : Position.Bottom
-    }, [isParameter, isHorizontal])
+    }, [isParameter, isAcross, isHorizontal])
 
     const targetPosition = React.useMemo(() => {
-        if (isParameter) return isHorizontal ? Position.Bottom : Position.Right
+        if (isParameter) return isAcross ? Position.Bottom : Position.Right
         return isHorizontal ? Position.Left : Position.Top
-    }, [isParameter, isHorizontal])
+    }, [isParameter, isAcross, isHorizontal])
 
     const [edgePath, labelX, labelY] = isParameter
         ? getBezierPath({
@@ -128,8 +131,8 @@ export const FlowBuilderEdgeComponent: React.FC<FlowBuilderEdgeProps> = memo((pr
     })
 
     const add = React.useMemo(
-        () => data?.addable ? edgeAddSegments(centeredPath ?? edgePath) : undefined,
-        [edgePath, centeredPath, data?.addable]
+        () => data?.addable ? edgeAddSegments(centeredPath ?? edgePath, data.alongFlow ? 0 : undefined) : undefined,
+        [edgePath, centeredPath, data?.addable, data?.alongFlow]
     )
 
     const color = data?.color ?? "#ffffff"
@@ -197,7 +200,7 @@ export const FlowBuilderEdgeComponent: React.FC<FlowBuilderEdgeProps> = memo((pr
                     >
                         <Badge color={"primary"} border>
                             {data!.parameterName}
-                            {data!.required ? <span style={{color: "var(--error)"}}>*</span> : null}
+                            {data!.required ? <span style={{color: "#D90429"}}>*</span> : null}
                         </Badge>
                     </div>
 
@@ -230,7 +233,7 @@ export const FlowBuilderEdgeComponent: React.FC<FlowBuilderEdgeProps> = memo((pr
                     >
                         <Badge color={"primary"} border>
                             {label}
-                            {data?.required ? <span style={{color: "var(--error)"}}>*</span> : null}
+                            {data?.required ? <span style={{color: "#D90429"}}>*</span> : null}
                         </Badge>
                     </div>
                 </EdgeLabelRenderer>
