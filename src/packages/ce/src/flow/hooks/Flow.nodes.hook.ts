@@ -173,6 +173,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                             isParameter: true,
                             parameterIndex: parameter.index,
                             parentNodeId: nodeId,
+                            alongFlow: parameter.alongFlow,
                             flowId: flowId,
                             color: hashToColor(`${nodeId}-slot-${parameter.index}`),
                             schema: nodeSchema

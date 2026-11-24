@@ -61,6 +61,18 @@ export const SuggestionDialogComponent: React.FC<SuggestionDialogComponentProps>
     const [currentTab, setCurrentTab] = React.useState<string>("group-0")
     const [holdCurrentTab, setHoldCurrentTab] = React.useState<string>("group-0")
 
+    // cmdk swaps the whole list content on every query but the scroll area around it keeps its offset, so
+    // the hits render at the top while the viewport still sits where the previous list left it. resetting
+    // inside onChange is too early: the position moves again once cmdk has re-rendered, so it is reset on
+    // the frame after as well, re-reading the viewport in case react replaced the node
+    const listArea = React.useRef<HTMLDivElement>(null)
+
+    const resetListScroll = React.useCallback(() => {
+        listArea.current?.querySelector("[data-radix-scroll-area-viewport]")?.scrollTo({top: 0})
+        requestAnimationFrame(() => requestAnimationFrame(() =>
+            listArea.current?.querySelector("[data-radix-scroll-area-viewport]")?.scrollTo({top: 0})))
+    }, [])
+
     return <>
         <SuggestionVariantDialogComponent suggestion={variantSuggestion}
                                          flowId={props.flowId}
@@ -99,6 +111,7 @@ export const SuggestionDialogComponent: React.FC<SuggestionDialogComponentProps>
                         </Flex>
                     </div>}
                     topContent={<div style={{padding: "0.35rem 0.7rem"}}><CommandInput onChange={(event) => {
+                        resetListScroll()
                         if (event.target.value == "") {
                             setCurrentTab(holdCurrentTab)
                         } else {
@@ -134,74 +147,76 @@ export const SuggestionDialogComponent: React.FC<SuggestionDialogComponentProps>
                                         <ScrollAreaThumb/>
                                     </ScrollAreaScrollbar>
                                 </ScrollArea>}>
-                            <ScrollArea h={"100%"} w={"100%"} type={"always"}>
-                                <ScrollAreaViewport style={{minWidth: "auto"}}>
-                                    <CommandList w={"100%"}>
-                                        <CommandEmpty>No results found.</CommandEmpty>
-                                        {onBackSelect ? <>
-                                            <CommandItem keywords={["back", "previous suggestions"]}
-                                                         display={"block"}
-                                                         my={0.7}
-                                                         style={{boxSizing: "border-box", overflow: "hidden"}}
-                                                         value={"back"} onSelect={() => {
-                                                onBackSelect()
-                                                props.onOpenChange?.(false)
-                                            }}>
-                                                <Flex style={{gap: "0.35rem"}} align={"center"}>
-                                                    <IconChevronLeft size={16}/>
-                                                    <Text size={"sm"}>Back</Text>
-                                                </Flex>
-                                                <Spacing spacing={"xxs"}/>
-                                                <Text hierarchy={"tertiary"} size={"sm"}>
-                                                    Return to the suggestions for this parameter.
-                                                </Text>
-                                            </CommandItem>
-                                            <CommandSeparator/>
-                                        </> : null}
-                                        {suggestions.map((group, index) => {
-                                            return currentTab === `group-${index}` && <>
-                                                {group.suggestions.map((suggestion, suggestionIndex) => {
+                            <div ref={listArea} style={{display: "contents"}}>
+                                <ScrollArea h={"100%"} w={"100%"} type={"always"}>
+                                    <ScrollAreaViewport style={{minWidth: "auto"}}>
+                                        <CommandList w={"100%"}>
+                                            <CommandEmpty>No results found.</CommandEmpty>
+                                            {onBackSelect ? <>
+                                                <CommandItem keywords={["back", "previous suggestions"]}
+                                                             display={"block"}
+                                                             my={0.7}
+                                                             style={{boxSizing: "border-box", overflow: "hidden"}}
+                                                             value={"back"} onSelect={() => {
+                                                    onBackSelect()
+                                                    props.onOpenChange?.(false)
+                                                }}>
+                                                    <Flex style={{gap: "0.35rem"}} align={"center"}>
+                                                        <IconChevronLeft size={16}/>
+                                                        <Text size={"sm"}>Back</Text>
+                                                    </Flex>
+                                                    <Spacing spacing={"xxs"}/>
+                                                    <Text hierarchy={"tertiary"} size={"sm"}>
+                                                        Return to the suggestions for this parameter.
+                                                    </Text>
+                                                </CommandItem>
+                                                <CommandSeparator/>
+                                            </> : null}
+                                            {suggestions.map((group, index) => {
+                                                return currentTab === `group-${index}` && <>
+                                                    {group.suggestions.map((suggestion, suggestionIndex) => {
 
-                                                    const directValue = suggestion.variants.find(variant => variant.__typename === "SubFlowValue")
-                                                    const resultValue = suggestion.variants.find(variant => variant.__typename === "NodeFunction")
+                                                        const directValue = suggestion.variants.find(variant => variant.__typename === "SubFlowValue")
+                                                        const resultValue = suggestion.variants.find(variant => variant.__typename === "NodeFunction")
 
-                                                    return <React.Fragment key={suggestionIndex}>
-                                                        <CommandItem keywords={[...(suggestion?.aliases ?? []), suggestion.displayMessage].filter((keyword): keyword is string => typeof keyword === "string")}
-                                                                     display={"block"}
-                                                                     my={0.7}
-                                                                     style={{boxSizing: "border-box", overflow: "hidden"}}
-                                                                     value={suggestionIndex.toString()} onSelect={() => {
-                                                            if (directValue && resultValue) {
-                                                                setVariantSuggestion(suggestion)
+                                                        return <React.Fragment key={suggestionIndex}>
+                                                            <CommandItem keywords={[...(suggestion?.aliases ?? []), suggestion.displayMessage].filter((keyword): keyword is string => typeof keyword === "string")}
+                                                                         display={"block"}
+                                                                         my={0.7}
+                                                                         style={{boxSizing: "border-box", overflow: "hidden"}}
+                                                                         value={suggestionIndex.toString()} onSelect={() => {
+                                                                if (directValue && resultValue) {
+                                                                    setVariantSuggestion(suggestion)
+                                                                    props.onOpenChange?.(false)
+                                                                    return
+                                                                }
+                                                                onSuggestionSelect?.(suggestion.value)
                                                                 props.onOpenChange?.(false)
-                                                                return
-                                                            }
-                                                            onSuggestionSelect?.(suggestion.value)
-                                                            props.onOpenChange?.(false)
-                                                        }}>
-                                                            <Flex style={{gap: "0.35rem"}} align={"center"}>
-                                                                <Icon icon={suggestion.icon as IconString}
-                                                                      color={hashToColor(`group-${index}`)}
-                                                                      size={16}/>
-                                                                <Text size={"sm"}>{suggestion.displayMessage}</Text>
-                                                                {directValue && resultValue ?
-                                                                    <IconChevronRight size={13}/> : null}
-                                                            </Flex>
-                                                            <Spacing spacing={"xxs"}/>
-                                                            <Text hierarchy={"tertiary"}
-                                                                  size={"sm"}>{suggestion.description}</Text>
-                                                        </CommandItem>
-                                                        <CommandSeparator/>
-                                                    </React.Fragment>
-                                                })}
-                                            </>
-                                        })}
-                                    </CommandList>
-                                </ScrollAreaViewport>
-                                <ScrollAreaScrollbar orientation={"vertical"}>
-                                    <ScrollAreaThumb/>
-                                </ScrollAreaScrollbar>
-                            </ScrollArea>
+                                                            }}>
+                                                                <Flex style={{gap: "0.35rem"}} align={"center"}>
+                                                                    <Icon icon={suggestion.icon as IconString}
+                                                                          color={hashToColor(`group-${index}`)}
+                                                                          size={16}/>
+                                                                    <Text size={"sm"}>{suggestion.displayMessage}</Text>
+                                                                    {directValue && resultValue ?
+                                                                        <IconChevronRight size={13}/> : null}
+                                                                </Flex>
+                                                                <Spacing spacing={"xxs"}/>
+                                                                <Text hierarchy={"tertiary"}
+                                                                      size={"sm"}>{suggestion.description}</Text>
+                                                            </CommandItem>
+                                                            <CommandSeparator/>
+                                                        </React.Fragment>
+                                                    })}
+                                                </>
+                                            })}
+                                        </CommandList>
+                                    </ScrollAreaViewport>
+                                    <ScrollAreaScrollbar orientation={"vertical"}>
+                                        <ScrollAreaThumb/>
+                                    </ScrollAreaScrollbar>
+                                </ScrollArea>
+                            </div>
                         </Layout>
                     </Tab>
                 </Card>

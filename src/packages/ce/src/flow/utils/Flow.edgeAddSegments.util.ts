@@ -11,15 +11,17 @@ export interface EdgeAddSegments {
 
 // the add button rides on the middle of the existing edge: the node side half becomes the white standard
 // edge carrying the parameter label, the parameter side keeps the parameter colour. de casteljau cuts the
-// curve so both halves stay exact beziers and nothing is painted twice where they meet
-export const edgeAddSegments = (path: string): EdgeAddSegments | undefined => {
+// curve so both halves stay exact beziers and nothing is painted twice where they meet.
+// split 0 puts the button on the source itself, which is what an empty slot wants: the box the layout
+// reserves is the button, and nothing is left over behind it
+export const edgeAddSegments = (path: string, split?: number): EdgeAddSegments | undefined => {
     const points = path.match(/-?\d+(?:\.\d+)?/g)?.map(Number)
 
     if (!points || points.length < 8) return undefined
 
     const [x0, y0, x1, y1, x2, y2, x3, y3] = points
     const curve: BezierCurve = [[x0, y0], [x1, y1], [x2, y2], [x3, y3]]
-    const t = bezierMiddle(curve)
+    const t = split ?? bezierMiddle(curve)
 
     const first: BezierPoint = [x0 + (x1 - x0) * t, y0 + (y1 - y0) * t]
     const second: BezierPoint = [x1 + (x2 - x1) * t, y1 + (y2 - y1) * t]

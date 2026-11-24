@@ -22,9 +22,11 @@ export const centerFunctionNode = (
     previousPlacement?: string,
     attempt: number = 0
 ) => {
-    const node = reactFlow.getNode(nodeId)
-    const placement = node?.measured?.width && node?.measured?.height
-        ? `${node.position.x}:${node.position.y}:${node.measured.width}:${node.measured.height}`
+    // a node inside a group carries a position relative to that group, so only the absolute one centres
+    const node = reactFlow.getInternalNode(nodeId)
+    const position = node?.internals?.positionAbsolute ?? node?.position
+    const placement = node?.measured?.width && node?.measured?.height && position
+        ? `${position.x}:${position.y}:${node.measured.width}:${node.measured.height}`
         : undefined
 
     if (!placement || placement !== previousPlacement) {
@@ -33,8 +35,8 @@ export const centerFunctionNode = (
     }
 
     reactFlow.setCenter(
-        node!.position.x + node!.measured!.width! / 2,
-        node!.position.y + node!.measured!.height! / 2,
+        position!.x + node!.measured!.width! / 2,
+        position!.y + node!.measured!.height! / 2,
         {zoom: reactFlow.getZoom(), duration: 250}
     )
 }

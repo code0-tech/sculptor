@@ -15,6 +15,7 @@ import {
 } from "@code0-tech/pictor";
 import {Flow, FunctionDefinition, NodeFunction, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
 import {FlowService} from "@edition/flow/services/Flow.service";
+import {parameterValueOfSuggestion} from "@edition/flow/utils/Flow.parameterValueOfSuggestion.util";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {DataTypeInputComponent} from "@edition/datatype/components/inputs/DataTypeInputComponent";
 import {
@@ -26,6 +27,7 @@ import {
 import {useSubFlowSchema} from "@edition/flow/hooks/Flow.subFlowSchema.hook";
 import {isSubFlowSchema} from "@edition/flow/utils/Flow.subFlowSchema.util";
 import {useShownOptionalInputs} from "@edition/function/hooks/Function.optionalInputs.hook";
+import {hasParameterValue} from "@edition/flow/utils/Flow.parameterValue.util";
 import {
     FunctionFileOptionalInputMenuComponent
 } from "@edition/function/components/files/FunctionFileOptionalInputMenuComponent";
@@ -79,7 +81,7 @@ export const FunctionFileSubFlowComponent: React.FC<FunctionFileSubFlowComponent
 
     const parametersWithValue = React.useMemo(() => (definition?.parameterDefinitions?.nodes ?? [])
         .filter(parameterDefinition => parameterDefinition?.optional
-            && subFlow?.parameters?.find(candidate => candidate?.identifier === parameterDefinition?.identifier)?.value != null)
+            && hasParameterValue(subFlow?.parameters?.find(candidate => candidate?.identifier === parameterDefinition?.identifier)?.value))
         .map(parameterDefinition => parameterDefinition!.id!), [definition, subFlow])
 
     const [shownParameters, showParameter] = useShownOptionalInputs(parametersWithValue)
@@ -179,6 +181,7 @@ export const FunctionFileSubFlowComponent: React.FC<FunctionFileSubFlowComponent
                                                         cast={parameter?.cast ?? null}
                                                         onChange={() => {
                                                             changedParameter.current.add(parameterDefinition.id!)
+                                                            showParameter(parameterDefinition.id!)
                                                             validate()
                                                         }}
                                                         onCastChange={changedCast => {
@@ -191,11 +194,8 @@ export const FunctionFileSubFlowComponent: React.FC<FunctionFileSubFlowComponent
                                                             ...inputProps.formValidation,
                                                             setValue: (value: NodeParameterValue | NodeFunction | null) => {
                                                                 if (value?.__typename !== "NodeFunction") return inputProps.formValidation?.setValue?.(value)
-                                                                const addedNodeId = flowService.addPreviousNodeById(flowId, nodeId, value)
-                                                                if (addedNodeId) inputProps.formValidation?.setValue?.({
-                                                                    __typename: "ReferenceValue",
-                                                                    nodeFunctionId: addedNodeId
-                                                                })
+                                                                const created = parameterValueOfSuggestion(flowService, flowId, nodeId, value, "parameter")
+                                                                if (created) inputProps.formValidation?.setValue?.(created.value)
                                                             }
                                                         }}/>
                             </div>

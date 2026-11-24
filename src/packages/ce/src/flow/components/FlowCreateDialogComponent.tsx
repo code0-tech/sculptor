@@ -105,6 +105,12 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
     const [currentTab, setCurrentTab] = React.useState<string>("group-0")
     const [holdCurrentTab, setHoldCurrentTab] = React.useState<string>("group-0")
 
+    // cmdk swaps the whole list content on every query but the scroll area around it keeps its offset, so
+    // the hits render at the top while the viewport still sits where the previous list left it. resetting
+    // inside onChange is too early: the position moves again once cmdk has re-rendered, so it is reset on
+    // the frame after as well, re-reading the viewport in case react replaced the node
+    const listArea = React.useRef<HTMLDivElement>(null)
+
     const selectedFlowType = React.useMemo(() => {
         return flowTypeService.getById(selectedFlowTypeId)
     }, [selectedFlowTypeId, flowTypeStore])
@@ -249,6 +255,12 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
     }, [resolutions, modules])
 
     const groups = mode === "template" ? templateGroups : flowTypeGroups
+
+    const resetListScroll = React.useCallback(() => {
+        listArea.current?.querySelector("[data-radix-scroll-area-viewport]")?.scrollTo({top: 0})
+        requestAnimationFrame(() => requestAnimationFrame(() =>
+            listArea.current?.querySelector("[data-radix-scroll-area-viewport]")?.scrollTo({top: 0})))
+    }, [])
 
     const createFlow = React.useCallback((name: string, type: FlowType['id']) => {
         if (!type) return
@@ -395,6 +407,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                         <Flex align={"center"} style={{gap: "0.7rem"}}>
                             <div style={{flex: 1}}>
                                 <CommandInput onChange={(event) => {
+                                    resetListScroll()
                                     if (event.target.value == "") {
                                         setCurrentTab(holdCurrentTab)
                                     } else {
@@ -454,79 +467,81 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
                                         <ScrollAreaThumb/>
                                     </ScrollAreaScrollbar>
                                 </ScrollArea>}>
-                            <ScrollArea h={"100%"} w={"100%"} type={"always"}>
-                                <ScrollAreaViewport style={{minWidth: "auto"}}>
-                                    <CommandList w={"100%"} data-qa-selector={"flow-create-list"}>
-                                        <CommandEmpty>No results found.</CommandEmpty>
-                                        {mode === "template" ? templateGroups.map((group, index) => {
-                                            return currentTab === `group-${index}` && <>
-                                                {group.resolutions.map((resolution, resolutionIndex) => {
+                            <div ref={listArea} style={{display: "contents"}}>
+                                <ScrollArea h={"100%"} w={"100%"} type={"always"}>
+                                    <ScrollAreaViewport style={{minWidth: "auto"}}>
+                                        <CommandList w={"100%"} data-qa-selector={"flow-create-list"}>
+                                            <CommandEmpty>No results found.</CommandEmpty>
+                                            {mode === "template" ? templateGroups.map((group, index) => {
+                                                return currentTab === `group-${index}` && <>
+                                                    {group.resolutions.map((resolution, resolutionIndex) => {
 
-                                                    const template = resolution.template
+                                                        const template = resolution.template
 
-                                                    return <>
-                                                        <CommandItem
-                                                            data-qa-selector={"flow-create-template-select-item"}
-                                                            keywords={[template.name, template.description, resolution.flowType?.names?.[0]?.content ?? ""]}
-                                                            display={"block"}
-                                                            my={0.7}
-                                                            style={{boxSizing: "border-box", overflow: "hidden"}}
-                                                            value={resolutionIndex.toString()} onSelect={() => {
-                                                            setSelectedTemplateSlug(template.slug)
-                                                            setSelectedFlowTypeId(resolution.flowType?.id)
-                                                            setStep("name")
-                                                        }}>
-                                                            <Flex style={{gap: "0.35rem"}} align={"center"}>
-                                                                <Icon icon={resolution.flowType?.displayIcon as IconString}
-                                                                      color={hashToColor(`group-${index}`)}
-                                                                      size={16}/>
-                                                                <Text size={"sm"}>{template.name}</Text>
-                                                            </Flex>
-                                                            <Spacing spacing={"xxs"}/>
-                                                            <Text hierarchy={"tertiary"} size={"sm"}>
-                                                                {template.description}
-                                                            </Text>
-                                                        </CommandItem>
-                                                        <CommandSeparator/>
-                                                    </>
-                                                })}
-                                            </>
-                                        }) : flowTypeGroups.map((group, index) => {
-                                            return currentTab === `group-${index}` && <>
-                                                {group.flowTypes.map((flowType, flowTypeIndex) => {
-                                                    return <>
-                                                        <CommandItem
-                                                            data-qa-selector={"flow-create-trigger-select-item"}
-                                                            keywords={[...(flowType.aliases?.[0]?.content ?? "").split(";"), flowType.names?.[0]?.content ?? FALLBACK_FLOW_TYPE_NAME]}
-                                                            display={"block"}
-                                                            my={0.7}
-                                                            style={{boxSizing: "border-box", overflow: "hidden"}}
-                                                            value={flowTypeIndex.toString()} onSelect={() => {
-                                                            setSelectedFlowTypeId(flowType.id)
-                                                            setStep("name")
-                                                        }}>
-                                                            <Flex style={{gap: "0.35rem"}} align={"center"}>
-                                                                <Icon icon={flowType.displayIcon as IconString}
-                                                                      color={hashToColor(`group-${index}`)}
-                                                                      size={16}/>
-                                                                <Text
-                                                                    size={"sm"}>{flowType.names?.[0]?.content ?? FALLBACK_FLOW_TYPE_NAME}</Text>
-                                                            </Flex>
-                                                            <Spacing spacing={"xxs"}/>
-                                                            <Text hierarchy={"tertiary"}
-                                                                  size={"sm"}>{flowType.descriptions?.[0]?.content}</Text>
-                                                        </CommandItem>
-                                                        <CommandSeparator/>
-                                                    </>
-                                                })}
-                                            </>
-                                        })}
-                                    </CommandList>
-                                </ScrollAreaViewport>
-                                <ScrollAreaScrollbar orientation={"vertical"}>
-                                    <ScrollAreaThumb/>
-                                </ScrollAreaScrollbar>
-                            </ScrollArea>
+                                                        return <>
+                                                            <CommandItem
+                                                                data-qa-selector={"flow-create-template-select-item"}
+                                                                keywords={[template.name, template.description, resolution.flowType?.names?.[0]?.content ?? ""]}
+                                                                display={"block"}
+                                                                my={0.7}
+                                                                style={{boxSizing: "border-box", overflow: "hidden"}}
+                                                                value={resolutionIndex.toString()} onSelect={() => {
+                                                                setSelectedTemplateSlug(template.slug)
+                                                                setSelectedFlowTypeId(resolution.flowType?.id)
+                                                                setStep("name")
+                                                            }}>
+                                                                <Flex style={{gap: "0.35rem"}} align={"center"}>
+                                                                    <Icon icon={resolution.flowType?.displayIcon as IconString}
+                                                                          color={hashToColor(`group-${index}`)}
+                                                                          size={16}/>
+                                                                    <Text size={"sm"}>{template.name}</Text>
+                                                                </Flex>
+                                                                <Spacing spacing={"xxs"}/>
+                                                                <Text hierarchy={"tertiary"} size={"sm"}>
+                                                                    {template.description}
+                                                                </Text>
+                                                            </CommandItem>
+                                                            <CommandSeparator/>
+                                                        </>
+                                                    })}
+                                                </>
+                                            }) : flowTypeGroups.map((group, index) => {
+                                                return currentTab === `group-${index}` && <>
+                                                    {group.flowTypes.map((flowType, flowTypeIndex) => {
+                                                        return <>
+                                                            <CommandItem
+                                                                data-qa-selector={"flow-create-trigger-select-item"}
+                                                                keywords={[...(flowType.aliases?.[0]?.content ?? "").split(";"), flowType.names?.[0]?.content ?? FALLBACK_FLOW_TYPE_NAME]}
+                                                                display={"block"}
+                                                                my={0.7}
+                                                                style={{boxSizing: "border-box", overflow: "hidden"}}
+                                                                value={flowTypeIndex.toString()} onSelect={() => {
+                                                                setSelectedFlowTypeId(flowType.id)
+                                                                setStep("name")
+                                                            }}>
+                                                                <Flex style={{gap: "0.35rem"}} align={"center"}>
+                                                                    <Icon icon={flowType.displayIcon as IconString}
+                                                                          color={hashToColor(`group-${index}`)}
+                                                                          size={16}/>
+                                                                    <Text
+                                                                        size={"sm"}>{flowType.names?.[0]?.content ?? FALLBACK_FLOW_TYPE_NAME}</Text>
+                                                                </Flex>
+                                                                <Spacing spacing={"xxs"}/>
+                                                                <Text hierarchy={"tertiary"}
+                                                                      size={"sm"}>{flowType.descriptions?.[0]?.content}</Text>
+                                                            </CommandItem>
+                                                            <CommandSeparator/>
+                                                        </>
+                                                    })}
+                                                </>
+                                            })}
+                                        </CommandList>
+                                    </ScrollAreaViewport>
+                                    <ScrollAreaScrollbar orientation={"vertical"}>
+                                        <ScrollAreaThumb/>
+                                    </ScrollAreaScrollbar>
+                                </ScrollArea>
+                            </div>
                         </Layout>
                     </Tab>
                 </Card>

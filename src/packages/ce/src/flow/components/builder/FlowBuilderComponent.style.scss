@@ -19,12 +19,27 @@
   }
 
   &[data-tree-visibility=true] {
-    .react-flow__node, .react-flow__edgelabel-renderer, .react-flow__edge {
+    .react-flow__node, .react-flow__edge {
       opacity: 1;
       pointer-events: auto;
       will-change: opacity, stroke-dashoffset;
       -webkit-will-change: opacity, stroke-dashoffset;
     }
+
+    .react-flow__edgelabel-renderer {
+      opacity: 1;
+      will-change: opacity, stroke-dashoffset;
+      -webkit-will-change: opacity, stroke-dashoffset;
+    }
+  }
+
+  // react flow paints the node layer after the edge labels, so a group card would cover the labels and
+  // + ports of its own children - the labels sit on the edges between nodes and belong on top.
+  // the layer itself has to stay click through or it covers the whole canvas: only the labels and the
+  // + ports take pointer events, and they ask for them themselves
+  .react-flow__edgelabel-renderer {
+    z-index: 1;
+    pointer-events: none;
   }
 
   .react-flow__panel.bottom.left .button-group {

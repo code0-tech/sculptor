@@ -16,12 +16,11 @@ import {FlowService} from "@edition/flow/services/Flow.service";
 import {FunctionService} from "@edition/function/services/Function.service";
 import {SuggestionDialogComponent} from "@edition/function/components/suggestion/SuggestionDialogComponent";
 import {useFunctionSuggestions} from "@edition/function/hooks/Function.suggestion.hook";
-import {exactSuggestions} from "@edition/datatype/utils/DataType.exactSuggestions.util";
-import {ownSuggestionCertainties} from "@edition/datatype/utils/DataType.suggestionCertainties.util";
+import {parameterNodeSuggestions} from "@edition/flow/utils/Flow.parameterNodeSuggestions.util";
 import {
-    listElementSuggestions,
-    listNodeSuggestions
-} from "@edition/datatype/components/inputs/list/DataTypeListInput.util";
+    parameterValueOfSuggestion,
+    SuggestionOrigin
+} from "@edition/flow/utils/Flow.parameterValueOfSuggestion.util";
 import {setSelectedFunctionNode} from "@edition/function/hooks/FunctionNode.selected.hook";
 
 export interface FunctionNodeParameterPortComponentProps {
@@ -65,31 +64,27 @@ export const FunctionNodeParameterPortComponent: React.FC<FunctionNodeParameterP
     const isList = input !== "sub-flow"
     const signaturePrefix = input === "list-sub-flow" ? "sub_flow" : "item"
 
-    const suggestions = React.useMemo(() => {
-        const parameterSuggestions = (parameterSchema?.schema?.suggestions ?? []) as (NodeFunction | SubFlowValue | ReferenceValue | LiteralValue)[]
+    // the only dialog that mixes both sources: triangulum's own suggestions when it has any, the whole
+    // function catalogue otherwise - and that fallback is exactly what makes a picked function a sub flow
+    const ownSuggestions = React.useMemo(
+        () => parameterNodeSuggestions(parameterSchema),
+        [parameterSchema]
+    )
 
-        const available = (input === "sub-flow"
-            ? exactSuggestions(parameterSuggestions, ownSuggestionCertainties(parameterSchema))
-            : input === "list-sub-flow"
-                ? listNodeSuggestions(parameterSchema, parameterSuggestions)
-                : listElementSuggestions(parameterSchema, parameterSuggestions))
-            .filter(suggestion => suggestion.__typename === "SubFlowValue"
-                || suggestion.__typename === "NodeFunction")
+    const origin: SuggestionOrigin = ownSuggestions.length > 0 ? "parameter" : "catalogue"
 
-        return available.length > 0 ? available : functionSuggestions
-    }, [parameterSchema, input, functionSuggestions])
+    const suggestions = React.useMemo(
+        () => ownSuggestions.length > 0 ? ownSuggestions : functionSuggestions,
+        [ownSuggestions, functionSuggestions]
+    )
 
     const onSuggestionSelect = React.useCallback(async (suggestion: NodeFunction | SubFlowValue | ReferenceValue | LiteralValue) => {
-        const addedNodeId = suggestion.__typename === "NodeFunction"
-            ? flowService.addPreviousNodeById(flowId, nodeId, suggestion)
-            : undefined
+        if (suggestion.__typename === "LiteralValue") return
 
-        if (suggestion.__typename === "NodeFunction" && !addedNodeId) return
+        const created = parameterValueOfSuggestion(flowService, flowId, nodeId ?? null, suggestion, origin)
+        if (!created) return
 
-        const value = (addedNodeId
-            ? {__typename: "ReferenceValue", nodeFunctionId: addedNodeId}
-            : suggestion) as SubFlowValue | ReferenceValue | LiteralValue
-
+        const {value, addedNodeId} = created
         const emptySubFlow = value.__typename === "SubFlowValue" && !value.startingNodeId
 
         if (!isList) {
@@ -114,13 +109,13 @@ export const FunctionNodeParameterPortComponent: React.FC<FunctionNodeParameterP
             references: [...currentReferences, {
                 __typename: "InlineReferenceValue",
                 signature: signature,
-                value: value as SubFlowValue | ReferenceValue
+                value: value
             } as InlineReferenceValue]
         } as LiteralValue, definition)
 
         const selectedNodeId = addedNodeId ?? (emptySubFlow ? `${nodeId}-${parameterIndex}-${signature}` : undefined)
         if (selectedNodeId) setSelectedFunctionNode(selectedNodeId, reactFlow)
-    }, [flowService, flowId, nodeId, parameterIndex, definition, isList, signaturePrefix, node, reactFlow])
+    }, [flowService, flowId, nodeId, parameterIndex, definition, isList, origin, signaturePrefix, node, reactFlow])
 
     return <>
         <SuggestionDialogComponent suggestions={suggestions}
