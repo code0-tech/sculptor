@@ -2,7 +2,6 @@
 
 import React from "react";
 import {usePathname} from "next/navigation";
-import {markDialogPathname} from "@core/util/Navigation.lastPage.util";
 import {
     Button,
     Card,
@@ -40,10 +39,6 @@ export const InputDialog: React.FC<InputDialogProps> = (props) => {
     React.useEffect(() => {
         setClosing(false)
     }, [pathname, open])
-
-    React.useEffect(() => {
-        if (open) markDialogPathname(route.current)
-    }, [])
 
     return <Dialog open={open && !closing && pathname === route.current} onOpenChange={(next) => {
         setClosing(!next)

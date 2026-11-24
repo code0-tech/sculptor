@@ -3,6 +3,7 @@
 import React from "react";
 import {useService, useStore} from "@code0-tech/pictor";
 import {notFound, useParams, useRouter} from "next/navigation";
+import {closeDialog} from "@core/util/Navigation.lastPage.util";
 import {Runtime} from "@code0-tech/sagittarius-graphql-types";
 import {RuntimeService} from "@edition/runtime/services/Runtime.service";
 import {RuntimeSettingsDialogComponent} from "@edition/runtime/components/RuntimeSettingsDialogComponent";
@@ -34,6 +35,6 @@ export const RuntimeSettingsPage: React.FC = () => {
                                            open={true}
                                            onOpenChange={(open) => {
                                                if (open) return
-                                               router.replace(runtimesHref)
+                                               closeDialog(router, runtimesHref)
                                            }}/>
 }

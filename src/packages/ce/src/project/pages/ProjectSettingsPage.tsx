@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react";
-import {lastPageUrl} from "@core/util/Navigation.lastPage.util";
+import {closeDialog} from "@core/util/Navigation.lastPage.util";
 import {useParams, useRouter} from "next/navigation";
 import {ProjectSettingsDialogComponent} from "@edition/project/components/ProjectSettingsDialogComponent";
 
@@ -17,6 +17,6 @@ export const ProjectSettingsPage: React.FC = () => {
     return <ProjectSettingsDialogComponent open={true}
                                            onOpenChange={(open) => {
                                                if (open) return
-                                               router.replace(lastPageUrl() ?? projectHref)
+                                               closeDialog(router, projectHref)
                                            }}/>
 }

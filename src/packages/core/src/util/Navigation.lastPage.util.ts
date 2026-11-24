@@ -1,13 +1,19 @@
-const dialogPathnames: string[] = []
-const pageUrls: string[] = []
+const visitedUrls: string[] = []
 
-export const markDialogPathname = (pathname: string) => {
-    if (!dialogPathnames.includes(pathname)) dialogPathnames.push(pathname)
+interface DialogRouter {
+    back: () => void
+    replace: (url: string) => void
 }
 
 export const recordPageUrl = (url: string) => {
-    if (dialogPathnames.includes(url.split("?")[0]) || pageUrls[pageUrls.length - 1] === url) return
-    pageUrls.push(url)
+    const last = visitedUrls[visitedUrls.length - 1]
+    if (last === url) return
+    if (last?.split("?")[0] === url.split("?")[0]) visitedUrls[visitedUrls.length - 1] = url
+    else visitedUrls.push(url)
+    if (visitedUrls.length > 50) visitedUrls.shift()
 }
 
-export const lastPageUrl = () => pageUrls[pageUrls.length - 1]
+export const closeDialog = (router: DialogRouter, fallbackUrl: string) => {
+    if (visitedUrls.length > 1) return router.back()
+    router.replace(fallbackUrl)
+}

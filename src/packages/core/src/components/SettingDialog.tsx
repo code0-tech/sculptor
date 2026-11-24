@@ -21,7 +21,6 @@ import {
 } from "@code0-tech/pictor";
 import {Tab, TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
-import {markDialogPathname} from "@core/util/Navigation.lastPage.util";
 
 export interface SettingDialogTab {
     value: string
@@ -61,10 +60,6 @@ export const SettingDialog: React.FC<SettingDialogProps> = (props) => {
     React.useEffect(() => {
         setClosing(false)
     }, [pathname, open])
-
-    React.useEffect(() => {
-        if (open) markDialogPathname(route.current)
-    }, [])
 
     return <Dialog open={open && !closing && pathname === route.current} onOpenChange={(next) => {
         setClosing(!next)
