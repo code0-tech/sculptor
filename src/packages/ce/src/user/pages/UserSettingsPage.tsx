@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react";
-import {lastPageUrl} from "@core/util/Navigation.lastPage.util";
+import {closeDialog} from "@core/util/Navigation.lastPage.util";
 import {notFound, useParams, useRouter} from "next/navigation";
 import {useService, useStore} from "@code0-tech/pictor";
 import {User} from "@code0-tech/sagittarius-graphql-types";
@@ -39,6 +39,6 @@ export const UserSettingsPage: React.FC = () => {
                                     onOpenChange={(open) => {
                                         if (open) return
                                         if (!isMe) router.replace("/settings?tab=users")
-                                        else router.replace(lastPageUrl() ?? "/users/@me")
+                                        else closeDialog(router, "/users/@me")
                                     }}/>
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react";
-import {lastPageUrl} from "@core/util/Navigation.lastPage.util";
+import {closeDialog} from "@core/util/Navigation.lastPage.util";
 import {useParams, useRouter} from "next/navigation";
 import {ModuleConfigurationDialogComponent} from "@ce-internal/module/components/ModuleConfigurationDialogComponent";
 
@@ -17,6 +17,6 @@ export const ModuleConfigurationPage: React.FC = () => {
     return <ModuleConfigurationDialogComponent open={true}
                                                onOpenChange={(open) => {
                                                    if (open) return
-                                                   router.replace(lastPageUrl() ?? moduleHref)
+                                                   closeDialog(router, moduleHref)
                                                }}/>
 }
