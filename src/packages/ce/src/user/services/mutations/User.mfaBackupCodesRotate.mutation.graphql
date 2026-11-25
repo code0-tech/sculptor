@@ -1,5 +1,7 @@
-mutation mfaBackupCodesRotate {
-    usersMfaBackupCodesRotate(input: {}) {
+mutation mfaBackupCodesRotate($mfa: MfaInput) {
+    usersMfaBackupCodesRotate(input: {
+        mfa: $mfa
+    }) {
         errors {
             ...on Error {
                 errorCode,
