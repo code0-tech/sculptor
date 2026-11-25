@@ -24,7 +24,9 @@ export class FunctionService extends ReactiveArrayService<FunctionDefinition, Fu
     }
 
     values(dependencies?: FunctionDependencies): FunctionDefinition[] {
-        const functions = super.values()
+        // a soft removed function definition no longer exists for the user - it has to look like a definition
+        // that was never found, so it is dropped before anything can resolve it
+        const functions = super.values().filter(functionD => !functionD.removedAt)
         if (!dependencies?.namespaceId || !dependencies.projectId || !dependencies.runtimeId) return functions
 
         const namespaceId = dependencies.namespaceId

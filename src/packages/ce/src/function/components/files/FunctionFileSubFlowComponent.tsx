@@ -116,7 +116,7 @@ export const FunctionFileSubFlowComponent: React.FC<FunctionFileSubFlowComponent
         {(() => {
             const indexedParameters = definition?.parameterDefinitions?.nodes
                 ?.map((parameterDefinition, index) => ({parameterDefinition, index}))
-                ?.filter(({parameterDefinition}) => parameterDefinition && !parameterDefinition.hidden) ?? []
+                ?.filter(({parameterDefinition}) => parameterDefinition && !parameterDefinition.hidden && !parameterDefinition.removedAt) ?? []
 
             const requiredParameters = indexedParameters.filter(({parameterDefinition}) => !parameterDefinition!.optional)
             const optionalParameters = indexedParameters.filter(({parameterDefinition}) => parameterDefinition!.optional)

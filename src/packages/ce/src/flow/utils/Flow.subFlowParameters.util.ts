@@ -14,7 +14,7 @@ export interface SubFlowParameter {
 
 export const subFlowParameters = (schema: NodeSchema[], node?: NodeFunction, definition?: FunctionDefinition): SubFlowParameter[] =>
     (definition?.parameterDefinitions?.nodes ?? []).flatMap((parameterDefinition, index) => {
-        if (parameterDefinition?.hidden) return []
+        if (parameterDefinition?.hidden || parameterDefinition?.removedAt) return []
 
         const input = schema[index]?.schema?.input
 
