@@ -1,0 +1,6 @@
+subscription flowExecution($flowId: FlowID!) {
+    namespacesProjectsFlowsExecution(flowId: $flowId) {
+        __typename
+        executionIdentifier
+    }
+}

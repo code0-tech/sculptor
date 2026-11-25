@@ -31,6 +31,7 @@ import {
 import {GraphqlClient} from "@core/util/graphql-client";
 import flowsQuery from "@edition/flow/services/queries/Flows.query.graphql";
 import flowQuery from "@edition/flow/services/queries/Flow.query.graphql";
+import flowExecutionResultQuery from "@edition/flow/services/queries/FlowExecutionResult.query.graphql";
 import flowCreateMutation from "@edition/flow/services/mutations/Flow.create.mutation.graphql";
 import flowDeleteMutation from "@edition/flow/services/mutations/Flow.delete.mutation.graphql";
 import flowUpdateMutation from "@edition/flow/services/mutations/Flow.update.mutation.graphql";
@@ -905,6 +906,32 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         })
 
         return result.data?.namespacesProjectsFlowsTriggerExecution ?? undefined
+    }
+
+    // the execution subscription only announces an execution by its identifier, so the result itself has
+    // to be fetched before it can go into the store
+    async loadExecutionResult(flowId: FlowView['id'], executionIdentifier: string): Promise<void> {
+        const flow = this.getById(flowId)
+        if (!flow?.project?.namespace?.id || !flow.project.id) return
+
+        const result = await this.client.query<Query>({
+            query: flowExecutionResultQuery,
+            fetchPolicy: "network-only",
+            variables: {
+                namespaceId: flow.project.namespace.id,
+                projectId: flow.project.id,
+                flowId: flowId,
+                executionIdentifier: executionIdentifier,
+
+                firstNodeResult: 50,
+                afterNodeResult: null
+            }
+        })
+
+        const executionResult = result.data?.namespace?.project?.flow?.executionResult
+        if (!executionResult) return
+
+        this.addExecutionResult(flowId, executionResult)
     }
 
     addExecutionResult(flowId: FlowView['id'], executionResult: ExecutionResult): void {
