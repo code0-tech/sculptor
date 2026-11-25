@@ -147,15 +147,16 @@ export const UserLoginPage: React.FC = () => {
             <SegmentedControl type={"single"}
                               value={mfaType}
                               tabIndex={-1}
+                              style={{display: "grid", gridAutoFlow: "column", gridAutoColumns: "1fr"}}
                               onValueChange={(next) => {
                                   setMfaType(next)
                                   inputs.getInputProps("mfa").formValidation?.setValue?.(null)
                               }}>
                 <SegmentedControlItem tabIndex={-1} w={"100%"} value={"TOTP"}>
-                    <Text>Authenticator</Text>
+                    <Text ta={"center"}>Authenticator</Text>
                 </SegmentedControlItem>
                 <SegmentedControlItem tabIndex={-1} w={"100%"} value={"BACKUP_CODE"}>
-                    <Text>Backup code</Text>
+                    <Text ta={"center"}>Backup code</Text>
                 </SegmentedControlItem>
             </SegmentedControl>
             <Spacing spacing={"xl"}/>
