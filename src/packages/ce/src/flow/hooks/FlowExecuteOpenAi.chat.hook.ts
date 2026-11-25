@@ -170,6 +170,18 @@ export const useOpenAiChat = (): OpenAiChat => {
             .filter(entry => !entry.error)
             .map(entry => entry.message)
 
+        const messages = [...history, message]
+
+        // the endpoint hands the flow what the user last said as text next to the request
+        // itself, so a manual execution has to carry that field the same way
+        const lastUser = [...messages].reverse().find(candidate => candidate.role === "user")
+        const lastContent = typeof lastUser?.content === "string"
+            ? lastUser.content
+            : (Array.isArray(lastUser?.content) ? lastUser.content : [])
+                .filter(part => part.type === "text")
+                .map(part => String(part.text ?? ""))
+                .join("")
+
         setPrompt("")
         setAttachments([])
         setToolCall(undefined)
@@ -183,7 +195,8 @@ export const useOpenAiChat = (): OpenAiChat => {
             runtimeId,
             input: {
                 model: chatSetting(flow, "model"),
-                messages: [...history, message]
+                messages,
+                prompt: lastContent
             }
         })
 
