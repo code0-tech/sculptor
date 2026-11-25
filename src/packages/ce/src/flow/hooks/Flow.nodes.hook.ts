@@ -89,6 +89,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
 
                 const value = param?.value
                 if (!value) return
+                if (functionDefinition?.parameterDefinitions?.nodes?.[parameterIndex]?.removedAt) return
 
                 const subFlowValues: { subFlow: SubFlowValue, key: string, signature?: string }[] =
                     value.__typename === "SubFlowValue"

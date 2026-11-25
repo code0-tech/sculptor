@@ -31,6 +31,7 @@ import {
 import {GraphqlClient} from "@core/util/graphql-client";
 import flowsQuery from "@edition/flow/services/queries/Flows.query.graphql";
 import flowQuery from "@edition/flow/services/queries/Flow.query.graphql";
+import flowExecutionResultQuery from "@edition/flow/services/queries/FlowExecutionResult.query.graphql";
 import flowCreateMutation from "@edition/flow/services/mutations/Flow.create.mutation.graphql";
 import flowDeleteMutation from "@edition/flow/services/mutations/Flow.delete.mutation.graphql";
 import flowUpdateMutation from "@edition/flow/services/mutations/Flow.update.mutation.graphql";
@@ -334,12 +335,15 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
                         signature: value.signature ?? "",
                         ...(subFlowName ? {name: subFlowName} : {}),
                         ...(subFlowDescription ? {description: subFlowDescription} : {}),
+                        // every parameter of a direct mapping sub flow has to be sent: a parameter without a
+                        // value is the one the parent keeps control over, a parameter with a value is the one
+                        // the user took over
                         parameters: (value.parameters ?? [])
-                            .filter(parameter => !!parameter?.identifier && !!parameter?.value)
+                            .filter(parameter => !!parameter?.identifier)
                             .map(parameter => ({
                                 identifier: parameter.identifier!,
                                 ...(parameter.cast ? {cast: parameter.cast} : {}),
-                                value: this.mapParameterValue(parameter.value),
+                                ...(parameter.value ? {value: this.mapParameterValue(parameter.value)} : {}),
                             })),
                     }
                 }
@@ -721,12 +725,24 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         return reference?.value as SubFlowValue | undefined
     }
 
-    async setSubFlowParameterValue(flowId: FlowView['id'], nodeId: NodeFunction['id'], parameterIndex: number, referenceSignature: string | undefined, identifier: string, value?: Maybe<NodeParameterValue>, cast?: string | null, removeOrphanedReferenceNodes?: boolean): Promise<void> {
+    async setSubFlowParameterValue(flowId: FlowView['id'], nodeId: NodeFunction['id'], parameterIndex: number, referenceSignature: string | undefined, identifier: string, value?: Maybe<NodeParameterValue>, functionDefinition?: FunctionDefinition, cast?: string | null, removeOrphanedReferenceNodes?: boolean): Promise<void> {
 
         const flow = this.getById(flowId)
         const index = this.values().findIndex(candidate => candidate.id === flowId)
         const subFlow = this.getSubFlowValue(flowId, nodeId, parameterIndex, referenceSignature)
         if (!flow || !subFlow || index < 0) return
+
+        // a direct mapping sub flow is mapped by position, so its parameters always carry every parameter
+        // definition in definition order - the ones the parent controls with a null value
+        const orderedParameters = (functionDefinition?.parameterDefinitions?.nodes ?? [])
+            .flatMap(parameterDefinition => (!parameterDefinition?.identifier || parameterDefinition.removedAt) ? [] : [
+                subFlow.parameters?.find(candidate => candidate?.identifier === parameterDefinition.identifier) ?? {
+                    __typename: "SubFlowValueParameter" as const,
+                    identifier: parameterDefinition.identifier,
+                    value: null,
+                }
+            ])
+        if (orderedParameters.length > 0) subFlow.parameters = orderedParameters
 
         const parameter = subFlow.parameters?.find(candidate => candidate?.identifier === identifier)
         const nodeIdsBefore = this.nodeIds(flow)
@@ -905,6 +921,32 @@ export class FlowService extends ReactiveArrayService<FlowView, FlowDependencies
         })
 
         return result.data?.namespacesProjectsFlowsTriggerExecution ?? undefined
+    }
+
+    // the execution subscription only announces an execution by its identifier, so the result itself has
+    // to be fetched before it can go into the store
+    async loadExecutionResult(flowId: FlowView['id'], executionIdentifier: string): Promise<void> {
+        const flow = this.getById(flowId)
+        if (!flow?.project?.namespace?.id || !flow.project.id) return
+
+        const result = await this.client.query<Query>({
+            query: flowExecutionResultQuery,
+            fetchPolicy: "network-only",
+            variables: {
+                namespaceId: flow.project.namespace.id,
+                projectId: flow.project.id,
+                flowId: flowId,
+                executionIdentifier: executionIdentifier,
+
+                firstNodeResult: 50,
+                afterNodeResult: null
+            }
+        })
+
+        const executionResult = result.data?.namespace?.project?.flow?.executionResult
+        if (!executionResult) return
+
+        this.addExecutionResult(flowId, executionResult)
     }
 
     addExecutionResult(flowId: FlowView['id'], executionResult: ExecutionResult): void {

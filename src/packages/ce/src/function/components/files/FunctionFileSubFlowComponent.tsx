@@ -27,7 +27,6 @@ import {
 import {useSubFlowSchema} from "@edition/flow/hooks/Flow.subFlowSchema.hook";
 import {isSubFlowSchema} from "@edition/flow/utils/Flow.subFlowSchema.util";
 import {useShownOptionalInputs} from "@edition/function/hooks/Function.optionalInputs.hook";
-import {hasParameterValue} from "@edition/flow/utils/Flow.parameterValue.util";
 import {
     FunctionFileOptionalInputMenuComponent
 } from "@edition/function/components/files/FunctionFileOptionalInputMenuComponent";
@@ -49,7 +48,6 @@ export const FunctionFileSubFlowComponent: React.FC<FunctionFileSubFlowComponent
     const flowStore = useStore(FlowService)
     const functionService = useService(FunctionService)
     const functionStore = useStore(FunctionService)
-    const [uncontrolledParameters, setUncontrolledParameters] = React.useState<Record<string, boolean | undefined>>({})
     const changedParameter = React.useRef<Set<string>>(new Set())
     const castByParameter = React.useRef<Map<string, string | null>>(new Map())
 
@@ -79,9 +77,11 @@ export const FunctionFileSubFlowComponent: React.FC<FunctionFileSubFlowComponent
         [parameter!.id!, subFlow?.parameters?.find(candidate => candidate?.identifier === parameter?.identifier)?.value ?? undefined]
     )), [definition, subFlow])
 
+    // a parameter only carries a value once the user took control over it - while the parent controls it
+    // the value stays null, which is what has to be sent for every parameter of a direct mapping sub flow
     const parametersWithValue = React.useMemo(() => (definition?.parameterDefinitions?.nodes ?? [])
         .filter(parameterDefinition => parameterDefinition?.optional
-            && hasParameterValue(subFlow?.parameters?.find(candidate => candidate?.identifier === parameterDefinition?.identifier)?.value))
+            && !!subFlow?.parameters?.find(candidate => candidate?.identifier === parameterDefinition?.identifier)?.value)
         .map(parameterDefinition => parameterDefinition!.id!), [definition, subFlow])
 
     const [shownParameters, showParameter] = useShownOptionalInputs(parametersWithValue)
@@ -91,7 +91,7 @@ export const FunctionFileSubFlowComponent: React.FC<FunctionFileSubFlowComponent
             if (!changedParameter.current.has(parameterDefinition?.id!)) return
             changedParameter.current.delete(parameterDefinition?.id!)
             const cast = castByParameter.current.get(parameterDefinition!.id!)
-            flowService.setSubFlowParameterValue(flowId, nodeId, parameterIndex, referenceSignature, parameterDefinition!.identifier!, values[parameterDefinition!.id!], cast, isSubFlowSchema(schemas[index]?.schema))
+            flowService.setSubFlowParameterValue(flowId, nodeId, parameterIndex, referenceSignature, parameterDefinition!.identifier!, values[parameterDefinition!.id!], definition, cast, isSubFlowSchema(schemas[index]?.schema))
         })
     }, [flowService, definition, flowId, nodeId, parameterIndex, referenceSignature, schemas])
 
@@ -116,7 +116,7 @@ export const FunctionFileSubFlowComponent: React.FC<FunctionFileSubFlowComponent
         {(() => {
             const indexedParameters = definition?.parameterDefinitions?.nodes
                 ?.map((parameterDefinition, index) => ({parameterDefinition, index}))
-                ?.filter(({parameterDefinition}) => parameterDefinition && !parameterDefinition.hidden) ?? []
+                ?.filter(({parameterDefinition}) => parameterDefinition && !parameterDefinition.hidden && !parameterDefinition.removedAt) ?? []
 
             const requiredParameters = indexedParameters.filter(({parameterDefinition}) => !parameterDefinition!.optional)
             const optionalParameters = indexedParameters.filter(({parameterDefinition}) => parameterDefinition!.optional)
@@ -125,7 +125,7 @@ export const FunctionFileSubFlowComponent: React.FC<FunctionFileSubFlowComponent
                 const title = parameterDefinition?.names?.[0]?.content ?? FALLBACK_FUNCTION_PARAMETER_NAME
                 const description = parameterDefinition?.descriptions?.[0]?.content ?? FALLBACK_FUNCTION_PARAMETER_DESCRIPTION
                 const parameter = subFlow?.parameters?.find(candidate => candidate?.identifier === parameterDefinition.identifier)
-                const isControlled = !(uncontrolledParameters[parameterDefinition.id!] ?? !!parameter?.value)
+                const isControlled = !parameter?.value
                 const inputProps = inputs.getInputProps(parameterDefinition.id!)
 
                 return <div key={parameterDefinition.id}>
@@ -152,10 +152,6 @@ export const FunctionFileSubFlowComponent: React.FC<FunctionFileSubFlowComponent
                                                       WebkitBackdropFilter: "blur(0.25rem)"
                                                   }}
                                                   onClick={() => {
-                                                      setUncontrolledParameters(current => ({
-                                                          ...current,
-                                                          [parameterDefinition.id!]: false
-                                                      }))
                                                       inputProps.formValidation?.setValue?.(null)
                                                       changedParameter.current.add(parameterDefinition.id!)
                                                       validate()
@@ -220,10 +216,14 @@ export const FunctionFileSubFlowComponent: React.FC<FunctionFileSubFlowComponent
                                               backdropFilter: "blur(0.25rem)",
                                               WebkitBackdropFilter: "blur(0.25rem)"
                                           }}
-                                          onClick={() => setUncontrolledParameters(current => ({
-                                              ...current,
-                                              [parameterDefinition.id!]: true
-                                          }))}>
+                                          onClick={() => {
+                                              inputProps.formValidation?.setValue?.({
+                                                  __typename: "LiteralValue",
+                                                  value: null
+                                              })
+                                              changedParameter.current.add(parameterDefinition.id!)
+                                              validate()
+                                          }}>
                                         <IconLink size={13}/>
                                         <Text size={"sm"}>{`${parentName} controls this value`}</Text>
                                     </Card>
@@ -251,7 +251,12 @@ export const FunctionFileSubFlowComponent: React.FC<FunctionFileSubFlowComponent
                         }))}
                     onAdd={id => {
                         showParameter(id)
-                        setUncontrolledParameters(current => ({...current, [id]: true}))
+                        inputs.getInputProps(id)?.formValidation?.setValue?.({
+                            __typename: "LiteralValue",
+                            value: null
+                        })
+                        changedParameter.current.add(id)
+                        validate()
                     }}/>
             </>
         })()}

@@ -83,22 +83,20 @@ export const UserMfaView: React.FC = () => {
         },
         onSubmit: (values) => {
             if (!signedSecret) return
-            startTransition(() => {
-                userService.usersMfaTotpValidateSecret({
+            startTransition(async () => {
+                const payload = await userService.usersMfaTotpValidateSecret({
                     currentTotp: values.code,
                     secret: signedSecret
-                }).then(payload => {
-                    if (!payload?.user || (payload.errors?.length ?? 0) > 0) {
-                        toast({title: "That code isn't valid. Please try again.", color: "error"})
-                        return
-                    }
-                    userService.usersMfaBackupCodesRotate({}).then(rotate => {
-                        setSecret(null)
-                        setSignedSecret(null)
-                        setBackupCodes(rotate?.codes ?? [])
-                        toast({title: "Two-factor authentication enabled", color: "success"})
-                    })
                 })
+                if (!payload?.user || (payload.errors?.length ?? 0) > 0) {
+                    toast({title: "That code isn't valid. Please try again.", color: "error"})
+                    return
+                }
+                const rotate = await withMfa((mfa) => userService.usersMfaBackupCodesRotate({mfa}))
+                setSecret(null)
+                setSignedSecret(null)
+                setBackupCodes(rotate?.codes ?? [])
+                toast({title: "Two-factor authentication enabled", color: "success"})
             })
         }
     })
@@ -229,11 +227,10 @@ export const UserMfaView: React.FC = () => {
                 </Text>
                 <Spacing spacing={"md"}/>
                 <Flex style={{gap: ".5rem"}}>
-                    <Button w={"100%"} color={"secondary"} onClick={() => startTransition(() => {
-                        userService.usersMfaBackupCodesRotate({}).then(payload => {
-                            if (!payload?.codes || (payload.errors?.length ?? 0) > 0) return
-                            setBackupCodes(payload.codes)
-                        })
+                    <Button w={"100%"} color={"secondary"} onClick={() => startTransition(async () => {
+                        const payload = await withMfa((mfa) => userService.usersMfaBackupCodesRotate({mfa}))
+                        if (!payload?.codes || (payload.errors?.length ?? 0) > 0) return
+                        setBackupCodes(payload.codes)
                     })}>
                         Regenerate backup codes
                     </Button>

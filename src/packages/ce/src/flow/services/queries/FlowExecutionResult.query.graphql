@@ -1,0 +1,105 @@
+query FlowExecutionResult (
+    $namespaceId: NamespaceID!
+    $projectId: NamespaceProjectID!
+    $flowId: FlowID!
+    $executionIdentifier: String!
+
+    $firstNodeResult: Int!,
+    $afterNodeResult: String
+) {
+    namespace(id: $namespaceId) {
+        project(id: $projectId) {
+            flow (id: $flowId) {
+                executionResult (executionIdentifier: $executionIdentifier) {
+                    __typename
+                    id
+                    createdAt
+                    updatedAt
+                    startedAt
+                    finishedAt
+                    input
+                    success
+                    flow {
+                        __typename
+                        id
+                    }
+                    error {
+                        __typename
+                        category
+                        code
+                        dependencies
+                        details
+                        message
+                        timestamp
+                        version
+                    }
+                    nodeResults(first: $firstNodeResult, after: $afterNodeResult) {
+                        __typename
+                        count
+                        nodes {
+                            __typename
+                            id
+                            createdAt
+                            updatedAt
+                            startedAt
+                            finishedAt
+                            position
+                            subFlowIdentifier
+                            success {
+                                __typename
+                                ... on RawValue {
+                                    __typename
+                                    value
+                                }
+                                ... on SubFlowFunctionResult {
+                                    __typename
+                                    name
+                                    description
+                                    subflowIdentifier
+                                    inputSchema
+                                    outputSchema
+                                }
+                            }
+                            parameterResults {
+                                __typename
+                                id
+                                createdAt
+                                updatedAt
+                                value
+                                subFlowFunctionResult
+                                position
+                            }
+                            functionDefinition {
+                                __typename
+                                id
+                            }
+                            nodeFunction {
+                                __typename
+                                id
+                                functionDefinition {
+                                    __typename
+                                    id
+                                }
+                            }
+                            error {
+                                __typename
+                                category
+                                code
+                                dependencies
+                                details
+                                message
+                                timestamp
+                                version
+                            }
+                        }
+                        pageInfo {
+                            __typename
+                            endCursor
+                            hasNextPage
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

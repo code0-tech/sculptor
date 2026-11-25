@@ -5,6 +5,7 @@ fragment Function on FunctionDefinition {
     signature
     identifier
     displayIcon
+    removedAt
     design
 
     aliases {
@@ -57,6 +58,7 @@ fragment Function on FunctionDefinition {
             defaultValue
             optional
             hidden
+            removedAt
             names {
                 code
                 content

@@ -142,7 +142,7 @@ export const useEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], proj
             node.parameters?.nodes?.forEach((param, index) => {
                 const parameterValue = param?.value;
                 const parameterDefinition = definition?.parameterDefinitions?.nodes?.[index];
-                if (!parameterValue) return
+                if (!parameterValue || parameterDefinition?.removedAt) return
 
                 const subFlowValues: { subFlow: SubFlowValue, key: string }[] =
                     parameterValue.__typename === "SubFlowValue"
