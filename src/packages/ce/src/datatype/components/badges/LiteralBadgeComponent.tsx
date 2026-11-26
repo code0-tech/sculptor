@@ -40,10 +40,9 @@ export const LiteralBadgeComponent: React.FC<LiteralBadgeComponentProps> = (prop
                 <IconCalendar size={12}/>
                 <Text size={size}>
                     {new Intl.DateTimeFormat("de-DE", {
-                        timeZone: "UTC",
                         dateStyle: "medium",
                         timeStyle: "medium"
-                    }).format(new Date(literal * 1000))}
+                    }).format(new Date(literal / 1000))}
                 </Text>
             </>
         }
