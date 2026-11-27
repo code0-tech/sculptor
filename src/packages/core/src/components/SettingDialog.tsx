@@ -21,6 +21,7 @@ import {
 } from "@code0-tech/pictor";
 import {Tab, TabContent} from "@code0-tech/pictor/dist/components/tab/Tab";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
+import {recordNavigation} from "@core/util/Navigation.dialog.util";
 
 export interface SettingDialogTab {
     value: string
@@ -46,7 +47,6 @@ export const SettingDialog: React.FC<SettingDialogProps> = (props) => {
     const pathname = usePathname()
     const searchParams = useSearchParams()
     const [closing, setClosing] = React.useState(false)
-    const route = React.useRef(pathname)
 
     const visibleTabs = tabs.filter((tab) => !!tab)
     const activeTab = searchParams.get("tab") || defaultValue || visibleTabs[0]?.value
@@ -61,7 +61,11 @@ export const SettingDialog: React.FC<SettingDialogProps> = (props) => {
         setClosing(false)
     }, [pathname, open])
 
-    return <Dialog open={open && !closing && pathname === route.current} onOpenChange={(next) => {
+    React.useEffect(() => {
+        recordNavigation()
+    }, [searchParams])
+
+    return <Dialog open={open && !closing} onOpenChange={(next) => {
         setClosing(!next)
         onOpenChange?.(next)
     }}>

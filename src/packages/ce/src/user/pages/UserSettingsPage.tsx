@@ -1,8 +1,8 @@
 "use client"
 
 import React from "react";
-import {closeDialog} from "@core/util/Navigation.lastPage.util";
-import {notFound, useParams, useRouter} from "next/navigation";
+import {closeDialog} from "@core/util/Navigation.dialog.util";
+import {notFound, useParams, usePathname, useRouter} from "next/navigation";
 import {useService, useStore} from "@code0-tech/pictor";
 import {User} from "@code0-tech/sagittarius-graphql-types";
 import {UserEditDialogComponent} from "@edition/user/components/UserEditDialogComponent";
@@ -13,6 +13,7 @@ export const UserSettingsPage: React.FC = () => {
 
     const params = useParams()
     const router = useRouter()
+    const pathname = usePathname()
     const currentSession = useUserSession()
     const userService = useService(UserService)
     const userStore = useStore(UserService)
@@ -35,10 +36,9 @@ export const UserSettingsPage: React.FC = () => {
     }
 
     return <UserEditDialogComponent userId={userId}
-                                    open={true}
+                                    open={pathname === `/users/${userIndex}/settings`}
                                     onOpenChange={(open) => {
                                         if (open) return
-                                        if (!isMe) router.replace("/settings?tab=users")
-                                        else closeDialog(router, "/users/@me")
+                                        closeDialog(router, isMe ? "/users/@me" : "/settings?tab=users")
                                     }}/>
 }

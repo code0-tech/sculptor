@@ -1,20 +1,23 @@
 "use client"
 
 import React from "react";
-import {useParams, useRouter} from "next/navigation";
+import {closeDialog} from "@core/util/Navigation.dialog.util";
+import {useParams, usePathname, useRouter} from "next/navigation";
 import {RoleSettingsDialogComponent} from "@edition/role/components/RoleSettingsDialogComponent";
 
 export const RoleSettingsPage: React.FC = () => {
 
     const params = useParams()
     const router = useRouter()
+    const pathname = usePathname()
 
     const namespaceIndex = params.namespaceId as any as number
+    const roleIndex = params.roleId as any as number
     const settingsHref = `/namespace/${namespaceIndex}/settings`
 
-    return <RoleSettingsDialogComponent open={true}
+    return <RoleSettingsDialogComponent open={pathname === `/namespace/${namespaceIndex}/roles/${roleIndex}/settings`}
                                         onOpenChange={(open) => {
                                             if (open) return
-                                            router.replace(`${settingsHref}?tab=roles`)
+                                            closeDialog(router, `${settingsHref}?tab=roles`)
                                         }}/>
 }

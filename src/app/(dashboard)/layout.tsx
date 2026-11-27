@@ -43,7 +43,7 @@ import {AIService, Model} from "@edition/ai/services/AI.service";
 import {UsageEntry, UsageService} from "@edition/usage/services/Usage.service";
 import {TutorialButtonComponent} from "@edition/tutorial/components/TutorialButtonComponent";
 import {OnboardingCardView} from "@edition/onboarding/views/OnboardingCardView";
-import {recordPageUrl} from "@core/util/Navigation.lastPage.util";
+import {recordNavigation} from "@core/util/Navigation.dialog.util";
 
 interface ApplicationLayoutProps {
     children: React.ReactNode
@@ -61,8 +61,13 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({children, sidebar,
     const graphqlClient = React.useMemo(() => new GraphqlClient(client), [client])
 
     React.useEffect(() => {
-        recordPageUrl(`${window.location.pathname}${window.location.search}`)
+        recordNavigation()
     }, [pathname])
+
+    React.useEffect(() => {
+        window.addEventListener("popstate", recordNavigation)
+        return () => window.removeEventListener("popstate", recordNavigation)
+    }, [])
 
     const namespaceIndex = params.namespaceId as any as number
     const projectIndex = params.projectId as any as number
