@@ -11,7 +11,7 @@ import {
     InputLabel
 } from "@code0-tech/pictor";
 import {IconCalendar} from "@tabler/icons-react";
-import {fromDate} from "@internationalized/date";
+import {fromDate, getLocalTimeZone} from "@internationalized/date";
 import {useDebouncedCallback} from "use-debounce";
 import {
     LiteralValue,
@@ -47,7 +47,7 @@ export const DataTypeDateInputComponent: React.FC<DataTypeDateInputComponentProp
         }} suggestions={suggestions}
                                      formValidation={formValidation}>
             <DateInput value={typeof (defaultValue as LiteralValue)?.value === "number"
-                ? fromDate(new Date((defaultValue as LiteralValue).value as number * 1000), "UTC")
+                ? fromDate(new Date((defaultValue as LiteralValue).value as number / 1000), getLocalTimeZone())
                 : null}
                        granularity={"second"}
                        locale={"de-DE"}

@@ -155,13 +155,12 @@ export const UpgradeDialogComponent: React.FC<UpgradeDialogComponentProps> = ({o
 
     const pathname = usePathname()
     const [closing, setClosing] = React.useState(false)
-    const route = React.useRef(pathname)
 
     React.useEffect(() => {
         setClosing(false)
     }, [pathname, open])
 
-    return <Dialog open={open && !closing && pathname === route.current} onOpenChange={(next) => {
+    return <Dialog open={open && !closing} onOpenChange={(next) => {
         setClosing(!next)
         onOpenChange?.(next)
     }}>
@@ -191,11 +190,11 @@ export const UpgradeDialogComponent: React.FC<UpgradeDialogComponentProps> = ({o
                         </BorderBeam>
                     </Flex>
                     <Spacing spacing={"xl"}/>
-                    <Text size={"xl"} hierarchy={"primary"}>
+                    <Text size={"xl"} hierarchy={"primary"} ta={"center"}>
                         {`Upgrade ${subject}`}
                     </Text>
                     <Spacing spacing={"xs"}/>
-                    <Text size={"sm"} hierarchy={"tertiary"}>
+                    <Text size={"sm"} hierarchy={"tertiary"} ta={"center"}>
                         {config?.upgradeDescription.split("\n").map((line, index) =>
                             <React.Fragment key={line}>
                                 {index > 0 && <br/>}

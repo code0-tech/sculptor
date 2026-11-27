@@ -1,8 +1,9 @@
 "use client"
 
 import React from "react";
+import {closeDialog} from "@core/util/Navigation.dialog.util";
 import {useService, useStore} from "@code0-tech/pictor";
-import {notFound, useRouter} from "next/navigation";
+import {notFound, usePathname, useRouter} from "next/navigation";
 import {UserService} from "@edition/user/services/User.service";
 import {useUserSession} from "@edition/user/hooks/User.session.hook";
 import {UserCreateDialogComponent} from "@edition/user/components/UserCreateDialogComponent";
@@ -10,6 +11,7 @@ import {UserCreateDialogComponent} from "@edition/user/components/UserCreateDial
 export const UserInvitePage: React.FC = () => {
 
     const router = useRouter()
+    const pathname = usePathname()
     const currentSession = useUserSession()
     const userService = useService(UserService)
     const userStore = useStore(UserService)
@@ -22,9 +24,9 @@ export const UserInvitePage: React.FC = () => {
         notFound()
     }
 
-    return <UserCreateDialogComponent open={true}
+    return <UserCreateDialogComponent open={pathname === "/users/invite"}
                                       onOpenChange={(open) => {
                                           if (open) return
-                                          router.replace("/settings?tab=users")
+                                          closeDialog(router, "/settings?tab=users")
                                       }}/>
 }

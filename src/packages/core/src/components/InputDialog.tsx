@@ -34,13 +34,12 @@ export const InputDialog: React.FC<InputDialogProps> = (props) => {
 
     const pathname = usePathname()
     const [closing, setClosing] = React.useState(false)
-    const route = React.useRef(pathname)
 
     React.useEffect(() => {
         setClosing(false)
     }, [pathname, open])
 
-    return <Dialog open={open && !closing && pathname === route.current} onOpenChange={(next) => {
+    return <Dialog open={open && !closing} onOpenChange={(next) => {
         setClosing(!next)
         onOpenChange?.(next)
     }}>
