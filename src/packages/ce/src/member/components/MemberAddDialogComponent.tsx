@@ -29,9 +29,13 @@ export const MemberAddDialogComponent: React.FC<MemberAddDialogComponentProps> =
         [memberStore, userStore, namespaceId]
     )
     const initialValues = React.useMemo(() => ({users: null}), [])
+    const [submitted, setSubmitted] = React.useState(false)
+    // The member list arrives after the dialog opens, and filtering against an
+    // empty one offers users who already are members - a namespace always has at
+    // least its owner, so an empty list means "not here yet", not "nobody".
     const filteredUsers = React.useMemo(() => {
         return (user: User) => {
-            return !members.find(m => m.user?.id === user.id)
+            return members.length > 0 && !members.find(m => m.user?.id === user.id)
         }
     }, [members])
 
@@ -70,9 +74,12 @@ export const MemberAddDialogComponent: React.FC<MemberAddDialogComponentProps> =
         <UserInputComponent title={"Users"}
                             description={"Select the users you want to add as members"}
                             filter={filteredUsers}
-                            onChange={() => validate("users")}
+                            onChange={() => submitted && validate("users")}
                             {...inputs.getInputProps("users")}/>
         <Spacing spacing={"xl"}/>
-        <Button color={"success"} w={"100%"} onClick={validate}>Add members</Button>
+        <Button color={"success"} w={"100%"} onClick={() => {
+            setSubmitted(true)
+            validate()
+        }}>Add members</Button>
     </InputDialog>
 }

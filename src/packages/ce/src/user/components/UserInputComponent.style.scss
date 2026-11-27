@@ -1,0 +1,33 @@
+// The input wrapper only pads its first child on the left, so the right gutter
+// of the editable is ours. Wrapping happens between words; only a single word
+// longer than the line is broken up.
+.user-input {
+
+  [data-slate-editor] {
+    padding-right: 0.6rem;
+    overflow-wrap: break-word;
+    word-break: normal;
+  }
+}
+
+// The menu is portalled to the body, so inside the modal dialog this input
+// lives in it inherits the dialog's pointer-events: none and none of its items
+// can be clicked. The open surface claims them back; the closing one stays
+// click-through so it does not swallow clicks while it animates out.
+.user-input__menu[data-state="open"] {
+  pointer-events: auto;
+}
+
+.user-input__menu {
+
+  // Which user rows survive is decided inside pictor (search match, onlyOnce),
+  // which renders the hidden ones as nothing at all - so the empty state keys
+  // off the rendered result instead of trying to predict that filter.
+  .user-input__menu-empty {
+    display: none;
+  }
+
+  &:not(:has(.menu__item:not(.user-input__menu-empty))) .user-input__menu-empty {
+    display: flex;
+  }
+}
