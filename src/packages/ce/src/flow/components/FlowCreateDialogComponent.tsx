@@ -185,7 +185,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
 
     const initialValues = React.useMemo(
         () => ({name: selectedTemplate ? ensureUniqueFlowName(selectedTemplate.template.name, flows.map(flow => flow.name!).filter(name => !!name)) : null}),
-        [selectedTemplateSlug]
+        [selectedTemplateSlug, open]
     )
 
     const visibleFlowTypes = React.useMemo(
