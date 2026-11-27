@@ -82,6 +82,7 @@ export const ProjectCreateDialogComponent: React.FC<ProjectCreateDialogComponent
     })
 
     return <InputDialog
+        onSubmit={validate}
         title={"Create new project"}
         description={"Projects group the flows, modules and runtimes you build within this workspace."}
         open={open}
@@ -102,6 +103,6 @@ export const ProjectCreateDialogComponent: React.FC<ProjectCreateDialogComponent
                    {...inputs.getInputProps("description")}/>
         <Spacing spacing={"xl"}/>
         <Button data-qa-selector={"dashboard-namespace-project-create-send"}
-                color={"success"} w={"100%"} onClick={validate}>Create project</Button>
+                type={"submit"} color={"success"} w={"100%"}>Create project</Button>
     </InputDialog>
 }

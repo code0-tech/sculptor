@@ -73,6 +73,7 @@ export const RuntimeCreateDialogComponent: React.FC<RuntimeCreateDialogComponent
     })
 
     return <InputDialog
+        onSubmit={!token ? validate : undefined}
         title={!token ? "Create new runtime" : "Runtime created"}
         description={!token
             ? "Global runtimes are the environments where your applications run across all workspaces."
@@ -104,7 +105,7 @@ export const RuntimeCreateDialogComponent: React.FC<RuntimeCreateDialogComponent
         )}
         <Spacing spacing={"xl"}/>
         {!token ? (
-            <Button color={"success"} w={"100%"} onClick={validate}>Create runtime</Button>
+            <Button type={"submit"} color={"success"} w={"100%"}>Create runtime</Button>
         ) : (
             <Button color={"success"} w={"100%"} onClick={() => onOpenChange?.(false)}>Done</Button>
         )}

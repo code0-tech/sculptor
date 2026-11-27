@@ -63,6 +63,7 @@ export const MemberAddDialogComponent: React.FC<MemberAddDialogComponentProps> =
     })
 
     return <InputDialog
+        onSubmit={validate}
         title={"Add new members"}
         description={"Add users to this workspace as members. They gain access based on the roles you assign to them."}
         open={open}
@@ -73,6 +74,6 @@ export const MemberAddDialogComponent: React.FC<MemberAddDialogComponentProps> =
                             onChange={() => validate("users")}
                             {...inputs.getInputProps("users")}/>
         <Spacing spacing={"xl"}/>
-        <Button color={"success"} w={"100%"} onClick={validate}>Add members</Button>
+        <Button type={"submit"} color={"success"} w={"100%"}>Add members</Button>
     </InputDialog>
 }

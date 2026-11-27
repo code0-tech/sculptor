@@ -26,15 +26,22 @@ export interface InputDialogProps {
     title?: string
     description?: string
     children?: React.ReactElement[]
+    onSubmit?: () => void
 }
 
 export const InputDialog: React.FC<InputDialogProps> = (props) => {
 
-    const {open, onOpenChange, title, description, children} = props
+    const {open, onOpenChange, title, description, children, onSubmit} = props
 
     const pathname = usePathname()
     const [closing, setClosing] = React.useState(false)
     const route = React.useRef(pathname)
+
+    const handleSubmit = React.useCallback((event: React.SubmitEvent<HTMLFormElement>) => {
+        event.preventDefault()
+        event.stopPropagation()
+        onSubmit?.()
+    }, [onSubmit])
 
     React.useEffect(() => {
         setClosing(false)
@@ -79,10 +86,12 @@ export const InputDialog: React.FC<InputDialogProps> = (props) => {
                     <Card color={"primary"} p={"0"} paddingSize={"md"} h={"100%"} w={"100%"}>
                         <ScrollArea h={"100%"} type={"scroll"}>
                             <ScrollAreaViewport>
-                                <div data-qa-selector={"dashboard-input-dialog-form"}
-                                     style={{maxWidth: "75%", margin: "0 auto", padding: "4rem 1rem"}}>
+                                <form data-qa-selector={"dashboard-input-dialog-form"}
+                                      noValidate
+                                      onSubmit={handleSubmit}
+                                      style={{maxWidth: "75%", margin: "0 auto", padding: "4rem 1rem"}}>
                                     {children!}
-                                </div>
+                                </form>
                             </ScrollAreaViewport>
                             <ScrollAreaScrollbar orientation={"vertical"}>
                                 <ScrollAreaThumb/>

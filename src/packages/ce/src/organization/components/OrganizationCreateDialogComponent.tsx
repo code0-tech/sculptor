@@ -43,6 +43,7 @@ export const OrganizationCreateDialogComponent: React.FC<OrganizationCreateDialo
     })
 
     return <InputDialog
+        onSubmit={validate}
         title={"Create new organization"}
         description={"Organizations are helpful if managing a group of users and plenty of projects."}
         open={open}
@@ -55,7 +56,7 @@ export const OrganizationCreateDialogComponent: React.FC<OrganizationCreateDialo
                    placeholder={"E.g. CodeZero"}
                    {...inputs.getInputProps("name")}/>
         <Spacing spacing={"xl"}/>
-        <Button w={"100%"} data-qa-selector={"dashboard-organization-create-send"} color={"success"} onClick={validate}>
+        <Button w={"100%"} data-qa-selector={"dashboard-organization-create-send"} type={"submit"} color={"success"}>
             Create organization
         </Button>
     </InputDialog>
