@@ -66,9 +66,11 @@ export const ProjectMenuComponent: React.FC<ProjectMenuComponentProps> = props =
                                                 <Text size={"md"} hierarchy={"primary"}>
                                                     {project?.name}
                                                 </Text>
-                                                <Text>
-                                                    {project?.description}
-                                                </Text>
+                                                {project?.description ? (
+                                                    <Text>
+                                                        {project.description}
+                                                    </Text>
+                                                ) : null}
                                             </Flex>
                                         </Flex>
 

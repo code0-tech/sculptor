@@ -56,8 +56,7 @@ export const ProjectSettingsGeneralView: React.FC = () => {
                 return null
             },
             description: (value) => {
-                if (!value) return "Description is required"
-                if (value.length > 50) return "Description needs to be less than 50 characters"
+                if (value && value.length > 50) return "Description needs to be less than 50 characters"
                 return null
             },
             slug: (value) => {
@@ -72,7 +71,7 @@ export const ProjectSettingsGeneralView: React.FC = () => {
                 projectService.projectUpdate({
                     slug: values.slug,
                     name: values.name,
-                    description: values.description,
+                    description: values.description ?? "",
                     namespaceProjectId: projectId
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
