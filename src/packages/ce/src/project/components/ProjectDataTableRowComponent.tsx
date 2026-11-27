@@ -49,9 +49,11 @@ export const ProjectDataTableRowComponent: React.FC<ProjectDataTableRowComponent
                         <Text size={"md"} hierarchy={"primary"}>
                             {project?.name}
                         </Text>
-                        <Text>
-                            {project?.description}
-                        </Text>
+                        {project?.description ? (
+                            <Text>
+                                {project.description}
+                            </Text>
+                        ) : null}
                     </Flex>
                 </Flex>
                 <Text hierarchy={"tertiary"}>

@@ -154,6 +154,7 @@ export const MfaProviderComponent: React.FC<{ children: React.ReactNode }> = ({c
     return <MfaContext.Provider value={withMfa}>
         {children}
         <InputDialog title={"Confirm it's you"}
+                     onSubmit={state.loading ? undefined : validate}
                      description={"This action requires multi-factor authentication. Enter a code from your authenticator app or one of your backup codes to continue."}
                      open={state.open}
                      onOpenChange={onOpenChange}>
@@ -190,7 +191,7 @@ export const MfaProviderComponent: React.FC<{ children: React.ReactNode }> = ({c
                                {...inputs.getInputProps("code")}/>
             {state.error ? <InputMessage>{state.error}</InputMessage> : <></>}
             <Spacing spacing={"md"}/>
-            <Button disabled={state.loading} color={"success"} w={"100%"} onClick={() => validate()}>
+            <Button type={"submit"} disabled={state.loading} color={"success"} w={"100%"}>
                 {state.loading ? "Verifying..." : "Confirm"}
             </Button>
         </InputDialog>

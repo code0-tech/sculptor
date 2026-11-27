@@ -97,7 +97,7 @@ export const UserCreateDialogComponent: React.FC<UserCreateDialogComponentProps>
         }
     })
 
-    return <InputDialog title={"Invite a new user"} description={"Create a new user with access to your instance. They can log in with the credentials you provide."} open={open} onOpenChange={(open) => onOpenChange?.(open)}>
+    return <InputDialog onSubmit={validate} title={"Invite a new user"} description={"Create a new user with access to your instance. They can log in with the credentials you provide."} open={open} onOpenChange={(open) => onOpenChange?.(open)}>
         <Row>
             <Col xs={6}>
                 <TextInput w={"100%"} placeholder={"Firstname"}
@@ -142,7 +142,7 @@ export const UserCreateDialogComponent: React.FC<UserCreateDialogComponentProps>
             </CardSection>
         </Card>
         <Spacing spacing={"xl"}/>
-        <Button color={"success"} w={"100%"} onClick={validate}>
+        <Button type={"submit"} color={"success"} w={"100%"}>
             <Text>
                 Create new user
             </Text>

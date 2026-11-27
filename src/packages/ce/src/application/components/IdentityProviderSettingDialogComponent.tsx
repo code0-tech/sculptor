@@ -199,6 +199,7 @@ export const IdentityProviderSettingDialogComponent: React.FC<IdentityProviderSe
     })
 
     return <InputDialog
+        onSubmit={validate}
         title={identityProviderId ? "Configure identity provider" : "Add identity provider"}
         description={"Provide the OAuth / OpenID Connect credentials issued by your provider so users can log in and register with it."}
         open={open}
@@ -281,7 +282,7 @@ export const IdentityProviderSettingDialogComponent: React.FC<IdentityProviderSe
             </>
         )}
         <Spacing spacing={"xl"}/>
-        <Button color={"success"} w={"100%"} onClick={validate}>
+        <Button type={"submit"} color={"success"} w={"100%"}>
             {provider ? "Save changes" : "Add provider"}
         </Button>
     </InputDialog>

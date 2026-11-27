@@ -55,8 +55,7 @@ export const ProjectCreateDialogComponent: React.FC<ProjectCreateDialogComponent
                 return null
             },
             description: (value) => {
-                if (!value) return "Description is required"
-                if (value.length > 50) return "Description needs to be less than 50 characters"
+                if (value && value.length > 50) return "Description needs to be less than 50 characters"
                 return null
             },
         },
@@ -71,7 +70,7 @@ export const ProjectCreateDialogComponent: React.FC<ProjectCreateDialogComponent
                 }
                 projectService.projectCreate({
                     name: values.name!!,
-                    description: values.description!!,
+                    description: values.description || undefined,
                     namespaceId: namespaceId
                 }).then(payload => {
                     if ((payload?.errors?.length ?? 0) <= 0) {
@@ -83,6 +82,7 @@ export const ProjectCreateDialogComponent: React.FC<ProjectCreateDialogComponent
     })
 
     return <InputDialog
+        onSubmit={validate}
         title={"Create new project"}
         description={"Projects group the flows, modules and runtimes you build within this workspace."}
         open={open}
@@ -96,14 +96,13 @@ export const ProjectCreateDialogComponent: React.FC<ProjectCreateDialogComponent
                    {...inputs.getInputProps("name")}/>
         <Spacing spacing={"md"}/>
         <TextInput data-qa-selector={"dashboard-namespace-project-create-description"}
-                   required
                    w={"100%"}
                    title={"Description"}
-                   description={"Provide a simple project description"}
+                   description={"Optionally provide a simple project description"}
                    placeholder={"E.g. Manage and authenticate users with rest routes"}
                    {...inputs.getInputProps("description")}/>
         <Spacing spacing={"xl"}/>
         <Button data-qa-selector={"dashboard-namespace-project-create-send"}
-                color={"success"} w={"100%"} onClick={validate}>Create project</Button>
+                type={"submit"} color={"success"} w={"100%"}>Create project</Button>
     </InputDialog>
 }

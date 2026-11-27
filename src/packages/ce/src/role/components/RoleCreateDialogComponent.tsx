@@ -54,6 +54,7 @@ export const RoleCreateDialogComponent: React.FC<RoleCreateDialogComponentProps>
     })
 
     return <InputDialog
+        onSubmit={validate}
         title={"Create new role"}
         description={"Roles bundle a set of permissions that you can assign to members of this workspace."}
         open={open}
@@ -65,6 +66,6 @@ export const RoleCreateDialogComponent: React.FC<RoleCreateDialogComponentProps>
                    placeholder={"E.g. Maintainer"}
                    {...inputs.getInputProps("name")}/>
         <Spacing spacing={"xl"}/>
-        <Button color={"success"} w={"100%"} onClick={validate}>Create role</Button>
+        <Button type={"submit"} color={"success"} w={"100%"}>Create role</Button>
     </InputDialog>
 }

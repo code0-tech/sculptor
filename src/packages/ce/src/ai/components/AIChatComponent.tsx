@@ -320,10 +320,15 @@ export const AIChatComponent: React.FC<AIChatComponentProps> = (props) => {
                     models.length > 0 ? (
                         <AIUsageComponent/>
                     ) : (
-                        <Flex align={"center"} justify={"center"} p={0.35}>
+                        <Flex align={"center"} justify={"space-between"} p={0} pl={0.35} style={{gap: "0.35rem"}}>
                             <Text>
                                 You currently don't have AI features enabled or don't have any models available
                             </Text>
+                            {onClose ? (
+                                <Button onClick={onClose} variant={"none"} color={"secondary"} aria-label={"Close"}>
+                                    <IconX size={13}/>
+                                </Button>
+                            ) : null}
                         </Flex>
                     )
                 }

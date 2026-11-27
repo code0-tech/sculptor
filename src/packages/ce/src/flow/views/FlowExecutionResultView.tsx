@@ -142,7 +142,9 @@ export const FlowExecutionResultView: React.FC = () => {
     )
 
     const flowExecutionResults = React.useMemo(
-        () => [...(flow?.executionResults?.nodes ?? [])]?.reverse() ?? [],
+        () => [...(flow?.executionResults?.nodes ?? [])].sort((resultA, resultB) =>
+            new Date(resultB?.createdAt ?? 0).getTime() - new Date(resultA?.createdAt ?? 0).getTime()
+        ),
         [flow?.executionResults?.nodes]
     )
 

@@ -153,6 +153,7 @@ export const ModuleConfigurationDialogComponent: React.FC<ModuleConfigurationDia
     console.log(module)
 
     return <InputDialog open={open}
+                        onSubmit={validate}
                         onOpenChange={(open) => onOpenChange?.(open)}
                         title={`${module?.names?.[0]?.content ?? "3-party"} Integration configuration`}
                         description={"Configure how this integration behaves within your project. Settings are applied per runtime and take effect for every flow that relies on it."}>
@@ -254,7 +255,7 @@ export const ModuleConfigurationDialogComponent: React.FC<ModuleConfigurationDia
                         </MenuContent>
                     </MenuPortal>
                 </Menu>
-                <Button variant={"none"} color={"success"} onClick={validate} paddingSize={"xxs"}>
+                <Button type={"submit"} variant={"none"} color={"success"} paddingSize={"xxs"}>
                     Save
                 </Button>
             </ButtonGroup>

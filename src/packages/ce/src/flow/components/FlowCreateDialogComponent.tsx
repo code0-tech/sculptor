@@ -1,5 +1,5 @@
 import React, {startTransition} from "react";
-import {FlowType, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
+import {Flow, FlowType, NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {IconArrowsUpDown, IconCornerDownLeft, IconSearch, IconX} from "@tabler/icons-react";
 import {
     Badge,
@@ -37,7 +37,7 @@ import {Tab, TabList, TabTrigger} from "@code0-tech/pictor/dist/components/tab/T
 import {FlowTypeService} from "@edition/flowtype/services/FlowType.service";
 import {ModuleService} from "@edition/module/services/Module.service";
 import {FlowNameInputComponent} from "@edition/flow/components/FlowNameInputComponent";
-import {useParams} from "next/navigation";
+import {useParams, useRouter} from "next/navigation";
 import {ProjectService} from "@edition/project/services/Project.service";
 import {RuntimeService} from "@edition/runtime/services/Runtime.service";
 import {FlowService} from "@edition/flow/services/Flow.service";
@@ -78,6 +78,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
     const {open, onOpenChange, flowTypeId} = props
 
     const params = useParams()
+    const router = useRouter()
     const flowService = useService(FlowService)
     const flowStore = useStore(FlowService)
     const flowTypeService = useService(FlowTypeService)
@@ -184,7 +185,7 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
 
     const initialValues = React.useMemo(
         () => ({name: selectedTemplate ? ensureUniqueFlowName(selectedTemplate.template.name, flows.map(flow => flow.name!).filter(name => !!name)) : null}),
-        [selectedTemplateSlug]
+        [selectedTemplateSlug, open]
     )
 
     const visibleFlowTypes = React.useMemo(
@@ -262,6 +263,12 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
             listArea.current?.querySelector("[data-radix-scroll-area-viewport]")?.scrollTo({top: 0})))
     }, [])
 
+    const openFlow = React.useCallback((flowId?: Flow['id']) => {
+        const flowIndex = flowId?.match(/Flow\/(\d+)$/)?.[1]
+        if (!flowIndex) return
+        router.push(`/namespace/${namespaceIndex}/project/${projectIndex}/flow/${flowIndex}`)
+    }, [router, namespaceIndex, projectIndex])
+
     const createFlow = React.useCallback((name: string, type: FlowType['id']) => {
         if (!type) return
         startTransition(() => {
@@ -279,11 +286,11 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
             }).then(payload => {
                 if ((payload?.errors?.length ?? 0) <= 0) {
                     toast({title: "Created flow", color: "success"})
-
+                    openFlow(payload?.flow?.id)
                 }
             })
         })
-    }, [flowService, selectedFlowType])
+    }, [flowService, selectedFlowType, openFlow])
 
     const createFlowFromTemplate = React.useCallback((name: string) => {
         if (!selectedTemplate) return
@@ -296,12 +303,13 @@ export const FlowCreateDialogComponent: React.FC<FlowCreateDialogComponentProps>
             }).then(result => {
                 if ((result?.errors?.length ?? 0) <= 0) {
                     toast({title: "Created flow from template", color: "success"})
+                    openFlow(result?.flow?.id)
                 } else {
                     toast({title: "Could not create the flow from this template", color: "error"})
                 }
             })
         })
-    }, [flowService, selectedTemplate, flows])
+    }, [flowService, selectedTemplate, flows, openFlow])
 
     React.useEffect(() => {
         if (!open || templates.length > 0) return
